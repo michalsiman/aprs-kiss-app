@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1 – 2026-11-17
+
+- Install with one click: a Flatpak and a `.deb` with every release, besides the tarball.
+- App icon, desktop entry and AppStream metainfo (app id `io.github.michalsiman.aprs_kiss_app`).
+
 ## 0.1.0 – 2026-11-17
 
 First standalone version, for Linux.

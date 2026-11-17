@@ -49,7 +49,20 @@ GitHub theme, and so does the app: it uses the system's light or dark mode.
 </tr>
 </table>
 
-## Install and run (Linux)
+## Install (Linux)
+
+Download from the [latest release](https://github.com/michalsiman/aprs-kiss-app/releases/latest)
+and double-click it; your software centre installs it with one click:
+
+- **`aprs-kiss-…-x86_64.flatpak`**: any distribution with Flatpak (Linux Mint, Fedora, Ubuntu with
+  Flatpak, …). A Flathub listing, with automatic updates, is on the way.
+- **`aprs-kiss_…_amd64.deb`**: Debian, Ubuntu, Linux Mint (22.04 / Debian 12 and newer).
+- **`aprs-kiss-…-linux-x86_64.tar.gz`**: unpack anywhere and run `./aprs-kiss`.
+
+None of them needs Python. For a TNC on a USB serial port your user needs to be in the `dialout`
+group: `sudo usermod -aG dialout $USER`, then log in again.
+
+### With Python
 
 Python 3.10 or newer.
 
@@ -86,10 +99,11 @@ A simulated TNC: stations, a weather report and messages arrive every few second
 your messages, answers chat and runs a small BBS (`OK0BBS`: H, L, B). Point the app at
 `127.0.0.1:8001`.
 
-### A packaged build
+### Packages
 
-`flet build linux` makes a self-contained bundle (no Python needed on the target). The
-*Build Linux app* GitHub workflow does it and attaches a `.tar.gz` to each `v*` release.
+The *Release packages* workflow runs `flet build linux` once and makes the tarball, the `.deb`
+(`packaging/deb/build-deb.sh`) and the Flatpak (`packaging/flatpak/`) from it, attached to each
+`v*` release. The desktop entry, AppStream metainfo and icons are in `packaging/linux/`.
 
 ## How it is built
 
