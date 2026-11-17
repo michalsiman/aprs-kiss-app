@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.7 – 2026-11-17
+
+- 13 more languages, 15 in all: Brazilian Portuguese, Croatian, Czech, Danish, English, French, German, Italian, Norwegian (Bokmål), Serbian (Cyrillic), Slovak, Slovenian, Spanish, Swedish and Ukrainian. The app picks the system language,
+  Settings › App › Language picks another. APRS symbol names stay in English outside Czech.
+- The APRS-IS licence statement can be typed in any of these languages.
+
 ## 0.1.6 – 2026-11-17
 
 - Settings › App › Appearance: as the system, light or dark.

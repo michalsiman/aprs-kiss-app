@@ -22,7 +22,8 @@ and iOS later (see [Platforms](#platforms)).
 - **Packet chat** (plain text to CQ) and a TNC-style **frame monitor**
 - **APRS-IS** (internet) with optional RX and TX iGate
 - Position beacon, status, unproto
-- English and Czech
+- In 15 languages: Brazilian Portuguese, Croatian, Czech, Danish, English, French, German, Italian, Norwegian (Bokmål), Serbian (Cyrillic), Slovak, Slovenian, Spanish, Swedish and Ukrainian; it follows the system language
+  or you pick one in Settings
 - Tells you when a new version is out: asks GitHub at most once a day for the latest release,
   sends nothing about you; can be switched off in Settings
 

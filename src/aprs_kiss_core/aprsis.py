@@ -33,14 +33,19 @@ LICENCE_STATEMENTS = (
 )
 
 
-def licence_confirmed(text: str | None) -> bool:
-    """True when `text` is the licence statement, in Czech or English."""
+def _plain(text: str | None) -> str:
     import unicodedata  # noqa: PLC0415
 
     plain = unicodedata.normalize("NFKD", text or "")
     plain = "".join(c for c in plain if not unicodedata.combining(c))
-    plain = " ".join(plain.lower().split()).rstrip(".!").strip()
-    return plain in LICENCE_STATEMENTS
+    return " ".join(plain.lower().split()).rstrip(".!").strip()
+
+
+def licence_confirmed(text: str | None, also: tuple[str, ...] | list[str] = ()) -> bool:
+    """True when `text` is the licence statement: in Czech or English, or one of `also`
+    (the app passes the sentence in each language it is translated to)."""
+    plain = _plain(text)
+    return bool(plain) and (plain in LICENCE_STATEMENTS or plain in {_plain(s) for s in also})
 
 
 def decode_line(raw: bytes) -> tuple[str, bool]:

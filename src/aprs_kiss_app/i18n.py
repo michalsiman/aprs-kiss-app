@@ -1,7 +1,9 @@
-"""User interface texts in English and Czech."""
+"""User interface texts. English and Czech here; other languages in lang/<code>.py
+(TEXTS, SSIDS, NAME), each falling back to English for anything missing."""
 
 from __future__ import annotations
 
+import importlib
 import locale
 import os
 
@@ -192,16 +194,53 @@ TEXTS: dict[str, dict[str, str]] = {
 }
 
 
+# Code → name in that language, as the language picker lists them.
+LANGUAGES: dict[str, str] = {"cs": "Čeština", "en": "English"}
+SSID_LABELS: dict[str, list[str]] = {}
+EXTRA = ("da", "de", "es", "fr", "hr", "it", "nb", "pt_BR", "sk", "sl", "sr", "sv", "uk")
+for _code in EXTRA:
+    _mod = importlib.import_module(f".lang.{_code}", __package__)
+    TEXTS[_code] = _mod.TEXTS
+    LANGUAGES[_code] = _mod.NAME
+    SSID_LABELS[_code] = _mod.SSIDS
+LANGUAGES = dict(sorted(LANGUAGES.items(), key=lambda kv: kv[1].casefold()))
+
+
+def ssid_labels(language: str) -> list[str]:
+    from .symbols import SSIDS  # noqa: PLC0415
+
+    return SSIDS.get(language) or SSID_LABELS.get(language) or SSIDS["en"]
+
+
+# Other names a system locale uses for the same language.
+_ALIASES = {"pt": "pt_BR", "no": "nb", "nn": "nb"}
+
+
+def match_language(value: str) -> str | None:
+    """'de_AT.UTF-8' → 'de', 'pt_PT' → 'pt_BR', 'sr_RS@latin' → 'sr'; None when not translated."""
+    value = (value or "").split(":")[0].split(".")[0].split("@")[0].replace("-", "_")
+    if not value or value in ("C", "POSIX"):
+        return None
+    if value in TEXTS:
+        return value
+    base = value.split("_")[0].lower()
+    if base in TEXTS:
+        return base
+    return _ALIASES.get(base)
+
+
 def system_language() -> str:
     for var in ("LC_ALL", "LC_MESSAGES", "LANG", "LANGUAGE"):
         value = os.environ.get(var, "")
         if value:
-            return "cs" if value.lower().startswith(("cs", "sk")) else "en"
+            return match_language(value) or "en"
     try:
         lang = locale.getlocale()[0] or ""
     except ValueError:
         lang = ""
-    return "cs" if lang.lower().startswith(("cs", "sk", "czech")) else "en"
+    if lang.lower().startswith("czech"):
+        return "cs"
+    return match_language(lang) or "en"
 
 
 class Translator:

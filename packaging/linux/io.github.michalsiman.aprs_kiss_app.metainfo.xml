@@ -25,6 +25,7 @@
       <li>Packet terminal for BBSes and nodes (AX.25 connected mode)</li>
       <li>Packet chat and a TNC-style frame monitor</li>
       <li>APRS-IS with an optional iGate</li>
+      <li>In 15 languages</li>
     </ul>
     <p>
       Transmitting is off until you switch it on; it is for licensed radio amateurs only.
@@ -110,6 +111,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.7" date="2026-11-17">
+      <description>
+        <p>Thirteen more languages: Danish, German, Spanish, French, Croatian, Italian, Norwegian, Brazilian Portuguese, Slovak, Slovenian, Serbian, Swedish and Ukrainian.</p>
+      </description>
+    </release>
     <release version="0.1.6" date="2026-11-17">
       <description>
         <p>Choose light, dark or the system's appearance; better detection of a dark desktop.</p>

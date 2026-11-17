@@ -11,7 +11,8 @@ import flet as ft
 from aprs_kiss_core.aprsis import licence_confirmed
 from aprs_kiss_core.config import Config
 
-from ..symbols import SSIDS, SYMBOLS
+from ..i18n import LANGUAGES, TEXTS, ssid_labels
+from ..symbols import SYMBOLS
 from .base import View
 
 BAUDRATES = ["1200", "4800", "9600", "19200", "38400", "57600", "115200"]
@@ -97,7 +98,7 @@ class SettingsView(View):
                                  capitalization=ft.TextCapitalization.CHARACTERS)
         self.ssid = ft.Dropdown(label=t("ssid"), value=ssid or "0", width=330,
                                 options=[ft.DropdownOption(key=str(i), text=label)
-                                         for i, label in enumerate(SSIDS[t.language])])
+                                         for i, label in enumerate(ssid_labels(t.language))])
         lang_index = 3 if t.language == "cs" else 2
         symbols = [ft.DropdownOption(key=s[0], text=f"{s[1]}  {s[lang_index]} ({s[0]})") for s in SYMBOLS]
         if not any(s[0] == c.symbol for s in SYMBOLS):
@@ -138,8 +139,8 @@ class SettingsView(View):
                                  on_select=lambda e: self.app.set_theme(e.control.value or "auto"))
         self.language = ft.Dropdown(label=t("language"), value=c.language or "", width=240,
                                     options=[ft.DropdownOption(key="", text=t("lang_auto")),
-                                             ft.DropdownOption(key="cs", text="Čeština"),
-                                             ft.DropdownOption(key="en", text="English")])
+                                             *[ft.DropdownOption(key=code, text=name)
+                                               for code, name in LANGUAGES.items()]])
 
         self.error = ft.Text(color=ft.Colors.ERROR)
         self.intro = ft.Text(t("first_run"), color=ft.Colors.PRIMARY, visible=not c.configured)
@@ -244,7 +245,8 @@ class SettingsView(View):
                         raise ValueError(self.t(key)) from None
             if data["aprsis_enabled"] and not old.aprsis_on:
                 # Switching APRS-IS on needs the licence statement typed out.
-                if not licence_confirmed(self.licence.value):
+                statements = [texts["licence_text"] for texts in TEXTS.values() if "licence_text" in texts]
+                if not licence_confirmed(self.licence.value, statements):
                     raise ValueError(self.t("licence_required"))
                 data["licence_confirmed"] = True
             conf = Config.from_dict(data).validate()
