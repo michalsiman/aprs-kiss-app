@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.6 – 2026-11-17
+
+- Settings › App › Appearance: as the system, light or dark.
+- "As the system" now also sees a dark desktop that only says so through its theme (Linux Mint's
+  dark themes and the like leave the light/dark preference unset), and follows changes within 30 s.
+
 ## 0.1.5 – 2026-11-17
 
 - Own Flatpak repository with automatic updates:

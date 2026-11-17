@@ -12,6 +12,8 @@ from typing import Any
 import flet as ft
 
 from aprs_kiss_core.config import VERSION, Config, data_dir, load_config, save_config
+
+from . import theme
 from aprs_kiss_core.engine import Engine, TransmitRefused
 
 from .about import show_about
@@ -32,6 +34,7 @@ _LOGGER = logging.getLogger(__name__)
 VIEWS = [MapView, MessagesView, StationsView, TerminalView, ChatView, MonitorView, SettingsView]
 FLUSH_DELAY = 0.25
 TICK_SECONDS = 5.0
+THEME_EVERY = 6  # ticks: the desktop theme is looked at every 30 s
 
 
 class App:
@@ -44,6 +47,7 @@ class App:
         self._flush_pending = False
         self._closing = False
         self.update_state = updates.UpdateState()
+        self._desktop_dark: bool | None = None
 
     # ─── start and stop ───────────────────────────────────────────────────
 
@@ -64,6 +68,7 @@ class App:
         self.engine = Engine(config, self.folder)
         self.engine.add_listener(self._on_event)
         await self.engine.start()
+        await self.apply_theme()
         self.build()
         if not config.configured:
             self.select("settings")
@@ -252,10 +257,28 @@ class App:
         self.page.update()
 
     async def _tick(self) -> None:
-        """Ages, map markers skipped by the rate limit and the like."""
+        """Ages, map markers skipped by the rate limit and the like; on "auto", a changed desktop theme."""
+        n = 0
         while not self._closing:
             await asyncio.sleep(TICK_SECONDS)
+            n += 1
+            if n % THEME_EVERY == 0 and self.engine.config.theme == "auto":
+                await self.apply_theme()
             self.refresh_now()
+
+    async def apply_theme(self) -> None:
+        if self.engine.config.theme == "auto":
+            self._desktop_dark = await asyncio.to_thread(theme.desktop_prefers_dark)
+        mode = theme.theme_mode(self.engine.config.theme, self._desktop_dark)
+        if mode != self.page.theme_mode:
+            self.page.theme_mode = mode
+            self.page.update()
+
+    def set_theme(self, choice: str) -> None:
+        """From Settings: applied at once and saved."""
+        self.engine.config.theme = choice if choice in theme.MODES else "auto"
+        self.page.run_task(asyncio.to_thread, save_config, self.engine.config, self.folder)
+        self.page.run_task(self.apply_theme)
 
     def _update_status(self) -> None:
         st = self.engine.status()

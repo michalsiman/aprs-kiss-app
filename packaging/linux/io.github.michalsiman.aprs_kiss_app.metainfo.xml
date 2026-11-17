@@ -110,6 +110,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.6" date="2026-11-17">
+      <description>
+        <p>Choose light, dark or the system's appearance; better detection of a dark desktop.</p>
+      </description>
+    </release>
     <release version="0.1.5" date="2026-11-17">
       <description>
         <p>Own Flatpak repository with automatic updates. Right-click the map to set your position. More compact settings.</p>
