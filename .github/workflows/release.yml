@@ -45,9 +45,8 @@ jobs:
   flatpak:
     needs: linux
     runs-on: ubuntu-24.04
-    container:
-      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-50
-      options: --privileged
+    env:
+      ID: io.github.michalsiman.aprs_kiss_app
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -55,12 +54,19 @@ jobs:
           name: linux
           path: dist
       - run: cp dist/aprs-kiss-*-linux-x86_64.tar.gz dist/aprs-kiss-linux-x86_64.tar.gz
-      - uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
+      - name: flatpak-builder
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y flatpak flatpak-builder
+          flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+          flatpak-builder --user --install-deps-from=flathub --disable-rofiles-fuse --force-clean \
+            --repo=repo build-dir packaging/flatpak/$ID.yml
+          flatpak build-bundle --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo \
+            repo "aprs-kiss-${{ needs.linux.outputs.version }}-x86_64.flatpak" $ID
+      - uses: actions/upload-artifact@v4
         with:
-          bundle: aprs-kiss-${{ needs.linux.outputs.version }}-x86_64.flatpak
-          manifest-path: packaging/flatpak/io.github.michalsiman.aprs_kiss_app.yml
-          cache-key: flatpak-builder-${{ github.sha }}
-          upload-artifact: true
+          name: flatpak
+          path: "*.flatpak"
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -76,4 +82,4 @@ jobs:
           files: |
             out/linux/*.tar.gz
             out/linux/*.deb
-            out/**/*.flatpak
+            out/flatpak/*.flatpak
