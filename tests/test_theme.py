@@ -2,12 +2,17 @@ import pathlib
 import sys
 import unittest
 
-import flet as ft
+try:
+    import flet as ft
+except ImportError:  # the CI test run installs the core only
+    ft = None
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "src"))
-from aprs_kiss_app.theme import parse_color_scheme, theme_is_dark, theme_mode  # noqa: E402
+if ft is not None:
+    from aprs_kiss_app.theme import parse_color_scheme, theme_is_dark, theme_mode  # noqa: E402
 
 
+@unittest.skipIf(ft is None, "needs flet")
 class ThemeTest(unittest.TestCase):
     def test_portal_color_scheme(self):
         self.assertIs(parse_color_scheme("(<uint32 1>,)\n"), True)

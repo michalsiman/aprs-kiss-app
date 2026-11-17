@@ -28,7 +28,9 @@ def serial_ports() -> list[tuple[str, str]]:
 
         for p in list_ports.comports():
             if not any(os.path.realpath(d) == p.device for d, _ in ports):
-                ports.append((p.device, f"{p.device} – {p.description}"))
+                # Windows repeats the port in the description: "USB-SERIAL CH340 (COM5)"
+                desc = (p.description or "").replace(f"({p.device})", "").strip()
+                ports.append((p.device, f"{p.device} – {desc}" if desc and desc != "n/a" else p.device))
     except ImportError:
         pass
     return ports
