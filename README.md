@@ -59,10 +59,11 @@ GitHub theme, and so does the app: it uses the system's light or dark mode.
 *Install*, or run
 
 ```bash
-flatpak install --user https://michalsiman.github.io/aprs-kiss-app/aprs-kiss.flatpakref
+flatpak install https://michalsiman.github.io/aprs-kiss-app/aprs-kiss.flatpakref
 ```
 
-It works on any distribution with Flatpak (Linux Mint, Fedora, Ubuntu with Flatpak, …). New versions
+(Without `--user`: Linux Mint's Update Manager and Software Manager only see the system-wide
+installation, so that is where the updates show up.) It works on any distribution with Flatpak (Linux Mint, Fedora, Ubuntu with Flatpak, …). New versions
 then come with your other updates, from our own signed Flatpak repository
 (key fingerprint `0E31 685C C5D6 4B8C 7837  B62F 66ED ABD8 50DC 14BD`).
 
