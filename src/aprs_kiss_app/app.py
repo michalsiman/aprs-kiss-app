@@ -16,7 +16,7 @@ from aprs_kiss_core.engine import Engine, TransmitRefused
 
 from .about import show_about
 from .i18n import Translator
-from .symbols import emoji
+from .symbols import symbol_info
 from .views.base import View, clock
 from .views.chat import ChatView
 from .views.map import MapView
@@ -232,6 +232,14 @@ class App:
 
     # ─── helpers for the views ────────────────────────────────────────────
 
+    def set_show_internet(self, value: bool) -> None:
+        """Map and station list share this choice; it is saved, the connection is not restarted."""
+        self.engine.config.show_internet = value
+        self.page.run_task(asyncio.to_thread, save_config, self.engine.config, self.folder)
+        for key in ("map", "stations"):
+            self.view(key).force()
+        self.refresh_now()
+
     def tracked(self) -> set[str]:
         return {c.strip().upper() for c in self.engine.config.tracked_callsigns.replace(" ", ",").split(",")
                 if c.strip()}
@@ -282,7 +290,12 @@ class App:
         entry = self.engine.station.heard.get(call)
         if not entry:
             return
+        pic, symbol_name, _known = symbol_info(entry.get("symbol_table"), entry.get("symbol"), self.t.language)
         rows: list[ft.Control] = [ft.Text(describe(self, entry))]
+        if symbol_name:
+            rows.append(ft.Text(f"{self.t('symbol')}: {symbol_name} "
+                                f"({entry.get('symbol_table') or '/'}{entry.get('symbol') or ''})",
+                                size=12, color=ft.Colors.ON_SURFACE_VARIANT))
         now = time.time()
         rows.append(ft.Text(f"{self.t('last_heard')}: {clock(entry['last_heard'])} ({self.t.age(now - entry['last_heard'])})"))
         weather = entry.get("weather")
@@ -322,8 +335,8 @@ class App:
             actions.insert(0, ft.TextButton(self.t("show_on_map"), icon=ft.Icons.MAP, on_click=on_map))
         actions.append(ft.TextButton(self.t("close"), on_click=lambda _e: self.page.pop_dialog()))
         self.page.show_dialog(ft.AlertDialog(
-            title=ft.Text(f"{emoji(entry.get('symbol_table'), entry.get('symbol'))}  {call}"),
-            content=ft.Column(rows, tight=True, spacing=6, width=420, scroll=ft.ScrollMode.AUTO),
+            title=ft.Text(f"{pic}  {call}"),
+            content=ft.Column(rows, tight=True, spacing=6, width=420),
             actions=actions,
         ))
 

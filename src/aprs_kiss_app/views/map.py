@@ -7,6 +7,7 @@ import time
 import flet as ft
 import flet_map as fm
 
+from ..legend import COLOR_ME, internet_checkbox, show_legend, station_color, visible
 from ..symbols import emoji
 from .base import View
 
@@ -39,18 +40,23 @@ class MapView(View):
                 fm.SimpleAttribution(text="© OpenStreetMap contributors", alignment=ft.Alignment.BOTTOM_RIGHT),
             ],
         )
-        self.only_recent = ft.Checkbox(label="< 2 h", value=False, on_change=lambda _e: self._force())
+        self.only_recent = ft.Checkbox(label=self.t("last_2h"), value=False, on_change=lambda _e: self.force())
+        self.internet = internet_checkbox(self.app)
         overlay = ft.Container(
             ft.Row([
                 ft.IconButton(ft.Icons.MY_LOCATION, tooltip=self.t("centre_me"), on_click=self._centre_me),
+                self.internet,
                 self.only_recent,
-            ], tight=True),
+                ft.TextButton(self.t("legend"), icon=ft.Icons.HELP_OUTLINE,
+                              on_click=lambda _e: show_legend(self.app)),
+            ], tight=True, wrap=True),
             bgcolor=ft.Colors.with_opacity(0.85, ft.Colors.SURFACE),
             border_radius=8, padding=ft.Padding.symmetric(horizontal=4), left=8, top=8,
         )
         return ft.Stack([self.map, overlay], expand=True)
 
-    def _force(self) -> None:
+    def force(self) -> None:
+        self.internet.value = self.engine.config.show_internet
         self._signature = None
         self._last_build = 0
         self.refresh()
@@ -86,7 +92,6 @@ class MapView(View):
             return
         self._signature = signature
         self._last_build = now
-        tracked = self.app.tracked()
         markers = []
         conf = self.engine.config
         recent = 7200 if self.only_recent.value else None
@@ -95,16 +100,16 @@ class MapView(View):
                 continue
             if recent and now - e["last_heard"] > recent:
                 continue
+            if not visible(self.app, e):
+                continue
             call = e["call"]
-            color = ft.Colors.ORANGE if call.upper() in tracked else (
-                ft.Colors.BLUE if e.get("last_rf") else ft.Colors.BLUE_GREY)
             markers.append(self._marker(e["latitude"], e["longitude"], call,
-                                        emoji(e.get("symbol_table"), e.get("symbol")), color,
+                                        emoji(e.get("symbol_table"), e.get("symbol")), station_color(self.app, e),
                                         on_click=lambda _e, c=call: self.app.show_station(c),
                                         bold=bool(e.get("last_rf"))))
         if conf.has_position:
             markers.append(self._marker(conf.latitude, conf.longitude, self.engine.status()["callsign"] or self.t("my_position"),
-                                        emoji(conf.symbol[:1], conf.symbol[1:]), ft.Colors.RED, bold=True))
+                                        emoji(conf.symbol[:1], conf.symbol[1:]), COLOR_ME, bold=True))
         self.markers.markers = markers
 
     async def centre(self, lat: float, lon: float, zoom: float = 12) -> None:

@@ -19,7 +19,7 @@ from .ax25 import Address
 _LOGGER = logging.getLogger(__name__)
 
 APP_NAME = "aprs-kiss"
-VERSION = "0.1.1"
+VERSION = "0.1.2"
 MIN_BEACON_MINUTES = 10
 
 
@@ -56,6 +56,7 @@ class Config:
     igate_tx: bool = False
     # App
     language: str = ""  # "", "cs" or "en"; empty = from the system
+    show_internet: bool = True  # map and station list also show stations seen only on APRS-IS
 
     @property
     def configured(self) -> bool:

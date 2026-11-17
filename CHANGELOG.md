@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.2 – 2026-11-17
+
+- Legend for the map and the station list: what the callsign colours mean (heard by the radio,
+  internet only, tracked, you) and which symbols are shown, with their names.
+- The whole APRS symbol set with names in English and Czech, including LoRa iGates and
+  digipeaters; 📍 is left only for symbols that are not in the table.
+- "Stations from the internet" on the map and in the station list (one shared, saved choice).
+- The station list says "radio" / "internet" and the symbol's name; the station window shows the
+  symbol's name and code.
+
 ## 0.1.1 – 2026-11-17
 
 - Install with one click: a Flatpak and a `.deb` with every release, besides the tarball.

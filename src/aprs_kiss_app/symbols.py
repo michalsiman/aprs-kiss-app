@@ -34,7 +34,196 @@ SYMBOLS: list[tuple[str, str, str, str]] = [
     ('/$', '☎️', 'Phone', 'Telefon'),
 ]
 
-_EMOJI = {s: e for s, e, _, _ in SYMBOLS}
+# The whole APRS symbol set (APRS 1.2 symbol tables): primary "/x", alternate "\x", and the
+# overlaid alternate symbols with their own meaning ("I&" iGate, "L#" LoRa digi, ...).
+# symbol: (emoji, English, Czech)
+ALL: dict[str, tuple[str, str, str]] = {
+    # primary table
+    "/!": ("🚓", "Police station", "Policie"),
+    "/#": ("🔁", "Digipeater", "Digipeater"),
+    "/$": ("☎️", "Phone", "Telefon"),
+    "/%": ("📊", "DX cluster", "DX cluster"),
+    "/&": ("🌐", "HF gateway", "HF brána"),
+    "/'": ("✈️", "Small aircraft", "Malé letadlo"),
+    "/(": ("🛰️", "Mobile satellite station", "Mobilní satelitní stanice"),
+    "/)": ("♿", "Wheelchair", "Vozíčkář"),
+    "/*": ("🛷", "Snowmobile", "Sněžný skútr"),
+    "/+": ("➕", "Red Cross", "Červený kříž"),
+    "/,": ("⚜️", "Boy Scouts", "Skauti"),
+    "/-": ("🏠", "House", "Dům"),
+    "/.": ("❌", "X", "Křížek"),
+    "//": ("🔴", "Red dot", "Červená tečka"),
+    "/:": ("🔥", "Fire", "Požár"),
+    "/;": ("⛺", "Campground, portable", "Kemp, portable"),
+    "/<": ("🏍️", "Motorcycle", "Motorka"),
+    "/=": ("🚂", "Railroad engine", "Lokomotiva"),
+    "/>": ("🚗", "Car", "Auto"),
+    "/?": ("🗄️", "File server", "Souborový server"),
+    "/@": ("🌀", "Hurricane forecast", "Předpověď hurikánu"),
+    "/A": ("⛑️", "Aid station", "Stanoviště první pomoci"),
+    "/B": ("📋", "BBS", "BBS"),
+    "/C": ("🛶", "Canoe", "Kánoe"),
+    "/E": ("👁️", "Eyeball (event)", "Akce, pozorování"),
+    "/F": ("🚜", "Farm vehicle", "Traktor"),
+    "/G": ("🗺️", "Grid square", "Čtverec lokátoru"),
+    "/H": ("🏨", "Hotel", "Hotel"),
+    "/I": ("💻", "TCP/IP", "TCP/IP"),
+    "/K": ("🏫", "School", "Škola"),
+    "/L": ("💻", "PC user", "Uživatel PC"),
+    "/M": ("🍎", "MacAPRS", "MacAPRS"),
+    "/N": ("📨", "NTS station", "Stanice NTS"),
+    "/O": ("🎈", "Balloon", "Balón"),
+    "/P": ("🚓", "Police", "Policie"),
+    "/R": ("🚐", "Recreational vehicle", "Obytný vůz"),
+    "/S": ("🚀", "Space shuttle", "Raketoplán"),
+    "/T": ("📺", "SSTV", "SSTV"),
+    "/U": ("🚌", "Bus", "Autobus"),
+    "/V": ("📺", "ATV", "ATV"),
+    "/W": ("🌩️", "Weather service site", "Meteorologická služba"),
+    "/X": ("🚁", "Helicopter", "Vrtulník"),
+    "/Y": ("⛵", "Yacht (sail)", "Plachetnice"),
+    "/Z": ("🪟", "WinAPRS", "WinAPRS"),
+    "/[": ("🚶", "Person (jogger)", "Osoba (chodec)"),
+    "/\\": ("🔺", "DF station", "Zaměřovací stanice"),
+    "/]": ("📮", "Post office", "Pošta"),
+    "/^": ("✈️", "Large aircraft", "Velké letadlo"),
+    "/_": ("🌦️", "Weather station", "Meteostanice"),
+    "/`": ("📡", "Dish antenna", "Parabola"),
+    "/a": ("🚑", "Ambulance", "Sanitka"),
+    "/b": ("🚲", "Bicycle", "Kolo"),
+    "/c": ("🏕️", "Incident command post", "Velitelské stanoviště"),
+    "/d": ("🚒", "Fire station", "Hasičská stanice"),
+    "/e": ("🐎", "Horse", "Kůň"),
+    "/f": ("🚒", "Fire truck", "Hasiči"),
+    "/g": ("🪂", "Glider", "Kluzák"),
+    "/h": ("🏥", "Hospital", "Nemocnice"),
+    "/i": ("🏝️", "Island (IOTA)", "Ostrov (IOTA)"),
+    "/j": ("🚙", "Jeep", "Terénní auto"),
+    "/k": ("🛻", "Pickup truck", "Pick-up"),
+    "/l": ("💻", "Laptop", "Notebook"),
+    "/m": ("🗼", "Mic-E repeater", "Převaděč Mic-E"),
+    "/n": ("🎯", "Node", "Nod"),
+    "/o": ("🏢", "EOC (emergency centre)", "Krizové centrum"),
+    "/p": ("🐕", "Rover (dog)", "Pes"),
+    "/q": ("🗺️", "Grid square", "Čtverec lokátoru"),
+    "/r": ("🗼", "Antenna, repeater", "Anténa, převaděč"),
+    "/s": ("🚤", "Ship, power boat", "Loď (motorová)"),
+    "/t": ("⛽", "Truck stop", "Odpočívadlo pro kamiony"),
+    "/u": ("🚚", "Truck (18-wheeler)", "Kamion"),
+    "/v": ("🚐", "Van", "Dodávka"),
+    "/w": ("💧", "Water station", "Vodárna"),
+    "/x": ("🐧", "Unix (xAPRS)", "Unix (xAPRS)"),
+    "/y": ("📡", "House with yagi", "Dům s anténou"),
+    # alternate table
+    "\\!": ("🆘", "Emergency", "Nouze"),
+    "\\#": ("🔁", "Digipeater (overlay)", "Digipeater"),
+    "\\$": ("🏧", "Bank, ATM", "Banka, bankomat"),
+    "\\&": ("🌐", "Gateway", "Brána"),
+    "\\'": ("💥", "Crash site", "Místo nehody"),
+    "\\(": ("☁️", "Cloudy", "Oblačno"),
+    "\\*": ("❄️", "Snow", "Sníh"),
+    "\\+": ("⛪", "Church", "Kostel"),
+    "\\,": ("⚜️", "Girl Scouts", "Skautky"),
+    "\\-": ("🏡", "House (HF)", "Dům (KV)"),
+    "\\.": ("❓", "Unknown position", "Nejistá poloha"),
+    "\\/": ("🏁", "Destination", "Cíl"),
+    "\\0": ("⭕", "Circle (IRLP, EchoLink, WIRES)", "Kruh (IRLP, EchoLink, WIRES)"),
+    "\\8": ("📶", "Wi-Fi network node", "Uzel Wi-Fi sítě"),
+    "\\9": ("⛽", "Gas station", "Čerpací stanice"),
+    "\\:": ("🌨️", "Hail", "Kroupy"),
+    "\\;": ("🌳", "Park, picnic", "Park, piknik"),
+    "\\<": ("🚩", "Advisory", "Výstraha"),
+    "\\>": ("🚗", "Car (overlay)", "Auto"),
+    "\\?": ("ℹ️", "Info kiosk", "Informace"),
+    "\\@": ("🌀", "Hurricane", "Hurikán"),
+    "\\A": ("📦", "Box (DTMF, RFID)", "Box (DTMF, RFID)"),
+    "\\B": ("🌬️", "Blowing snow", "Zvířený sníh"),
+    "\\C": ("⚓", "Coast guard", "Pobřežní stráž"),
+    "\\D": ("🌦️", "Drizzle", "Mrholení"),
+    "\\E": ("💨", "Smoke", "Kouř"),
+    "\\F": ("🧊", "Freezing rain", "Mrznoucí déšť"),
+    "\\G": ("🌨️", "Snow shower", "Sněhová přeháňka"),
+    "\\H": ("🌫️", "Haze", "Opar"),
+    "\\I": ("🌧️", "Rain shower", "Přeháňka"),
+    "\\J": ("⚡", "Lightning", "Blesky"),
+    "\\K": ("📻", "Kenwood radio", "Rádio Kenwood"),
+    "\\L": ("🗼", "Lighthouse", "Maják"),
+    "\\M": ("🎖️", "MARS", "MARS"),
+    "\\N": ("🛟", "Navigation buoy", "Bóje"),
+    "\\O": ("🚀", "Rocket", "Raketa"),
+    "\\P": ("🅿️", "Parking", "Parkoviště"),
+    "\\Q": ("🌋", "Earthquake", "Zemětřesení"),
+    "\\R": ("🍴", "Restaurant", "Restaurace"),
+    "\\S": ("🛰️", "Satellite", "Satelit"),
+    "\\T": ("⛈️", "Thunderstorm", "Bouřka"),
+    "\\U": ("☀️", "Sunny", "Slunečno"),
+    "\\V": ("🧭", "VORTAC", "VORTAC"),
+    "\\W": ("🌩️", "Weather service site", "Meteorologická služba"),
+    "\\X": ("💊", "Pharmacy", "Lékárna"),
+    "\\Y": ("📻", "Radios and devices", "Rádia a zařízení"),
+    "\\[": ("🌪️", "Wall cloud", "Bouřkový oblak"),
+    "\\^": ("✈️", "Aircraft (overlay)", "Letadlo"),
+    "\\_": ("🌦️", "Weather site", "Meteostanice"),
+    "\\`": ("🌧️", "Rain", "Déšť"),
+    "\\a": ("🔶", "ARES, WinLink", "ARES, WinLink"),
+    "\\b": ("🏜️", "Blowing dust, sand", "Prach, písek"),
+    "\\c": ("🛡️", "Civil defence", "Civilní ochrana"),
+    "\\d": ("🎯", "DX spot", "DX spot"),
+    "\\e": ("🌨️", "Sleet", "Plískanice"),
+    "\\f": ("🌪️", "Funnel cloud", "Nálevkovitý oblak"),
+    "\\g": ("🚩", "Gale flags", "Vichřice"),
+    "\\h": ("🏪", "Store", "Obchod"),
+    "\\i": ("📌", "Point of interest", "Zajímavé místo"),
+    "\\j": ("🚧", "Work zone", "Stavba"),
+    "\\k": ("🚙", "SUV, ATV", "SUV, čtyřkolka"),
+    "\\l": ("📍", "Area location", "Oblast"),
+    "\\m": ("🪧", "Milepost", "Milník"),
+    "\\n": ("🔺", "Triangle", "Trojúhelník"),
+    "\\o": ("⚪", "Small circle", "Kroužek"),
+    "\\p": ("⛅", "Partly cloudy", "Polojasno"),
+    "\\r": ("🚻", "Restrooms", "Toalety"),
+    "\\s": ("🚤", "Boat (overlay)", "Loď"),
+    "\\t": ("🌪️", "Tornado", "Tornádo"),
+    "\\u": ("🚚", "Truck (overlay)", "Nákladní auto"),
+    "\\v": ("🚐", "Van (overlay)", "Dodávka"),
+    "\\w": ("🌊", "Flooding", "Povodeň"),
+    "\\y": ("🌩️", "Skywarn", "Skywarn"),
+    "\\z": ("🏚️", "Shelter", "Úkryt"),
+    "\\{": ("🌫️", "Fog", "Mlha"),
+    # overlaid alternate symbols with a meaning of their own
+    "I&": ("🌐", "iGate (RX and TX)", "iGate (RX i TX)"),
+    "R&": ("📥", "iGate, receive only", "iGate jen příjem"),
+    "T&": ("📤", "iGate, transmit", "iGate s vysíláním"),
+    "L&": ("🌐", "LoRa iGate", "LoRa iGate"),
+    "L#": ("🔁", "LoRa digipeater", "LoRa digipeater"),
+    "1#": ("🔁", "Digipeater (WIDE1)", "Digipeater (WIDE1)"),
+    "S#": ("🔁", "Digipeater (SSn-N)", "Digipeater (SSn-N)"),
+    "D&": ("🌐", "D-STAR gateway", "Brána D-STAR"),
+    "W0": ("⭕", "WIRES-X node", "Nod WIRES-X"),
+    "E0": ("⭕", "EchoLink node", "Nod EchoLink"),
+    "I0": ("⭕", "IRLP node", "Nod IRLP"),
+}
+
+UNKNOWN = "📍"
+
+
+
+def symbol_info(table: str | None, code: str | None, language: str = "en") -> tuple[str, str, bool]:
+    """(emoji, name, known) of a station's symbol. An overlay character on the alternate table keeps
+    the alternate symbol's picture unless the combination has a meaning of its own (I&, L#, ...)."""
+    if not code:
+        return UNKNOWN, "", False
+    table = table or "/"
+    cs = language == "cs"
+    found = ALL.get(table + code)
+    if found is None and table not in "/\\":
+        base = ALL.get("\\" + code)
+        if base:
+            name = f"{base[2] if cs else base[1]} ({'overlay' if not cs else 'překryv'} {table})"
+            return base[0], name, True
+    if found is None:
+        return UNKNOWN, f"{table}{code}", False
+    return found[0], found[2] if cs else found[1], True
 
 # SSID conventions (APRS SSID recommendations by Bob Bruninga, WB4APR).
 SSIDS = {
@@ -44,10 +233,5 @@ SSIDS = {
 
 
 def emoji(table: str | None, code: str | None) -> str:
-    """An emoji for a station's symbol; overlay tables fall back to the alternate table's symbol."""
-    if not code:
-        return "📍"
-    table = table or "/"
-    if table not in "/\\":
-        return _EMOJI.get(table + code) or _EMOJI.get("\\" + code) or "📍"
-    return _EMOJI.get(table + code, "📍")
+    """An emoji for a station's symbol."""
+    return symbol_info(table, code)[0]

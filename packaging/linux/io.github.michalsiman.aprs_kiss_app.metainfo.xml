@@ -110,6 +110,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.2" date="2026-11-17">
+      <description>
+        <p>A legend for the map and the station list, names for all APRS symbols, and a choice to show stations seen only on the internet.</p>
+      </description>
+    </release>
     <release version="0.1.1" date="2026-11-17">
       <description>
         <p>Packaged for installing from a software centre: Flatpak and Debian packages, an app icon. An About window with links to the source, the F4HWN firmware and the author.</p>
