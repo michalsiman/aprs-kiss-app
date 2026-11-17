@@ -112,7 +112,7 @@
   <releases>
     <release version="0.1.1" date="2026-11-17">
       <description>
-        <p>Packaged for installing from a software centre: Flatpak and Debian packages, an app icon.</p>
+        <p>Packaged for installing from a software centre: Flatpak and Debian packages, an app icon. An About window with links to the source, the F4HWN firmware and the author.</p>
       </description>
     </release>
     <release version="0.1.0" date="2026-11-17">

@@ -57,6 +57,22 @@ TEXTS: dict[str, dict[str, str]] = {
         "first_run": "Welcome! Set your callsign and how to reach the TNC, then press Save.",
         "aprsis_state": "APRS-IS", "verified": "logged in", "unverified": "connected, not verified (check the passcode)",
         "invalid": "Invalid setting",
+        "about": "About", "about_version": "Version {version}",
+        "about_what": "An APRS station and packet radio terminal for a radio with a KISS TNC: a map of the "
+                      "stations heard, APRS messages with acknowledgement, a terminal for BBSes and nodes, "
+                      "packet chat, a frame monitor and APRS-IS with an optional iGate.",
+        "about_radio": "Made for the Quansheng UV-K1/UV-K5 V3 with the F4HWN firmware and its KISS TNC app; "
+                       "any KISS TNC works (Direwolf, a hardware TNC, a radio on USB or on the network).",
+        "about_source": "Source code and documentation (GitHub)", "about_issues": "Report a problem or an idea",
+        "about_releases": "New versions", "about_firmware": "F4HWN firmware for Quansheng UV-K1/K5 V3",
+        "about_kiss_app": "KISS TNC app for the F4HWN firmware (by F4WAT)",
+        "about_ha": "The same as a Home Assistant integration",
+        "about_author": "Author",
+        "about_contact": "Questions and feedback: GitHub issues, or through ok1sim.cz.",
+        "about_together": "Written together with Claude Code (Anthropic).",
+        "about_licence": "MIT licence. Map data © OpenStreetMap contributors. APRS parsing by aprslib. "
+                         "F4HWN firmware by Armel F4HWN, KISS TNC app by F4WAT.",
+        "about_data": "Settings and history",
     },
     "cs": {
         "app_title": "APRS & Packet",
@@ -108,6 +124,22 @@ TEXTS: dict[str, dict[str, str]] = {
         "first_run": "Vítej! Nastav svou značku a připojení k TNC a klikni na Uložit.",
         "aprsis_state": "APRS-IS", "verified": "přihlášeno", "unverified": "připojeno, neověřeno (zkontroluj passcode)",
         "invalid": "Neplatné nastavení",
+        "about": "O aplikaci", "about_version": "Verze {version}",
+        "about_what": "APRS stanice a packet radio terminál pro rádio s KISS TNC: mapa slyšených stanic, "
+                      "APRS zprávy s potvrzením, terminál pro BBS a nody, packet chat, monitor rámců "
+                      "a APRS-IS s volitelnou iGate.",
+        "about_radio": "Dělané pro Quansheng UV-K1/UV-K5 V3 s firmwarem F4HWN a jeho aplikací KISS TNC; "
+                       "funguje s jakýmkoli KISS TNC (Direwolf, hardwarové TNC, rádio na USB nebo v síti).",
+        "about_source": "Zdrojový kód a návod (GitHub)", "about_issues": "Nahlásit chybu nebo nápad",
+        "about_releases": "Nové verze", "about_firmware": "Firmware F4HWN pro Quansheng UV-K1/K5 V3",
+        "about_kiss_app": "Aplikace KISS TNC pro firmware F4HWN (od F4WAT)",
+        "about_ha": "Totéž jako integrace pro Home Assistant",
+        "about_author": "Autor",
+        "about_contact": "Dotazy a připomínky: GitHub issues nebo přes ok1sim.cz.",
+        "about_together": "Napsáno společně s Claude Code (Anthropic).",
+        "about_licence": "Licence MIT. Mapová data © přispěvatelé OpenStreetMap. Parsování APRS: aprslib. "
+                         "Firmware F4HWN: Armel F4HWN, aplikace KISS TNC: F4WAT.",
+        "about_data": "Nastavení a historie",
     },
 }
 

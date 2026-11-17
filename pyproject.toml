@@ -33,6 +33,9 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+aprs_kiss_app = ["icon.png"]
+
 # ─── flet build (Linux now; Windows, macOS, Android, iOS from the same code) ───
 [tool.flet]
 org = "io.github.michalsiman"

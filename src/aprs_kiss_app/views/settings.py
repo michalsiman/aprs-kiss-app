@@ -125,7 +125,9 @@ class SettingsView(View):
                          ft.Text(t("position_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
                          self.beacon, self.beacon_is, self.tracked, self.incoming),
                 _section(t("aprsis"), self.aprsis, self.licence, self.is_fields, self.is_state),
-                _section(t("app_section"), self.language),
+                _section(t("app_section"), self.language,
+                         ft.Row([ft.OutlinedButton(t("about"), icon=ft.Icons.INFO_OUTLINE,
+                                                   on_click=lambda _e: self._about())])),
                 self.error,
                 ft.Row([ft.FilledButton(t("save"), icon=ft.Icons.SAVE, on_click=self._save)]),
                 ft.Container(height=24),
@@ -134,6 +136,11 @@ class SettingsView(View):
             horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
             expand=True,
         )
+
+    def _about(self) -> None:
+        from ..about import show_about  # noqa: PLC0415
+
+        show_about(self.app)
 
     def _port_options(self, current: str = "") -> list[ft.DropdownOption]:
         ports = serial_ports()

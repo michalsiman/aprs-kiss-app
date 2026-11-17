@@ -14,6 +14,7 @@ import flet as ft
 from aprs_kiss_core.config import VERSION, Config, data_dir, load_config, save_config
 from aprs_kiss_core.engine import Engine, TransmitRefused
 
+from .about import show_about
 from .i18n import Translator
 from .symbols import emoji
 from .views.base import View, clock
@@ -125,6 +126,8 @@ class App:
                     ft.Container(expand=True),
                     ft.IconButton(ft.Icons.SHARE_LOCATION, tooltip=self.t("beacon_now"), on_click=self._beacon_now),
                     self.tx_box,
+                    ft.IconButton(ft.Icons.INFO_OUTLINE, tooltip=self.t("about"),
+                                  on_click=lambda _e: show_about(self)),
                 ],
                 spacing=16,
                 vertical_alignment=ft.CrossAxisAlignment.CENTER,

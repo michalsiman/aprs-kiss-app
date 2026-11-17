@@ -4,6 +4,8 @@
 
 - Install with one click: a Flatpak and a `.deb` with every release, besides the tarball.
 - App icon, desktop entry and AppStream metainfo (app id `io.github.michalsiman.aprs_kiss_app`).
+- About window (ⓘ in the top bar, or Settings): what the app does, version, links to the source,
+  issues, new versions, the F4HWN firmware and its KISS TNC app, the author.
 
 ## 0.1.0 – 2026-11-17
 
