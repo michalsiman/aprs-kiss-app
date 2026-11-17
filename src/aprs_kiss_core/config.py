@@ -19,7 +19,7 @@ from .ax25 import Address
 _LOGGER = logging.getLogger(__name__)
 
 APP_NAME = "aprs-kiss"
-VERSION = "0.1.3"
+VERSION = "0.1.4"
 MIN_BEACON_MINUTES = 10
 
 
@@ -57,6 +57,7 @@ class Config:
     # App
     language: str = ""  # "", "cs" or "en"; empty = from the system
     show_internet: bool = True  # map and station list also show stations seen only on APRS-IS
+    check_updates: bool = True  # ask GitHub once a day whether a newer version is out
 
     @property
     def configured(self) -> bool:

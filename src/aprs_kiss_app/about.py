@@ -9,6 +9,8 @@ import flet as ft
 
 from aprs_kiss_core.config import VERSION
 
+from .views.base import clock
+
 if TYPE_CHECKING:
     from .app import App
 
@@ -39,9 +41,38 @@ def _link(text: str, icon, url: str) -> ft.Control:
                          style=ft.ButtonStyle(alignment=ft.Alignment.CENTER_LEFT))
 
 
+def _update_text(app: App) -> tuple[str, str | None]:
+    """(text, colour) describing the last check for a new version."""
+    t = app.t
+    st = app.update_state
+    if st.available:
+        return t("update_available", version=st.latest), ft.Colors.PRIMARY
+    if not st.last_check:
+        return t("update_never"), ft.Colors.ON_SURFACE_VARIANT
+    when = t("update_checked", when=clock(st.last_check))
+    if st.error:
+        return f"{t('update_failed')} ({when}).", ft.Colors.ON_SURFACE_VARIANT
+    return f"{t('update_none')} ({when})", ft.Colors.ON_SURFACE_VARIANT
+
+
 def show_about(app: App) -> None:
     t = app.t
     small = ft.Colors.ON_SURFACE_VARIANT
+    text, color = _update_text(app)
+    update_text = ft.Text(text, size=13, color=color)
+    update_link = ft.TextButton(t("update_show"), icon=ft.Icons.NEW_RELEASES, url=app.update_state.url,
+                                visible=app.update_state.available)
+
+    async def check_now(e) -> None:
+        e.control.disabled = True
+        update_text.value = "…"
+        app.page.update()
+        await app.check_updates(force=True)
+        update_text.value, update_text.color = _update_text(app)
+        update_link.visible = app.update_state.available
+        update_link.url = app.update_state.url
+        e.control.disabled = False
+        app.page.update()
     content = ft.Column(
         [
             ft.Row(
@@ -54,6 +85,9 @@ def show_about(app: App) -> None:
                 ],
                 spacing=16,
             ),
+            ft.Row([update_text, update_link,
+                    ft.TextButton(t("update_check_now"), icon=ft.Icons.REFRESH, on_click=check_now)],
+                   wrap=True, spacing=4),
             ft.Text(t("about_what")),
             ft.Text(t("about_radio"), color=small, size=13),
             ft.Divider(height=8),

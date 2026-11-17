@@ -23,6 +23,8 @@ and iOS later (see [Platforms](#platforms)).
 - **APRS-IS** (internet) with optional RX and TX iGate
 - Position beacon, status, unproto
 - English and Czech
+- Tells you when a new version is out: asks GitHub at most once a day for the latest release,
+  sends nothing about you; can be switched off in Settings
 
 > **Transmitting is off by default.** Switch *Transmit* on in the top bar only if you hold an amateur
 > radio licence. APRS-IS can be switched on only after typing the licence statement.

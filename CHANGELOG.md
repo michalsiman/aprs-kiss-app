@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.4 – 2026-11-17
+
+- Tells you when a new version is out: once a day at most it asks GitHub for the latest release
+  (nothing about you is sent). A button in the top bar opens the download page; a short notice is
+  shown once per version. The About window shows the last check and can check now; Settings can
+  switch it off.
+
 ## 0.1.3 – 2026-11-17
 
 - Closing the window asks first and says what would stop (receiving, the beacon, the iGate,

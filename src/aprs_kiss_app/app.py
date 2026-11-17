@@ -15,6 +15,7 @@ from aprs_kiss_core.config import VERSION, Config, data_dir, load_config, save_c
 from aprs_kiss_core.engine import Engine, TransmitRefused
 
 from .about import show_about
+from . import updates
 from .i18n import Translator
 from .symbols import symbol_info
 from .views.base import View, clock
@@ -42,6 +43,7 @@ class App:
         self.current = 0
         self._flush_pending = False
         self._closing = False
+        self.update_state = updates.UpdateState()
 
     # ─── start and stop ───────────────────────────────────────────────────
 
@@ -66,6 +68,7 @@ class App:
         if not config.configured:
             self.select("settings")
         page.run_task(self._tick)
+        page.run_task(self._check_updates_later)
 
     async def _on_window_event(self, e: ft.WindowEvent) -> None:
         if e.type == ft.WindowEventType.CLOSE:
@@ -150,6 +153,9 @@ class App:
         self.tnc_text = ft.Text(size=13)
         self.is_dot = ft.Icon(ft.Icons.CIRCLE, size=12)
         self.is_box = ft.Row([self.is_dot, ft.Text("APRS-IS", size=13)], spacing=4, tight=True)
+        self.update_btn = ft.FilledTonalButton(icon=ft.Icons.NEW_RELEASES, visible=False,
+                                               tooltip=self.t("update_tooltip"))
+        self._show_update()
         self.tx_switch = ft.Switch(label=self.t("transmit"), on_change=self._tx_changed)
         self.tx_box = ft.Container(self.tx_switch, border_radius=20, padding=ft.Padding.symmetric(horizontal=10))
         status = ft.Container(
@@ -159,6 +165,7 @@ class App:
                     ft.Row([self.tnc_dot, ft.Text(self.t("tnc"), size=13), self.tnc_text], spacing=4, tight=True),
                     self.is_box,
                     ft.Container(expand=True),
+                    self.update_btn,
                     ft.IconButton(ft.Icons.SHARE_LOCATION, tooltip=self.t("beacon_now"), on_click=self._beacon_now),
                     self.tx_box,
                     ft.IconButton(ft.Icons.INFO_OUTLINE, tooltip=self.t("about"),
@@ -261,6 +268,40 @@ class App:
         messages = self.view("messages")
         dest = self.rail.destinations[self.views.index(messages)]
         dest.badge = str(len(messages.unread)) if messages.unread else None
+
+    # ─── new versions ─────────────────────────────────────────────────────
+
+    async def _check_updates_later(self) -> None:
+        """Once a day at most, a while after the start so it does not slow it down."""
+        self.update_state = await asyncio.to_thread(updates.load, self.folder)
+        self._show_update()
+        await asyncio.sleep(10)
+        if self.engine.config.check_updates and not self._closing:
+            await self.check_updates(force=False)
+
+    async def check_updates(self, force: bool = True) -> None:
+        self.update_state = await asyncio.to_thread(updates.check, self.folder, force)
+        self._show_update()
+        st = self.update_state
+        if st.available and st.notified != st.latest and not self._closing:
+            st.notified = st.latest
+            await asyncio.to_thread(updates.save, self.folder, st)
+            self.page.show_dialog(ft.SnackBar(
+                ft.Text(self.t("update_available", version=st.latest)),
+                action=ft.SnackBarAction(label=self.t("update_show"),
+                                         on_click=lambda _e: self.page.run_task(self._open_release)),
+                duration=10000, behavior=ft.SnackBarBehavior.FLOATING, width=520,
+            ))
+        self.refresh_now()
+
+    async def _open_release(self) -> None:
+        await ft.UrlLauncher().launch_url(self.update_state.url)
+
+    def _show_update(self) -> None:
+        st = self.update_state
+        self.update_btn.visible = st.available
+        self.update_btn.content = self.t("update_button", version=st.latest)
+        self.update_btn.url = st.url
 
     def _tx_changed(self, e) -> None:
         self.engine.set_tx(bool(e.control.value))

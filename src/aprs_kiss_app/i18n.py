@@ -72,6 +72,12 @@ TEXTS: dict[str, dict[str, str]] = {
         "quit_igate": "the iGate",
         "quit_sessions": "connected packet sessions ({n})",
         "quit_yes": "Quit", "quit_stay": "Keep running", "quit_minimize": "Minimise",
+        "update_available": "A new version {version} is out.", "update_show": "Show",
+        "update_button": "New version {version}", "update_tooltip": "Open the download page",
+        "update_none": "You have the newest version.", "update_never": "Not checked for new versions yet.",
+        "update_failed": "Could not check for new versions", "update_checked": "checked {when}",
+        "update_check_now": "Check now",
+        "check_updates": "Check for new versions once a day (asks GitHub, sends nothing about you)",
         "about": "About", "about_version": "Version {version}",
         "about_what": "An APRS station and packet radio terminal for a radio with a KISS TNC: a map of the "
                       "stations heard, APRS messages with acknowledgement, a terminal for BBSes and nodes, "
@@ -154,6 +160,12 @@ TEXTS: dict[str, dict[str, str]] = {
         "quit_igate": "iGate",
         "quit_sessions": "připojená packet spojení ({n})",
         "quit_yes": "Ukončit", "quit_stay": "Nechat běžet", "quit_minimize": "Minimalizovat",
+        "update_available": "Je venku nová verze {version}.", "update_show": "Zobrazit",
+        "update_button": "Nová verze {version}", "update_tooltip": "Otevřít stránku ke stažení",
+        "update_none": "Máš nejnovější verzi.", "update_never": "Nové verze se ještě nekontrolovaly.",
+        "update_failed": "Nové verze se nepodařilo zkontrolovat", "update_checked": "kontrola {when}",
+        "update_check_now": "Zkontrolovat teď",
+        "check_updates": "Jednou denně zkontrolovat nové verze (dotaz na GitHub, nic o tobě se neposílá)",
         "about": "O aplikaci", "about_version": "Verze {version}",
         "about_what": "APRS stanice a packet radio terminál pro rádio s KISS TNC: mapa slyšených stanic, "
                       "APRS zprávy s potvrzením, terminál pro BBS a nody, packet chat, monitor rámců "

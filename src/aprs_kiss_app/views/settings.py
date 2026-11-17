@@ -106,6 +106,7 @@ class SettingsView(View):
                                     self.igate_rx, self.igate_tx], spacing=12)
 
         # App
+        self.check_updates = ft.Checkbox(label=t("check_updates"), value=c.check_updates)
         self.language = ft.Dropdown(label=t("language"), value=c.language or "", width=240,
                                     options=[ft.DropdownOption(key="", text=t("lang_auto")),
                                              ft.DropdownOption(key="cs", text="Čeština"),
@@ -125,7 +126,7 @@ class SettingsView(View):
                          ft.Text(t("position_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
                          self.beacon, self.beacon_is, self.tracked, self.incoming),
                 _section(t("aprsis"), self.aprsis, self.licence, self.is_fields, self.is_state),
-                _section(t("app_section"), self.language,
+                _section(t("app_section"), self.language, self.check_updates,
                          ft.Row([ft.OutlinedButton(t("about"), icon=ft.Icons.INFO_OUTLINE,
                                                    on_click=lambda _e: self._about())])),
                 self.error,
@@ -196,6 +197,7 @@ class SettingsView(View):
             "aprsis_passcode": self.passcode.value, "aprsis_radius_km": self.radius.value,
             "igate_rx": self.igate_rx.value, "igate_tx": self.igate_tx.value,
             "language": self.language.value or "",
+            "check_updates": self.check_updates.value,
         }
         try:
             for key in ("latitude", "longitude"):
