@@ -5,6 +5,9 @@ on:
   push:
     tags: ["v*"]
 
+permissions:
+  contents: write  # attach the build to the release
+
 jobs:
   build:
     runs-on: ubuntu-24.04
