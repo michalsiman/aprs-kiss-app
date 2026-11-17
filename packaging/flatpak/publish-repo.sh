@@ -23,6 +23,9 @@ if git fetch --quiet --depth 1 origin gh-pages; then
     git archive FETCH_HEAD | tar -x -C site
 fi
 [ -d site/repo/objects ] || ostree init --mode=archive-z2 --repo=site/repo
+# git keeps no empty folders, and ostree needs these
+mkdir -p site/repo/refs/heads site/repo/refs/remotes site/repo/refs/mirrors site/repo/tmp \
+    site/repo/state site/repo/extensions
 
 flatpak build-commit-from --src-repo="$SRC" --gpg-sign="$KEY" --gpg-homedir="$GNUPGHOME" \
     --no-update-summary site/repo "app/$ID/x86_64/stable"
