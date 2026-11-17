@@ -112,7 +112,7 @@
   <releases>
     <release version="0.1.5" date="2026-11-17">
       <description>
-        <p>Own Flatpak repository with automatic updates.</p>
+        <p>Own Flatpak repository with automatic updates. Right-click the map to set your position. More compact settings.</p>
       </description>
     </release>
     <release version="0.1.4" date="2026-11-17">

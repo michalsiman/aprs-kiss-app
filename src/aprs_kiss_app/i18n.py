@@ -37,8 +37,10 @@ TEXTS: dict[str, dict[str, str]] = {
         "station": "Station", "callsign": "Callsign", "ssid": "SSID", "symbol": "Icon (APRS symbol)",
         "comment": "Position comment", "digipath": "Digipeater path",
         "latitude": "Latitude", "longitude": "Longitude",
-        "position_hint": "Your position for the beacon and the map, in degrees (e.g. 49.7458 and 13.3772). "
-                         "Everyone on aprs.fi will see it.",
+        "position_hint": "Your position for the beacon and the map, in degrees (e.g. 49.7458 and 13.3772), "
+                         "or right-click the map: Set as my position. Everyone on aprs.fi will see it.",
+        "set_my_position": "Set as my position", "copy_coordinates": "Copy {lat}, {lon}",
+        "copied": "Copied", "position_set": "My position set to {lat}, {lon}",
         "beacon": "Send position every (minutes, 0 = off, at least 10)",
         "beacon_is": "Send it regularly over the internet too (APRS-IS)",
         "tracked": "Callsigns to highlight on the map (comma separated)",
@@ -125,8 +127,10 @@ TEXTS: dict[str, dict[str, str]] = {
         "station": "Stanice", "callsign": "Značka", "ssid": "SSID", "symbol": "Ikona (APRS symbol)",
         "comment": "Komentář k poloze", "digipath": "Cesta přes digipeatery",
         "latitude": "Zeměpisná šířka", "longitude": "Zeměpisná délka",
-        "position_hint": "Tvoje poloha pro maják a mapu ve stupních (např. 49.7458 a 13.3772). "
-                         "Na aprs.fi ji uvidí každý.",
+        "position_hint": "Tvoje poloha pro maják a mapu ve stupních (např. 49.7458 a 13.3772), "
+                         "nebo klikni pravým na mapu: Nastavit jako moji polohu. Na aprs.fi ji uvidí každý.",
+        "set_my_position": "Nastavit jako moji polohu", "copy_coordinates": "Kopírovat {lat}, {lon}",
+        "copied": "Zkopírováno", "position_set": "Moje poloha nastavena na {lat}, {lon}",
         "beacon": "Posílat polohu každých (minut, 0 = ne, nejméně 10)",
         "beacon_is": "Posílat pravidelně i přes internet (APRS-IS)",
         "tracked": "Značky zvýrazněné na mapě (oddělené čárkou)",

@@ -33,13 +33,36 @@ def serial_ports() -> list[tuple[str, str]]:
     return ports
 
 
+TEXT = 14
+
+
 def _section(title: str, *controls: ft.Control) -> ft.Control:
     return ft.Card(
         ft.Container(
-            ft.Column([ft.Text(title, size=16, weight=ft.FontWeight.BOLD), *controls], spacing=12),
-            padding=ft.Padding.all(16),
+            ft.Column([ft.Text(title, size=15, weight=ft.FontWeight.BOLD), *controls], spacing=8),
+            padding=ft.Padding.symmetric(horizontal=14, vertical=10),
         ),
     )
+
+
+def _compact(control: ft.Control) -> None:
+    """Smaller text and input boxes than the Material defaults, all through the settings form."""
+    if isinstance(control, (ft.TextField, ft.Dropdown)):
+        control.dense = True
+        control.text_size = TEXT
+        control.label_style = ft.TextStyle(size=TEXT)
+        vertical = 4 if isinstance(control, ft.Dropdown) else 10
+        control.content_padding = ft.Padding.symmetric(horizontal=10, vertical=vertical)
+    elif isinstance(control, ft.Checkbox):
+        control.label_style = ft.TextStyle(size=TEXT)
+        control.visual_density = ft.VisualDensity.COMPACT
+    elif isinstance(control, ft.Text) and control.size is None:
+        control.size = TEXT
+    for attr in ("content", "controls"):
+        child = getattr(control, attr, None)
+        for c in child if isinstance(child, list) else [child]:
+            if isinstance(c, ft.Control):
+                _compact(c)
 
 
 class SettingsView(View):
@@ -87,7 +110,7 @@ class SettingsView(View):
         self.lon = ft.TextField(label=t("longitude"), value="" if c.longitude is None else str(c.longitude), width=160)
         self.beacon = ft.TextField(label=t("beacon"), value=str(c.beacon_minutes or 0), width=420, input_filter=num)
         self.beacon_is = ft.Checkbox(label=t("beacon_is"), value=c.beacon_is)
-        self.tracked = ft.TextField(label=t("tracked"), value=c.tracked_callsigns,
+        self.tracked = ft.TextField(label=t("tracked"), value=c.tracked_callsigns, width=420,
                                     capitalization=ft.TextCapitalization.CHARACTERS)
         self.incoming = ft.Checkbox(label=t("incoming"), value=c.accept_incoming)
 
@@ -116,7 +139,7 @@ class SettingsView(View):
         self.intro = ft.Text(t("first_run"), color=ft.Colors.PRIMARY, visible=not c.configured)
         self._connection_changed(update=False)
         self._aprsis_changed(update=False)
-        return ft.Column(
+        form = ft.Column(
             [
                 self.intro,
                 _section(t("tnc_section"), self.connection, self.tcp_row, self.serial_row, self.txdelay),
@@ -136,7 +159,13 @@ class SettingsView(View):
             scroll=ft.ScrollMode.AUTO,
             horizontal_alignment=ft.CrossAxisAlignment.STRETCH,
             expand=True,
+            spacing=8,
         )
+        _compact(form)
+        return form
+
+    def show_position(self, lat: float, lon: float) -> None:
+        self.lat.value, self.lon.value = str(lat), str(lon)
 
     def _about(self) -> None:
         from ..about import show_about  # noqa: PLC0415

@@ -131,6 +131,13 @@ class App:
         self.toast(self.t("saved"))
         self.refresh_now()
 
+    async def set_position(self, lat: float, lon: float) -> None:
+        """From the map: becomes my position, saved at once and shown in Settings."""
+        conf = Config.from_dict({**self.engine.config.to_dict(), "latitude": lat, "longitude": lon}).validate()
+        await self.apply_config(conf)
+        self.view("settings").show_position(lat, lon)
+        self.toast(self.t("position_set", lat=f"{lat:.5f}", lon=f"{lon:.5f}"))
+
     # ─── layout ───────────────────────────────────────────────────────────
 
     def build(self) -> None:

@@ -5,6 +5,9 @@
 - Own Flatpak repository with automatic updates:
   [michalsiman.github.io/aprs-kiss-app](https://michalsiman.github.io/aprs-kiss-app/). The `.flatpak`
   file from a release now also takes its updates from there.
+- Right-click the map (long press on a touch screen): *Set as my position* or copy the coordinates,
+  so you no longer need to type them in.
+- Settings are more compact: smaller text and input boxes.
 
 ## 0.1.4 – 2026-11-17
 

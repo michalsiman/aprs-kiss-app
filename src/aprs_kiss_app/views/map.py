@@ -39,6 +39,14 @@ class MapView(View):
                 self.markers,
                 fm.SimpleAttribution(text="© OpenStreetMap contributors", alignment=ft.Alignment.BOTTOM_RIGHT),
             ],
+            # Right click (long press on touch screens): "set as my position".
+            on_secondary_tap=self._menu,
+            on_long_press=self._menu,
+        )
+        self._picked: tuple[float, float] | None = None
+        self.menu = ft.ContextMenu(
+            self.map, primary_trigger=None, secondary_trigger=None, tertiary_trigger=None,
+            on_select=self._menu_select, expand=True,
         )
         self.only_recent = ft.Checkbox(label=self.t("last_2h"), value=False, on_change=lambda _e: self.force())
         self.internet = internet_checkbox(self.app)
@@ -53,7 +61,7 @@ class MapView(View):
             bgcolor=ft.Colors.with_opacity(0.85, ft.Colors.SURFACE),
             border_radius=8, padding=ft.Padding.symmetric(horizontal=4), left=8, top=8,
         )
-        return ft.Stack([self.map, overlay], expand=True)
+        return ft.Stack([self.menu, overlay], expand=True)
 
     def force(self) -> None:
         self.internet.value = self.engine.config.show_internet
@@ -111,6 +119,28 @@ class MapView(View):
             markers.append(self._marker(conf.latitude, conf.longitude, self.engine.status()["callsign"] or self.t("my_position"),
                                         emoji(conf.symbol[:1], conf.symbol[1:]), COLOR_ME, bold=True))
         self.markers.markers = markers
+
+    async def _menu(self, e) -> None:
+        lon = (e.coordinates.longitude + 180) % 360 - 180  # the map wraps around the world
+        lat, lon = round(e.coordinates.latitude, 5), round(lon, 5)
+        self._picked = (lat, lon)
+        self.menu.items = [
+            ft.PopupMenuItem(content=self.t("set_my_position"), icon=ft.Icons.MY_LOCATION, data="me"),
+            ft.PopupMenuItem(content=self.t("copy_coordinates", lat=f"{lat:.5f}", lon=f"{lon:.5f}"),
+                             icon=ft.Icons.CONTENT_COPY, data="copy"),
+        ]
+        self.menu.update()
+        await self.menu.open(global_position=e.global_position, local_position=e.local_position)
+
+    async def _menu_select(self, e) -> None:
+        if not self._picked or e.item is None:
+            return
+        lat, lon = self._picked
+        if e.item.data == "me":
+            await self.app.set_position(lat, lon)
+        elif e.item.data == "copy":
+            await ft.Clipboard().set(f"{lat:.5f}, {lon:.5f}")
+            self.app.toast(self.t("copied"))
 
     async def centre(self, lat: float, lon: float, zoom: float = 12) -> None:
         await self.map.center_on(fm.MapLatitudeLongitude(lat, lon), zoom)
