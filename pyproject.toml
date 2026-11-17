@@ -1,0 +1,48 @@
+[project]
+name = "aprs-kiss"
+version = "0.1.0"
+description = "APRS station and packet radio terminal for a KISS TNC, as a desktop (and later mobile) app"
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Michal Šiman (OK1SIM)" }]
+requires-python = ">=3.10"
+dependencies = [
+    "flet==1.1.2",
+    "flet-map==1.1.2",
+    "aprslib>=0.7.2",
+    "platformdirs>=4",
+    "pyserial-asyncio-fast>=0.16; sys_platform == 'linux' or sys_platform == 'win32' or sys_platform == 'darwin'",
+]
+
+[project.optional-dependencies]
+# Running with plain Python (pip/pipx) needs the desktop client; `flet build` bundles its own.
+desktop = ["flet-desktop==1.1.2"]
+dev = ["flet[all]==1.1.2"]
+
+[project.scripts]
+aprs-kiss = "aprs_kiss_app.cli:run"
+
+[project.urls]
+Homepage = "https://github.com/michalsiman/aprs-kiss-app"
+"Home Assistant integration" = "https://github.com/michalsiman/aprs-kiss-ha"
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# ─── flet build (Linux now; Windows, macOS, Android, iOS from the same code) ───
+[tool.flet]
+org = "io.github.michalsiman"
+product = "APRS & Packet"
+company = "OK1SIM"
+copyright = "Copyright (c) 2026 Michal Šiman (OK1SIM)"
+
+[tool.flet.app]
+path = "src"
+module = "main"
+
+[tool.flet.android.permission]
+"android.permission.INTERNET" = true
