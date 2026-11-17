@@ -219,7 +219,7 @@ class App:
         self.tx_switch.value = st["tx_enabled"]
         self.tx_switch.disabled = not self.engine.config.configured
         self.tx_switch.tooltip = self.t("tx_on") if st["tx_enabled"] else self.t("tx_off")
-        self.tx_box.bgcolor = ft.Colors.RED_200 if st["tx_enabled"] else None
+        self.tx_box.bgcolor = ft.Colors.ERROR_CONTAINER if st["tx_enabled"] else None
         messages = self.view("messages")
         dest = self.rail.destinations[self.views.index(messages)]
         dest.badge = str(len(messages.unread)) if messages.unread else None

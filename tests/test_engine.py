@@ -31,7 +31,7 @@ class EngineTest(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.folder = pathlib.Path(self.tmp.name)
-        self.tnc = FakeTnc(argparse.Namespace(port=0, mycall=MYCALL, bbs="OK0BBS", interval=0.1))
+        self.tnc = FakeTnc(argparse.Namespace(port=0, mycall=MYCALL, bbs="OK0BBS", interval=0.1, message_every=3))
         self.server = await asyncio.start_server(self.tnc.client, "127.0.0.1", 0)
         port = self.server.sockets[0].getsockname()[1]
         self.beacons = asyncio.create_task(self.tnc.beacons())

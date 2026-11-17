@@ -26,6 +26,29 @@ and iOS later (see [Platforms](#platforms)).
 > **Transmitting is off by default.** Switch *Transmit* on in the top bar only if you hold an amateur
 > radio licence. APRS-IS can be switched on only after typing the licence statement.
 
+## Screenshots
+
+Taken with the simulated TNC (`tests/fake_tnc.py`); click for full size. They follow your
+GitHub theme, and so does the app: it uses the system's light or dark mode.
+
+<table>
+<tr>
+<td colspan="2"><a href="assets/map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/map-light.png"><img src="assets/map.png" alt="Map of heard stations with APRS symbols"></picture></a></td>
+</tr>
+<tr>
+<td width="50%"><a href="assets/messages.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/messages-light.png"><img src="assets/messages.png" alt="APRS messages, the sent one acknowledged"></picture></a></td>
+<td width="50%"><a href="assets/stations.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/stations-light.png"><img src="assets/stations.png" alt="Stations heard, with distance and direction"></picture></a></td>
+</tr>
+<tr>
+<td><a href="assets/terminal.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/terminal-light.png"><img src="assets/terminal.png" alt="Packet terminal connected to a BBS"></picture></a></td>
+<td><a href="assets/chat.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/chat-light.png"><img src="assets/chat.png" alt="Packet chat"></picture></a></td>
+</tr>
+<tr>
+<td><a href="assets/monitor.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/monitor-light.png"><img src="assets/monitor.png" alt="Frame monitor"></picture></a></td>
+<td><a href="assets/settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-light.png"><img src="assets/settings.png" alt="Settings: TNC connection and station"></picture></a></td>
+</tr>
+</table>
+
 ## Install and run (Linux)
 
 Python 3.10 or newer.
@@ -103,6 +126,13 @@ tests/              unit tests, engine tests against fake_tnc.py
 .venv/bin/python -m unittest discover -s tests -t .
 ```
 
-## Licence
+## Credits and licence
 
-MIT. Map data © OpenStreetMap contributors.
+- Written by [Michal Šiman](https://github.com/michalsiman) ([OK1SIM](https://ok1sim.cz/)) together with
+  [Claude Code](https://claude.com/claude-code).
+- User interface by [Flet](https://flet.dev) (Flutter), maps by [flutter_map](https://github.com/fleaflet/flutter_map)
+  through flet-map, map data © OpenStreetMap contributors.
+- APRS parsing by [aprslib](https://github.com/rossengeorgiev/aprs-python).
+- KISS TNC app for F4HWN by **F4WAT**, F4HWN firmware by **Armel F4HWN**.
+
+MIT licence, see [LICENSE](LICENSE).

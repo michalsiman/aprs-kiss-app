@@ -11,3 +11,5 @@ First standalone version, for Linux.
 - Settings and message history saved as JSON in the user's data folder.
 - Flet desktop app: map, messages, stations, terminal, chat, monitor, settings; English and Czech.
 - Tests of the core and of the engine against the simulated TNC; CI and a Linux build workflow.
+- Light and dark mode following the system; screenshots in the README.
+- The simulated TNC has more stations and `--message-every` (0 = no messages).

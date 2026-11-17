@@ -38,6 +38,11 @@ SAMPLES = [
     ("OK2DEF-7", "APRS", ["OK0DIG*"], ">Listening on 144.800"),
     ("OK1WX", "APRS", [], "@161200z4936.50N/01310.00E_090/005g010t050r000p000P000h80b10150Weather"),
     ("OK1XYZ", "CQ", [], "Good evening, anyone on packet tonight?"),
+    ("OK1KPL-10", "APRS", ["WIDE2-1"], "!4944.80NI01323.40E&iGate Plzen 144.800"),
+    ("OK0DIG", "APRS", [], "!4951.20N/01306.00E#Digipeater Krasov"),
+    ("OK1JKL-9", "APRS", ["OK0DIG*"], "=4939.60N/01328.90E>On the way to Klatovy"),
+    ("OK1MNO-7", "APRS", ["WIDE1-1"], "=4948.30N/01317.20E[Hiking, 2 m handheld"),
+    ("OK2PQR-5", "APRS", ["OK0DIG*", "WIDE2-1"], "=4933.10N/01309.80Eb Cycling around Prestice"),
 ]
 
 
@@ -61,7 +66,7 @@ class FakeTnc:
             src, dst, path, info = SAMPLES[i % len(SAMPLES)]
             i += 1
             await self.send_to_client(ax25.Frame(A(dst), A(src), [A(p) for p in path], info.encode()))
-            if i % 3 == 0:
+            if self.args.message_every and i % self.args.message_every == 0:
                 self.msg_no += 1
                 text = f":{aprs.addressee(self.args.mycall)}:Test message {self.msg_no} from the simulator{{{self.msg_no}"
                 await self.send_to_client(ax25.Frame(A("APRS"), A("OK1ABC-9"), [A("WIDE1-1")], text.encode()))
@@ -143,4 +148,5 @@ if __name__ == "__main__":
     p.add_argument("--mycall", default="OK1SIM-7")
     p.add_argument("--bbs", default="OK0BBS")
     p.add_argument("--interval", type=float, default=20)
+    p.add_argument("--message-every", type=int, default=3, help="a message to us every N packets, 0 = never")
     asyncio.run(FakeTnc(p.parse_args()).run())
