@@ -1,6 +1,6 @@
 [project]
 name = "aprs-kiss"
-version = "0.1.0"
+version = "0.1.1"
 description = "APRS station and packet radio terminal for a KISS TNC, as a desktop (and later mobile) app"
 readme = "README.md"
 license = "MIT"
@@ -36,6 +36,8 @@ where = ["src"]
 # ─── flet build (Linux now; Windows, macOS, Android, iOS from the same code) ───
 [tool.flet]
 org = "io.github.michalsiman"
+# The same id as the Flatpak and the desktop file, so the window gets the app icon.
+bundle_id = "io.github.michalsiman.aprs_kiss_app"
 product = "APRS & Packet"
 company = "OK1SIM"
 copyright = "Copyright (c) 2026 Michal Šiman (OK1SIM)"

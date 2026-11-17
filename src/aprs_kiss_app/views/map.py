@@ -12,7 +12,7 @@ from .base import View
 
 TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
 # OpenStreetMap's tile usage policy asks for an identifying User-Agent.
-USER_AGENT = "io.github.michalsiman.aprs_kiss"
+USER_AGENT = "io.github.michalsiman.aprs_kiss_app"
 DEFAULT_CENTER = (49.8, 15.5)  # Czechia
 REBUILD_SECONDS = 2.0
 MAX_MARKERS = 400

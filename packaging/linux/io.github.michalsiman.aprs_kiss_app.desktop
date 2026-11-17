@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=APRS & Packet
+GenericName=APRS and packet radio
+GenericName[cs]=APRS a packet radio
+Comment=APRS station and packet radio terminal for a KISS TNC
+Comment[cs]=APRS stanice a packet radio terminál pro KISS TNC
+Exec=aprs-kiss
+Icon=io.github.michalsiman.aprs_kiss_app
+Terminal=false
+Categories=Network;HamRadio;
+Keywords=APRS;packet;radio;ham;amateur;KISS;TNC;AX.25;BBS;iGate;
+Keywords[cs]=APRS;packet;rádio;radioamatér;KISS;TNC;AX.25;BBS;iGate;
+StartupNotify=true

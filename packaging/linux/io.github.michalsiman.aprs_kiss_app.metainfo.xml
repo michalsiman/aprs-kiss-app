@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.michalsiman.aprs_kiss_app</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+
+  <name>APRS &amp; Packet</name>
+  <summary>APRS station and packet radio terminal for a KISS TNC</summary>
+  <summary xml:lang="cs">APRS stanice a packet radio terminál pro KISS TNC</summary>
+
+  <developer id="io.github.michalsiman">
+    <name>Michal Šiman (OK1SIM)</name>
+  </developer>
+
+  <description>
+    <p>
+      Turns a radio with a KISS TNC into an APRS station and a packet radio terminal. Made for the
+      Quansheng UV-K1/UV-K5 V3 with the F4HWN firmware, but any KISS TNC works: Direwolf, a hardware
+      TNC, or a radio on a USB serial port or on the network.
+    </p>
+    <ul>
+      <li>Map of the stations heard, with their APRS symbols</li>
+      <li>APRS messages as conversations, retried until acknowledged</li>
+      <li>Stations heard on the radio or on APRS-IS, with distance and direction</li>
+      <li>Packet terminal for BBSes and nodes (AX.25 connected mode)</li>
+      <li>Packet chat and a TNC-style frame monitor</li>
+      <li>APRS-IS with an optional iGate</li>
+    </ul>
+    <p>
+      Transmitting is off until you switch it on; it is for licensed radio amateurs only.
+    </p>
+    <p xml:lang="cs">
+      Z rádia s KISS TNC udělá APRS stanici a packet radio terminál. Dělané pro Quansheng
+      UV-K1/UV-K5 V3 s firmwarem F4HWN, funguje ale s jakýmkoli KISS TNC: Direwolf, hardwarové TNC,
+      nebo rádio na USB sériovém portu či v síti.
+    </p>
+    <ul xml:lang="cs">
+      <li>Mapa slyšených stanic s jejich APRS symboly</li>
+      <li>APRS zprávy jako konverzace, opakované do potvrzení</li>
+      <li>Stanice slyšené rádiem nebo přes APRS-IS se vzdáleností a směrem</li>
+      <li>Packet terminál pro BBS a nody (AX.25 spojení)</li>
+      <li>Packet chat a monitor rámců jako na TNC</li>
+      <li>APRS-IS s volitelnou iGate</li>
+    </ul>
+    <p xml:lang="cs">
+      Vysílání je vypnuté, dokud ho nezapneš; je jen pro radioamatéry s licencí.
+    </p>
+  </description>
+
+  <launchable type="desktop-id">io.github.michalsiman.aprs_kiss_app.desktop</launchable>
+  <provides>
+    <binary>aprs-kiss</binary>
+  </provides>
+
+  <url type="homepage">https://github.com/michalsiman/aprs-kiss-app</url>
+  <url type="bugtracker">https://github.com/michalsiman/aprs-kiss-app/issues</url>
+  <url type="vcs-browser">https://github.com/michalsiman/aprs-kiss-app</url>
+
+  <categories>
+    <category>Network</category>
+    <category>HamRadio</category>
+  </categories>
+  <keywords>
+    <keyword>APRS</keyword>
+    <keyword>packet radio</keyword>
+    <keyword>ham radio</keyword>
+    <keyword>KISS TNC</keyword>
+    <keyword>AX.25</keyword>
+  </keywords>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>Map of the stations heard</caption>
+      <image>https://raw.githubusercontent.com/michalsiman/aprs-kiss-app/main/assets/map-light.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>APRS messages with delivery confirmation</caption>
+      <image>https://raw.githubusercontent.com/michalsiman/aprs-kiss-app/main/assets/messages-light.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Stations heard, with distance and direction</caption>
+      <image>https://raw.githubusercontent.com/michalsiman/aprs-kiss-app/main/assets/stations-light.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Packet terminal connected to a BBS</caption>
+      <image>https://raw.githubusercontent.com/michalsiman/aprs-kiss-app/main/assets/terminal-light.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Frame monitor</caption>
+      <image>https://raw.githubusercontent.com/michalsiman/aprs-kiss-app/main/assets/monitor-light.png</image>
+    </screenshot>
+  </screenshots>
+
+  <branding>
+    <color type="primary" scheme_preference="light">#aab0f0</color>
+    <color type="primary" scheme_preference="dark">#2b3290</color>
+  </branding>
+
+  <content_rating type="oars-1.1">
+    <content_attribute id="social-chat">intense</content_attribute>
+    <content_attribute id="social-location">intense</content_attribute>
+  </content_rating>
+
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+  </supports>
+  <requires>
+    <display_length compare="ge">640</display_length>
+  </requires>
+
+  <releases>
+    <release version="0.1.1" date="2026-11-17">
+      <description>
+        <p>Packaged for installing from a software centre: Flatpak and Debian packages, an app icon.</p>
+      </description>
+    </release>
+    <release version="0.1.0" date="2026-11-17">
+      <description>
+        <p>First standalone version: map, APRS messages, stations, packet terminal, chat, monitor and APRS-IS.</p>
+      </description>
+    </release>
+  </releases>
+</component>

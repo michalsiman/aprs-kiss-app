@@ -1,0 +1,36 @@
+# Flatpak of the `flet build linux` output (built in CI from the tarball in dist/).
+# The Flathub manifest is the same with the release tarball's URL and sha256 as the source.
+id: io.github.michalsiman.aprs_kiss_app
+runtime: org.gnome.Platform
+runtime-version: '50'
+sdk: org.gnome.Sdk
+command: aprs-kiss
+finish-args:
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --device=dri
+  # TNC over the network (KISS TCP) and APRS-IS, map tiles
+  - --share=network
+  # TNC on a USB serial port (/dev/ttyUSB*, /dev/ttyACM*)
+  - --device=all
+modules:
+  - name: aprs-kiss
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/lib/aprs-kiss /app/bin
+      - cp -a bundle/. /app/lib/aprs-kiss/
+      - printf '#!/bin/sh\nexec /app/lib/aprs-kiss/aprs-kiss "$@"\n' > /app/bin/aprs-kiss
+      - chmod 755 /app/bin/aprs-kiss
+      - install -Dm644 linux/${FLATPAK_ID}.desktop /app/share/applications/${FLATPAK_ID}.desktop
+      - install -Dm644 linux/${FLATPAK_ID}.metainfo.xml /app/share/metainfo/${FLATPAK_ID}.metainfo.xml
+      - install -Dm644 linux/icons/scalable.svg /app/share/icons/hicolor/scalable/apps/${FLATPAK_ID}.svg
+      - for s in 64 128 256 512; do install -Dm644 linux/icons/$s.png /app/share/icons/hicolor/${s}x${s}/apps/${FLATPAK_ID}.png; done
+    sources:
+      - type: archive
+        path: ../../dist/aprs-kiss-linux-x86_64.tar.gz
+        dest: bundle
+        strip-components: 1
+      - type: dir
+        path: ../linux
+        dest: linux

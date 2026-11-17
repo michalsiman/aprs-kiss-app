@@ -1,0 +1,79 @@
+name: Release packages
+
+# Every v* tag: the Linux build, a .deb and a .flatpak, attached to the GitHub release.
+# Run by hand to just build them (artifacts of the run).
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  linux:
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - id: version
+        run: echo "version=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")" >> "$GITHUB_OUTPUT"
+      - name: Linux build dependencies (Flutter desktop)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev \
+            libstdc++-12-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libsecret-1-dev
+      - run: pip install "flet[all]==1.1.2"
+      - name: flet build linux
+        run: flet build linux --yes --no-rich-output --skip-flutter-doctor
+      - name: Tarball and .deb
+        run: |
+          V=${{ steps.version.outputs.version }}
+          mkdir -p dist staging
+          cp -a build/linux "staging/aprs-kiss-$V"
+          tar -C staging -czf "dist/aprs-kiss-$V-linux-x86_64.tar.gz" "aprs-kiss-$V"
+          packaging/deb/build-deb.sh build/linux "$V" dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux
+          path: dist/*
+
+  flatpak:
+    needs: linux
+    runs-on: ubuntu-24.04
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:gnome-50
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux
+          path: dist
+      - run: cp dist/aprs-kiss-*-linux-x86_64.tar.gz dist/aprs-kiss-linux-x86_64.tar.gz
+      - uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
+        with:
+          bundle: aprs-kiss-${{ needs.linux.outputs.version }}-x86_64.flatpak
+          manifest-path: packaging/flatpak/io.github.michalsiman.aprs_kiss_app.yml
+          cache-key: flatpak-builder-${{ github.sha }}
+          upload-artifact: true
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [linux, flatpak]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: out
+      - run: find out -type f
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            out/linux/*.tar.gz
+            out/linux/*.deb
+            out/**/*.flatpak

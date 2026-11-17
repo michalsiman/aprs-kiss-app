@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4f5bd5"/>
+      <stop offset="1" stop-color="#2b3290"/>
+    </linearGradient>
+    <linearGradient id="pin" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ff7a59"/>
+      <stop offset="1" stop-color="#e2452a"/>
+    </linearGradient>
+  </defs>
+  <!-- base -->
+  <rect x="32" y="32" width="448" height="448" rx="96" fill="url(#bg)"/>
+  <!-- map grid -->
+  <g stroke="#ffffff" stroke-opacity="0.13" stroke-width="6" fill="none">
+    <path d="M32 200 C 150 170, 260 260, 480 210"/>
+    <path d="M32 330 C 170 300, 300 380, 480 340"/>
+    <path d="M170 32 C 150 180, 230 300, 190 480"/>
+    <path d="M360 32 C 330 160, 390 320, 350 480"/>
+  </g>
+  <!-- radio waves -->
+  <g stroke="#ffffff" stroke-width="22" stroke-linecap="round" fill="none">
+    <path d="M168 132 A 120 120 0 0 0 168 300" stroke-opacity="0.95"/>
+    <path d="M344 132 A 120 120 0 0 1 344 300" stroke-opacity="0.95"/>
+    <path d="M118 92 A 180 180 0 0 0 118 340" stroke-opacity="0.55"/>
+    <path d="M394 92 A 180 180 0 0 1 394 340" stroke-opacity="0.55"/>
+  </g>
+  <!-- map pin -->
+  <path d="M256 412 C 256 412, 176 316, 176 236 A 80 80 0 0 1 336 236 C 336 316, 256 412, 256 412 Z"
+        fill="url(#pin)" stroke="#ffffff" stroke-width="10" stroke-linejoin="round"/>
+  <circle cx="256" cy="236" r="30" fill="#ffffff"/>
+</svg>
