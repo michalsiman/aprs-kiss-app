@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.5 – 2026-11-17
+
+- Own Flatpak repository with automatic updates:
+  [michalsiman.github.io/aprs-kiss-app](https://michalsiman.github.io/aprs-kiss-app/). The `.flatpak`
+  file from a release now also takes its updates from there.
+
 ## 0.1.4 – 2026-11-17
 
 - Tells you when a new version is out: once a day at most it asks GitHub for the latest release

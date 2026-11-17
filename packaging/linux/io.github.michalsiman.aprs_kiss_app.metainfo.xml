@@ -110,6 +110,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.5" date="2026-11-17">
+      <description>
+        <p>Own Flatpak repository with automatic updates.</p>
+      </description>
+    </release>
     <release version="0.1.4" date="2026-11-17">
       <description>
         <p>Tells you when a new version is out (checked at most once a day; can be switched off).</p>

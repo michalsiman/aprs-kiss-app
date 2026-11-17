@@ -1,9 +1,15 @@
 name: Release packages
 
-# Every v* tag: the Linux build, a .deb and a .flatpak, attached to the GitHub release.
-# Run by hand to just build them (artifacts of the run).
+# Every v* tag: the Linux build, a .deb and a .flatpak, attached to the GitHub release,
+# and the app added to our Flatpak repository on GitHub Pages (packaging/flatpak/publish-repo.sh).
+# Run by hand to just build them (artifacts of the run), or to also publish to the Flatpak repository.
 on:
   workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish to the Flatpak repository
+        type: boolean
+        default: false
   push:
     tags: ["v*"]
 
@@ -57,12 +63,22 @@ jobs:
       - name: flatpak-builder
         run: |
           sudo apt-get update
-          sudo apt-get install -y flatpak flatpak-builder
+          sudo apt-get install -y flatpak flatpak-builder ostree
           flatpak remote-add --user --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
           flatpak-builder --user --install-deps-from=flathub --disable-rofiles-fuse --force-clean \
-            --repo=repo build-dir packaging/flatpak/$ID.yml
+            --default-branch=stable --repo=repo build-dir packaging/flatpak/$ID.yml
+          # Installed from this file, the app still gets updates from our repository.
           flatpak build-bundle --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo \
-            repo "aprs-kiss-${{ needs.linux.outputs.version }}-x86_64.flatpak" $ID
+            --repo-url=https://michalsiman.github.io/aprs-kiss-app/repo/ \
+            --gpg-keys=packaging/flatpak/aprs-kiss.gpg \
+            repo "aprs-kiss-${{ needs.linux.outputs.version }}-x86_64.flatpak" $ID stable
+      - name: Publish to the Flatpak repository (GitHub Pages)
+        if: startsWith(github.ref, 'refs/tags/v') || inputs.publish
+        env:
+          VERSION: ${{ needs.linux.outputs.version }}
+          GPG_KEY: ${{ secrets.FLATPAK_GPG_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: packaging/flatpak/publish-repo.sh repo
       - uses: actions/upload-artifact@v4
         with:
           name: flatpak

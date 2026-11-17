@@ -54,11 +54,23 @@ GitHub theme, and so does the app: it uses the system's light or dark mode.
 
 ## Install (Linux)
 
-Download from the [latest release](https://github.com/michalsiman/aprs-kiss-app/releases/latest)
-and double-click it; your software centre installs it with one click:
+**With automatic updates (Flatpak):** open
+**[michalsiman.github.io/aprs-kiss-app](https://michalsiman.github.io/aprs-kiss-app/)** and click
+*Install*, or run
 
-- **`aprs-kiss-…-x86_64.flatpak`**: any distribution with Flatpak (Linux Mint, Fedora, Ubuntu with
-  Flatpak, …). A Flathub listing, with automatic updates, is on the way.
+```bash
+flatpak install --user https://michalsiman.github.io/aprs-kiss-app/aprs-kiss.flatpakref
+```
+
+It works on any distribution with Flatpak (Linux Mint, Fedora, Ubuntu with Flatpak, …). New versions
+then come with your other updates, from our own signed Flatpak repository
+(key fingerprint `0E31 685C C5D6 4B8C 7837  B62F 66ED ABD8 50DC 14BD`).
+
+**Or download a package** from the [latest release](https://github.com/michalsiman/aprs-kiss-app/releases/latest)
+and double-click it:
+
+- **`aprs-kiss-…-x86_64.flatpak`**: the same Flatpak as a single file; it also updates from the
+  repository above (releases from 0.1.5 on).
 - **`aprs-kiss_…_amd64.deb`**: Debian, Ubuntu, Linux Mint (22.04 / Debian 12 and newer).
 - **`aprs-kiss-…-linux-x86_64.tar.gz`**: unpack anywhere and run `./aprs-kiss`.
 
