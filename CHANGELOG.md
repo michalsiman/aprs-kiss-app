@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.3 – 2026-11-17
+
+- Closing the window asks first and says what would stop (receiving, the beacon, the iGate,
+  connected sessions); it can also just minimise the window.
+- README links to the F4HWN firmware and its KISS TNC app.
+
 ## 0.1.2 – 2026-11-17
 
 - Legend for the map and the station list: what the callsign colours mean (heard by the radio,

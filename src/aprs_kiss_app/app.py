@@ -69,8 +69,43 @@ class App:
 
     async def _on_window_event(self, e: ft.WindowEvent) -> None:
         if e.type == ft.WindowEventType.CLOSE:
+            self._confirm_quit()
+
+    def _confirm_quit(self) -> None:
+        """Closing the window stops receiving, beacons and the iGate, so ask first."""
+        if self._closing:
+            return
+        st = self.engine.status()
+        what = [self.t("quit_rx")]
+        if self.engine.config.beacon_minutes and st["tx_enabled"]:
+            what.append(self.t("quit_beacon"))
+        if self.engine.aprsis and (self.engine.config.igate_rx or self.engine.config.igate_tx):
+            what.append(self.t("quit_igate"))
+        if st["sessions"]:
+            what.append(self.t("quit_sessions", n=len(st["sessions"])))
+
+        async def quit_now(_e) -> None:
+            self.page.pop_dialog()
             await self.shutdown()
             await self.page.window.destroy()
+
+        async def minimize(_e) -> None:
+            self.page.pop_dialog()
+            self.page.window.minimized = True
+            self.page.update()
+
+        self.page.show_dialog(ft.AlertDialog(
+            modal=True,
+            title=ft.Text(self.t("quit_title")),
+            content=ft.Column([ft.Text(self.t("quit_text")), *[ft.Text(f"• {w}") for w in what]],
+                              tight=True, spacing=6, width=420),
+            actions=[
+                ft.TextButton(self.t("quit_minimize"), icon=ft.Icons.MINIMIZE, on_click=minimize),
+                ft.TextButton(self.t("quit_stay"), on_click=lambda _e: self.page.pop_dialog()),
+                ft.FilledButton(self.t("quit_yes"), icon=ft.Icons.POWER_SETTINGS_NEW, on_click=quit_now,
+                                style=ft.ButtonStyle(bgcolor=ft.Colors.ERROR, color=ft.Colors.ON_ERROR)),
+            ],
+        ))
 
     async def _on_page_close(self, _e) -> None:
         await self.shutdown()

@@ -5,7 +5,8 @@ application – no Home Assistant, no web server. It is the standalone sibling o
 [APRS & Packet Home Assistant integration](https://github.com/michalsiman/aprs-kiss-ha) and shares
 its radio core.
 
-Made for the Quansheng UV-K1/UV-K5 V3 with the F4HWN firmware, but any KISS TNC works
+Made for the Quansheng UV-K1/UV-K5 V3 with the [F4HWN firmware](https://github.com/armel/uv-k1-k5v3-firmware-custom)
+and its [KISS TNC app](https://github.com/armel/uv-k1-k5v3-firmware-custom/wiki/App-KISS-TNC), but any KISS TNC works
 (Direwolf, a hardware TNC, the radio's USB serial port, or the KISS TCP bridge from the integration).
 
 **Status: 0.1.0, Linux first.** The same code is meant to be built for Windows, macOS, Android
@@ -147,6 +148,7 @@ tests/              unit tests, engine tests against fake_tnc.py
 - User interface by [Flet](https://flet.dev) (Flutter), maps by [flutter_map](https://github.com/fleaflet/flutter_map)
   through flet-map, map data © OpenStreetMap contributors.
 - APRS parsing by [aprslib](https://github.com/rossengeorgiev/aprs-python).
-- KISS TNC app for F4HWN by **F4WAT**, F4HWN firmware by **Armel F4HWN**.
+- [F4HWN firmware](https://github.com/armel/uv-k1-k5v3-firmware-custom) for the Quansheng UV-K1/K5 V3 by **Armel F4HWN**,
+  its [KISS TNC app](https://github.com/armel/uv-k1-k5v3-firmware-custom/wiki/App-KISS-TNC) by **F4WAT**.
 
 MIT licence, see [LICENSE](LICENSE).

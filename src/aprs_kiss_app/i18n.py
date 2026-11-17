@@ -65,6 +65,13 @@ TEXTS: dict[str, dict[str, str]] = {
         "legend_unknown": "Symbol not in the table (code)",
         "show_internet": "Stations from the internet", "last_2h": "Last 2 hours",
         "via_heard_rf": "radio", "via_heard_is": "internet",
+        "quit_title": "Quit APRS & Packet?",
+        "quit_text": "When the app is closed, this stops:",
+        "quit_rx": "receiving packets and messages",
+        "quit_beacon": "sending your position (beacon)",
+        "quit_igate": "the iGate",
+        "quit_sessions": "connected packet sessions ({n})",
+        "quit_yes": "Quit", "quit_stay": "Keep running", "quit_minimize": "Minimise",
         "about": "About", "about_version": "Version {version}",
         "about_what": "An APRS station and packet radio terminal for a radio with a KISS TNC: a map of the "
                       "stations heard, APRS messages with acknowledgement, a terminal for BBSes and nodes, "
@@ -140,6 +147,13 @@ TEXTS: dict[str, dict[str, str]] = {
         "legend_unknown": "Symbol, který není v tabulce (kód)",
         "show_internet": "Stanice z internetu", "last_2h": "Posledních 2 h",
         "via_heard_rf": "rádio", "via_heard_is": "internet",
+        "quit_title": "Ukončit APRS & Packet?",
+        "quit_text": "Po zavření aplikace se zastaví:",
+        "quit_rx": "příjem paketů a zpráv",
+        "quit_beacon": "vysílání polohy (maják)",
+        "quit_igate": "iGate",
+        "quit_sessions": "připojená packet spojení ({n})",
+        "quit_yes": "Ukončit", "quit_stay": "Nechat běžet", "quit_minimize": "Minimalizovat",
         "about": "O aplikaci", "about_version": "Verze {version}",
         "about_what": "APRS stanice a packet radio terminál pro rádio s KISS TNC: mapa slyšených stanic, "
                       "APRS zprávy s potvrzením, terminál pro BBS a nody, packet chat, monitor rámců "
