@@ -17,7 +17,9 @@ Builds for **Linux** and **Windows**; **macOS** is planned, Android and iOS late
 ## What it does
 
 - **Map** of heard stations (OpenStreetMap), your own position, tracked callsigns highlighted;
-  framed callsign labels and a *Muted map* button that fades the map so the stations stand out
+  framed callsign labels and a *Muted map* button that fades the map so the stations stand out;
+  a bundled **offline map** (country borders, coastlines, bigger cities) that the map switches to by itself
+  when there is no internet
 - **APRS messages** as conversations, retried until acknowledged, delivery state shown;
   incoming messages acknowledged automatically
 - **#APRSThursday**: its own section for the weekly HOTG net through ANSRVR – check in with one
@@ -194,6 +196,7 @@ tests/              unit tests, engine tests against fake_tnc.py
   [Claude Code](https://claude.com/claude-code).
 - User interface by [Flet](https://flet.dev) (Flutter), maps by [flutter_map](https://github.com/fleaflet/flutter_map)
   through flet-map, map data © OpenStreetMap contributors.
+- Offline map from [Natural Earth](https://www.naturalearthdata.com/) (public domain).
 - APRS parsing by [aprslib](https://github.com/rossengeorgiev/aprs-python).
 - [F4HWN firmware](https://github.com/armel/uv-k1-k5v3-firmware-custom) for the Quansheng UV-K1/K5 V3 by **Armel F4HWN**,
   its [KISS TNC app](https://github.com/armel/uv-k1-k5v3-firmware-custom/wiki/App-KISS-TNC) by **F4WAT**.

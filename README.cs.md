@@ -17,7 +17,9 @@ Sestavení pro **Linux** a **Windows**; **macOS** je v plánu, Android a iOS poz
 ## Co umí
 
 - **Mapa** slyšených stanic (OpenStreetMap), vaše poloha, zvýrazněné sledované značky;
-  popisky značek v rámečku a tlačítko *Tlumená mapa*, které mapu ztlumí, aby stanice vynikly
+  popisky značek v rámečku a tlačítko *Tlumená mapa*, které mapu ztlumí, aby stanice vynikly;
+  **offline mapa** přímo v aplikaci (hranice států, pobřeží, větší města), na kterou se mapa sama
+  přepne, když není internet
 - **APRS zprávy** jako konverzace, opakované až do potvrzení, se stavem doručení;
   příchozí zprávy se potvrzují automaticky
 - **#APRSThursday**: vlastní sekce pro čtvrteční síť HOTG přes ANSRVR – zapojení jedním tlačítkem,
@@ -195,6 +197,7 @@ tests/              testy jednotek, testy enginu proti fake_tnc.py
   s [Claude Code](https://claude.com/claude-code).
 - Uživatelské rozhraní [Flet](https://flet.dev) (Flutter), mapy [flutter_map](https://github.com/fleaflet/flutter_map)
   přes flet-map, mapová data © přispěvatelé OpenStreetMap.
+- Offline mapa z [Natural Earth](https://www.naturalearthdata.com/) (volné dílo).
 - Zpracování APRS [aprslib](https://github.com/rossengeorgiev/aprs-python).
 - [Firmware F4HWN](https://github.com/armel/uv-k1-k5v3-firmware-custom) pro Quansheng UV-K1/K5 V3 od **Armela F4HWN**,
   jeho [aplikace KISS TNC](https://github.com/armel/uv-k1-k5v3-firmware-custom/wiki/App-KISS-TNC) od **F4WAT**.

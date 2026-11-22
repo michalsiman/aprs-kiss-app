@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.17 – 2026-11-22
+
+- **Offline map** bundled with the app: country borders, coastlines and about 1,000 bigger cities
+  (Natural Earth, public domain), for the APRS map and for TAK. More and smaller cities appear as you
+  zoom in. A button on the map switches to it; **with no internet the map switches to it by itself**
+  and says so, and back to OpenStreetMap when the internet returns.
+- The map can no longer be zoomed out so far that the world repeats.
+
 ## 0.1.16 – 2026-11-22
 
 - **USB GPS module** as the source of your position (Settings › GPS): NMEA from u-blox, VK-172 and

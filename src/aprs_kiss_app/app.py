@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import os
 import contextlib
 import logging
 import time
@@ -81,6 +82,7 @@ class App:
             self.select("settings")
         page.run_task(self._tick)
         page.run_task(self._check_updates_later)
+        page.run_task(self._watch_internet)
 
     async def _on_window_event(self, e: ft.WindowEvent) -> None:
         if e.type == ft.WindowEventType.CLOSE:
@@ -334,6 +336,41 @@ class App:
 
     # ─── new versions ─────────────────────────────────────────────────────
 
+    # ─── internet: the map falls back to the offline map without it ──────
+
+    no_internet = False
+
+    @staticmethod
+    def _internet_up() -> bool:
+        import socket  # noqa: PLC0415
+
+        host = os.environ.get("APRS_KISS_TILE_CHECK_HOST", "tile.openstreetmap.org")  # tests point it elsewhere
+        try:
+            with socket.create_connection((host, 443), timeout=4):
+                return True
+        except OSError:
+            return False
+
+    async def _watch_internet(self) -> None:
+        """Every minute: can the map tiles be reached? If not, the maps switch to the offline map by
+        themselves (and back when the internet returns), with a short notice."""
+        await asyncio.sleep(3)  # let the window come up first, so the notice is seen
+        while True:
+            up = await asyncio.to_thread(self._internet_up)
+            if up == self.no_internet:  # changed
+                self.no_internet = not up
+                for v in self.views:
+                    if hasattr(v, "base_map_changed"):
+                        v.base_map_changed()
+                if not self.engine.config.map_offline:
+                    self.toast(self.t("net_offline") if self.no_internet else self.t("net_online"), seconds=10)
+                self.page.update()
+            await asyncio.sleep(60)
+
+    def offline_map(self) -> bool:
+        """The offline base map: chosen by the user, or because there is no internet."""
+        return bool(self.engine.config.map_offline or self.no_internet)
+
     async def _check_updates_later(self) -> None:
         """Once a day at most, a while after the start so it does not slow it down."""
         self.update_state = await asyncio.to_thread(updates.load, self.folder)
@@ -388,11 +425,11 @@ class App:
         return {c.strip().upper() for c in self.engine.config.tracked_callsigns.replace(" ", ",").split(",")
                 if c.strip()}
 
-    def toast(self, text: str, error: bool = False) -> None:
+    def toast(self, text: str, error: bool = False, seconds: float = 4) -> None:
         self.page.show_dialog(ft.SnackBar(
             ft.Text(text, color=ft.Colors.ON_ERROR_CONTAINER if error else None),
             bgcolor=ft.Colors.ERROR_CONTAINER if error else None,
-            behavior=ft.SnackBarBehavior.FLOATING, width=520,
+            behavior=ft.SnackBarBehavior.FLOATING, width=520, duration=int(seconds * 1000),
         ))
 
     async def guard(self, coro: Awaitable[Any]) -> bool:

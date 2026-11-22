@@ -1,6 +1,6 @@
 [project]
 name = "aprs-kiss"
-version = "0.1.16"
+version = "0.1.17"
 description = "APRS station and packet radio terminal for a KISS TNC, as a desktop (and later mobile) app"
 readme = "README.md"
 license = "MIT"
@@ -35,7 +35,7 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.setuptools.package-data]
-aprs_kiss_app = ["icon.png"]
+aprs_kiss_app = ["icon.png", "offline/world.json"]
 
 # ─── flet build (Linux now; Windows, macOS, Android, iOS from the same code) ───
 [tool.flet]

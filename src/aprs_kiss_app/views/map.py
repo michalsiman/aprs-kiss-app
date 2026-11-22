@@ -7,6 +7,7 @@ import time
 import flet as ft
 import flet_map as fm
 
+from ..offline_map import ATTRIBUTION, MIN_ZOOM, OfflineLayers
 from ..legend import COLOR_ME, internet_checkbox, show_legend, station_color, visible
 from ..symbols import emoji
 from .base import View
@@ -34,19 +35,19 @@ class MapView(View):
         self.markers = fm.MarkerLayer(markers=[])
         self.tiles = fm.TileLayer(url_template=TILES, user_agent_package_name=USER_AGENT, max_zoom=19,
                                   opacity=MUTED_OPACITY if conf.map_muted else 1.0)
+        self._zoom = 10 if here else 7
+        self.offline: OfflineLayers | None = None
         self.map = fm.Map(
             expand=True,
             bgcolor=ft.Colors.SURFACE,
             initial_center=fm.MapLatitudeLongitude(*center),
-            initial_zoom=10 if here else 7,
-            layers=[
-                self.tiles,
-                self.markers,
-                fm.SimpleAttribution(text="© OpenStreetMap contributors", alignment=ft.Alignment.BOTTOM_RIGHT),
-            ],
+            initial_zoom=self._zoom,
+            min_zoom=MIN_ZOOM,
+            layers=self._layers(),
             # Right click (long press on touch screens): "set as my position".
             on_secondary_tap=self._menu,
             on_long_press=self._menu,
+            on_position_change=self._moved,
         )
         self._picked: tuple[float, float] | None = None
         self.menu = ft.ContextMenu(
@@ -59,6 +60,7 @@ class MapView(View):
             ft.Row([
                 ft.IconButton(ft.Icons.MY_LOCATION, tooltip=self.t("centre_me"), on_click=self._centre_me),
                 self._muted_btn(),
+                self._offline_btn(),
                 self.internet,
                 self.only_recent,
                 ft.TextButton(self.t("legend"), icon=ft.Icons.HELP_OUTLINE,
@@ -72,7 +74,7 @@ class MapView(View):
     def _muted_btn(self) -> ft.IconButton:
         self.muted = ft.IconButton(ft.Icons.FILTER_B_AND_W_OUTLINED, selected_icon=ft.Icons.FILTER_B_AND_W,
                                    selected=self.engine.config.map_muted, tooltip=self.t("map_muted"),
-                                   on_click=self._toggle_muted)
+                                   on_click=self._toggle_muted, disabled=self.engine.config.map_offline)
         return self.muted
 
     def _toggle_muted(self, _e) -> None:
@@ -83,6 +85,46 @@ class MapView(View):
         self.tiles.opacity = MUTED_OPACITY if conf.map_muted else 1.0
         self.app.save_config_soon()
         self.app.page.update()
+
+    # ─── base map: OpenStreetMap tiles, or the bundled offline map ─────
+
+    def base_map_changed(self) -> None:
+        """Called by the app when the internet goes away or returns."""
+        if hasattr(self, "map"):
+            self.map.layers = self._layers()
+            self.offline_btn.selected = self.app.offline_map()
+            self.muted.disabled = self.app.offline_map()
+
+    def _layers(self) -> list:
+        if self.app.offline_map():
+            if self.offline is None:
+                self.offline = OfflineLayers(self._zoom)
+            base, credit = self.offline.layers, f"{ATTRIBUTION} (offline)"
+        else:
+            base, credit = [self.tiles], "© OpenStreetMap contributors"
+        return [*base, self.markers, fm.SimpleAttribution(text=credit, alignment=ft.Alignment.BOTTOM_RIGHT)]
+
+    def _offline_btn(self) -> ft.IconButton:
+        self.offline_btn = ft.IconButton(ft.Icons.CLOUD_OFF_OUTLINED, selected_icon=ft.Icons.CLOUD_OFF,
+                                         selected=self.app.offline_map(), tooltip=self.t("map_offline"),
+                                         on_click=self._toggle_offline)
+        return self.offline_btn
+
+    def _toggle_offline(self, _e) -> None:
+        conf = self.engine.config
+        conf.map_offline = not conf.map_offline
+        self.offline_btn.selected = self.muted.disabled = self.app.offline_map()
+        self.map.layers = self._layers()
+        self.app.save_config_soon()
+        self.app.page.update()
+
+    def _moved(self, e) -> None:
+        zoom = getattr(getattr(e, "camera", None), "zoom", None)
+        if zoom is None:
+            return
+        self._zoom = zoom
+        if self.offline and self.app.offline_map() and self.offline.zoomed(zoom):
+            self.offline.cities.update()
 
     def _centre_on_first_fix(self) -> None:
         """The first GPS fix moves the map to where we are, once, while the map is on screen."""

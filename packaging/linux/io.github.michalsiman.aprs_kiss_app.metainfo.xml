@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.17" date="2026-11-22">
+      <description>
+        <p>An offline map with country borders and bigger cities, used by itself when there is no internet.</p>
+      </description>
+    </release>
     <release version="0.1.16" date="2026-11-22">
       <description>
         <p>Your position from a USB GPS module, and a TAK mode: ATAK-compatible positions and GeoChat over the radio.</p>
