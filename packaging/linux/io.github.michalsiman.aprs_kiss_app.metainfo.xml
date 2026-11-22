@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.18" date="2026-11-22">
+      <description>
+        <p>The terminal can connect over VARA FM as well as over AX.25 packet.</p>
+      </description>
+    </release>
     <release version="0.1.17" date="2026-11-22">
       <description>
         <p>An offline map with country borders and bigger cities, used by itself when there is no internet.</p>

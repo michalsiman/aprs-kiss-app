@@ -27,7 +27,8 @@ Sestavení pro **Linux** a **Windows**; **macOS** je v plánu, Android a iOS poz
 - **Stanice** slyšené rádiem nebo viděné na APRS-IS: vzdálenost, směr, komentář, počasí;
   objeví se i stanice, které iGate pošle z internetu do rádia (pakety třetí strany)
 - **Packet terminál**: AX.25 spojení s BBS a nody, seznam **uložených BBS** k výběru,
-  počet pokusů o připojení s tlačítkem *Zastavit připojování*, volitelně příchozí spojení
+  počet pokusů o připojení s tlačítkem *Zastavit připojování*, volitelně příchozí spojení; také
+  **přes VARA FM** (VARA běží zvlášť s rádiem na zvukové kartě, např. kabelem AIOC)
 - **BBS SERVER**: vlastní packetová BBS na vaší značce s vlastním SSID – klasické příkazy W0RLI / MBL / FBB,
   osobní zprávy a bulletiny, nastavení a texty v obyčejných souborech (bbs.toml, welcome.txt, …),
   každá zpráva v jednom textovém souboru. Dokud běží, je všechno ostatní v aplikaci vypnuté (rádio je

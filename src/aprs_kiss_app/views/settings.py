@@ -127,6 +127,9 @@ class SettingsView(View):
                                              on_click=lambda _e: self._refresh_gps_ports())])
         self.gps_hint = ft.Text(t("gps_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT)
         self._gps_changed(update=False)
+        self.vara_host = ft.TextField(label=t("vara_host"), value=c.vara_host, width=260, hint_text="127.0.0.1")
+        self.vara_port = ft.TextField(label=t("vara_port"), value=str(c.vara_port or 8300), width=260,
+                                      keyboard_type=ft.KeyboardType.NUMBER, input_filter=ft.NumbersOnlyInputFilter())
         from aprs_kiss_core import tak  # noqa: PLC0415
         self.tak_callsign = ft.TextField(label=t("tak_callsign"), value=c.tak_callsign, width=330,
                                          capitalization=ft.TextCapitalization.CHARACTERS)
@@ -194,6 +197,8 @@ class SettingsView(View):
                          self.beacon, self.beacon_is, self.tracked, self.incoming),
                 _section("GPS", self.gps_source, self.gps_row, self.gps_hint),
                 _section(t("aprsis"), self.aprsis, self.licence, self.is_fields, self.is_state),
+                _section("VARA FM", ft.Row([self.vara_host, self.vara_port], wrap=True),
+                         ft.Text(t("vara_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT)),
                 _section(t("tak"), ft.Row([self.tak_callsign, self.tak_team, self.tak_role], wrap=True),
                          self.tak_interval),
                 _section(t("bbs"), ft.Row([self.bbs_ssid, self.bbs_sessions], wrap=True),
@@ -324,6 +329,7 @@ class SettingsView(View):
             "bbs_ssid": self.bbs_ssid.value or "1",
             "gps_source": self.gps_source.value or "manual", "gps_device": (self.gps_device.value or "").strip(),
             "gps_baudrate": self.gps_baud.value or "0",
+            "vara_host": (self.vara_host.value or "").strip(), "vara_port": self.vara_port.value or "8300",
             "tak_callsign": (self.tak_callsign.value or "").strip().upper(), "tak_team": self.tak_team.value or "Cyan",
             "tak_role": self.tak_role.value or "Team Member", "tak_interval_min": self.tak_interval.value or "0",
             "aprsis_enabled": self.aprsis.value, "aprsis_host": self.is_host.value, "aprsis_port": self.is_port.value,

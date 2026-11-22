@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.18 – 2026-11-22
+
+- **Terminal over VARA FM**: with VARA FM's address set in Settings › VARA FM, the terminal offers
+  *Connection: Packet (AX.25) / VARA FM*. Over VARA it connects to BBSes and nodes that take VARA FM
+  (BPQ, RMS gateways…), through VARA's TCP interface (command port 8300, data 8301 by default), with
+  digipeaters if given. The state line shows VARA's progress, PTT and the transmit buffer; *Stop
+  connecting* aborts a connect at once. VARA runs on its own (Windows, or Wine on Linux) with the radio
+  on a sound card, e.g. an AIOC cable. A pretend VARA for trying it without a radio: `tests/fake_vara.py`.
+- Tests: the offline map test also runs where Flet is not installed.
+
 ## 0.1.17 – 2026-11-22
 
 - **Offline map** bundled with the app: country borders, coastlines and about 1,000 bigger cities

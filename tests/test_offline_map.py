@@ -6,12 +6,19 @@ import unittest
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "src"))
 
-from aprs_kiss_app import offline_map  # noqa: E402
+import json  # noqa: E402
+
+try:
+    from aprs_kiss_app import offline_map  # needs flet
+except ImportError:
+    offline_map = None
+
+DATA = pathlib.Path(__file__).resolve().parents[1] / "src/aprs_kiss_app/offline/world.json"
 
 
 class OfflineMapTest(unittest.TestCase):
     def test_data(self):
-        d = offline_map.data()
+        d = json.loads(DATA.read_text(encoding="utf-8"))
         self.assertGreater(len(d["borders"]), 300)
         self.assertGreater(len(d["coast"]), 500)
         names = {c[0] for c in d["cities"]}
@@ -21,6 +28,7 @@ class OfflineMapTest(unittest.TestCase):
         self.assertAlmostEqual(lat, 49.74, delta=0.1)
         self.assertAlmostEqual(lon, 13.37, delta=0.1)
 
+    @unittest.skipIf(offline_map is None, "flet is not installed")
     def test_cities_by_zoom(self):
         counts = [len(offline_map.city_markers(level)) for level in range(len(offline_map.TIERS))]
         self.assertEqual(counts, sorted(set(counts)))  # strictly more at every step

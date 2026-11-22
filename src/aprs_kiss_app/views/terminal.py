@@ -28,6 +28,11 @@ class TerminalView(View):
         self.remove_btn = ft.IconButton(ft.Icons.BOOKMARK_REMOVE_OUTLINED, tooltip=self.t("bbs_remove"),
                                         on_click=self._remove)
         self._fill_saved()
+        # Over AX.25 packet (the TNC) or VARA FM; the choice appears once VARA is set up in Settings.
+        self.via = ft.Dropdown(label=self.t("connection"), width=210, dense=True, value="ax25",
+                               visible=self.engine.vara is not None,
+                               options=[ft.DropdownOption(key="ax25", text=self.t("via_packet")),
+                                        ft.DropdownOption(key="vara", text="VARA FM")])
         self.connect_btn = ft.FilledButton(self.t("connect"), icon=ft.Icons.LINK, on_click=self._connect)
         self.disconnect_btn = ft.OutlinedButton(self.t("disconnect"), icon=ft.Icons.LINK_OFF, on_click=self._disconnect)
         self.state = ft.Text(self.t("not_connected_session"), color=ft.Colors.ON_SURFACE_VARIANT)
@@ -37,7 +42,7 @@ class TerminalView(View):
                                   text_style=ft.TextStyle(font_family=MONO))
         return ft.Column(
             [
-                ft.Row([self.saved, self.remote, self.path, self.save_btn, self.remove_btn,
+                ft.Row([self.saved, self.remote, self.path, self.via, self.save_btn, self.remove_btn,
                         self.connect_btn, self.disconnect_btn], wrap=True),
                 self.state,
                 ft.Container(ft.SelectionArea(self.lines), expand=True, border_radius=8,
@@ -121,7 +126,11 @@ class TerminalView(View):
             state = states[self.remote.value]
         info = self.engine.session_info(self.current) if state else None
         connecting = state == "connecting"
-        if connecting and info:
+        if info and info.get("via") == "vara":
+            flags = " · PTT" if info.get("ptt") else ""
+            flags += f" · TX {info['buffer']} B" if info.get("buffer") else ""
+            self.state.value = f"{self.current}: VARA FM · {self.t('vara_' + state)}{flags}"
+        elif connecting and info:
             hms = lambda ts: time.strftime("%H:%M:%S", time.localtime(ts))  # noqa: E731
             self.state.value = f"{self.current}: " + self.t("term_attempt", n=info["attempts"], max=info["max_attempts"],
                                                             time=hms(info["last_attempt"]), start=hms(info["started"]))
@@ -146,7 +155,8 @@ class TerminalView(View):
 
     async def _connect(self, _e) -> None:
         try:
-            self.engine.connect(self.current, self.path.value or "")
+            self.engine.connect(self.current, self.path.value or "",
+                                via=self.via.value if self.via.visible else "ax25")
         except TransmitRefused:
             self.app.toast(self.t("tx_refused"), error=True)
             return

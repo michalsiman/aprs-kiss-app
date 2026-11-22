@@ -33,6 +33,7 @@ from .aprsis import AprsIsClient, gate_to_is, passcode, third_party
 from .ax25 import PF, U_DM, Address, Frame
 from .bbs import BbsConfigError, BbsServer
 from . import tak
+from . import vara as vara_mod
 from .gps import GpsFix, GpsReader
 from .config import MIN_BEACON_MINUTES, VERSION, Config, data_dir, load_state, save_state
 from .connection import KissConnection, TncSettings
@@ -123,6 +124,7 @@ class Engine:
         self.bbs_error = ""
         self.bbs_sessions: dict[str, Session] = {}
         self.gps: GpsReader | None = None
+        self.vara: vara_mod.VaraClient | None = None
         # TAK: the stations heard (uid -> event), the GeoChat messages and the position loop
         self.tak_stations: dict[str, dict[str, Any]] = {}
         self.tak_chat: deque[dict[str, Any]] = deque(maxlen=CHAT_LINES)
@@ -192,6 +194,10 @@ class Engine:
         self.station.tx_enabled = tx_enabled
         self._build_bbs()
         self._build_gps()
+        self.vara = None
+        if conf.vara_host and conf.configured and not self.exclusive_mode:
+            self.vara = vara_mod.VaraClient(conf.vara_host, int(conf.vara_port or vara_mod.DEFAULT_PORT), str(self.me),
+                                            self._vara_state, self._vara_text, self._on_update)
         self.aprsis: AprsIsClient | None = None
         if conf.aprsis_on and conf.callsign and not self.exclusive_mode:
             radius = int(conf.aprsis_radius_km or 0)
@@ -443,6 +449,8 @@ class Engine:
             self._bbs_task = asyncio.create_task(self._bbs_loop(), name="aprs_kiss_bbs")
         if self.gps:
             await self.gps.start()
+        if self.vara:
+            await self.vara.start()
         if self.tak_mode:
             self._tak_task = asyncio.create_task(self._tak_loop(), name="aprs_kiss_tak")
         self._on_update()
@@ -454,6 +462,8 @@ class Engine:
         self.sessions.clear()
         if self.gps:
             await self.gps.stop()
+        if self.vara:
+            await self.vara.stop()
         if self._tak_task:
             self._tak_task.cancel()
             with contextlib.suppress(asyncio.CancelledError):
@@ -548,6 +558,8 @@ class Engine:
                 "speed": self.gps.speed,
                 "error": self.gps.last_error,
             } if self.gps else ({"error": self.gps_error} if self.gps_error else None),
+            "vara": {"link": self.vara.link_up, "error": self.vara.last_error, "state": self.vara.state,
+                     "ptt": self.vara.ptt, "busy": self.vara.busy} if self.vara else None,
         }
 
     # ─── sending ──────────────────────────────────────────────────────────
@@ -825,10 +837,21 @@ class Engine:
         self.terminal.append(entry)
         self._emit("terminal", {"entry": entry})
 
-    def connect(self, remote: str, path: str = "") -> None:
+    def connect(self, remote: str, path: str = "", via: str = "ax25") -> None:
+        """Connect the terminal: over AX.25 packet through the TNC, or over VARA FM (via="vara")."""
         self._not_in_bbs_mode()
         if not self.station.tx_enabled:
             raise TransmitRefused("Transmitting is switched off")
+        if via == "vara":
+            if not self.vara or not self.vara.link_up:
+                where = f"{self.config.vara_host}:{self.config.vara_port}" if self.config.vara_host else "(not set)"
+                raise ConnectionError(f"VARA FM is not reachable at {where}")
+            if self.vara.state != vara_mod.IDLE:
+                raise ConnectionError("VARA is already in a session")
+            key = str(Address.parse(remote))
+            self.vara.remote = key
+            self._spawn(self.vara.connect(key, Config(path=path).paths()))
+            return
         if not self.connection.connected:
             raise ConnectionError("The TNC is not connected")
         addr = Address.parse(remote)
@@ -837,11 +860,20 @@ class Engine:
         sess.connect()
 
     def disconnect(self, remote: str) -> None:
+        if self._vara_session(remote):
+            self._spawn(self.vara.disconnect())
+            return
         sess = self.sessions.get(str(Address.parse(remote)))
         if sess:
             sess.disconnect()
 
     def send_text(self, remote: str, text: str) -> None:
+        if self._vara_session(remote):
+            if self.vara.state != vara_mod.CONNECTED:
+                raise ConnectionError("Not connected")
+            self._spawn(self.vara.send(text))
+            self._terminal(str(Address.parse(remote)), "tx", text)
+            return
         key = str(Address.parse(remote))
         sess = self.sessions.get(key)
         if sess is None:
@@ -850,15 +882,40 @@ class Engine:
         self._terminal(key, "tx", text)
 
     def session_states(self) -> dict[str, str]:
-        return {k: s.state for k, s in self.sessions.items() if s.state != DISCONNECTED}
+        states = {k: s.state for k, s in self.sessions.items() if s.state != DISCONNECTED}
+        if self.vara and self.vara.state != vara_mod.IDLE and self.vara.remote:
+            states[self.vara.remote] = self.vara.state
+        return states
 
     def session_info(self, remote: str) -> dict[str, Any] | None:
         """State of a terminal connection, with its connect attempts while it is connecting."""
+        if self._vara_session(remote):
+            v = self.vara
+            return {"state": v.state, "via": "vara", "ptt": v.ptt, "busy": v.busy, "buffer": v.buffer}
         sess = self.sessions.get(str(Address.parse(remote))) if remote else None
         if sess is None or sess.state == DISCONNECTED:
             return None
         return {"state": sess.state, "attempts": sess.attempts, "max_attempts": CONNECT_ATTEMPTS,
                 "started": sess.connect_started, "last_attempt": sess.last_attempt}
+
+    # ─── VARA FM sessions for the terminal ────────────────────────────────
+
+    def _vara_session(self, remote: str) -> bool:
+        try:
+            key = str(Address.parse(remote))
+        except ValueError:
+            return False
+        return bool(self.vara and self.vara.state != vara_mod.IDLE and self.vara.remote == key)
+
+    def _vara_state(self, state: str, reason: str) -> None:
+        if self.vara and self.vara.remote:
+            self._terminal(self.vara.remote, "state", f"VARA: {reason}")
+            self._emit("state", {"remote": self.vara.remote, "state": state})
+        self._on_update()
+
+    def _vara_text(self, text: str) -> None:
+        if self.vara and self.vara.remote:
+            self._terminal(self.vara.remote, "rx", text)
 
     # ─── chat (plain text in UI frames) ───────────────────────────────────
 

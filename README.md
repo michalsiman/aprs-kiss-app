@@ -27,7 +27,8 @@ Builds for **Linux** and **Windows**; **macOS** is planned, Android and iOS late
 - **Stations** heard on the radio or seen on APRS-IS: distance, direction, comment, weather;
   stations an iGate relays from the internet by radio (third-party packets) show up too
 - **Packet terminal**: AX.25 connected mode to BBSes and nodes, a list of **saved BBSes** to pick
-  from, connect attempts shown with a *Stop connecting* button, optional incoming connections
+  from, connect attempts shown with a *Stop connecting* button, optional incoming connections; also
+  **over VARA FM** (VARA running on its own with the radio on a sound card such as an AIOC cable)
 - **BBS SERVER**: run your own packet BBS on your callsign with its own SSID – classic W0RLI / MBL / FBB
   commands, personal messages and bulletins, settings and texts in plain files (bbs.toml, welcome.txt,
   …), one text file per message. While it runs, everything else in the app is off (the radio sits on the

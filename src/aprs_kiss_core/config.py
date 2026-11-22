@@ -19,7 +19,7 @@ from .ax25 import Address
 _LOGGER = logging.getLogger(__name__)
 
 APP_NAME = "aprs-kiss"
-VERSION = "0.1.17"
+VERSION = "0.1.18"
 MIN_BEACON_MINUTES = 10
 
 
@@ -68,6 +68,8 @@ class Config:
     tak_team: str = "Cyan"
     tak_role: str = "Team Member"
     tak_interval_min: int = 2  # own position every N minutes (0 = only when asked)
+    vara_host: str = ""  # VARA FM's address for the terminal (empty = no VARA)
+    vara_port: int = 8300  # its command port; the data port is the next one
     bbs_enabled: bool = False  # run the BBS server (its own SSID, below)
     bbs_ssid: int = 1  # the BBS answers on your callsign with this SSID
     bbs_list: str = ""  # saved BBSes and nodes for the terminal: JSON [{"call": ..., "path": ...}]
