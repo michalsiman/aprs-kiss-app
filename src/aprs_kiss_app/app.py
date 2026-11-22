@@ -45,6 +45,8 @@ TICK_SECONDS = 5.0
 THEME_EVERY = 6  # ticks: the desktop theme is looked at every 30 s
 
 
+COMPACT_WIDTH = 700  # narrower than this (a phone): the compact layout
+
 class App:
     def __init__(self, page: ft.Page) -> None:
         self.page = page
@@ -56,6 +58,7 @@ class App:
         self._closing = False
         self.update_state = updates.UpdateState()
         self._desktop_dark: bool | None = None
+        self.compact = False  # a phone: a menu instead of the side rail, a slimmer top bar
 
     # ─── start and stop ───────────────────────────────────────────────────
 
@@ -71,6 +74,7 @@ class App:
         page.on_close = self._on_page_close  # web and mobile: the session ended
         page.window.min_width = 640
         page.window.min_height = 480
+        page.on_resize = self._on_resize
 
         config = await asyncio.to_thread(load_config, self.folder)
         self.engine = Engine(config, self.folder)
@@ -157,8 +161,27 @@ class App:
 
     # ─── layout ───────────────────────────────────────────────────────────
 
+    def _is_compact(self) -> bool:
+        page = self.page
+        if page.platform in (ft.PagePlatform.ANDROID, ft.PagePlatform.IOS):
+            return True
+        width = getattr(page, "width", None) or 0
+        return bool(width) and width < COMPACT_WIDTH
+
+    def _on_resize(self, _e) -> None:
+        if self.views and self._is_compact() != self.compact:
+            self.build()
+
+    async def _open_menu(self, _e=None) -> None:
+        await self.page.show_drawer()
+
+    async def _menu_selected(self, e) -> None:
+        await self.page.close_drawer()
+        self.select(self.views[e.control.selected_index].key)
+
     def build(self) -> None:
         self.t = Translator(self.engine.config.language)
+        self.compact = self._is_compact()
         key = self.current_key if self.views else "map"
         mode = self.engine.exclusive_mode
         self.views = [cls(self) for cls in (BBS_VIEWS if mode == "bbs" else TAK_VIEWS if mode == "tak" else VIEWS)]
@@ -172,7 +195,16 @@ class App:
                                                        label=self.t(v.key)) for v in self.views],
             on_change=lambda e: self.select(self.views[e.control.selected_index].key),
         )
-        self.holders = [ft.Container(v.control, visible=False, expand=True, padding=ft.Padding.all(12))
+        self.drawer = ft.NavigationDrawer(
+            controls=[ft.Container(ft.Text("APRS & Packet", weight=ft.FontWeight.BOLD, size=16),
+                                   padding=ft.Padding.only(left=28, top=20, bottom=12))]
+            + [ft.NavigationDrawerDestination(icon=v.icon, selected_icon=v.selected_icon, label=self.t(v.key))
+               for v in self.views],
+            on_change=self._menu_selected,
+        )
+        self.page.drawer = self.drawer if self.compact else None
+        pad = 6 if self.compact else 12
+        self.holders = [ft.Container(v.control, visible=False, expand=True, padding=ft.Padding.all(pad))
                         for v in self.views]
 
         self.callsign = ft.Text(weight=ft.FontWeight.BOLD, size=18)
@@ -189,9 +221,16 @@ class App:
         self._show_update()
         self.tx_switch = ft.Switch(label=self.t("transmit"), on_change=self._tx_changed)
         self.tx_box = ft.Container(self.tx_switch, border_radius=20, padding=ft.Padding.symmetric(horizontal=10))
+        if self.compact:
+            self.tx_switch.label = None
+        menu_btn = ft.IconButton(ft.Icons.MENU, tooltip=self.t("menu"), on_click=self._open_menu,
+                                 visible=self.compact)
+        self.callsign.size = 16 if self.compact else 18
+        self.tnc_text.visible = not self.compact
         status = ft.Container(
             ft.Row(
                 [
+                    menu_btn,
                     self.callsign,
                     ft.Row([self.tnc_dot, ft.Text(self.t("tnc"), size=13), self.tnc_text], spacing=4, tight=True),
                     self.is_box,
@@ -204,21 +243,18 @@ class App:
                     ft.IconButton(ft.Icons.INFO_OUTLINE, tooltip=self.t("about"),
                                   on_click=lambda _e: show_about(self)),
                 ],
-                spacing=16,
+                spacing=6 if self.compact else 16,
                 vertical_alignment=ft.CrossAxisAlignment.CENTER,
             ),
-            padding=ft.Padding.symmetric(horizontal=16, vertical=6),
+            padding=ft.Padding.symmetric(horizontal=4 if self.compact else 16, vertical=2 if self.compact else 6),
             bgcolor=ft.Colors.SURFACE_CONTAINER,
         )
         self.page.controls.clear()
         self.page.add(
             ft.SafeArea(
                 ft.Row(
-                    [
-                        self.rail,
-                        ft.VerticalDivider(width=1),
-                        ft.Column([status, ft.Stack(self.holders, expand=True)], expand=True, spacing=0),
-                    ],
+                    ([] if self.compact else [self.rail, ft.VerticalDivider(width=1)])
+                    + [ft.Column([status, ft.Stack(self.holders, expand=True)], expand=True, spacing=0)],
                     expand=True,
                     spacing=0,
                 ),
@@ -242,6 +278,7 @@ class App:
         index = next(i for i, v in enumerate(self.views) if v.key == key)
         self.current = index
         self.rail.selected_index = index
+        self.drawer.selected_index = index
         for i, holder in enumerate(self.holders):
             holder.visible = i == index
         self.views[index].shown()

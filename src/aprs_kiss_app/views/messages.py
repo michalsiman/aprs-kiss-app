@@ -31,20 +31,24 @@ class MessagesView(View):
                                capitalization=ft.TextCapitalization.CHARACTERS)
         self.text = ft.TextField(hint_text=self.t("text"), expand=True, dense=True, max_length=MAX_TEXT,
                                  on_submit=self._send)
+        compact = self.app.compact
         self.via = ft.Dropdown(
-            width=200, dense=True, value="both",
+            width=120 if compact else 200, dense=True, value="both",
             options=[ft.DropdownOption(key=k, text=self.t(f"via_{k}")) for k in ("radio", "internet", "both")],
         )
-        left = ft.Column(
+        # On a phone one side at a time: the conversations, or one conversation with a back button.
+        self.back = ft.IconButton(ft.Icons.ARROW_BACK, tooltip=self.t("back"), on_click=self._back, visible=False)
+        self.left = left = ft.Column(
             [
                 ft.FilledTonalButton(self.t("new_message"), icon=ft.Icons.EDIT, on_click=self._new),
                 self.conversations,
             ],
-            width=250,
+            width=None if compact else 250,
+            expand=compact,
         )
-        right = ft.Column(
+        self.right = right = ft.Column(
             [
-                self.title,
+                ft.Row([self.back, self.title], spacing=4),
                 ft.Container(ft.SelectionArea(self.thread), expand=True, border_radius=8,
                              bgcolor=ft.Colors.SURFACE_CONTAINER_LOWEST),
                 ft.Row([self.to, self.text, self.via,
@@ -53,6 +57,8 @@ class MessagesView(View):
             ],
             expand=True,
         )
+        if compact:
+            return ft.Row([left, right], expand=True, vertical_alignment=ft.CrossAxisAlignment.STRETCH)
         return ft.Row([left, ft.VerticalDivider(width=1), right], expand=True,
                       vertical_alignment=ft.CrossAxisAlignment.STRETCH)
 
@@ -106,6 +112,20 @@ class MessagesView(View):
         else:
             self.title.value = self.t("pick_conversation")
             self.thread.controls = []
+        self._sides()
+
+    def _sides(self) -> None:
+        if not self.app.compact:
+            return
+        open_ = bool(self.selected or self.to.visible)
+        self.left.visible, self.right.visible, self.back.visible = not open_, open_, open_
+
+    def _back(self, _e) -> None:
+        self.selected = None
+        self.to.visible = False
+        self._signature = None
+        self.refresh()
+        self.app.page.update()
 
     def _conversation_tile(self, call: str, msgs: list[dict]) -> ft.Control:
         last = msgs[-1]

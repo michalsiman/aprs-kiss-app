@@ -19,6 +19,14 @@ class MonitorView(View):
     icon = ft.Icons.LIST_ALT_OUTLINED
     selected_icon = ft.Icons.LIST_ALT
 
+    def _header(self) -> list[ft.Control]:
+        hint = ft.Text(self.t("monitor_hint"), color=ft.Colors.ON_SURFACE_VARIANT, expand=not self.app.compact)
+        buttons = [self.internet, self.pause_btn,
+                   ft.TextButton(self.t("clear"), icon=ft.Icons.DELETE_SWEEP, on_click=self._clear)]
+        if self.app.compact:  # a phone: the hint above, the buttons below
+            return [hint, ft.Row(buttons, wrap=True, spacing=0)]
+        return [ft.Row([hint, *buttons])]
+
     def build(self) -> ft.Control:
         self.paused = False
         self.lines = ft.ListView(expand=True, spacing=0, auto_scroll=True, padding=ft.Padding.all(8))
@@ -28,10 +36,7 @@ class MonitorView(View):
         self.pause_btn = ft.TextButton(self.t("pause"), icon=ft.Icons.PAUSE, on_click=self._toggle)
         return ft.Column(
             [
-                ft.Row([ft.Text(self.t("monitor_hint"), color=ft.Colors.ON_SURFACE_VARIANT, expand=True),
-                        self.internet,
-                        self.pause_btn,
-                        ft.TextButton(self.t("clear"), icon=ft.Icons.DELETE_SWEEP, on_click=self._clear)]),
+                *self._header(),
                 ft.Container(ft.SelectionArea(self.lines), expand=True, border_radius=8,
                              bgcolor=ft.Colors.SURFACE_CONTAINER_LOWEST),
             ],

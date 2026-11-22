@@ -145,9 +145,15 @@ jobs:
           path: dist/*
 
   macos:
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
+      # Flet's plugins (connectivity_plus) need the macOS/iOS 26 SDK, i.e. Xcode 26.
+      - name: Newest Xcode
+        run: |
+          X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$X" ]; then sudo xcode-select -s "$X"; fi
+          xcodebuild -version
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -171,9 +177,15 @@ jobs:
           path: dist/*
 
   ios:
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
+      # Flet's plugins (connectivity_plus) need the macOS/iOS 26 SDK, i.e. Xcode 26.
+      - name: Newest Xcode
+        run: |
+          X=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+          if [ -n "$X" ]; then sudo xcode-select -s "$X"; fi
+          xcodebuild -version
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"

@@ -68,6 +68,7 @@ class MapView(View):
             ], tight=True, wrap=True),
             bgcolor=ft.Colors.with_opacity(0.85, ft.Colors.SURFACE),
             border_radius=8, padding=ft.Padding.symmetric(horizontal=4), left=8, top=8,
+            right=8 if self.app.compact else None,  # on a phone the buttons wrap onto a second line
         )
         return ft.Stack([self.menu, overlay], expand=True)
 
