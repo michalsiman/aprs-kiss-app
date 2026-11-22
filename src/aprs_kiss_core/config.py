@@ -19,7 +19,7 @@ from .ax25 import Address
 _LOGGER = logging.getLogger(__name__)
 
 APP_NAME = "aprs-kiss"
-VERSION = "0.1.20"
+VERSION = "0.1.21"
 MIN_BEACON_MINUTES = 10
 
 

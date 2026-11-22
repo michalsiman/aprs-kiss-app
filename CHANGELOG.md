@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.21 – 2026-11-23
+
+- **Phone: the screens are in a bar along the bottom** instead of a side menu that covered half of the
+  screen. The bar scrolls sideways when the screens do not fit, and the open one stays in sight.
+
 ## 0.1.20 – 2026-11-23
 
 - **New platforms**: every release now also has

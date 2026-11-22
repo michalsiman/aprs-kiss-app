@@ -137,8 +137,8 @@ Download **`aprs-kiss-…-android.apk`** on the phone from the
 to allow installing apps from the browser or file manager once. On the phone the app reaches the TNC
 **over the network (KISS over TCP)**: Direwolf on a computer, the radio shared with
 [`kiss_tcp_bridge.py`](https://github.com/michalsiman/aprs-kiss-ha/tree/main/bridge), or a Wi-Fi TNC;
-a TNC on the phone's own USB port is not supported yet. The screens fit a phone: a menu instead of the
-side bar. BBS SERVER, USB GPS and the serial port are for computers only.
+a TNC on the phone's own USB port is not supported yet. The screens fit a phone: the screens in a bar along the
+bottom instead of the side bar. BBS SERVER, USB GPS and the serial port are for computers only.
 
 ## Install (iPhone, iPad)
 

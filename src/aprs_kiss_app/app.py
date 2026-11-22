@@ -58,7 +58,7 @@ class App:
         self._closing = False
         self.update_state = updates.UpdateState()
         self._desktop_dark: bool | None = None
-        self.compact = False  # a phone: a menu instead of the side rail, a slimmer top bar
+        self.compact = False  # a phone: a bottom bar instead of the side rail, a slimmer top bar
 
     # ─── start and stop ───────────────────────────────────────────────────
 
@@ -184,12 +184,28 @@ class App:
         if self.views and self._is_compact(getattr(e, "width", None)) != self.compact:
             self.build()
 
-    async def _open_menu(self, _e=None) -> None:
-        await self.page.show_drawer()
+    def _tab(self, v: View) -> ft.Container:
+        """One item of the phone's bottom bar: an icon with its name under it."""
+        return ft.Container(
+            ft.Column([ft.Icon(v.icon, size=22), ft.Text(self.t(v.key), size=10, no_wrap=True,
+                                               overflow=ft.TextOverflow.ELLIPSIS)],
+                      spacing=1, tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+            width=70, height=52, border_radius=12, alignment=ft.Alignment.CENTER, data=v.key, key=ft.ScrollKey(v.key),
+            on_click=lambda e: self.select(e.control.data), ink=True,
+        )
 
-    async def _menu_selected(self, e) -> None:
-        await self.page.close_drawer()
-        self.select(self.views[e.control.selected_index].key)
+    async def _scroll_tab(self, key: str) -> None:
+        """Keep the chosen screen's item in sight in the bottom bar."""
+        with contextlib.suppress(Exception):
+            await self.tabs.scroll_to(scroll_key=key, duration=200)
+
+    def _mark_tabs(self, index: int) -> None:
+        for i, (tab, v) in enumerate(zip(self.tabs.controls, self.views)):
+            on = i == index
+            tab.bgcolor = ft.Colors.SECONDARY_CONTAINER if on else None
+            icon = tab.content.controls[0]
+            icon.icon = v.selected_icon if on else v.icon
+            tab.content.controls[1].weight = ft.FontWeight.BOLD if on else None
 
     def build(self) -> None:
         self.t = Translator(self.engine.config.language)
@@ -210,14 +226,11 @@ class App:
                                                        label=self.t(v.key)) for v in self.views],
             on_change=lambda e: self.select(self.views[e.control.selected_index].key),
         )
-        self.drawer = ft.NavigationDrawer(
-            controls=[ft.Container(ft.Text("APRS & Packet", weight=ft.FontWeight.BOLD, size=16),
-                                   padding=ft.Padding.only(left=28, top=20, bottom=12))]
-            + [ft.NavigationDrawerDestination(icon=v.icon, selected_icon=v.selected_icon, label=self.t(v.key))
-               for v in self.views],
-            on_change=self._menu_selected,
-        )
-        self.page.drawer = self.drawer if self.compact else None
+        # a phone: the screens in a bar along the bottom (scrolls sideways when they do not fit)
+        self.tabs = ft.Row([self._tab(v) for v in self.views], spacing=2, scroll=ft.ScrollMode.HIDDEN,
+                           alignment=ft.MainAxisAlignment.SPACE_EVENLY)
+        bottom_bar = ft.Container(self.tabs, bgcolor=ft.Colors.SURFACE_CONTAINER,
+                                  padding=ft.Padding.symmetric(horizontal=4, vertical=4))
         pad = 6 if self.compact else 12
         self.holders = [ft.Container(v.control if v.built else None, visible=False, expand=True,
                                      padding=ft.Padding.all(pad))
@@ -239,14 +252,11 @@ class App:
         self.tx_box = ft.Container(self.tx_switch, border_radius=20, padding=ft.Padding.symmetric(horizontal=10))
         if self.compact:
             self.tx_switch.label = None
-        menu_btn = ft.IconButton(ft.Icons.MENU, tooltip=self.t("menu"), on_click=self._open_menu,
-                                 visible=self.compact)
         self.callsign.size = 16 if self.compact else 18
         self.tnc_text.visible = not self.compact
         status = ft.Container(
             ft.Row(
                 [
-                    menu_btn,
                     self.callsign,
                     ft.Row([self.tnc_dot, ft.Text(self.t("tnc"), size=13), self.tnc_text], spacing=4, tight=True),
                     self.is_box,
@@ -262,7 +272,7 @@ class App:
                 spacing=6 if self.compact else 16,
                 vertical_alignment=ft.CrossAxisAlignment.CENTER,
             ),
-            padding=ft.Padding.symmetric(horizontal=4 if self.compact else 16, vertical=2 if self.compact else 6),
+            padding=ft.Padding.symmetric(horizontal=10 if self.compact else 16, vertical=2 if self.compact else 6),
             bgcolor=ft.Colors.SURFACE_CONTAINER,
         )
         self.page.controls.clear()
@@ -270,7 +280,9 @@ class App:
             ft.SafeArea(
                 ft.Row(
                     ([] if self.compact else [self.rail, ft.VerticalDivider(width=1)])
-                    + [ft.Column([status, ft.Stack(self.holders, expand=True)], expand=True, spacing=0)],
+                    + [ft.Column([status, ft.Stack(self.holders, expand=True)]
+                                 + ([ft.Divider(height=1), bottom_bar] if self.compact else []),
+                                 expand=True, spacing=0)],
                     expand=True,
                     spacing=0,
                 ),
@@ -296,7 +308,9 @@ class App:
         index = next(i for i, v in enumerate(self.views) if v.key == key)
         self.current = index
         self.rail.selected_index = index
-        self.drawer.selected_index = index
+        self._mark_tabs(index)
+        if self.compact and self.tabs.page:
+            self.page.run_task(self._scroll_tab, key)
         if self.holders[index].content is not self.views[index].control:
             self.holders[index].content = self.views[index].control  # built the first time it is shown
         for i, holder in enumerate(self.holders):
@@ -391,6 +405,7 @@ class App:
             messages = self.view("messages")
             dest = self.rail.destinations[self.views.index(messages)]
             dest.badge = str(len(messages.unread)) if messages.unread else None
+            self.tabs.controls[self.views.index(messages)].content.controls[0].badge = dest.badge
 
     # ─── new versions ─────────────────────────────────────────────────────
 

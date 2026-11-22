@@ -136,8 +136,8 @@ Stáhněte v telefonu **`aprs-kiss-…-android.apk`** z
 se jednou zeptá, jestli smí prohlížeč nebo správce souborů instalovat aplikace. V telefonu se aplikace
 připojuje k TNC **po síti (KISS přes TCP)**: Direwolf na počítači, rádio sdílené přes
 [`kiss_tcp_bridge.py`](https://github.com/michalsiman/aprs-kiss-ha/tree/main/bridge) nebo Wi-Fi TNC;
-TNC na USB portu telefonu zatím podporované není. Obrazovky jsou upravené pro telefon: místo boční
-lišty je nabídka. BBS SERVER, USB GPS a sériový port jsou jen pro počítače.
+TNC na USB portu telefonu zatím podporované není. Obrazovky jsou upravené pro telefon a přepínají
+se v liště dole. BBS SERVER, USB GPS a sériový port jsou jen pro počítače.
 
 ## Instalace (iPhone, iPad)
 
