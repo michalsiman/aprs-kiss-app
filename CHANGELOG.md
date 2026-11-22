@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.9 – 2026-11-22
+
+- Third-party packets (`}`), which an iGate uses to put an internet station on the air, are now
+  unpacked: the station inside shows on the map at its position, marked *iGate OK0XYZ* in the
+  station list until your radio hears it directly.
+- Messages for you that an iGate relays from the internet by radio are now received and
+  acknowledged (the ack goes back by radio for the iGate to pass on). Before, they were dropped
+  unless the app was also connected to APRS-IS.
+
 ## 0.1.8 – 2026-11-22
 
 - Monitor: a *Stations from the internet* switch hides the APRS-IS lines (`[IS]`) and leaves only

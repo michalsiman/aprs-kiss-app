@@ -111,6 +111,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.9" date="2026-11-22">
+      <description>
+        <p>Stations and messages that an iGate relays from the internet by radio are now shown: the station on the map, the message in your inbox, acknowledged by radio.</p>
+      </description>
+    </release>
     <release version="0.1.8" date="2026-11-22">
       <description>
         <p>The monitor can hide stations from the internet (APRS-IS) and show only radio traffic. Windows installer.</p>

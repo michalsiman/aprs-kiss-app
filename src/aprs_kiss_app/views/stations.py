@@ -19,6 +19,8 @@ def describe(app, entry: dict) -> str:
         d = distance_km(conf.latitude, conf.longitude, entry["latitude"], entry["longitude"])
         parts.append(f"{d:.0f} km {bearing(conf.latitude, conf.longitude, entry['latitude'], entry['longitude'])}")
     parts.append(app.t("via_heard_rf") if entry.get("last_rf") else app.t("via_heard_is"))
+    if entry.get("gated_by"):
+        parts.append(f"iGate {entry['gated_by']}")
     _, name, known = symbol_info(entry.get("symbol_table"), entry.get("symbol"), app.t.language)
     if known:
         parts.append(name)
