@@ -1,5 +1,7 @@
 # APRS & Packet – standalone app
 
+**English** · [Česky](README.cs.md)
+
 An APRS station and packet radio terminal for a radio with a **KISS TNC**, as a normal desktop
 application – no Home Assistant, no web server. It is the standalone sibling of the
 [APRS & Packet Home Assistant integration](https://github.com/michalsiman/aprs-kiss-ha) and shares
@@ -27,7 +29,8 @@ Builds for **Linux** and **Windows**; **macOS** is planned, Android and iOS late
 - **BBS SERVER**: run your own packet BBS on your callsign with its own SSID – classic W0RLI / MBL / FBB
   commands, personal messages and bulletins, settings and texts in plain files (bbs.toml, welcome.txt,
   …), one text file per message. While it runs, everything else in the app is off (the radio sits on the
-  BBS frequency, never on 144.800); switching it on takes a typed confirmation
+  BBS frequency, never on 144.800); switching it on takes a typed confirmation.
+  See the **[BBS SERVER guide](docs/BBS.md)**
 - **Packet chat** (plain text to CQ, QST, ALL or you; automatic frames such as digipeater DX reports
   stay out) and a TNC-style **frame monitor**, which can hide the APRS-IS lines
 - **APRS-IS** (internet) with optional RX and TX iGate; messages an iGate relays to you by radio
@@ -63,7 +66,8 @@ GitHub theme, and so does the app: it uses the system's light or dark mode.
 <td><a href="assets/monitor.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/monitor-light.png"><img src="assets/monitor.png" alt="Frame monitor"></picture></a></td>
 </tr>
 <tr>
-<td colspan="2"><a href="assets/settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-light.png"><img src="assets/settings.png" alt="Settings: TNC connection and station"></picture></a></td>
+<td><a href="assets/bbs.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/bbs-light.png"><img src="assets/bbs.png" alt="BBS SERVER: the app as a packet BBS"></picture></a></td>
+<td><a href="assets/settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-light.png"><img src="assets/settings.png" alt="Settings: TNC connection and station"></picture></a></td>
 </tr>
 </table>
 
@@ -148,7 +152,7 @@ The *Release packages* workflow runs `flet build linux` once and makes the tarba
 ```
 src/
   aprs_kiss_core/   the radio, no user interface: KISS, AX.25 (UI + connected mode), APRS,
-                    APRS-IS/iGate, the station (acks, retries, limits) and the Engine that
+                    APRS-IS/iGate, the station (acks, retries, limits), the BBS server (bbs/) and the Engine that
                     ties it together and announces events to listeners
   aprs_kiss_app/    the Flet user interface: one view per screen
   main.py           entry point for `flet run` / `flet build`

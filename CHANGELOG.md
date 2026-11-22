@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.14 – 2026-11-22
+
+- **BBS SERVER guide** in English and Czech ([docs/BBS.md](docs/BBS.md), [docs/BBS.cs.md](docs/BBS.cs.md)):
+  switching it on, the settings, where the files are, every option in bbs.toml, the placeholders in the
+  texts, users.toml, the message files and the user commands, with screenshots. The BBS SERVER section
+  has a *Guide* button that opens it.
+- **README in Czech** ([README.cs.md](README.cs.md)) with Czech screenshots; both READMEs link to each other.
+- New screenshots in English and Czech, light and dark, now with BBS SERVER.
+- The BBS folder is shown with ~ for your home folder.
+
 ## 0.1.13 – 2026-11-22
 
 - **BBS SERVER**: the app can run its own packet BBS on your callsign with its own SSID. Users get the

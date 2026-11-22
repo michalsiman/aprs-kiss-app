@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.14" date="2026-11-22">
+      <description>
+        <p>A guide to the BBS SERVER in English and Czech, a Czech README and new screenshots.</p>
+      </description>
+    </release>
     <release version="0.1.13" date="2026-11-22">
       <description>
         <p>BBS SERVER: run your own packet BBS, configured in files and in Settings. The terminal shows connect attempts and can stop them.</p>

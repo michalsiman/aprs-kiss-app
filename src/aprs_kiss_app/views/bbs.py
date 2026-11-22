@@ -12,7 +12,11 @@ from aprs_kiss_core.bbs import BbsConfigError
 from aprs_kiss_core.config import Config
 
 from ..i18n import TEXTS
-from .base import MONO, View, clock
+from .base import MONO, View, clock, short_path
+
+
+GUIDE_EN = "https://github.com/michalsiman/aprs-kiss-app/blob/main/docs/BBS.md"
+GUIDE_CS = "https://github.com/michalsiman/aprs-kiss-app/blob/main/docs/BBS.cs.md"
 
 
 def _plain(text: str) -> str:
@@ -37,16 +41,19 @@ class BbsView(View):
         self.switch = ft.Switch(label=self.t("bbs"), value=self.engine.bbs_mode, on_change=self._toggle)
         self.state = ft.Text(size=15, weight=ft.FontWeight.BOLD)
         self.hint = ft.Text(size=12, color=ft.Colors.ON_SURFACE_VARIANT)
-        self.folder = ft.Text(str(self.engine.bbs_folder()), size=12, font_family=MONO, selectable=True)
+        self.folder = ft.Text(short_path(self.engine.bbs_folder()), size=12, font_family=MONO, selectable=True)
         self.tools = ft.Row([
             ft.TextButton(self.t("bbs_folder"), icon=ft.Icons.FOLDER_OPEN, on_click=self._open_folder),
             ft.TextButton(self.t("bbs_reload"), icon=ft.Icons.REFRESH, on_click=self._reload),
         ], wrap=True)
+        self.guide = ft.TextButton(self.t("bbs_guide"), icon=ft.Icons.MENU_BOOK, url=GUIDE_CS if self.t.language == "cs"
+                                   else GUIDE_EN)
         self.users = ft.Column(spacing=2)
         self.messages = ft.ListView(expand=True, spacing=0)
         self.log = ft.ListView(expand=True, spacing=0, auto_scroll=True)
         header = ft.Container(
-            ft.Column([ft.Row([ft.Icon(ft.Icons.DNS, color=ft.Colors.PRIMARY), self.switch]), self.state, self.hint,
+            ft.Column([ft.Row([ft.Icon(ft.Icons.DNS, color=ft.Colors.PRIMARY), self.switch, self.guide]), self.state,
+                       self.hint,
                        self.folder, self.tools], spacing=4, tight=True),
             padding=12, border_radius=8, bgcolor=ft.Colors.SURFACE_CONTAINER,
         )

@@ -22,7 +22,7 @@ from aprs_kiss_core.config import Config
 
 from ..i18n import LANGUAGES, TEXTS, ssid_labels
 from ..symbols import SYMBOLS
-from .base import View
+from .base import View, short_path
 
 BAUDRATES = ["1200", "4800", "9600", "19200", "38400", "57600", "115200"]
 
@@ -174,7 +174,7 @@ class SettingsView(View):
                          ft.Row([self.bbs_idle, self.bbs_tx, self.bbs_max], wrap=True),
                          ft.Text(t("bbs_welcome"), size=12), ft.Row([self.bbs_welcome]),
                          ft.Text(t("bbs_more"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
-                         ft.Text(str(self.engine.bbs_folder()), size=12, font_family="monospace", selectable=True)),
+                         ft.Text(short_path(self.engine.bbs_folder()), size=12, font_family="monospace", selectable=True)),
                 _section(t("app_section"), ft.Row([self.language, self.theme], wrap=True), self.check_updates,
                          ft.Row([ft.OutlinedButton(t("about"), icon=ft.Icons.INFO_OUTLINE,
                                                    on_click=lambda _e: self._about())])),

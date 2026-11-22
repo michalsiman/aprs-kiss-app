@@ -46,6 +46,14 @@ class View:
         self.refresh()
 
 
+def short_path(path) -> str:
+    """A path with the home folder as ~, shorter to read (and without the user name)."""
+    from pathlib import Path  # noqa: PLC0415
+
+    text, home = str(path), str(Path.home())
+    return "~" + text[len(home):] if text == home or text.startswith(home + "/") or text.startswith(home + "\\") else text
+
+
 def clock(ts: float | None) -> str:
     if not ts:
         return ""
