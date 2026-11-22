@@ -13,11 +13,11 @@ from .base import View, bearing, distance_km
 
 def describe(app, entry: dict) -> str:
     """One line about a heard station: distance, how it was heard, symbol, comment."""
-    conf = app.engine.config
+    here = app.engine.my_position()
     parts = []
-    if conf.has_position and entry.get("latitude") is not None:
-        d = distance_km(conf.latitude, conf.longitude, entry["latitude"], entry["longitude"])
-        parts.append(f"{d:.0f} km {bearing(conf.latitude, conf.longitude, entry['latitude'], entry['longitude'])}")
+    if here and entry.get("latitude") is not None:
+        d = distance_km(*here, entry["latitude"], entry["longitude"])
+        parts.append(f"{d:.0f} km {bearing(*here, entry['latitude'], entry['longitude'])}")
     parts.append(app.t("via_heard_rf") if entry.get("last_rf") else app.t("via_heard_is"))
     if entry.get("gated_by"):
         parts.append(f"iGate {entry['gated_by']}")

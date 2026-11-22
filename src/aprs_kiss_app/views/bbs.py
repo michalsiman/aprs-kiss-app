@@ -185,5 +185,8 @@ class BbsView(View):
         ))
 
     async def _apply(self, on: bool) -> None:
-        conf = Config.from_dict({**self.engine.config.to_dict(), "bbs_enabled": on}).validate()
+        data = {**self.engine.config.to_dict(), "bbs_enabled": on}
+        if on:
+            data["tak_enabled"] = False  # one exclusive mode at a time
+        conf = Config.from_dict(data).validate()
         await self.app.apply_config(conf)

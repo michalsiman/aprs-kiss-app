@@ -1,6 +1,6 @@
 [project]
 name = "aprs-kiss"
-version = "0.1.15"
+version = "0.1.16"
 description = "APRS station and packet radio terminal for a KISS TNC, as a desktop (and later mobile) app"
 readme = "README.md"
 license = "MIT"

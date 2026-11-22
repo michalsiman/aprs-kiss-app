@@ -113,6 +113,29 @@ class SettingsView(View):
         self.bbs_ssid = ft.Dropdown(label=t("bbs_ssid"), value=str(c.bbs_ssid), width=200,
                                     options=[ft.DropdownOption(key=str(i), text=str(i)) for i in range(1, 16)])
         self._build_bbs_fields(t)
+        self.gps_source = ft.Dropdown(label=t("gps_source"), value=c.gps_source if c.gps_source in ("manual", "usb")
+                                      else "manual", width=320, on_select=lambda _e: self._gps_changed(),
+                                      options=[ft.DropdownOption(key="manual", text=t("gps_manual")),
+                                               ft.DropdownOption(key="usb", text=t("gps_usb"))])
+        self.gps_device = ft.Dropdown(label=t("gps_device"), value=c.gps_device or None, editable=True, expand=True,
+                                      options=self._port_options(c.gps_device))
+        self.gps_baud = ft.Dropdown(label=t("baudrate"), value=str(c.gps_baudrate or 0), width=170,
+                                    options=[ft.DropdownOption(key="0", text=t("gps_auto"))] +
+                                    [ft.DropdownOption(key=b, text=b) for b in ("4800", "9600", "38400", "115200")])
+        self.gps_row = ft.Row([self.gps_device, self.gps_baud,
+                               ft.IconButton(ft.Icons.REFRESH, tooltip=t("refresh_ports"),
+                                             on_click=lambda _e: self._refresh_gps_ports())])
+        self.gps_hint = ft.Text(t("gps_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT)
+        self._gps_changed(update=False)
+        from aprs_kiss_core import tak  # noqa: PLC0415
+        self.tak_callsign = ft.TextField(label=t("tak_callsign"), value=c.tak_callsign, width=330,
+                                         capitalization=ft.TextCapitalization.CHARACTERS)
+        self.tak_team = ft.Dropdown(label=t("tak_team"), value=c.tak_team if c.tak_team in tak.TEAMS else "Cyan",
+                                    width=200, options=[ft.DropdownOption(key=x, text=x) for x in tak.TEAMS])
+        self.tak_role = ft.Dropdown(label=t("tak_role"), value=c.tak_role if c.tak_role in tak.ROLES else "Team Member",
+                                    width=220, options=[ft.DropdownOption(key=x, text=x) for x in tak.ROLES])
+        self.tak_interval = ft.TextField(label=t("tak_interval"), value=str(c.tak_interval_min), width=440,
+                                         keyboard_type=ft.KeyboardType.NUMBER, input_filter=ft.NumbersOnlyInputFilter())
         lang_index = 3 if t.language == "cs" else 2
         symbols = [ft.DropdownOption(key=s[0], text=f"{s[1]}  {s[lang_index]} ({s[0]})") for s in SYMBOLS]
         if not any(s[0] == c.symbol for s in SYMBOLS):
@@ -169,7 +192,10 @@ class SettingsView(View):
                          ft.Row([self.lat, self.lon], wrap=True),
                          ft.Text(t("position_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
                          self.beacon, self.beacon_is, self.tracked, self.incoming),
+                _section("GPS", self.gps_source, self.gps_row, self.gps_hint),
                 _section(t("aprsis"), self.aprsis, self.licence, self.is_fields, self.is_state),
+                _section(t("tak"), ft.Row([self.tak_callsign, self.tak_team, self.tak_role], wrap=True),
+                         self.tak_interval),
                 _section(t("bbs"), ft.Row([self.bbs_ssid, self.bbs_sessions], wrap=True),
                          ft.Row([self.bbs_idle, self.bbs_tx, self.bbs_max], wrap=True),
                          ft.Text(t("bbs_welcome"), size=12), ft.Row([self.bbs_welcome]),
@@ -233,6 +259,16 @@ class SettingsView(View):
             state = self.t("disconnected") + (f" – {s['error']}" if s.get("error") else "")
         self.is_state.value = f"{self.t('aprsis_state')}: {state}"
 
+    def _gps_changed(self, update: bool = True) -> None:
+        usb = self.gps_source.value == "usb"
+        self.gps_row.visible = self.gps_hint.visible = usb
+        if update:
+            self.app.page.update()
+
+    def _refresh_gps_ports(self) -> None:
+        self.gps_device.options = self._port_options(self.gps_device.value)
+        self.app.page.update()
+
     # ─── BBS SERVER: these fields live in the BBS folder (bbs.toml, welcome.txt), not in the app's config
 
     def _build_bbs_fields(self, t) -> None:
@@ -286,6 +322,10 @@ class SettingsView(View):
             "beacon_minutes": self.beacon.value, "beacon_is": self.beacon_is.value,
             "tracked_callsigns": self.tracked.value, "accept_incoming": self.incoming.value,
             "bbs_ssid": self.bbs_ssid.value or "1",
+            "gps_source": self.gps_source.value or "manual", "gps_device": (self.gps_device.value or "").strip(),
+            "gps_baudrate": self.gps_baud.value or "0",
+            "tak_callsign": (self.tak_callsign.value or "").strip().upper(), "tak_team": self.tak_team.value or "Cyan",
+            "tak_role": self.tak_role.value or "Team Member", "tak_interval_min": self.tak_interval.value or "0",
             "aprsis_enabled": self.aprsis.value, "aprsis_host": self.is_host.value, "aprsis_port": self.is_port.value,
             "aprsis_passcode": self.passcode.value, "aprsis_radius_km": self.radius.value,
             "igate_rx": self.igate_rx.value, "igate_tx": self.igate_tx.value,
@@ -311,6 +351,13 @@ class SettingsView(View):
             self.error.value = f"{self.t('invalid')}: {err}"
             return
         self.error.value = ""
+        if data["gps_source"] == "usb" and not data["gps_device"]:
+            self.error.value = f"{self.t('invalid')}: {self.t('gps_device')}"
+            return
+        if (data["gps_source"] == "usb" and data["connection"] == "serial"
+                and data["gps_device"] == data["device"]):
+            self.error.value = f"{self.t('invalid')}: {self.t('gps_same_port')}"
+            return
         try:
             await asyncio.to_thread(self._save_bbs)
         except (BbsConfigError, OSError, ValueError) as err:

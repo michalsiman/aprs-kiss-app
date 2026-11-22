@@ -29,7 +29,8 @@ class MapView(View):
         self._signature = None
         self._last_build = 0.0
         conf = self.engine.config
-        center = (conf.latitude, conf.longitude) if conf.has_position else DEFAULT_CENTER
+        here = self.engine.my_position()
+        center = here or DEFAULT_CENTER
         self.markers = fm.MarkerLayer(markers=[])
         self.tiles = fm.TileLayer(url_template=TILES, user_agent_package_name=USER_AGENT, max_zoom=19,
                                   opacity=MUTED_OPACITY if conf.map_muted else 1.0)
@@ -37,7 +38,7 @@ class MapView(View):
             expand=True,
             bgcolor=ft.Colors.SURFACE,
             initial_center=fm.MapLatitudeLongitude(*center),
-            initial_zoom=10 if conf.has_position else 7,
+            initial_zoom=10 if here else 7,
             layers=[
                 self.tiles,
                 self.markers,
@@ -83,6 +84,15 @@ class MapView(View):
         self.app.save_config_soon()
         self.app.page.update()
 
+    def _centre_on_first_fix(self) -> None:
+        """The first GPS fix moves the map to where we are, once, while the map is on screen."""
+        if getattr(self, "_gps_centred", False) or self.app.current_key != self.key:
+            return
+        here = self.engine.gps_fix()
+        if here:
+            self._gps_centred = True
+            self.app.page.run_task(self.centre, here.latitude, here.longitude, 11)
+
     def force(self) -> None:
         self.internet.value = self.engine.config.show_internet
         self._signature = None
@@ -113,11 +123,11 @@ class MapView(View):
         )
 
     def refresh(self) -> None:
+        self._centre_on_first_fix()
         now = time.time()
         heard = self.engine.station.heard
         signature = (len(heard), next(reversed(heard), None),
-                     heard[next(reversed(heard))]["count"] if heard else 0, self.engine.config.latitude,
-                     self.engine.config.longitude)
+                     heard[next(reversed(heard))]["count"] if heard else 0, self.engine.my_position())
         if signature == self._signature or now - self._last_build < REBUILD_SECONDS:
             return
         self._signature = signature
@@ -137,8 +147,9 @@ class MapView(View):
                                         emoji(e.get("symbol_table"), e.get("symbol")), station_color(self.app, e),
                                         on_click=lambda _e, c=call: self.app.show_station(c),
                                         bold=bool(e.get("last_rf"))))
-        if conf.has_position:
-            markers.append(self._marker(conf.latitude, conf.longitude, self.engine.status()["callsign"] or self.t("my_position"),
+        here = self.engine.my_position()
+        if here:
+            markers.append(self._marker(*here, self.engine.status()["callsign"] or self.t("my_position"),
                                         emoji(conf.symbol[:1], conf.symbol[1:]), COLOR_ME, bold=True))
         self.markers.markers = markers
 
@@ -169,5 +180,6 @@ class MapView(View):
 
     async def _centre_me(self, _e) -> None:
         conf = self.engine.config
-        if conf.has_position:
-            await self.centre(conf.latitude, conf.longitude, 11)
+        here = self.engine.my_position()
+        if here:
+            await self.centre(*here, 11)

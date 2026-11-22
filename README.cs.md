@@ -31,6 +31,11 @@ Sestavení pro **Linux** a **Windows**; **macOS** je v plánu, Android a iOS poz
   každá zpráva v jednom textovém souboru. Dokud běží, je všechno ostatní v aplikaci vypnuté (rádio je
   na kmitočtu BBS, nikdy ne na 144.800); zapnutí vyžaduje napsat potvrzovací větu.
   Viz **[návod k BBS SERVER](docs/BBS.cs.md)**
+- **TAK**: aplikace jako TAK stanice přes rádio – polohy a GeoChat kompatibilní s ATAK (TAK Protocol v1
+  v AX.25 UI rámcích), stanice na mapě barevně podle týmu, zprávy všem nebo jedné stanici.
+  Stejně jako BBS SERVER vypne všechno ostatní. Viz **[specifikace TAK](docs/TAK.cs.md)**
+- **USB GPS modul** (NMEA, u-blox/VK-172 a podobné, rychlost se zjistí sama): s fixem používá jeho polohu
+  mapa, maják (i s výškou) a TAK; stav GPS v horní liště
 - **Packet chat** (prostý text na CQ, QST, ALL nebo vám; automatické rámce jako DX hlášení
   digipeaterů do chatu nepatří; jak ho použít v jiném softwaru popisuje **[specifikace chatu](docs/CHAT.cs.md)**)
   a **monitor rámců** jako na TNC, který umí skrýt řádky z APRS-IS

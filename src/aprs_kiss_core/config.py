@@ -19,7 +19,7 @@ from .ax25 import Address
 _LOGGER = logging.getLogger(__name__)
 
 APP_NAME = "aprs-kiss"
-VERSION = "0.1.15"
+VERSION = "0.1.16"
 MIN_BEACON_MINUTES = 10
 
 
@@ -59,6 +59,14 @@ class Config:
     show_internet: bool = True  # map and station list also show stations seen only on APRS-IS
     monitor_internet: bool = True  # the frame monitor also shows APRS-IS lines ([IS])
     map_muted: bool = False  # map tiles faded, so the station labels stand out
+    gps_source: str = "manual"  # "manual" (latitude/longitude above) or "usb" (an NMEA GPS module)
+    gps_device: str = ""  # its serial port
+    gps_baudrate: int = 0  # 0 = find it automatically
+    tak_enabled: bool = False  # TAK mode: only TAK positions and GeoChat over the radio
+    tak_callsign: str = ""  # TAK callsign shown to others; empty = the station callsign
+    tak_team: str = "Cyan"
+    tak_role: str = "Team Member"
+    tak_interval_min: int = 2  # own position every N minutes (0 = only when asked)
     bbs_enabled: bool = False  # run the BBS server (its own SSID, below)
     bbs_ssid: int = 1  # the BBS answers on your callsign with this SSID
     bbs_list: str = ""  # saved BBSes and nodes for the terminal: JSON [{"call": ..., "path": ...}]

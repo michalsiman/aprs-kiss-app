@@ -31,6 +31,11 @@ Builds for **Linux** and **Windows**; **macOS** is planned, Android and iOS late
   …), one text file per message. While it runs, everything else in the app is off (the radio sits on the
   BBS frequency, never on 144.800); switching it on takes a typed confirmation.
   See the **[BBS SERVER guide](docs/BBS.md)**
+- **TAK**: the app as a TAK station over the radio – ATAK-compatible positions and GeoChat (TAK Protocol v1
+  in AX.25 UI frames), the stations on the map coloured by team, messages to everybody or one station.
+  Like BBS SERVER it switches everything else off. See the **[TAK specification](docs/TAK.md)**
+- **USB GPS module** (NMEA, u-blox/VK-172 and the like, speed found automatically): with a fix the map,
+  the beacon (with altitude) and TAK use its position; GPS state in the top bar
 - **Packet chat** (plain text to CQ, QST, ALL or you; automatic frames such as digipeater DX reports
   stay out; see the **[chat specification](docs/CHAT.md)** to use it from other software) and a
   TNC-style **frame monitor**, which can hide the APRS-IS lines

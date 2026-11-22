@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.16 – 2026-11-22
+
+- **USB GPS module** as the source of your position (Settings › GPS): NMEA from u-blox, VK-172 and
+  similar modules, the speed found automatically, reconnecting when unplugged. With a fix the map,
+  the station list, the beacon (with the APRS altitude extension) and TAK use the GPS position; without
+  one, the position typed in Settings. The top bar shows the GPS state; the map centres on the first fix.
+- **TAK**: a new section that turns the app into a TAK station over the radio – positions (PLI) and
+  GeoChat in TAK Protocol v1 (protobuf) in AX.25 UI frames, compatible with ATAK, WinTAK and iTAK.
+  The TAK stations on the map, coloured by team and faded when stale; a station list; GeoChat to
+  everybody or to one station; your position every N minutes and with a button. Callsign, team, role
+  and interval in Settings › TAK. Switching it on takes a typed sentence ("TAK must have another
+  frequency than APRS") and, like BBS SERVER, turns everything else off. The monitor shows TAK frames
+  decoded. [Specification](docs/TAK.md).
+
 ## 0.1.15 – 2026-11-22
 
 - Chat: a message that starts with a character APRS uses (`?`, `:`, `>`, `!`, `@`…, e.g. a smiley

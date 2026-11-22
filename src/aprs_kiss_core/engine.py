@@ -32,6 +32,8 @@ from . import thursday
 from .aprsis import AprsIsClient, gate_to_is, passcode, third_party
 from .ax25 import PF, U_DM, Address, Frame
 from .bbs import BbsConfigError, BbsServer
+from . import tak
+from .gps import GpsFix, GpsReader
 from .config import MIN_BEACON_MINUTES, VERSION, Config, data_dir, load_state, save_state
 from .connection import KissConnection, TncSettings
 from .parser import parse
@@ -120,6 +122,13 @@ class Engine:
         self.bbs_call: Address | None = None
         self.bbs_error = ""
         self.bbs_sessions: dict[str, Session] = {}
+        self.gps: GpsReader | None = None
+        # TAK: the stations heard (uid -> event), the GeoChat messages and the position loop
+        self.tak_stations: dict[str, dict[str, Any]] = {}
+        self.tak_chat: deque[dict[str, Any]] = deque(maxlen=CHAT_LINES)
+        self._tak_task: asyncio.Task | None = None
+        self.gps_error = ""
+        self._gps_shown: tuple | None = None
         self._bbs_task: asyncio.Task | None = None
         self._save_handle: asyncio.TimerHandle | None = None
         self._loaded = False
@@ -147,14 +156,26 @@ class Engine:
         no APRS, APRS-IS, iGate, beacon, messages, terminal or chat until it is switched off."""
         return bool(self.config.bbs_enabled and self.config.configured)
 
+    @property
+    def tak_mode(self) -> bool:
+        """TAK on: the app is a TAK station over the radio (positions and GeoChat) and nothing else.
+        BBS SERVER wins if both were switched on in the settings file."""
+        return bool(self.config.tak_enabled and self.config.configured and not self.bbs_mode)
+
+    @property
+    def exclusive_mode(self) -> str:
+        return "bbs" if self.bbs_mode else "tak" if self.tak_mode else ""
+
     def _not_in_bbs_mode(self) -> None:
         if self.bbs_mode:
             raise TransmitRefused("BBS SERVER is on: everything else is off")
+        if self.tak_mode:
+            raise TransmitRefused("TAK is on: everything else is off")
 
     def _build(self, tx_enabled: bool) -> None:
         conf = self.config
         self.me = Address.parse(conf.callsign or "NOCALL")
-        bbs = bool(conf.bbs_enabled and conf.configured)
+        bbs = bool((conf.bbs_enabled or conf.tak_enabled) and conf.configured)  # an exclusive mode
         self.accept_incoming = conf.accept_incoming and not bbs
         self.igate_rx = conf.igate_rx and not bbs
         self.igate_tx = conf.igate_tx and not bbs
@@ -170,8 +191,9 @@ class Engine:
         )
         self.station.tx_enabled = tx_enabled
         self._build_bbs()
+        self._build_gps()
         self.aprsis: AprsIsClient | None = None
-        if conf.aprsis_on and conf.callsign and not self.bbs_mode:
+        if conf.aprsis_on and conf.callsign and not self.exclusive_mode:
             radius = int(conf.aprsis_radius_km or 0)
             code = conf.aprsis_passcode or passcode(str(self.me))
             area = (f"r/{conf.latitude:.3f}/{conf.longitude:.3f}/{radius}"
@@ -181,6 +203,139 @@ class Engine:
                 f"aprs-kiss {VERSION}", self._on_is_line, self._on_is_state,
             )
             self.station.send_is = self._send_own_to_is
+
+    # ─── own position: typed in, or from a USB GPS module ────────────────
+
+    def _build_gps(self) -> None:
+        self.gps, self.gps_error, self._gps_shown = None, "", None
+        conf = self.config
+        if conf.gps_source != "usb" or self.bbs_mode:
+            return
+        if not conf.gps_device:
+            self.gps_error = "No GPS port chosen"
+            return
+        if conf.connection == "serial" and conf.device and conf.gps_device == conf.device:
+            self.gps_error = "The GPS must be on another port than the TNC"
+            return
+        self.gps = GpsReader(conf.gps_device, int(conf.gps_baudrate or 0), self._on_gps_fix, self._on_update)
+
+    def _on_gps_fix(self, fix: GpsFix) -> None:
+        # Announce it only when something visible changes (about 1 m, the satellites, the fix).
+        shown = (fix.usable(), round(fix.latitude or 0, 5), round(fix.longitude or 0, 5), fix.satellites)
+        if shown != self._gps_shown:
+            self._gps_shown = shown
+            self._emit("gps")
+            self._on_update()
+
+    def gps_fix(self) -> GpsFix | None:
+        """The GPS fix when there is a usable one."""
+        return self.gps.fix if self.gps and self.gps.fix.usable() else None
+
+    def my_position(self) -> tuple[float, float] | None:
+        """Where we are: the GPS fix when there is one, else the position typed in Settings."""
+        fix = self.gps_fix()
+        if fix:
+            return fix.latitude, fix.longitude
+        conf = self.config
+        return (conf.latitude, conf.longitude) if conf.has_position else None
+
+    def _position_comment(self, comment: str) -> str:
+        """APRS altitude extension (/A=feet) when the GPS knows it."""
+        fix = self.gps_fix()
+        if fix and fix.altitude_m is not None:
+            return f"/A={max(0, round(fix.altitude_m / 0.3048)):06d} {comment}".rstrip()
+        return comment
+
+    # ─── TAK ──────────────────────────────────────────────────────────────
+
+    @staticmethod
+    def _monitor_line(frame: Frame) -> str:
+        """TNC-style line; TAK frames (binary protobuf) are shown decoded."""
+        if frame.is_ui and frame.destination.call == tak.DESTINATION:
+            text = tak.monitor_text(frame.info)
+            if text:
+                return f"{frame.source}>{frame.destination} <UI>: {text}"
+        return frame.monitor()
+
+    @property
+    def tak_uid(self) -> str:
+        return str(self.me)
+
+    @property
+    def tak_callsign(self) -> str:
+        return (self.config.tak_callsign or "").strip() or str(self.me)
+
+    def _tak_frame(self, frame: Frame) -> None:
+        try:
+            ev = tak.decode(frame.info)
+        except (ValueError, IndexError) as err:
+            self._monitor(f"? TAK frame not understood ({err})")
+            return
+        if ev.uid == self.tak_uid or ev.uid.startswith(f"GeoChat.{self.tak_uid}."):
+            return  # our own, back from a digipeater
+        now = time.time()
+        if ev.type == tak.TYPE_CHAT:
+            chat = ev.extra
+            to = chat.get("to") or "All"
+            if to not in ("All", tak.ALL_CHAT, self.tak_uid):
+                return  # a private message for someone else
+            self._tak_chat_add({"time": now, "from": chat.get("sender") or str(frame.source),
+                                "uid": ev.uid.split(".")[1] if ev.uid.count(".") >= 3 else str(frame.source),
+                                "to": to, "text": chat.get("text", ""), "out": False})
+            return
+        if ev.lat == 0.0 and ev.lon == 0.0:
+            return
+        self.tak_stations[ev.uid] = {"uid": ev.uid, "callsign": ev.callsign or ev.uid, "type": ev.type,
+                                     "team": ev.team, "role": ev.role, "lat": ev.lat, "lon": ev.lon,
+                                     "hae": None if ev.hae >= tak.UNKNOWN else ev.hae, "speed": ev.speed,
+                                     "course": ev.course, "battery": ev.battery, "stale": ev.stale_ms / 1000,
+                                     "received": now, "via": str(frame.source)}
+        self._emit("tak", {"uid": ev.uid})
+        self._on_update()
+
+    def _tak_chat_add(self, entry: dict[str, Any]) -> None:
+        self.tak_chat.append(entry)
+        self._emit("tak", {"chat": entry})
+
+    async def _tak_send(self, event: tak.TakEvent) -> None:
+        payload = event.encode()
+        await self.send_frame(Frame(Address.parse(tak.DESTINATION), self.me, [], payload).encode())
+
+    async def send_tak_position(self) -> None:
+        """Our position as a TAK PLI: from the GPS when it has a fix (with altitude, speed and course)."""
+        if not self.tak_mode:
+            raise TransmitRefused("TAK is off")
+        here = self.my_position()
+        if not here:
+            raise ValueError("No position set")
+        fix = self.gps_fix()
+        interval = max(1, int(self.config.tak_interval_min or 0) or 5)
+        await self._tak_send(tak.pli(self.tak_uid, self.tak_callsign, *here, team=self.config.tak_team,
+                                     role=self.config.tak_role,
+                                     hae=fix.altitude_m if fix and fix.altitude_m is not None else None,
+                                     speed=(fix.speed_kmh or 0) / 3.6 if fix else 0.0,
+                                     course=(fix.course or 0) if fix else 0.0, stale_s=interval * 60 * 3))
+
+    async def send_tak_chat(self, text: str, to_uid: str = "", to_callsign: str = "") -> None:
+        """GeoChat to everybody, or to one station (its uid)."""
+        if not self.tak_mode:
+            raise TransmitRefused("TAK is off")
+        text = text.strip()
+        if not text:
+            return
+        for event in tak.geochat_events(self.tak_uid, self.tak_callsign, text, to_uid, to_callsign):
+            await self._tak_send(event)
+        self._tak_chat_add({"time": time.time(), "from": self.tak_callsign, "uid": self.tak_uid,
+                            "to": to_uid or "All", "to_callsign": to_callsign, "text": text, "out": True})
+
+    async def _tak_loop(self) -> None:
+        await asyncio.sleep(5)  # let the TNC connect first
+        while True:
+            minutes = int(self.config.tak_interval_min or 0)
+            if minutes > 0 and self.station.tx_enabled:
+                with contextlib.suppress(TransmitRefused, ConnectionError, ValueError):
+                    await self.send_tak_position()
+            await asyncio.sleep(max(1, minutes) * 60)
 
     # ─── BBS server ───────────────────────────────────────────────────────
 
@@ -282,10 +437,14 @@ class Engine:
         await self.connection.start()
         if self.aprsis:
             await self.aprsis.start()
-        if self.config.beacon_minutes and not self.bbs_mode:
+        if self.config.beacon_minutes and not self.exclusive_mode:
             self._beacon_task = asyncio.create_task(self._beacon_loop(), name="aprs_kiss_beacon")
         if self.bbs:
             self._bbs_task = asyncio.create_task(self._bbs_loop(), name="aprs_kiss_bbs")
+        if self.gps:
+            await self.gps.start()
+        if self.tak_mode:
+            self._tak_task = asyncio.create_task(self._tak_loop(), name="aprs_kiss_tak")
         self._on_update()
 
     async def stop(self) -> None:
@@ -293,6 +452,13 @@ class Engine:
         for s in self.sessions.values():
             s.close()
         self.sessions.clear()
+        if self.gps:
+            await self.gps.stop()
+        if self._tak_task:
+            self._tak_task.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await self._tak_task
+            self._tak_task = None
         for s in self.bbs_sessions.values():
             s.close()
         self.bbs_sessions.clear()
@@ -375,6 +541,13 @@ class Engine:
             "igate_stats": dict(self.igate_stats),
             "stats": dict(self.station.stats),
             "sessions": self.session_states(),
+            "gps": {
+                "connected": self.gps.connected,
+                "fix": self.gps.fix.usable(),
+                "satellites": self.gps.fix.satellites,
+                "speed": self.gps.speed,
+                "error": self.gps.last_error,
+            } if self.gps else ({"error": self.gps_error} if self.gps_error else None),
         }
 
     # ─── sending ──────────────────────────────────────────────────────────
@@ -384,7 +557,7 @@ class Engine:
         if not self.station.tx_enabled:
             raise TransmitRefused("Transmitting is switched off")
         await self.connection.send(raw)
-        self._monitor(Frame.decode(raw).monitor(), outgoing=True)
+        self._monitor(self._monitor_line(Frame.decode(raw)), outgoing=True)
 
     async def _send_quietly(self, raw: bytes) -> None:
         try:
@@ -400,11 +573,15 @@ class Engine:
         except ValueError as err:
             self._monitor(f"? undecodable frame ({err}): {raw.hex()}")
             return
-        self._monitor(frame.monitor())
+        self._monitor(self._monitor_line(frame))
         if self.bbs_mode:
             if self.bbs_call and frame.destination == self.bbs_call and not frame.is_ui:
                 self._bbs_frame(frame, [Address(d.call, d.ssid) for d in reversed(frame.path)])
             return  # only the BBS listens; APRS, chat and the terminal are off
+        if self.tak_mode:
+            if frame.is_ui and frame.destination.call == tak.DESTINATION:
+                self._tak_frame(frame)
+            return  # only TAK listens
         if frame.is_ui:
             self._chat_frame(frame)
             self.station.handle_frame(raw)
@@ -507,13 +684,14 @@ class Engine:
 
     async def beacon(self) -> None:
         """Our position: by radio while transmitting is on; over the internet only when chosen."""
-        if self.bbs_mode:
+        if self.exclusive_mode:
             return
-        if not self.config.has_position:
+        position = self.my_position()
+        if not position:
             _LOGGER.debug("Beacon not sent: no position set")
             return
         try:
-            await self.station.send_position(self.config.latitude, self.config.longitude,
+            await self.station.send_position(*position, self._position_comment(self.config.comment),
                                              to_is=self.config.beacon_is)
         except (TransmitRefused, ConnectionError) as err:
             _LOGGER.debug("Beacon not sent: %s", err)
@@ -521,10 +699,12 @@ class Engine:
     async def send_position(self, lat: float | None = None, lon: float | None = None,
                             comment: str | None = None) -> None:
         self._not_in_bbs_mode()
-        lat = self.config.latitude if lat is None else lat
-        lon = self.config.longitude if lon is None else lon
+        position = self.my_position()
         if lat is None or lon is None:
-            raise ValueError("No position set")
+            if not position:
+                raise ValueError("No position set")
+            lat, lon = position
+            comment = self._position_comment(self.config.comment if comment is None else comment)
         await self.station.send_position(lat, lon, comment)
 
     async def send_status(self, text: str) -> None:

@@ -22,6 +22,7 @@ from .i18n import Translator
 from .symbols import symbol_info
 from .views.base import View, clock
 from .views.bbs import BbsView
+from .views.tak import TakView
 from .views.chat import ChatView
 from .views.map import MapView
 from .views.messages import MessagesView
@@ -33,9 +34,11 @@ from .views.thursday import ThursdayView
 
 _LOGGER = logging.getLogger(__name__)
 
-VIEWS = [MapView, MessagesView, ThursdayView, StationsView, TerminalView, ChatView, MonitorView, BbsView, SettingsView]
+VIEWS = [MapView, MessagesView, ThursdayView, StationsView, TerminalView, ChatView, MonitorView, BbsView, TakView,
+         SettingsView]
 # With BBS SERVER on the app is only the BBS; the monitor stays to see what the radio hears.
 BBS_VIEWS = [BbsView, MonitorView, SettingsView]
+TAK_VIEWS = [TakView, MonitorView, SettingsView]
 FLUSH_DELAY = 0.25
 TICK_SECONDS = 5.0
 THEME_EVERY = 6  # ticks: the desktop theme is looked at every 30 s
@@ -132,12 +135,14 @@ class App:
 
     async def apply_config(self, config: Config) -> None:
         language_changed = config.language != self.engine.config.language
-        mode_changed = config.bbs_enabled != self.engine.config.bbs_enabled
+        old = self.engine.config
+        mode_changed = (config.bbs_enabled, config.tak_enabled) != (old.bbs_enabled, old.tak_enabled)
         await asyncio.to_thread(save_config, config, self.folder)
         await self.engine.reconfigure(config)
         if language_changed or mode_changed:
             self.build()
-            self.select("bbs" if mode_changed else "settings")
+            # stay in the section whose switch was turned (on or off)
+            self.select(("tak" if config.tak_enabled != old.tak_enabled else "bbs") if mode_changed else "settings")
         self.toast(self.t("saved"))
         self.refresh_now()
 
@@ -153,7 +158,8 @@ class App:
     def build(self) -> None:
         self.t = Translator(self.engine.config.language)
         key = self.current_key if self.views else "map"
-        self.views = [cls(self) for cls in (BBS_VIEWS if self.engine.bbs_mode else VIEWS)]
+        mode = self.engine.exclusive_mode
+        self.views = [cls(self) for cls in (BBS_VIEWS if mode == "bbs" else TAK_VIEWS if mode == "tak" else VIEWS)]
         if key not in {v.key for v in self.views}:
             key = self.views[0].key
         self.rail = ft.NavigationRail(
@@ -172,6 +178,10 @@ class App:
         self.tnc_text = ft.Text(size=13)
         self.is_dot = ft.Icon(ft.Icons.CIRCLE, size=12)
         self.is_box = ft.Row([self.is_dot, ft.Text("APRS-IS", size=13)], spacing=4, tight=True)
+        self.gps_dot = ft.Icon(ft.Icons.CIRCLE, size=12)
+        self.gps_text = ft.Text(size=13)
+        self.gps_box = ft.Row([self.gps_dot, ft.Text("GPS", size=13), self.gps_text], spacing=4, tight=True,
+                              visible=False)
         self.update_btn = ft.FilledTonalButton(icon=ft.Icons.NEW_RELEASES, visible=False,
                                                tooltip=self.t("update_tooltip"))
         self._show_update()
@@ -183,10 +193,11 @@ class App:
                     self.callsign,
                     ft.Row([self.tnc_dot, ft.Text(self.t("tnc"), size=13), self.tnc_text], spacing=4, tight=True),
                     self.is_box,
+                    self.gps_box,
                     ft.Container(expand=True),
                     self.update_btn,
                     ft.IconButton(ft.Icons.SHARE_LOCATION, tooltip=self.t("beacon_now"), on_click=self._beacon_now,
-                                  visible=not self.engine.bbs_mode),
+                                  visible=not self.engine.exclusive_mode),
                     self.tx_box,
                     ft.IconButton(ft.Icons.INFO_OUTLINE, tooltip=self.t("about"),
                                   on_click=lambda _e: show_about(self)),
@@ -303,6 +314,15 @@ class App:
         if aprsis:
             self.is_dot.color = (ft.Colors.GREEN if aprsis["verified"] else
                                  ft.Colors.AMBER if aprsis["connected"] else ft.Colors.RED)
+        gps = st.get("gps")
+        self.gps_box.visible = gps is not None
+        if gps:
+            # green: a fix · amber: the module talks, no fix yet · red: no module (or a setting is wrong)
+            fix, talking = gps.get("fix"), gps.get("connected")
+            self.gps_dot.color = ft.Colors.GREEN if fix else ft.Colors.AMBER if talking else ft.Colors.RED
+            self.gps_text.value = (self.t("gps_sats", n=gps["satellites"]) if fix else
+                                   self.t("gps_nofix") if talking else self.t("disconnected"))
+            self.gps_box.tooltip = gps.get("error") or None
         self.tx_switch.value = st["tx_enabled"]
         self.tx_switch.disabled = not self.engine.config.configured
         self.tx_switch.tooltip = self.t("tx_on") if st["tx_enabled"] else self.t("tx_off")
@@ -406,7 +426,7 @@ class App:
         ))
 
     async def _beacon_now(self, _e) -> None:
-        if not self.engine.config.has_position:
+        if not self.engine.my_position():
             self.toast(f"{self.t('not_sent')}: {self.t('position_hint')}", error=True)
             return
         if await self.guard(self.engine.send_position()):
