@@ -111,6 +111,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.11" date="2026-11-22">
+      <description>
+        <p>Station labels on the map have a dark frame, and a button mutes the map's colours so the stations stand out.</p>
+      </description>
+    </release>
     <release version="0.1.10" date="2026-11-22">
       <description>
         <p>Polish translation. The chat no longer shows automatic frames such as digipeater DX reports.</p>

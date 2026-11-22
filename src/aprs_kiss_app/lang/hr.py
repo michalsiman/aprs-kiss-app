@@ -60,7 +60,7 @@ TEXTS = {
     "legend_symbols": "Trenutačno prikazani simboli",
     "legend_symbols_hint": "Svaka stanica bira svoj APRS simbol: automobil, kuću, meteorološku stanicu…",
     "legend_unknown": "Simbol nije u tablici (kôd)",
-    "show_internet": "Stanice s interneta", "last_2h": "Zadnja 2 sata",
+    "show_internet": "Stanice s interneta", "map_muted": "Prigušena karta", "last_2h": "Zadnja 2 sata",
     "via_heard_rf": "radio", "via_heard_is": "internet",
     "quit_title": "Zatvoriti APRS & Packet?",
     "quit_text": "Kad se aplikacija zatvori, zaustavlja se:",

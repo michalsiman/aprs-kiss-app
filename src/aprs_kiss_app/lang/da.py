@@ -60,7 +60,7 @@ TEXTS = {
     "legend_symbols": "Symboler vist nu",
     "legend_symbols_hint": "Hver station vælger sit eget APRS-symbol: en bil, et hus, en vejrstation…",
     "legend_unknown": "Symbol ikke i tabellen (kode)",
-    "show_internet": "Stationer fra internettet", "last_2h": "Seneste 2 timer",
+    "show_internet": "Stationer fra internettet", "map_muted": "Dæmpet kort", "last_2h": "Seneste 2 timer",
     "via_heard_rf": "radio", "via_heard_is": "internet",
     "quit_title": "Afslut APRS & Packet?",
     "quit_text": "Når appen lukkes, stopper:",

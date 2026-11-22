@@ -60,7 +60,7 @@ TEXTS = {
     "legend_symbols": "Práve zobrazené symboly",
     "legend_symbols_hint": "Každá stanica si volí vlastný APRS symbol: auto, dom, meteostanicu…",
     "legend_unknown": "Symbol nie je v tabuľke (kód)",
-    "show_internet": "Stanice z internetu", "last_2h": "Posledné 2 h",
+    "show_internet": "Stanice z internetu", "map_muted": "Tlmená mapa", "last_2h": "Posledné 2 h",
     "via_heard_rf": "rádio", "via_heard_is": "internet",
     "quit_title": "Ukončiť APRS & Packet?",
     "quit_text": "Po zatvorení aplikácie sa zastaví:",

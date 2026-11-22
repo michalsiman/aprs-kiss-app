@@ -61,7 +61,7 @@ TEXTS = {
     "legend_symbols": "Simboli mostrati ora",
     "legend_symbols_hint": "Ogni stazione sceglie il proprio simbolo APRS: un'auto, una casa, una stazione meteo…",
     "legend_unknown": "Simbolo non in tabella (codice)",
-    "show_internet": "Stazioni da internet", "last_2h": "Ultime 2 ore",
+    "show_internet": "Stazioni da internet", "map_muted": "Mappa attenuata", "last_2h": "Ultime 2 ore",
     "via_heard_rf": "radio", "via_heard_is": "internet",
     "quit_title": "Uscire da APRS & Packet?",
     "quit_text": "Chiudendo l'app si interrompe:",

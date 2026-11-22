@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.11 – 2026-11-22
+
+- Map: callsign labels have a thin dark frame, so they stand out on a colourful map.
+- Map: a *Muted map* button fades the map tiles; the stations keep their colours. The choice is saved.
+
 ## 0.1.10 – 2026-11-22
 
 - Polish: 16 languages in all.
