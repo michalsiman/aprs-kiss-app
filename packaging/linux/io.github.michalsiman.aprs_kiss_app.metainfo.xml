@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.20" date="2026-11-23">
+      <description>
+        <p>Builds for Android, macOS and iOS, a layout for phones, and fast switching of TAK and BBS SERVER.</p>
+      </description>
+    </release>
     <release version="0.1.19" date="2026-11-22">
       <description>
         <p>TAK frames are no longer mistaken for APRS stations outside TAK mode.</p>

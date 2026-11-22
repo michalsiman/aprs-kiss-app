@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.20 – 2026-11-23
+
+- **New platforms**: every release now also has
+  - **Android** (`…-android.apk`), tried in the Android 17 emulator: connects to the TNC over the network
+    (KISS over TCP);
+  - **macOS** (`…-macos.dmg` and `.zip`, not signed by Apple: the first time right-click › Open);
+  - **iOS** as an unsigned `.ipa` for sideloading (AltStore, Sideloadly).
+  The macOS and iOS builds are made on GitHub and not tried on Apple hardware yet.
+- **Phone layout**: on a narrow screen a menu replaces the side bar, the top bar is slimmer, Messages show the
+  list or one conversation with a back button, TAK puts its map above the stations and GeoChat, and the map and
+  monitor toolbars fit. BBS SERVER, the serial port and USB GPS are left out on phones.
+- **Switching TAK or BBS SERVER on and off is fast again**: the screens are now built the first time they are
+  opened instead of all at once (this also makes the app start faster).
+- Back to the desktop layout when a narrow window is made wide again.
+
 ## 0.1.19 – 2026-11-22
 
 - Fix: outside TAK mode, TAK frames heard on the radio (binary, to `TAK`) were read as APRS and could

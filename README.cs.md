@@ -12,7 +12,7 @@ a jeho [aplikací KISS TNC](https://github.com/armel/uv-k1-k5v3-firmware-custom/
 s jakýmkoliv KISS TNC (Direwolf, hardwarové TNC, USB sériový port rádia nebo KISS TCP most z integrace).
 
 **Stav: aktivní vývoj** – nové verze vycházejí často (viz [CHANGELOG](CHANGELOG.md), anglicky).
-Sestavení pro **Linux** a **Windows**; **macOS** je v plánu, Android a iOS později (viz [Platformy](#platformy)).
+Sestavení pro **Linux**, **Windows**, **macOS**, **Android** a **iOS** (viz [Platformy](#platformy)).
 
 ## Co umí
 
@@ -118,7 +118,35 @@ zvětší. Řídí se motivem GitHubu, stejně jako aplikace: používá světl�
 Stáhněte **`aprs-kiss-…-windows-x64-setup.exe`** z
 [posledního vydání](https://github.com/michalsiman/aprs-kiss-app/releases/latest) a spusťte ho, nebo vezměte
 **`…-windows-x64.zip`** a rozbalte ho kamkoliv. Rádio na USB se v Nastavení ukáže jako COM port.
-macOS je v plánu, ale zatím se nesestavuje (není Mac, na kterém by se dal vyzkoušet).
+
+## Instalace (macOS)
+
+Stáhněte **`aprs-kiss-…-macos.dmg`** z
+[posledního vydání](https://github.com/michalsiman/aprs-kiss-app/releases/latest), otevřete ho a přetáhněte
+*APRS & Packet* do Aplikací. Aplikace není podepsaná u Applu (bez placeného vývojářského účtu), takže
+poprvé na ni **klikněte pravým › Otevřít › Otevřít**, nebo ji povolte v *Nastavení systému › Soukromí
+a zabezpečení › Přesto otevřít*. Rádio na USB se v Nastavení ukáže jako `/dev/cu.usbserial…` /
+`/dev/cu.usbmodem…`. Verze pro macOS se sestavuje na GitHubu bez Macu, na kterém by se dala vyzkoušet:
+dejte vědět, když něco nefunguje.
+
+## Instalace (Android)
+
+Stáhněte v telefonu **`aprs-kiss-…-android.apk`** z
+[posledního vydání](https://github.com/michalsiman/aprs-kiss-app/releases/latest) a otevřete ho; Android
+se jednou zeptá, jestli smí prohlížeč nebo správce souborů instalovat aplikace. V telefonu se aplikace
+připojuje k TNC **po síti (KISS přes TCP)**: Direwolf na počítači, rádio sdílené přes
+[`kiss_tcp_bridge.py`](https://github.com/michalsiman/aprs-kiss-ha/tree/main/bridge) nebo Wi-Fi TNC;
+TNC na USB portu telefonu zatím podporované není. Obrazovky jsou upravené pro telefon: místo boční
+lišty je nabídka. BBS SERVER, USB GPS a sériový port jsou jen pro počítače.
+
+## Instalace (iPhone, iPad)
+
+Apple pouští aplikace do iPhonu jen přes App Store nebo podepsané vývojářským účtem, který tento
+projekt nemá. Ve vydání je **nepodepsaný `aprs-kiss-…-ios-unsigned.ipa`**, který si do zařízení dáte
+nástrojem pro sideloading jako [AltStore](https://altstore.io/) nebo [Sideloadly](https://sideloadly.io/);
+ten ho podepíše vaším vlastním Apple ID (s bezplatným Apple ID je potřeba ho každých 7 dní obnovit).
+Stejně jako na Androidu se k TNC připojuje po síti. Sestavuje se na GitHubu a na skutečném iPhonu
+zatím vyzkoušený není.
 
 ## Instalace (Linux)
 
@@ -212,7 +240,7 @@ tests/              testy jednotek, testy enginu proti fake_tnc.py a fake_vara.p
 - **Flet** (Python, vykresluje Flutter): jeden kód pro počítač i mobil, nativní okno,
   žádný webový server.
 - **Způsoby připojení jsou rozšiřitelné** (`aprs_kiss_core.connection.register_transport`): TCP
-  a sériový port jsou vestavěné; USB na Androidu a Bluetooth TNC přibudou jako vlastní způsoby
+  a sériový port jsou vestavěné; USB na Androidu a Bluetooth TNC můžou přibýt jako vlastní způsoby
   připojení bez zásahu do kódu KISS/AX.25.
 - Moduly jádra jsou stejné jako v integraci pro Home Assistant (tam `hub.py`, tady `engine.py`).
   V plánu je vydat jádro jako jeden balíček, který budou používat obě.
@@ -221,11 +249,12 @@ tests/              testy jednotek, testy enginu proti fake_tnc.py a fake_vara.p
 
 | | Linux | Windows | macOS | Android | iOS |
 |---|---|---|---|---|---|
-| KISS přes TCP | ✅ | ✅ | v plánu | v plánu | v plánu |
-| USB sériový port | ✅ | ✅ (COM porty) | v plánu | potřebuje USB host | ❌ (iOS) |
+| KISS přes TCP | ✅ | ✅ | ✅ | ✅ | ✅ (sideloading) |
+| USB sériový port | ✅ | ✅ (COM porty) | ✅ | potřebuje USB host | ❌ (iOS) |
 | Bluetooth TNC | – | – | – | v plánu | jen BLE |
-| USB GPS modul | ✅ | ✅ (COM porty) | v plánu | potřebuje USB host | ❌ |
-| VARA FM | ✅ (VARA ve Wine) | ✅ | v plánu | VARA na jiném počítači | VARA na jiném počítači |
+| USB GPS modul | ✅ | ✅ (COM porty) | ✅ | potřebuje USB host | ❌ |
+| VARA FM | ✅ (VARA ve Wine) | ✅ | VARA na jiném počítači | VARA na jiném počítači | VARA na jiném počítači |
+| BBS SERVER | ✅ | ✅ | ✅ | – (jen počítače) | – (jen počítače) |
 | Běh na pozadí | ✅ | ✅ | ✅ | potřebuje službu na popředí | omezeno iOS |
 
 ## Testy

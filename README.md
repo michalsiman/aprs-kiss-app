@@ -12,7 +12,7 @@ and its [KISS TNC app](https://github.com/armel/uv-k1-k5v3-firmware-custom/wiki/
 (Direwolf, a hardware TNC, the radio's USB serial port, or the KISS TCP bridge from the integration).
 
 **Status: actively developed** – new versions come out often (see [CHANGELOG](CHANGELOG.md)).
-Builds for **Linux** and **Windows**; **macOS** is planned, Android and iOS later (see [Platforms](#platforms)).
+Builds for **Linux**, **Windows**, **macOS**, **Android** and **iOS** (see [Platforms](#platforms)).
 
 ## What it does
 
@@ -120,7 +120,34 @@ full size. They follow your GitHub theme, and so does the app: it uses the syste
 Download **`aprs-kiss-…-windows-x64-setup.exe`** from the
 [latest release](https://github.com/michalsiman/aprs-kiss-app/releases/latest) and run it, or take the
 **`…-windows-x64.zip`** and unpack it anywhere. The radio on USB shows up as a COM port in Settings.
-macOS is planned but not built yet (no Mac to test it on).
+
+## Install (macOS)
+
+Download **`aprs-kiss-…-macos.dmg`** from the
+[latest release](https://github.com/michalsiman/aprs-kiss-app/releases/latest), open it and drag
+*APRS & Packet* to Applications. The app is not signed by Apple (no paid developer account), so the
+first time **right-click it › Open › Open**, or allow it in *System Settings › Privacy & Security ›
+Open Anyway*. The radio on USB shows up as `/dev/cu.usbserial…` / `/dev/cu.usbmodem…` in Settings.
+The macOS build is made on GitHub without a Mac to try it on: tell us if something does not work.
+
+## Install (Android)
+
+Download **`aprs-kiss-…-android.apk`** on the phone from the
+[latest release](https://github.com/michalsiman/aprs-kiss-app/releases/latest) and open it; Android asks
+to allow installing apps from the browser or file manager once. On the phone the app reaches the TNC
+**over the network (KISS over TCP)**: Direwolf on a computer, the radio shared with
+[`kiss_tcp_bridge.py`](https://github.com/michalsiman/aprs-kiss-ha/tree/main/bridge), or a Wi-Fi TNC;
+a TNC on the phone's own USB port is not supported yet. The screens fit a phone: a menu instead of the
+side bar. BBS SERVER, USB GPS and the serial port are for computers only.
+
+## Install (iPhone, iPad)
+
+Apple lets apps onto an iPhone only through the App Store or signed by a developer account, which this
+project does not have. The release has an **unsigned `aprs-kiss-…-ios-unsigned.ipa`** that you can put on
+your device with a sideloading tool such as [AltStore](https://altstore.io/) or
+[Sideloadly](https://sideloadly.io/), which signs it with your own Apple ID (with a free Apple ID it has
+to be refreshed every 7 days). Like on Android, the TNC is reached over the network. It is built on
+GitHub and not tried on a real iPhone yet.
 
 ## Install (Linux)
 
@@ -214,7 +241,7 @@ tests/              unit tests, engine tests against fake_tnc.py and fake_vara.p
 - **Flet** (Python, drawn by Flutter): one code base for desktop and mobile, a native window,
   no web server.
 - **Transports are pluggable** (`aprs_kiss_core.connection.register_transport`): TCP and
-  serial are built in; Android USB host and Bluetooth TNCs will be added as their own transports
+  serial are built in; Android USB host and Bluetooth TNCs can be added as their own transports
   without touching the KISS/AX.25 code.
 - The core modules are the same as in the Home Assistant integration (`hub.py` there,
   `engine.py` here). The plan is to publish the core as one package both use.
@@ -223,11 +250,12 @@ tests/              unit tests, engine tests against fake_tnc.py and fake_vara.p
 
 | | Linux | Windows | macOS | Android | iOS |
 |---|---|---|---|---|---|
-| KISS over TCP | ✅ | ✅ | planned | planned | planned |
-| USB serial | ✅ | ✅ (COM ports) | planned | needs a USB-host transport | ❌ (iOS) |
+| KISS over TCP | ✅ | ✅ | ✅ | ✅ | ✅ (sideloaded) |
+| USB serial | ✅ | ✅ (COM ports) | ✅ | needs a USB-host transport | ❌ (iOS) |
 | Bluetooth TNC | – | – | – | planned | BLE only |
-| USB GPS module | ✅ | ✅ (COM ports) | planned | needs a USB-host transport | ❌ |
-| VARA FM | ✅ (VARA in Wine) | ✅ | planned | VARA on another computer | VARA on another computer |
+| USB GPS module | ✅ | ✅ (COM ports) | ✅ | needs a USB-host transport | ❌ |
+| VARA FM | ✅ (VARA in Wine) | ✅ | VARA on another computer | VARA on another computer | VARA on another computer |
+| BBS SERVER | ✅ | ✅ | ✅ | – (computers only) | – (computers only) |
 | Running in the background | ✅ | ✅ | ✅ | needs a foreground service | limited by iOS |
 
 ## Tests

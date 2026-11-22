@@ -131,11 +131,24 @@ jobs:
           java-version: "17"
       - run: pip install "flet[all]==1.1.2"
       - name: flet build apk
+        # Signed with the project's own key (secrets ANDROID_KEYSTORE_B64 and ANDROID_KEYSTORE_PASSWORD), so each
+        # release installs over the previous one; without the secrets a throwaway key is used.
         # The Python-for-Android download now and then breaks off: one more try before giving up.
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
-          flet build apk --yes --no-rich-output --skip-flutter-doctor || {
+          SIGN=()
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
+            SIGN=(--android-signing-key-store "$RUNNER_TEMP/release.jks" --android-signing-key-alias aprs-kiss
+                  --android-signing-key-store-password "$KEYSTORE_PASSWORD" --android-signing-key-password "$KEYSTORE_PASSWORD")
+          else
+            echo "::warning::No Android signing key in the secrets: the .apk is signed with a throwaway key"
+          fi
+          flet build apk --yes --no-rich-output --skip-flutter-doctor "${SIGN[@]}" || {
             echo "Retrying the Android build"; sleep 30
-            flet build apk --yes --no-rich-output --skip-flutter-doctor; }
+            flet build apk --yes --no-rich-output --skip-flutter-doctor "${SIGN[@]}"; }
       - name: Rename
         run: |
           V=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
