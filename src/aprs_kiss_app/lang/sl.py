@@ -60,7 +60,7 @@ TEXTS = {
     "legend_symbols": "Trenutno prikazani simboli",
     "legend_symbols_hint": "Vsaka postaja si izbere svoj simbol APRS: avto, hišo, vremensko postajo…",
     "legend_unknown": "Simbola ni v tabeli (koda)",
-    "show_internet": "Postaje z interneta", "map_muted": "Pridušen zemljevid", "last_2h": "Zadnji 2 uri",
+    "show_internet": "Postaje z interneta", "map_muted": "Pridušen zemljevid", "thursday": "APRS Thursday", "th_running": "Poteka zdaj, konča se čez {t}", "th_next": "Naslednji se začne {when} (čez {t})", "th_member": "V skupini HOTG si do {when}", "th_not_member": "Nisi v skupini HOTG: prvo sporočilo te doda vanjo", "th_about": "Vsak četrtek (UTC) radioamaterji z vsega sveta pošljejo kratko sporočilo skupini HOTG. ANSRVR ga posreduje vsem, ki so skupini pisali v zadnjih 12 urah, tebi pa pošlje njihova sporočila.", "th_rf_hint": "Po radiu te odgovori dosežejo le prek iGate, ki posreduje sporočila z interneta na radio; prek interneta (APRS-IS) deluje vedno.", "th_placeholder": "Tvoje sporočilo skupini (npr. od kod oddajaš, s čim)", "th_send": "Pošlji v HOTG", "th_leave": "Zapusti skupino", "th_map": "Zemljevid in prijave (aprs.to)", "th_empty": "Še ni sporočil HOTG.", "th_wait": "Naslednje sporočilo lahko pošlješ čez {t} (eno na 30 minut)", "bbs_saved": "Shranjeni BBS", "bbs_save": "Shrani ta BBS (klicni znak in pot)", "bbs_remove": "Odstrani iz shranjenih", "bbs_saved_as": "{call} shranjen", "last_2h": "Zadnji 2 uri",
     "via_heard_rf": "radio", "via_heard_is": "internet",
     "quit_title": "Zapreti APRS & Packet?",
     "quit_text": "Ko se aplikacija zapre, se ustavi:",

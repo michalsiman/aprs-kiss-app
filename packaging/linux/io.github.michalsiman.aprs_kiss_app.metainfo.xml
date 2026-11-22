@@ -79,6 +79,10 @@
       <image>https://raw.githubusercontent.com/michalsiman/aprs-kiss-app/main/assets/messages-light.png</image>
     </screenshot>
     <screenshot>
+      <caption>#APRSThursday: the weekly HOTG net with its own feed</caption>
+      <image>https://raw.githubusercontent.com/michalsiman/aprs-kiss-app/main/assets/thursday-light.png</image>
+    </screenshot>
+    <screenshot>
       <caption>Stations heard, with distance and direction</caption>
       <image>https://raw.githubusercontent.com/michalsiman/aprs-kiss-app/main/assets/stations-light.png</image>
     </screenshot>
@@ -111,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.12" date="2026-11-22">
+      <description>
+        <p>A section for the weekly #APRSThursday net (check in, the group's messages, when the next net starts) and a list of saved BBSes in the terminal.</p>
+      </description>
+    </release>
     <release version="0.1.11" date="2026-11-22">
       <description>
         <p>Station labels on the map have a dark frame, and a button mutes the map's colours so the stations stand out.</p>

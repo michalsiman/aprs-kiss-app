@@ -60,7 +60,7 @@ TEXTS = {
     "legend_symbols": "Gerade angezeigte Symbole",
     "legend_symbols_hint": "Jede Station wählt ihr eigenes APRS-Symbol: ein Auto, ein Haus, eine Wetterstation…",
     "legend_unknown": "Symbol nicht in der Tabelle (Code)",
-    "show_internet": "Stationen aus dem Internet", "map_muted": "Gedämpfte Karte", "last_2h": "Letzte 2 Stunden",
+    "show_internet": "Stationen aus dem Internet", "map_muted": "Gedämpfte Karte", "thursday": "APRS Thursday", "th_running": "Läuft gerade, endet in {t}", "th_next": "Das nächste beginnt {when} (in {t})", "th_member": "Du bist bis {when} in der Gruppe HOTG", "th_not_member": "Nicht in der Gruppe HOTG: deine erste Nachricht nimmt dich auf", "th_about": "Jeden Donnerstag (UTC) senden Funkamateure aus aller Welt eine kurze Nachricht an die Gruppe HOTG. ANSRVR gibt sie an alle weiter, die in den letzten 12 Stunden an die Gruppe geschrieben haben, und schickt dir deren Nachrichten.", "th_rf_hint": "Per Funk erreichen dich Antworten nur über ein iGate, das Internet-Nachrichten auf Funk weitergibt; über das Internet (APRS-IS) klappt es immer.", "th_placeholder": "Deine Nachricht an die Gruppe (z. B. Standort, Gerät)", "th_send": "An HOTG senden", "th_leave": "Gruppe verlassen", "th_map": "Karte und Teilnehmer (aprs.to)", "th_empty": "Noch keine HOTG-Nachrichten.", "th_wait": "Nächste Nachricht in {t} möglich (eine pro 30 Minuten)", "bbs_saved": "Gespeicherte BBS", "bbs_save": "Diese BBS speichern (Rufzeichen und Pfad)", "bbs_remove": "Aus der Liste entfernen", "bbs_saved_as": "{call} gespeichert", "last_2h": "Letzte 2 Stunden",
     "via_heard_rf": "Funk", "via_heard_is": "Internet",
     "quit_title": "APRS & Packet beenden?",
     "quit_text": "Wenn die App geschlossen wird, endet:",

@@ -28,6 +28,7 @@ from pathlib import Path
 from typing import Any
 
 from . import aprs as aprs_build
+from . import thursday
 from .aprsis import AprsIsClient, gate_to_is, passcode, third_party
 from .ax25 import PF, U_DM, Address, Frame
 from .config import MIN_BEACON_MINUTES, VERSION, Config, load_state, save_state
@@ -39,6 +40,8 @@ from .station import Station, StationConfig, TransmitRefused
 _LOGGER = logging.getLogger(__name__)
 
 MONITOR_LINES = 500
+THURSDAY_LINES = 300
+THURSDAY_DUPLICATE_SECONDS = 15 * 60
 TERMINAL_LINES = 2000
 MESSAGE_HISTORY = 500
 CHAT_LINES = 500
@@ -70,6 +73,11 @@ class Engine:
         self.monitor_rf: deque[str] = deque(maxlen=MONITOR_LINES)  # the same without APRS-IS lines
         self.terminal: deque[dict[str, Any]] = deque(maxlen=TERMINAL_LINES)
         self.chat: deque[dict[str, Any]] = deque(maxlen=CHAT_LINES)
+        # #APRSThursday: the HOTG group's traffic and ANSRVR's answers, kept out of the inbox.
+        self.thursday: deque[dict[str, Any]] = deque(maxlen=THURSDAY_LINES)
+        self.thursday_joined = 0.0  # when we last sent a CQ to HOTG (0 = not in the group)
+        self.thursday_cq = 0.0  # the last CQ, for the server's one-per-30-minutes rule
+        self._thursday_recent: dict[str, float] = {}
         self._chat_recent: dict[str, float] = {}
         self.sessions: dict[str, Session] = {}
         self.igate_stats = {"rf_to_is": 0, "is_to_rf": 0, "is_messages": 0}
@@ -131,6 +139,9 @@ class Engine:
             stored = await asyncio.to_thread(load_state, self._folder)
             self._msg_counter = int(stored.get("msg_counter", 0))
             self.messages.extend(stored.get("messages", []))
+            self.thursday.extend(stored.get("thursday", []))
+            self.thursday_joined = float(stored.get("thursday_joined", 0) or 0)
+            self.thursday_cq = float(stored.get("thursday_cq", 0) or 0)
             self._loaded = True
         self.running = True
         if not self.config.configured:
@@ -176,7 +187,8 @@ class Engine:
         await asyncio.to_thread(save_state, self._state(), self._folder)
 
     def _state(self) -> dict[str, Any]:
-        return {"msg_counter": self._msg_counter, "messages": list(self.messages)}
+        return {"msg_counter": self._msg_counter, "messages": list(self.messages), "thursday": list(self.thursday),
+                "thursday_joined": self.thursday_joined, "thursday_cq": self.thursday_cq}
 
     def _schedule_save(self) -> None:
         if self._save_handle:
@@ -370,12 +382,69 @@ class Engine:
     # ─── APRS messages ────────────────────────────────────────────────────
 
     def _on_message(self, message: dict[str, Any]) -> None:
+        if thursday.is_server(message["from"]) or thursday.is_group_text(message.get("text", "")):
+            self._thursday_in(message)
+            return
         item = {"direction": "in", "from": message["from"], "to": str(self.me), "text": message["text"],
                 "time": message["received_at"], "msg_no": message.get("msg_no"), "via": message.get("via")}
         self.messages.append(item)
         self._schedule_save()
         self._emit("message", message)
         self._emit("aprs_message", {"message": item})
+
+    # ─── #APRSThursday ────────────────────────────────────────────────────
+
+    def _thursday_in(self, message: dict[str, Any]) -> None:
+        """A HOTG message passed on by ANSRVR (from the original sender), or ANSRVR's own answer."""
+        now = message.get("received_at") or time.time()
+        text = message.get("text", "")
+        key = f"{message['from'].upper()}|{text}"
+        for k in [k for k, t in self._thursday_recent.items() if now - t > THURSDAY_DUPLICATE_SECONDS]:
+            del self._thursday_recent[k]
+        if key in self._thursday_recent:  # the same relay heard by radio and over the internet
+            return
+        self._thursday_recent[key] = now
+        server = thursday.is_server(message["from"])
+        if server and text.lower().startswith("removed from"):
+            self.thursday_joined = 0.0
+        entry = {"time": now, "from": message["from"], "text": text if server else thursday.strip_prefix(text),
+                 "kind": "server" if server else "in", "via": message.get("via")}
+        self._thursday_add(entry)
+
+    def _thursday_add(self, entry: dict[str, Any]) -> None:
+        self.thursday.append(entry)
+        self._schedule_save()
+        self._emit("thursday", {"entry": entry})
+
+    def thursday_member_until(self, now: float | None = None) -> float:
+        """Until when ANSRVR keeps us in HOTG (0 = not a member)."""
+        until = self.thursday_joined + thursday.MEMBER_SECONDS if self.thursday_joined else 0.0
+        return until if until > (now or time.time()) else 0.0
+
+    def thursday_wait(self, now: float | None = None) -> float:
+        """Seconds before the server takes another CQ from us."""
+        return max(0.0, self.thursday_cq + thursday.CQ_INTERVAL - (now or time.time()))
+
+    async def send_thursday(self, text: str, via: str = "both") -> dict[str, Any]:
+        """Check in: "CQ HOTG <text>" to ANSRVR, which passes it on to the group and adds us to it."""
+        if not text.strip():
+            raise ValueError("Empty message")
+        wait = self.thursday_wait()
+        if wait:
+            raise ValueError(f"ANSRVR takes one message every 30 minutes; wait {int(wait // 60) + 1} min")
+        msg = await self.station.send_message(thursday.SERVER, thursday.compose(text), via=via)
+        now = time.time()
+        self.thursday_cq = self.thursday_joined = now
+        self._thursday_add({"time": now, "from": str(self.me), "text": thursday.strip_prefix(msg.text),
+                            "kind": "out", "msg_no": msg.msg_id, "via": via})
+        return msg.as_dict()
+
+    async def leave_thursday(self, via: str = "both") -> None:
+        """Leave HOTG ("U HOTG"), so the group's messages stop coming."""
+        msg = await self.station.send_message(thursday.SERVER, f"U {thursday.GROUP}", via=via)
+        self.thursday_joined = 0.0
+        self._thursday_add({"time": time.time(), "from": str(self.me), "text": msg.text, "kind": "leave",
+                            "msg_no": msg.msg_id, "via": via})
 
     def _on_connection_state(self, connected: bool) -> None:
         self._on_update()

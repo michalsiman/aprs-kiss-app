@@ -19,7 +19,7 @@ from .ax25 import Address
 _LOGGER = logging.getLogger(__name__)
 
 APP_NAME = "aprs-kiss"
-VERSION = "0.1.11"
+VERSION = "0.1.12"
 MIN_BEACON_MINUTES = 10
 
 
@@ -59,6 +59,7 @@ class Config:
     show_internet: bool = True  # map and station list also show stations seen only on APRS-IS
     monitor_internet: bool = True  # the frame monitor also shows APRS-IS lines ([IS])
     map_muted: bool = False  # map tiles faded, so the station labels stand out
+    bbs_list: str = ""  # saved BBSes and nodes for the terminal: JSON [{"call": ..., "path": ...}]
     check_updates: bool = True  # ask GitHub once a day whether a newer version is out
     theme: str = "auto"  # auto (as the desktop), light, dark
 
@@ -104,6 +105,28 @@ class Config:
         if not self.aprsis_enabled:
             self.licence_confirmed = False
         return self
+
+    def saved_bbs(self) -> list[dict[str, str]]:
+        """The terminal's saved stations, each {"call", "path"}, in the order they were saved."""
+        try:
+            items = json.loads(self.bbs_list) if self.bbs_list else []
+        except ValueError:
+            return []
+        out = []
+        for item in items if isinstance(items, list) else []:
+            if isinstance(item, dict) and str(item.get("call", "")).strip():
+                out.append({"call": str(item["call"]).strip().upper(), "path": str(item.get("path", "")).strip().upper()})
+        return out
+
+    def save_bbs(self, call: str, path: str = "") -> None:
+        """Add a station, or update its path when it is already saved."""
+        call, path = call.strip().upper(), path.strip().upper()
+        items = [i for i in self.saved_bbs() if i["call"] != call]
+        items.append({"call": call, "path": path})
+        self.bbs_list = json.dumps(items)
+
+    def remove_bbs(self, call: str) -> None:
+        self.bbs_list = json.dumps([i for i in self.saved_bbs() if i["call"] != call.strip().upper()])
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

@@ -62,7 +62,7 @@ TEXTS = {
     "legend_symbols": "Obecnie wyświetlane symbole",
     "legend_symbols_hint": "Każda stacja wybiera własny symbol APRS: samochód, dom, stację pogodową…",
     "legend_unknown": "Symbolu nie ma w tabeli (kod)",
-    "show_internet": "Stacje z internetu", "map_muted": "Przygaszona mapa", "last_2h": "Ostatnie 2 godziny",
+    "show_internet": "Stacje z internetu", "map_muted": "Przygaszona mapa", "thursday": "APRS Thursday", "th_running": "Trwa teraz, kończy się za {t}", "th_next": "Następny zaczyna się {when} (za {t})", "th_member": "Jesteś w grupie HOTG do {when}", "th_not_member": "Nie jesteś w grupie HOTG: pierwsza wiadomość cię do niej doda", "th_about": "W każdy czwartek (UTC) krótkofalowcy z całego świata wysyłają krótką wiadomość do grupy HOTG. ANSRVR przekazuje ją wszystkim, którzy pisali do grupy w ciągu ostatnich 12 godzin, i wysyła ci ich wiadomości.", "th_rf_hint": "Przez radio odpowiedzi dotrą do ciebie tylko przez iGate, który przekazuje wiadomości z internetu do radia; przez internet (APRS-IS) działa to zawsze.", "th_placeholder": "Twoja wiadomość do grupy (np. skąd nadajesz, na czym)", "th_send": "Wyślij do HOTG", "th_leave": "Opuść grupę", "th_map": "Mapa i zgłoszenia (aprs.to)", "th_empty": "Brak wiadomości HOTG.", "th_wait": "Następną wiadomość możesz wysłać za {t} (jedna na 30 minut)", "bbs_saved": "Zapisane BBS", "bbs_save": "Zapisz ten BBS (znak i ścieżkę)", "bbs_remove": "Usuń z zapisanych", "bbs_saved_as": "Zapisano {call}", "last_2h": "Ostatnie 2 godziny",
     "via_heard_rf": "radio", "via_heard_is": "internet",
     "quit_title": "Zamknąć APRS & Packet?",
     "quit_text": "Po zamknięciu aplikacji zatrzyma się:",

@@ -28,10 +28,11 @@ from .views.monitor import MonitorView
 from .views.settings import SettingsView
 from .views.stations import StationsView, describe
 from .views.terminal import TerminalView
+from .views.thursday import ThursdayView
 
 _LOGGER = logging.getLogger(__name__)
 
-VIEWS = [MapView, MessagesView, StationsView, TerminalView, ChatView, MonitorView, SettingsView]
+VIEWS = [MapView, MessagesView, ThursdayView, StationsView, TerminalView, ChatView, MonitorView, SettingsView]
 FLUSH_DELAY = 0.25
 TICK_SECONDS = 5.0
 THEME_EVERY = 6  # ticks: the desktop theme is looked at every 30 s

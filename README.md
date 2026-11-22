@@ -9,18 +9,25 @@ Made for the Quansheng UV-K1/UV-K5 V3 with the [F4HWN firmware](https://github.c
 and its [KISS TNC app](https://github.com/armel/uv-k1-k5v3-firmware-custom/wiki/App-KISS-TNC), but any KISS TNC works
 (Direwolf, a hardware TNC, the radio's USB serial port, or the KISS TCP bridge from the integration).
 
-**Status: 0.1.0, Linux first.** The same code is meant to be built for Windows, macOS, Android
-and iOS later (see [Platforms](#platforms)).
+**Status: actively developed** – new versions come out often (see [CHANGELOG](CHANGELOG.md)).
+Builds for **Linux** and **Windows**; **macOS** is planned, Android and iOS later (see [Platforms](#platforms)).
 
 ## What it does
 
-- **Map** of heard stations (OpenStreetMap), your own position, tracked callsigns highlighted
+- **Map** of heard stations (OpenStreetMap), your own position, tracked callsigns highlighted;
+  framed callsign labels and a *Muted map* button that fades the map so the stations stand out
 - **APRS messages** as conversations, retried until acknowledged, delivery state shown;
   incoming messages acknowledged automatically
-- **Stations** heard on the radio or seen on APRS-IS: distance, direction, comment, weather
-- **Packet terminal**: AX.25 connected mode to BBSes and nodes, optional incoming connections
-- **Packet chat** (plain text to CQ) and a TNC-style **frame monitor**
-- **APRS-IS** (internet) with optional RX and TX iGate
+- **#APRSThursday**: its own section for the weekly HOTG net through ANSRVR – check in with one
+  button, read the group's messages apart from your inbox, see when the next net starts, leave the group
+- **Stations** heard on the radio or seen on APRS-IS: distance, direction, comment, weather;
+  stations an iGate relays from the internet by radio (third-party packets) show up too
+- **Packet terminal**: AX.25 connected mode to BBSes and nodes, a list of **saved BBSes** to pick
+  from, optional incoming connections
+- **Packet chat** (plain text to CQ, QST, ALL or you; automatic frames such as digipeater DX reports
+  stay out) and a TNC-style **frame monitor**, which can hide the APRS-IS lines
+- **APRS-IS** (internet) with optional RX and TX iGate; messages an iGate relays to you by radio
+  are received and acknowledged
 - Position beacon, status, unproto
 - In 16 languages: Brazilian Portuguese, Croatian, Czech, Danish, English, French, German, Italian, Norwegian (Bokmål), Polish, Serbian (Cyrillic), Slovak, Slovenian, Spanish, Swedish and Ukrainian; it follows the system language
   or you pick one in Settings
@@ -41,17 +48,27 @@ GitHub theme, and so does the app: it uses the system's light or dark mode.
 </tr>
 <tr>
 <td width="50%"><a href="assets/messages.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/messages-light.png"><img src="assets/messages.png" alt="APRS messages, the sent one acknowledged"></picture></a></td>
-<td width="50%"><a href="assets/stations.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/stations-light.png"><img src="assets/stations.png" alt="Stations heard, with distance and direction"></picture></a></td>
+<td width="50%"><a href="assets/thursday.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/thursday-light.png"><img src="assets/thursday.png" alt="APRS Thursday: the HOTG net with its own feed"></picture></a></td>
 </tr>
 <tr>
-<td><a href="assets/terminal.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/terminal-light.png"><img src="assets/terminal.png" alt="Packet terminal connected to a BBS"></picture></a></td>
+<td><a href="assets/stations.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/stations-light.png"><img src="assets/stations.png" alt="Stations heard, with distance and direction"></picture></a></td>
+<td><a href="assets/terminal.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/terminal-light.png"><img src="assets/terminal.png" alt="Packet terminal: a saved BBS, connected"></picture></a></td>
+</tr>
+<tr>
 <td><a href="assets/chat.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/chat-light.png"><img src="assets/chat.png" alt="Packet chat"></picture></a></td>
+<td><a href="assets/monitor.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/monitor-light.png"><img src="assets/monitor.png" alt="Frame monitor"></picture></a></td>
 </tr>
 <tr>
-<td><a href="assets/monitor.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/monitor-light.png"><img src="assets/monitor.png" alt="Frame monitor"></picture></a></td>
-<td><a href="assets/settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-light.png"><img src="assets/settings.png" alt="Settings: TNC connection and station"></picture></a></td>
+<td colspan="2"><a href="assets/settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-light.png"><img src="assets/settings.png" alt="Settings: TNC connection and station"></picture></a></td>
 </tr>
 </table>
+
+## Install (Windows)
+
+Download **`aprs-kiss-…-windows-x64-setup.exe`** from the
+[latest release](https://github.com/michalsiman/aprs-kiss-app/releases/latest) and run it, or take the
+**`…-windows-x64.zip`** and unpack it anywhere. The radio on USB shows up as a COM port in Settings.
+macOS is planned but not built yet (no Mac to test it on).
 
 ## Install (Linux)
 
@@ -146,8 +163,8 @@ tests/              unit tests, engine tests against fake_tnc.py
 
 | | Linux | Windows | macOS | Android | iOS |
 |---|---|---|---|---|---|
-| KISS over TCP | ✅ | planned | planned | planned | planned |
-| USB serial | ✅ | planned (COM ports) | planned | needs a USB-host transport | ❌ (iOS) |
+| KISS over TCP | ✅ | ✅ | planned | planned | planned |
+| USB serial | ✅ | ✅ (COM ports) | planned | needs a USB-host transport | ❌ (iOS) |
 | Bluetooth TNC | – | – | – | planned | BLE only |
 | Running in the background | ✅ | ✅ | ✅ | needs a foreground service | limited by iOS |
 

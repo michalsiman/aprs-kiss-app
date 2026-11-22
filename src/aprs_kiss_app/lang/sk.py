@@ -60,7 +60,7 @@ TEXTS = {
     "legend_symbols": "Práve zobrazené symboly",
     "legend_symbols_hint": "Každá stanica si volí vlastný APRS symbol: auto, dom, meteostanicu…",
     "legend_unknown": "Symbol nie je v tabuľke (kód)",
-    "show_internet": "Stanice z internetu", "map_muted": "Tlmená mapa", "last_2h": "Posledné 2 h",
+    "show_internet": "Stanice z internetu", "map_muted": "Tlmená mapa", "thursday": "APRS Thursday", "th_running": "Práve prebieha, končí o {t}", "th_next": "Ďalší začína {when} (o {t})", "th_member": "Si v skupine HOTG do {when}", "th_not_member": "Nie si v skupine HOTG: prvá správa ťa do nej pridá", "th_about": "Každý štvrtok (UTC) posielajú rádioamatéri z celého sveta krátku správu do skupiny HOTG. ANSRVR ju odovzdá všetkým, ktorí do skupiny písali za posledných 12 hodín, a tebe pošle tie ich.", "th_rf_hint": "Rádiom k tebe odpovede prídu iba cez iGate, ktorý posiela správy z internetu do rádia; cez internet (APRS-IS) to funguje vždy.", "th_placeholder": "Tvoja správa pre skupinu (napr. odkiaľ vysielaš, s čím)", "th_send": "Poslať do HOTG", "th_leave": "Odhlásiť zo skupiny", "th_map": "Mapa a zapojenia (aprs.to)", "th_empty": "Zatiaľ žiadne správy HOTG.", "th_wait": "Ďalšiu správu môžeš poslať o {t} (jedna za 30 minút)", "bbs_saved": "Uložené BBS", "bbs_save": "Uložiť túto BBS (značku a cestu)", "bbs_remove": "Odobrať z uložených", "bbs_saved_as": "{call} uložené", "last_2h": "Posledné 2 h",
     "via_heard_rf": "rádio", "via_heard_is": "internet",
     "quit_title": "Ukončiť APRS & Packet?",
     "quit_text": "Po zatvorení aplikácie sa zastaví:",

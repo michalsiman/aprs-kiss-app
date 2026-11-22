@@ -60,7 +60,7 @@ TEXTS = {
     "legend_symbols": "Symboler som vises nå",
     "legend_symbols_hint": "Hver stasjon velger sitt eget APRS-symbol: en bil, et hus, en værstasjon…",
     "legend_unknown": "Symbol som ikke er i tabellen (kode)",
-    "show_internet": "Stasjoner fra internett", "map_muted": "Dempet kart", "last_2h": "Siste 2 timer",
+    "show_internet": "Stasjoner fra internett", "map_muted": "Dempet kart", "thursday": "APRS Thursday", "th_running": "Pågår nå, slutter om {t}", "th_next": "Neste starter {when} (om {t})", "th_member": "Du er med i gruppen HOTG til {when}", "th_not_member": "Ikke med i gruppen HOTG: den første meldingen din melder deg inn", "th_about": "Hver torsdag (UTC) sender radioamatører fra hele verden en kort melding til gruppen HOTG. ANSRVR sender den videre til alle som har skrevet til gruppen de siste 12 timene, og sender deg deres.", "th_rf_hint": "Via radio når svarene deg bare gjennom en iGate som sender internettmeldinger ut på radio; via internett (APRS-IS) virker det alltid.", "th_placeholder": "Meldingen din til gruppen (f.eks. hvor du sender fra, med hva)", "th_send": "Send til HOTG", "th_leave": "Forlat gruppen", "th_map": "Kart og deltakere (aprs.to)", "th_empty": "Ingen HOTG-meldinger ennå.", "th_wait": "Neste melding kan sendes om {t} (én per 30 minutter)", "bbs_saved": "Lagrede BBS", "bbs_save": "Lagre denne BBS-en (kallesignal og sti)", "bbs_remove": "Fjern fra lagrede", "bbs_saved_as": "{call} lagret", "last_2h": "Siste 2 timer",
     "via_heard_rf": "radio", "via_heard_is": "internett",
     "quit_title": "Avslutte APRS & Packet?",
     "quit_text": "Når appen lukkes, stopper:",

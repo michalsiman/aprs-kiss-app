@@ -21,6 +21,11 @@ class TerminalView(View):
                                    capitalization=ft.TextCapitalization.CHARACTERS, on_submit=self._connect)
         self.path = ft.TextField(label=self.t("path"), width=200, dense=True,
                                  capitalization=ft.TextCapitalization.CHARACTERS)
+        self.saved = ft.Dropdown(label=self.t("bbs_saved"), width=220, dense=True, on_select=self._pick)
+        self.save_btn = ft.IconButton(ft.Icons.BOOKMARK_ADD_OUTLINED, tooltip=self.t("bbs_save"), on_click=self._save)
+        self.remove_btn = ft.IconButton(ft.Icons.BOOKMARK_REMOVE_OUTLINED, tooltip=self.t("bbs_remove"),
+                                        on_click=self._remove)
+        self._fill_saved()
         self.connect_btn = ft.FilledButton(self.t("connect"), icon=ft.Icons.LINK, on_click=self._connect)
         self.disconnect_btn = ft.OutlinedButton(self.t("disconnect"), icon=ft.Icons.LINK_OFF, on_click=self._disconnect)
         self.state = ft.Text(self.t("not_connected_session"), color=ft.Colors.ON_SURFACE_VARIANT)
@@ -30,7 +35,8 @@ class TerminalView(View):
                                   text_style=ft.TextStyle(font_family=MONO))
         return ft.Column(
             [
-                ft.Row([self.remote, self.path, self.connect_btn, self.disconnect_btn], wrap=True),
+                ft.Row([self.saved, self.remote, self.path, self.save_btn, self.remove_btn,
+                        self.connect_btn, self.disconnect_btn], wrap=True),
                 self.state,
                 ft.Container(ft.SelectionArea(self.lines), expand=True, border_radius=8,
                              bgcolor=ft.Colors.SURFACE_CONTAINER_LOWEST),
@@ -38,6 +44,45 @@ class TerminalView(View):
             ],
             expand=True,
         )
+
+    # ─── saved BBSes ──────────────────────────────────────────────────────
+
+    def _fill_saved(self) -> None:
+        items = self.engine.config.saved_bbs()
+        self.saved.options = [ft.DropdownOption(key=i["call"], text=f"{i['call']} via {i['path']}" if i["path"]
+                                                else i["call"]) for i in items]
+        if self.saved.value not in {i["call"] for i in items}:
+            self.saved.value = None
+        self.saved.disabled = not items
+        self.remove_btn.disabled = self.saved.value is None
+
+    def _pick(self, e) -> None:
+        """Choosing a saved station fills in its callsign and path, ready to connect."""
+        item = next((i for i in self.engine.config.saved_bbs() if i["call"] == e.control.value), None)
+        if item:
+            self.remote.value, self.path.value = item["call"], item["path"]
+            self._reload_lines()
+            self.refresh()
+        self.remove_btn.disabled = item is None
+        self.app.page.update()
+
+    def _save(self, _e) -> None:
+        if not self.current:
+            return
+        self.engine.config.save_bbs(self.current, self.path.value or "")
+        self.app.save_config_soon()
+        self.saved.value = self.current
+        self._fill_saved()
+        self.app.toast(self.t("bbs_saved_as", call=self.current))
+        self.app.page.update()
+
+    def _remove(self, _e) -> None:
+        if self.saved.value:
+            self.engine.config.remove_bbs(self.saved.value)
+            self.app.save_config_soon()
+            self.saved.value = None
+            self._fill_saved()
+            self.app.page.update()
 
     @property
     def current(self) -> str:

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.12 – 2026-11-22
+
+- **APRS Thursday**: a new section for the weekly #APRSThursday net. Shows whether the net is on
+  (Thursday, UTC) or when the next one starts, and whether you are in the HOTG group. Check in with
+  one button ("CQ HOTG …" to ANSRVR, by radio or over the internet, with the delivery state), read
+  the group's messages in their own feed (they no longer fill your inbox), leave the group
+  ("U HOTG"), open the map of check-ins on aprs.to. ANSRVR's one message per 30 minutes is shown.
+- Terminal: a list of **saved BBSes and nodes** (callsign and digipeater path): save the station
+  you typed, pick one from the list to fill in the fields, remove it again.
+- New screenshots; README describes the new features and the Windows install.
+
 ## 0.1.11 – 2026-11-22
 
 - Map: callsign labels have a thin dark frame, so they stand out on a colourful map.

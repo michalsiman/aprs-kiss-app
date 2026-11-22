@@ -128,6 +128,19 @@ class ConfigTest(unittest.TestCase):
         conf = Config.from_dict({"port": "8003", "beacon_is": "true", "latitude": "", "unknown": 1})
         self.assertEqual((conf.port, conf.beacon_is, conf.latitude), (8003, True, None))
 
+    def test_saved_bbs(self):
+        conf = Config()
+        self.assertEqual(conf.saved_bbs(), [])
+        conf.save_bbs("ok0bbs", "ok0abc")
+        conf.save_bbs("OK0NOD")
+        conf.save_bbs("OK0BBS", "")  # saving again updates the path, keeps one entry
+        self.assertEqual(conf.saved_bbs(), [{"call": "OK0NOD", "path": ""}, {"call": "OK0BBS", "path": ""}])
+        again = Config.from_dict(conf.to_dict())
+        self.assertEqual(again.saved_bbs(), conf.saved_bbs())
+        again.remove_bbs("ok0nod")
+        self.assertEqual([i["call"] for i in again.saved_bbs()], ["OK0BBS"])
+        self.assertEqual(Config(bbs_list="not json").saved_bbs(), [])
+
     def test_invalid(self):
         with self.assertRaises(ValueError):
             Config(callsign="OK1SIM", symbol="x").validate()

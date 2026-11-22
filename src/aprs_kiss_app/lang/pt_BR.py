@@ -60,7 +60,7 @@ TEXTS = {
     "legend_symbols": "Símbolos exibidos agora",
     "legend_symbols_hint": "Cada estação escolhe seu próprio símbolo APRS: um carro, uma casa, uma estação meteorológica…",
     "legend_unknown": "Símbolo fora da tabela (código)",
-    "show_internet": "Estações da internet", "map_muted": "Mapa esmaecido", "last_2h": "Últimas 2 horas",
+    "show_internet": "Estações da internet", "map_muted": "Mapa esmaecido", "thursday": "APRS Thursday", "th_running": "Acontecendo agora, termina em {t}", "th_next": "O próximo começa {when} (em {t})", "th_member": "Você está no grupo HOTG até {when}", "th_not_member": "Você não está no grupo HOTG: sua primeira mensagem o adiciona", "th_about": "Toda quinta-feira (UTC) radioamadores do mundo todo enviam uma mensagem curta ao grupo HOTG. O ANSRVR a repassa a todos que escreveram ao grupo nas últimas 12 horas e envia a você as mensagens deles.", "th_rf_hint": "Pelo rádio, as respostas só chegam a você por um iGate que repassa mensagens da internet para o rádio; pela internet (APRS-IS) sempre funciona.", "th_placeholder": "Sua mensagem ao grupo (ex.: de onde transmite, com qual equipamento)", "th_send": "Enviar ao HOTG", "th_leave": "Sair do grupo", "th_map": "Mapa e participantes (aprs.to)", "th_empty": "Ainda não há mensagens HOTG.", "th_wait": "Próxima mensagem possível em {t} (uma a cada 30 minutos)", "bbs_saved": "BBS salvas", "bbs_save": "Salvar esta BBS (indicativo e caminho)", "bbs_remove": "Remover das salvas", "bbs_saved_as": "{call} salva", "last_2h": "Últimas 2 horas",
     "via_heard_rf": "rádio", "via_heard_is": "internet",
     "quit_title": "Sair do APRS & Packet?",
     "quit_text": "Ao fechar o aplicativo, para:",
