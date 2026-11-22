@@ -27,9 +27,11 @@ Pravidla pro text:
 - Konce řádků uvnitř zprávy se posílají jako CR (`0x0D`).
 - Bez předpony: značka odesílatele je zdrojem rámce, takže na začátek **nepřidávejte** `OK1SIM: `.
 - Informační pole držte nejvýš na **256 bajtech** (výchozí N1 v AX.25; písmena s diakritikou mají
-  v UTF-8 2 bajty). APRS & Packet to zatím nehlídá, takže delší zprávu může některé TNC zahodit.
-- **Text nezačínejte žádným z těchto znaků:** `! = / @ ; ) ` ' : > ? < $ _ { } * #`.
-  Jsou to identifikátory typu APRS dat a přijímač by takový rámec bral jako APRS, ne jako chat.
+  v UTF-8 2 bajty). Delší zpráva se pošle jako několik rámců, rozdělená mezi slovy; APRS & Packet to
+  dělá sám.
+- **Informační pole nesmí začínat žádným z těchto znaků:** `! = / @ ; ) ` ' : > ? < $ _ { } * #`.
+  Jsou to identifikátory typu APRS dat a přijímač by rámec bral jako APRS, ne jako chat. Když zpráva
+  takovým znakem začíná, dejte před něj mezeru (APRS & Packet to dělá sám); přijímač ji zase odstraní.
 
 Příklad: `OK1SIM-14>CQ <UI>: Ahoj Pepo, slyšíš?`
 

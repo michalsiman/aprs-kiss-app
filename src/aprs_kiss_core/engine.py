@@ -57,6 +57,37 @@ APRS_TYPES = set("!=/@;)`':>?<$_{}*#")
 # frames (a digipeater's "DX de ..." report to DX, station IDs to ID or BEACON) stay in the monitor.
 CHAT_DESTINATIONS = {"CQ", "QST", "ALL"}
 
+CHAT_MAX_BYTES = 256  # AX.25 N1: longer information fields are dropped by some TNCs
+
+
+def chat_parts(text: str, limit: int = CHAT_MAX_BYTES) -> list[str]:
+    """The chat text as the information fields of one or more UI frames (docs/CHAT.md).
+
+    Each part fits in `limit` bytes of UTF-8, split at a space or line break where possible, and a part
+    that would start with an APRS data type character gets a leading space, so receivers do not take
+    it for APRS (they strip the space again).
+    """
+    parts: list[str] = []
+    rest = text.strip()
+    while rest:
+        room = limit - 1  # keep a byte for the leading space a part may need
+        if len(rest.encode("utf-8")) <= room:
+            cut = len(rest)
+        else:
+            cut = 0
+            for i in range(len(rest)):
+                if len(rest[: i + 1].encode("utf-8")) > room:
+                    break
+                cut = i + 1
+            gap = max(rest.rfind(" ", 0, cut), rest.rfind("\n", 0, cut))
+            if gap > cut // 2:
+                cut = gap
+        part, rest = rest[:cut].rstrip(), rest[cut:].strip()
+        if part:
+            parts.append(" " + part if part[0] in APRS_TYPES else part)
+    return parts
+
+
 Listener = Callable[[str, dict[str, Any]], None]
 
 __all__ = ["Engine", "TransmitRefused"]
@@ -686,7 +717,8 @@ class Engine:
         text = text.strip()
         if not text:
             return
-        await self.send_unproto("CQ", text)
+        for part in chat_parts(text):
+            await self.send_unproto("CQ", part)
         self._chat_add({"time": time.time(), "from": str(self.me), "to": "CQ", "text": text, "out": True})
 
     async def send_unproto(self, destination: str, text: str, path: str = "") -> None:

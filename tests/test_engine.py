@@ -84,6 +84,18 @@ class EngineTest(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(any("DX de" in t or "/R WIDE" in t for t in texts))
         self.assertTrue(any("DX de" in line for line in self.engine.monitor))
 
+    async def test_chat_parts(self):
+        from aprs_kiss_core.engine import chat_parts
+        self.assertEqual(chat_parts("  hello  "), ["hello"])
+        self.assertEqual(chat_parts("?anyone there"), [" ?anyone there"])  # not mistaken for APRS
+        self.assertEqual(chat_parts(":-)"), [" :-)"])
+        long = ("slyšíš mě dobře? " * 40).strip()
+        parts = chat_parts(long)
+        self.assertGreater(len(parts), 1)
+        self.assertTrue(all(len(p.encode("utf-8")) <= 256 for p in parts))
+        self.assertEqual(" ".join(parts).split(), long.split())  # nothing lost, split between words
+        self.assertEqual(chat_parts(""), [])
+
     async def test_transmit_is_off_by_default(self):
         self.assertFalse(self.engine.tx_enabled)
         with self.assertRaises(TransmitRefused):

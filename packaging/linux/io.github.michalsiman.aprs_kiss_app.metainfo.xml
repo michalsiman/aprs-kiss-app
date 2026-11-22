@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.15" date="2026-11-22">
+      <description>
+        <p>Chat messages starting with an APRS character (such as a smiley) and long messages now reach other stations.</p>
+      </description>
+    </release>
     <release version="0.1.14" date="2026-11-22">
       <description>
         <p>A guide to the BBS SERVER in English and Czech, a Czech README and new screenshots.</p>

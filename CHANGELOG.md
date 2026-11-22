@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.15 – 2026-11-22
+
+- Chat: a message that starts with a character APRS uses (`?`, `:`, `>`, `!`, `@`…, e.g. a smiley
+  `:-)`) gets a leading space on the air, so other stations no longer take it for APRS and drop it.
+- Chat: a message longer than 256 bytes is sent as several frames, split between words, instead of
+  one frame some TNCs would drop.
+- [Packet chat specification](docs/CHAT.md) (also [in Czech](docs/CHAT.cs.md)), for using the chat
+  from other software.
+
 ## 0.1.14 – 2026-11-22
 
 - **BBS SERVER guide** in English and Czech ([docs/BBS.md](docs/BBS.md), [docs/BBS.cs.md](docs/BBS.cs.md)):

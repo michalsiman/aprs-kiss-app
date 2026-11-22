@@ -27,10 +27,12 @@ Rules for the text:
 - Line breaks inside a message are sent as CR (`0x0D`).
 - No prefix: the sender's callsign is the frame's source, so do **not** add `OK1SIM: ` in front.
 - Keep the information field to at most **256 bytes** (the AX.25 default N1; UTF-8 accented letters
-  take 2 bytes). APRS & Packet does not enforce this yet, so a longer message may be dropped by
-  some TNCs.
-- **Do not start the text with one of these characters:** `! = / @ ; ) ` ' : > ? < $ _ { } * #`.
-  They are APRS data type identifiers, and receivers treat such a frame as APRS, not chat.
+  take 2 bytes). A longer message is sent as several frames, split between words; APRS & Packet does
+  this itself.
+- **The information field must not start with one of these characters:** `! = / @ ; ) ` ' : > ? < $ _ { } * #`.
+  They are APRS data type identifiers, and receivers would treat the frame as APRS, not chat. When a
+  message starts with one, put a space in front of it (APRS & Packet does this itself); receivers
+  strip it again.
 
 Example: `OK1SIM-14>CQ <UI>: Ahoj Pepo, slyšíš?`
 
