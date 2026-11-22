@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.8 – 2026-11-22
+
+- Monitor: a *Stations from the internet* switch hides the APRS-IS lines (`[IS]`) and leaves only
+  what the radio heard and sent. The choice is saved. The radio's frames are kept apart, so a busy
+  APRS-IS feed no longer pushes them out of the monitor history.
+- Windows: an installer and a zip are built with every release; serial ports are listed as
+  "COM5 – USB-SERIAL CH340" instead of repeating the port.
+
 ## 0.1.7 – 2026-11-17
 
 - 13 more languages, 15 in all: Brazilian Portuguese, Croatian, Czech, Danish, English, French, German, Italian, Norwegian (Bokmål), Serbian (Cyrillic), Slovak, Slovenian, Spanish, Swedish and Ukrainian. The app picks the system language,

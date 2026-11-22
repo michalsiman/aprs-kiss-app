@@ -60,6 +60,14 @@ class EngineTest(unittest.IsolatedAsyncioTestCase):
         self.assertIn("message", self.kinds())
         self.assertTrue(await wait_for(lambda: any(e["text"].startswith("Good evening") for e in self.engine.chat)))
 
+    async def test_monitor_keeps_radio_lines_apart_from_aprs_is(self):
+        self.assertTrue(await wait_for(lambda: len(self.engine.monitor_rf) >= 2))
+        for i in range(600):  # a busy APRS-IS feed must not push the radio frames out
+            self.engine._on_is_line(f"OK{i}XYZ>APRS,TCPIP*,qAC,T2CZECH:>test {i}")
+        self.assertTrue(all("[IS] " not in line for line in self.engine.monitor_rf))
+        self.assertGreaterEqual(len(self.engine.monitor_rf), 2)
+        self.assertTrue(all("[IS] " in line for line in list(self.engine.monitor)[-500:]))
+
     async def test_transmit_is_off_by_default(self):
         self.assertFalse(self.engine.tx_enabled)
         with self.assertRaises(TransmitRefused):

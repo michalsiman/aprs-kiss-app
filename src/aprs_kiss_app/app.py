@@ -338,10 +338,14 @@ class App:
 
     # ─── helpers for the views ────────────────────────────────────────────
 
+    def save_config_soon(self) -> None:
+        """Save a view-only choice in the background; the connection is not restarted."""
+        self.page.run_task(asyncio.to_thread, save_config, self.engine.config, self.folder)
+
     def set_show_internet(self, value: bool) -> None:
         """Map and station list share this choice; it is saved, the connection is not restarted."""
         self.engine.config.show_internet = value
-        self.page.run_task(asyncio.to_thread, save_config, self.engine.config, self.folder)
+        self.save_config_soon()
         for key in ("map", "stations"):
             self.view(key).force()
         self.refresh_now()

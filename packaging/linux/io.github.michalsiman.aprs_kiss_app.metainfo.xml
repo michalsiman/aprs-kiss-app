@@ -111,6 +111,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.8" date="2026-11-22">
+      <description>
+        <p>The monitor can hide stations from the internet (APRS-IS) and show only radio traffic. Windows installer.</p>
+      </description>
+    </release>
     <release version="0.1.7" date="2026-11-17">
       <description>
         <p>Thirteen more languages: Danish, German, Spanish, French, Croatian, Italian, Norwegian, Brazilian Portuguese, Slovak, Slovenian, Serbian, Swedish and Ukrainian.</p>
