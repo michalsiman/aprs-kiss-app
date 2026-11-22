@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.13 – 2026-11-22
+
+- **BBS SERVER**: the app can run its own packet BBS on your callsign with its own SSID. Users get the
+  classic W0RLI / MBL / FBB commands (L, LM, LB, R, RM, S, SP, SB, K, KM, N, NQ, NH, I, H, J, B), personal
+  messages and bulletins. Everything lives in files in the BBS folder: bbs.toml (with comments),
+  welcome.txt, help.txt, info.txt, users.toml, and one text file per message. The BBS SERVER section shows
+  who is connected, the messages (read, delete) and a log.
+- Switching BBS SERVER on takes a typed sentence ("BBS SERVER must have another frequency than APRS"),
+  and while it runs everything else is off: APRS, APRS-IS, iGate, beacon, messages, APRS Thursday,
+  terminal and chat. The monitor stays.
+- Settings › BBS SERVER: SSID, clients at the same time, inactivity timeout (seconds), maximum TX time per
+  connection, maximum stored messages and the welcome message (ASCII art welcome), written to the BBS files.
+- Terminal: while connecting, the attempts are shown with their times ("attempt 3/9"), and the Disconnect
+  button becomes *Stop connecting*, which stops the attempts at once.
+
 ## 0.1.12 – 2026-11-22
 
 - **APRS Thursday**: a new section for the weekly #APRSThursday net. Shows whether the net is on

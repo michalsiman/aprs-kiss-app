@@ -21,6 +21,7 @@ from . import updates
 from .i18n import Translator
 from .symbols import symbol_info
 from .views.base import View, clock
+from .views.bbs import BbsView
 from .views.chat import ChatView
 from .views.map import MapView
 from .views.messages import MessagesView
@@ -32,7 +33,9 @@ from .views.thursday import ThursdayView
 
 _LOGGER = logging.getLogger(__name__)
 
-VIEWS = [MapView, MessagesView, ThursdayView, StationsView, TerminalView, ChatView, MonitorView, SettingsView]
+VIEWS = [MapView, MessagesView, ThursdayView, StationsView, TerminalView, ChatView, MonitorView, BbsView, SettingsView]
+# With BBS SERVER on the app is only the BBS; the monitor stays to see what the radio hears.
+BBS_VIEWS = [BbsView, MonitorView, SettingsView]
 FLUSH_DELAY = 0.25
 TICK_SECONDS = 5.0
 THEME_EVERY = 6  # ticks: the desktop theme is looked at every 30 s
@@ -129,11 +132,12 @@ class App:
 
     async def apply_config(self, config: Config) -> None:
         language_changed = config.language != self.engine.config.language
+        mode_changed = config.bbs_enabled != self.engine.config.bbs_enabled
         await asyncio.to_thread(save_config, config, self.folder)
         await self.engine.reconfigure(config)
-        if language_changed:
+        if language_changed or mode_changed:
             self.build()
-            self.select("settings")
+            self.select("bbs" if mode_changed else "settings")
         self.toast(self.t("saved"))
         self.refresh_now()
 
@@ -149,7 +153,9 @@ class App:
     def build(self) -> None:
         self.t = Translator(self.engine.config.language)
         key = self.current_key if self.views else "map"
-        self.views = [cls(self) for cls in VIEWS]
+        self.views = [cls(self) for cls in (BBS_VIEWS if self.engine.bbs_mode else VIEWS)]
+        if key not in {v.key for v in self.views}:
+            key = self.views[0].key
         self.rail = ft.NavigationRail(
             selected_index=0,
             label_type=ft.NavigationRailLabelType.ALL,
@@ -179,7 +185,8 @@ class App:
                     self.is_box,
                     ft.Container(expand=True),
                     self.update_btn,
-                    ft.IconButton(ft.Icons.SHARE_LOCATION, tooltip=self.t("beacon_now"), on_click=self._beacon_now),
+                    ft.IconButton(ft.Icons.SHARE_LOCATION, tooltip=self.t("beacon_now"), on_click=self._beacon_now,
+                                  visible=not self.engine.bbs_mode),
                     self.tx_box,
                     ft.IconButton(ft.Icons.INFO_OUTLINE, tooltip=self.t("about"),
                                   on_click=lambda _e: show_about(self)),
@@ -213,6 +220,10 @@ class App:
 
     def view(self, key: str) -> View:
         return next(v for v in self.views if v.key == key)
+
+    def has_view(self, key: str) -> bool:
+        """In BBS SERVER mode only some of the views exist."""
+        return any(v.key == key for v in self.views)
 
     def select(self, key: str) -> None:
         index = next(i for i, v in enumerate(self.views) if v.key == key)
@@ -296,9 +307,10 @@ class App:
         self.tx_switch.disabled = not self.engine.config.configured
         self.tx_switch.tooltip = self.t("tx_on") if st["tx_enabled"] else self.t("tx_off")
         self.tx_box.bgcolor = ft.Colors.ERROR_CONTAINER if st["tx_enabled"] else None
-        messages = self.view("messages")
-        dest = self.rail.destinations[self.views.index(messages)]
-        dest.badge = str(len(messages.unread)) if messages.unread else None
+        if self.has_view("messages"):
+            messages = self.view("messages")
+            dest = self.rail.destinations[self.views.index(messages)]
+            dest.badge = str(len(messages.unread)) if messages.unread else None
 
     # ─── new versions ─────────────────────────────────────────────────────
 
@@ -348,7 +360,8 @@ class App:
         self.engine.config.show_internet = value
         self.save_config_soon()
         for key in ("map", "stations"):
-            self.view(key).force()
+            if self.has_view(key):
+                self.view(key).force()
         self.refresh_now()
 
     def tracked(self) -> set[str]:
@@ -374,6 +387,8 @@ class App:
         return False
 
     def _notify_message(self, message: dict[str, Any]) -> None:
+        if not self.has_view("messages"):
+            return
         if self.current_key == "messages" and self.view("messages").selected == message["from"].upper():
             return
         sender = message["from"]

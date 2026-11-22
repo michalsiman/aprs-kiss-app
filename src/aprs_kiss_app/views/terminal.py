@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import time
+
 import flet as ft
 
 from aprs_kiss_core.engine import TransmitRefused
@@ -117,9 +119,22 @@ class TerminalView(View):
         if not self.current and len(states) == 1:
             self.remote.value = next(iter(states))
             state = states[self.remote.value]
-        self.state.value = f"{self.current}: {state}" if state else self.t("not_connected_session")
-        self.state.color = ft.Colors.GREEN if state == "connected" else ft.Colors.ON_SURFACE_VARIANT
+        info = self.engine.session_info(self.current) if state else None
+        connecting = state == "connecting"
+        if connecting and info:
+            hms = lambda ts: time.strftime("%H:%M:%S", time.localtime(ts))  # noqa: E731
+            self.state.value = f"{self.current}: " + self.t("term_attempt", n=info["attempts"], max=info["max_attempts"],
+                                                            time=hms(info["last_attempt"]), start=hms(info["started"]))
+        else:
+            self.state.value = f"{self.current}: {state}" if state else self.t("not_connected_session")
+        self.state.color = (ft.Colors.GREEN if state == "connected" else ft.Colors.AMBER_800 if connecting
+                            else ft.Colors.ON_SURFACE_VARIANT)
+        # While it keeps trying, the Disconnect button becomes a clear "Stop connecting".
         self.disconnect_btn.disabled = not state
+        self.disconnect_btn.content = self.t("term_stop") if connecting else self.t("disconnect")
+        self.disconnect_btn.icon = ft.Icons.STOP_CIRCLE if connecting else ft.Icons.LINK_OFF
+        self.disconnect_btn.style = ft.ButtonStyle(color=ft.Colors.ERROR) if connecting else None
+        self.connect_btn.disabled = bool(state)
         self.input.disabled = state != "connected"
 
     def _reload_lines(self) -> None:
@@ -143,10 +158,13 @@ class TerminalView(View):
         self.refresh()
 
     def _disconnect(self, _e) -> None:
+        """Disconnect, or stop the connect attempts while the station has not answered yet."""
         try:
             self.engine.disconnect(self.current)
         except ValueError as err:
             self.app.toast(str(err), error=True)
+        self.refresh()
+        self.app.page.update()
 
     async def _send(self, _e) -> None:
         text = self.input.value or ""

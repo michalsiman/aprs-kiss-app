@@ -154,6 +154,31 @@ class SessionTest(unittest.IsolatedAsyncioTestCase):
         await self._settle()
         self.assertEqual(self.link.a.state, session.DISCONNECTED)
 
+    async def test_connect_attempts_are_counted_and_can_be_stopped(self):
+        sent, states = [], []
+
+        async def send(raw):
+            sent.append(ax25.Frame.decode(raw).kind)
+
+        old_t1 = session.T1
+        session.T1 = 0.02
+        try:
+            s = session.Session(ax25.Address.parse("OK1SIM-7"), ax25.Address.parse("OK0BBS"), [], send,
+                                lambda t: None, lambda st, why: states.append(why))
+            s.connect()
+            await asyncio.sleep(0.07)
+            self.assertGreaterEqual(s.attempts, 3)
+            self.assertTrue(any(w.startswith("connect attempt 2/9 at ") for w in states))
+            self.assertGreater(s.last_attempt, s.connect_started)
+            s.disconnect()  # "Stop connecting"
+            count = sent.count("SABM")
+            await asyncio.sleep(0.07)
+            self.assertEqual(sent.count("SABM"), count)  # no more tries
+            self.assertEqual(s.state, session.DISCONNECTED)
+            self.assertEqual(states[-1], "cancelled")
+        finally:
+            session.T1 = old_t1
+
     async def test_no_answer_gives_up(self):
         session.N2 = 2
         self.link.drop = set(range(1000))

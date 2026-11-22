@@ -9,6 +9,15 @@ import os
 import flet as ft
 
 from aprs_kiss_core.aprsis import licence_confirmed
+from aprs_kiss_core.bbs import BbsConfigError
+from aprs_kiss_core.bbs.storage import (
+    BbsSettings,
+    load_settings,
+    prepare_folder,
+    read_text,
+    update_settings,
+    write_text,
+)
 from aprs_kiss_core.config import Config
 
 from ..i18n import LANGUAGES, TEXTS, ssid_labels
@@ -101,6 +110,9 @@ class SettingsView(View):
         self.ssid = ft.Dropdown(label=t("ssid"), value=ssid or "0", width=330,
                                 options=[ft.DropdownOption(key=str(i), text=label)
                                          for i, label in enumerate(ssid_labels(t.language))])
+        self.bbs_ssid = ft.Dropdown(label=t("bbs_ssid"), value=str(c.bbs_ssid), width=200,
+                                    options=[ft.DropdownOption(key=str(i), text=str(i)) for i in range(1, 16)])
+        self._build_bbs_fields(t)
         lang_index = 3 if t.language == "cs" else 2
         symbols = [ft.DropdownOption(key=s[0], text=f"{s[1]}  {s[lang_index]} ({s[0]})") for s in SYMBOLS]
         if not any(s[0] == c.symbol for s in SYMBOLS):
@@ -158,6 +170,11 @@ class SettingsView(View):
                          ft.Text(t("position_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
                          self.beacon, self.beacon_is, self.tracked, self.incoming),
                 _section(t("aprsis"), self.aprsis, self.licence, self.is_fields, self.is_state),
+                _section(t("bbs"), ft.Row([self.bbs_ssid, self.bbs_sessions], wrap=True),
+                         ft.Row([self.bbs_idle, self.bbs_tx, self.bbs_max], wrap=True),
+                         ft.Text(t("bbs_welcome"), size=12), ft.Row([self.bbs_welcome]),
+                         ft.Text(t("bbs_more"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
+                         ft.Text(str(self.engine.bbs_folder()), size=12, font_family="monospace", selectable=True)),
                 _section(t("app_section"), ft.Row([self.language, self.theme], wrap=True), self.check_updates,
                          ft.Row([ft.OutlinedButton(t("about"), icon=ft.Icons.INFO_OUTLINE,
                                                    on_click=lambda _e: self._about())])),
@@ -216,6 +233,43 @@ class SettingsView(View):
             state = self.t("disconnected") + (f" – {s['error']}" if s.get("error") else "")
         self.is_state.value = f"{self.t('aprsis_state')}: {state}"
 
+    # ─── BBS SERVER: these fields live in the BBS folder (bbs.toml, welcome.txt), not in the app's config
+
+    def _build_bbs_fields(self, t) -> None:
+        folder = self.engine.bbs_folder()
+        try:
+            prepare_folder(folder, t.language)
+            st = load_settings(folder)
+        except (BbsConfigError, OSError):
+            st = BbsSettings()
+        number = dict(width=200, keyboard_type=ft.KeyboardType.NUMBER, input_filter=ft.NumbersOnlyInputFilter())
+        self.bbs_sessions = ft.TextField(label=t("bbs_max_sessions"), value=str(st.max_sessions), **number)
+        self.bbs_idle = ft.TextField(label=t("bbs_idle_sec"), value=str(st.idle_timeout_sec), **{**number, "width": 260})
+        self.bbs_tx = ft.TextField(label=t("bbs_max_tx"), value=str(st.max_tx_min), **{**number, "width": 420})
+        self.bbs_max = ft.TextField(label=t("bbs_max_messages"), value=str(st.max_messages), **{**number, "width": 320})
+        self.bbs_welcome = ft.TextField(value=read_text(folder, "welcome.txt").rstrip("\n"), expand=True,
+                                        multiline=True, min_lines=5, max_lines=14,
+                                        text_style=ft.TextStyle(font_family="monospace"))
+
+    def _save_bbs(self) -> None:
+        def number(field: ft.TextField, low: int) -> int:
+            try:
+                value = int((field.value or "").strip())
+            except ValueError:
+                raise ValueError(field.label) from None
+            if value < low:
+                raise ValueError(f"{field.label} >= {low}")
+            return value
+
+        values = {("limits", "max_sessions"): number(self.bbs_sessions, 1),
+                  ("limits", "idle_timeout_sec"): number(self.bbs_idle, 10),
+                  ("limits", "max_tx_min"): number(self.bbs_tx, 0),
+                  ("limits", "max_messages"): number(self.bbs_max, 0)}
+        folder = self.engine.bbs_folder()
+        prepare_folder(folder, self.t.language)
+        update_settings(folder, values)
+        write_text(folder, "welcome.txt", self.bbs_welcome.value or "")
+
     async def _save(self, _e) -> None:
         old = self.engine.config
         call = (self.call.value or "").strip().upper()
@@ -231,6 +285,7 @@ class SettingsView(View):
             "longitude": (self.lon.value or "").replace(",", ".").strip(),
             "beacon_minutes": self.beacon.value, "beacon_is": self.beacon_is.value,
             "tracked_callsigns": self.tracked.value, "accept_incoming": self.incoming.value,
+            "bbs_ssid": self.bbs_ssid.value or "1",
             "aprsis_enabled": self.aprsis.value, "aprsis_host": self.is_host.value, "aprsis_port": self.is_port.value,
             "aprsis_passcode": self.passcode.value, "aprsis_radius_km": self.radius.value,
             "igate_rx": self.igate_rx.value, "igate_tx": self.igate_tx.value,
@@ -256,5 +311,10 @@ class SettingsView(View):
             self.error.value = f"{self.t('invalid')}: {err}"
             return
         self.error.value = ""
+        try:
+            await asyncio.to_thread(self._save_bbs)
+        except (BbsConfigError, OSError, ValueError) as err:
+            self.error.value = f"{self.t('invalid')}: {err}"
+            return
         await self.app.apply_config(conf)
         await asyncio.sleep(0)

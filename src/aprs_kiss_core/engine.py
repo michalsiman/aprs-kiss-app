@@ -31,16 +31,18 @@ from . import aprs as aprs_build
 from . import thursday
 from .aprsis import AprsIsClient, gate_to_is, passcode, third_party
 from .ax25 import PF, U_DM, Address, Frame
-from .config import MIN_BEACON_MINUTES, VERSION, Config, load_state, save_state
+from .bbs import BbsConfigError, BbsServer
+from .config import MIN_BEACON_MINUTES, VERSION, Config, data_dir, load_state, save_state
 from .connection import KissConnection, TncSettings
 from .parser import parse
-from .session import DISCONNECTED, Session
+from .session import CONNECT_ATTEMPTS, DISCONNECTED, Session
 from .station import Station, StationConfig, TransmitRefused
 
 _LOGGER = logging.getLogger(__name__)
 
 MONITOR_LINES = 500
 THURSDAY_LINES = 300
+BBS_TICK_SECONDS = 20
 THURSDAY_DUPLICATE_SECONDS = 15 * 60
 TERMINAL_LINES = 2000
 MESSAGE_HISTORY = 500
@@ -83,6 +85,11 @@ class Engine:
         self.igate_stats = {"rf_to_is": 0, "is_to_rf": 0, "is_messages": 0}
         self._tasks: set[asyncio.Task] = set()
         self._beacon_task: asyncio.Task | None = None
+        self.bbs: BbsServer | None = None
+        self.bbs_call: Address | None = None
+        self.bbs_error = ""
+        self.bbs_sessions: dict[str, Session] = {}
+        self._bbs_task: asyncio.Task | None = None
         self._save_handle: asyncio.TimerHandle | None = None
         self._loaded = False
         self.running = False
@@ -103,12 +110,23 @@ class Engine:
 
     # ─── building from the config ─────────────────────────────────────────
 
+    @property
+    def bbs_mode(self) -> bool:
+        """BBS SERVER on: the radio sits on the BBS frequency and the app is only the BBS -
+        no APRS, APRS-IS, iGate, beacon, messages, terminal or chat until it is switched off."""
+        return bool(self.config.bbs_enabled and self.config.configured)
+
+    def _not_in_bbs_mode(self) -> None:
+        if self.bbs_mode:
+            raise TransmitRefused("BBS SERVER is on: everything else is off")
+
     def _build(self, tx_enabled: bool) -> None:
         conf = self.config
         self.me = Address.parse(conf.callsign or "NOCALL")
-        self.accept_incoming = conf.accept_incoming
-        self.igate_rx = conf.igate_rx
-        self.igate_tx = conf.igate_tx
+        bbs = bool(conf.bbs_enabled and conf.configured)
+        self.accept_incoming = conf.accept_incoming and not bbs
+        self.igate_rx = conf.igate_rx and not bbs
+        self.igate_tx = conf.igate_tx and not bbs
         self.connection = KissConnection(
             TncSettings(kind=conf.connection, host=conf.host, port=int(conf.port), device=conf.device,
                         baudrate=int(conf.baudrate), txdelay_ms=conf.txdelay_ms or None),
@@ -120,8 +138,9 @@ class Engine:
             self.send_frame, parse, self._on_packet, self._on_message, self._on_update, self._next_msg_number,
         )
         self.station.tx_enabled = tx_enabled
+        self._build_bbs()
         self.aprsis: AprsIsClient | None = None
-        if conf.aprsis_on and conf.callsign:
+        if conf.aprsis_on and conf.callsign and not self.bbs_mode:
             radius = int(conf.aprsis_radius_km or 0)
             code = conf.aprsis_passcode or passcode(str(self.me))
             area = (f"r/{conf.latitude:.3f}/{conf.longitude:.3f}/{radius}"
@@ -131,6 +150,88 @@ class Engine:
                 f"aprs-kiss {VERSION}", self._on_is_line, self._on_is_state,
             )
             self.station.send_is = self._send_own_to_is
+
+    # ─── BBS server ───────────────────────────────────────────────────────
+
+    def bbs_folder(self) -> Path:
+        return (self._folder or data_dir()) / "bbs"
+
+    def _build_bbs(self) -> None:
+        self.bbs, self.bbs_call, self.bbs_error = None, None, ""
+        conf = self.config
+        if not (conf.bbs_enabled and conf.configured):
+            return
+        try:
+            call = Address(self.me.call, int(conf.bbs_ssid))
+            if call == self.me:
+                raise BbsConfigError(f"The BBS needs another SSID than the station ({call})")
+            self.bbs = BbsServer(self.bbs_folder(), str(call), VERSION, self._bbs_send, self._bbs_disconnect,
+                                 lambda: self._emit("bbs"), conf.language or "en")
+            self.bbs_call = call
+        except (BbsConfigError, ValueError, OSError) as err:
+            self.bbs_error = str(err)
+            _LOGGER.warning("BBS server not started: %s", err)
+
+    def bbs_reload(self) -> None:
+        """Read bbs.toml again without dropping the connected users."""
+        if self.bbs:
+            self.bbs.reload()
+
+    def _bbs_frame(self, frame: Frame, back: list[Address]) -> None:
+        key = str(frame.source)
+        sess = self.bbs_sessions.get(key)
+        if sess is None or sess.state == DISCONNECTED:
+            if frame.kind == "SABM" and self.station.tx_enabled and self.bbs and self.bbs.can_accept(key):
+                sess = self._new_bbs_session(frame.source, back)
+            else:
+                if (frame.kind == "SABM" or (frame.command and frame.poll_final)) and self.station.tx_enabled:
+                    reply = Frame(frame.source, self.bbs_call, back, b"", U_DM | (PF if frame.poll_final else 0),
+                                  None, False)
+                    self._spawn(self._send_quietly(reply.encode()))
+                return
+        sess.handle(frame)
+
+    def _new_bbs_session(self, remote: Address, path: list[Address]) -> Session:
+        key = str(remote)
+
+        def on_text(text: str) -> None:
+            if self.bbs:
+                self.bbs.receive(key, text)
+
+        def on_state(state: str, _reason: str) -> None:
+            if not self.bbs:
+                return
+            if state == "connected":
+                self.bbs.connected(key)
+            elif state == DISCONNECTED:
+                self.bbs.disconnected(key)
+                self.bbs_sessions.pop(key, None)
+            self._emit("bbs")
+
+        sess = Session(self.bbs_call, remote, path, self.send_frame, on_text, on_state)
+        self.bbs_sessions[key] = sess
+        return sess
+
+    def _bbs_send(self, remote: str, text: str) -> None:
+        sess = self.bbs_sessions.get(remote)
+        if sess:
+            sess.send_text(text)
+
+    def _bbs_disconnect(self, remote: str) -> None:
+        sess = self.bbs_sessions.get(remote)
+        if sess:
+            sess.disconnect()
+
+    async def _bbs_loop(self) -> None:
+        while True:
+            await asyncio.sleep(BBS_TICK_SECONDS)
+            if not self.bbs:
+                continue
+            text = self.bbs.tick()
+            if text and self.station.tx_enabled and self.bbs_call:
+                frame = Frame(Address.parse("MAIL"), self.bbs_call, [], text.encode("utf-8"))
+                with contextlib.suppress(TransmitRefused, ConnectionError):
+                    await self.send_frame(frame.encode())
 
     # ─── lifecycle ────────────────────────────────────────────────────────
 
@@ -150,8 +251,10 @@ class Engine:
         await self.connection.start()
         if self.aprsis:
             await self.aprsis.start()
-        if self.config.beacon_minutes:
+        if self.config.beacon_minutes and not self.bbs_mode:
             self._beacon_task = asyncio.create_task(self._beacon_loop(), name="aprs_kiss_beacon")
+        if self.bbs:
+            self._bbs_task = asyncio.create_task(self._bbs_loop(), name="aprs_kiss_bbs")
         self._on_update()
 
     async def stop(self) -> None:
@@ -159,6 +262,16 @@ class Engine:
         for s in self.sessions.values():
             s.close()
         self.sessions.clear()
+        for s in self.bbs_sessions.values():
+            s.close()
+        self.bbs_sessions.clear()
+        if self.bbs:
+            self.bbs.conns.clear()
+        if self._bbs_task:
+            self._bbs_task.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await self._bbs_task
+            self._bbs_task = None
         if self._beacon_task:
             self._beacon_task.cancel()
             with contextlib.suppress(asyncio.CancelledError):
@@ -257,6 +370,10 @@ class Engine:
             self._monitor(f"? undecodable frame ({err}): {raw.hex()}")
             return
         self._monitor(frame.monitor())
+        if self.bbs_mode:
+            if self.bbs_call and frame.destination == self.bbs_call and not frame.is_ui:
+                self._bbs_frame(frame, [Address(d.call, d.ssid) for d in reversed(frame.path)])
+            return  # only the BBS listens; APRS, chat and the terminal are off
         if frame.is_ui:
             self._chat_frame(frame)
             self.station.handle_frame(raw)
@@ -359,6 +476,8 @@ class Engine:
 
     async def beacon(self) -> None:
         """Our position: by radio while transmitting is on; over the internet only when chosen."""
+        if self.bbs_mode:
+            return
         if not self.config.has_position:
             _LOGGER.debug("Beacon not sent: no position set")
             return
@@ -370,6 +489,7 @@ class Engine:
 
     async def send_position(self, lat: float | None = None, lon: float | None = None,
                             comment: str | None = None) -> None:
+        self._not_in_bbs_mode()
         lat = self.config.latitude if lat is None else lat
         lon = self.config.longitude if lon is None else lon
         if lat is None or lon is None:
@@ -377,6 +497,7 @@ class Engine:
         await self.station.send_position(lat, lon, comment)
 
     async def send_status(self, text: str) -> None:
+        self._not_in_bbs_mode()
         await self.station.send_status(text)
 
     # ─── APRS messages ────────────────────────────────────────────────────
@@ -427,6 +548,7 @@ class Engine:
 
     async def send_thursday(self, text: str, via: str = "both") -> dict[str, Any]:
         """Check in: "CQ HOTG <text>" to ANSRVR, which passes it on to the group and adds us to it."""
+        self._not_in_bbs_mode()
         if not text.strip():
             raise ValueError("Empty message")
         wait = self.thursday_wait()
@@ -441,6 +563,7 @@ class Engine:
 
     async def leave_thursday(self, via: str = "both") -> None:
         """Leave HOTG ("U HOTG"), so the group's messages stop coming."""
+        self._not_in_bbs_mode()
         msg = await self.station.send_message(thursday.SERVER, f"U {thursday.GROUP}", via=via)
         self.thursday_joined = 0.0
         self._thursday_add({"time": time.time(), "from": str(self.me), "text": msg.text, "kind": "leave",
@@ -453,6 +576,7 @@ class Engine:
         self._emit("update")
 
     async def send_aprs_message(self, to: str, text: str, via: str = "both") -> dict[str, Any]:
+        self._not_in_bbs_mode()
         msg = await self.station.send_message(to, text, via=via)
         item = {"direction": "out", "from": str(self.me), "to": msg.to, "text": msg.text, "time": msg.created,
                 "msg_no": msg.msg_id, "via": via}
@@ -491,6 +615,7 @@ class Engine:
         self._emit("terminal", {"entry": entry})
 
     def connect(self, remote: str, path: str = "") -> None:
+        self._not_in_bbs_mode()
         if not self.station.tx_enabled:
             raise TransmitRefused("Transmitting is switched off")
         if not self.connection.connected:
@@ -515,6 +640,14 @@ class Engine:
 
     def session_states(self) -> dict[str, str]:
         return {k: s.state for k, s in self.sessions.items() if s.state != DISCONNECTED}
+
+    def session_info(self, remote: str) -> dict[str, Any] | None:
+        """State of a terminal connection, with its connect attempts while it is connecting."""
+        sess = self.sessions.get(str(Address.parse(remote))) if remote else None
+        if sess is None or sess.state == DISCONNECTED:
+            return None
+        return {"state": sess.state, "attempts": sess.attempts, "max_attempts": CONNECT_ATTEMPTS,
+                "started": sess.connect_started, "last_attempt": sess.last_attempt}
 
     # ─── chat (plain text in UI frames) ───────────────────────────────────
 
@@ -549,6 +682,7 @@ class Engine:
 
     async def send_chat(self, text: str) -> None:
         """Packet chat: just the text in a UI frame to CQ, direct (no digipeaters, nothing of APRS)."""
+        self._not_in_bbs_mode()
         text = text.strip()
         if not text:
             return
@@ -557,6 +691,7 @@ class Engine:
 
     async def send_unproto(self, destination: str, text: str, path: str = "") -> None:
         """A UI frame with plain text (classic unproto, e.g. to CQ or ID)."""
+        self._not_in_bbs_mode()
         frame = Frame(Address.parse(destination or "CQ"), self.me,
                       [Address.parse(p) for p in Config(path=path).paths()], text.replace("\n", "\r").encode("utf-8"))
         await self.send_frame(frame.encode())

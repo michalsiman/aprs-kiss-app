@@ -23,7 +23,11 @@ Builds for **Linux** and **Windows**; **macOS** is planned, Android and iOS late
 - **Stations** heard on the radio or seen on APRS-IS: distance, direction, comment, weather;
   stations an iGate relays from the internet by radio (third-party packets) show up too
 - **Packet terminal**: AX.25 connected mode to BBSes and nodes, a list of **saved BBSes** to pick
-  from, optional incoming connections
+  from, connect attempts shown with a *Stop connecting* button, optional incoming connections
+- **BBS SERVER**: run your own packet BBS on your callsign with its own SSID – classic W0RLI / MBL / FBB
+  commands, personal messages and bulletins, settings and texts in plain files (bbs.toml, welcome.txt,
+  …), one text file per message. While it runs, everything else in the app is off (the radio sits on the
+  BBS frequency, never on 144.800); switching it on takes a typed confirmation
 - **Packet chat** (plain text to CQ, QST, ALL or you; automatic frames such as digipeater DX reports
   stay out) and a TNC-style **frame monitor**, which can hide the APRS-IS lines
 - **APRS-IS** (internet) with optional RX and TX iGate; messages an iGate relays to you by radio

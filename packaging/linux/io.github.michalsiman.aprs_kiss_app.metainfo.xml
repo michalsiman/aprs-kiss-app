@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.13" date="2026-11-22">
+      <description>
+        <p>BBS SERVER: run your own packet BBS, configured in files and in Settings. The terminal shows connect attempts and can stop them.</p>
+      </description>
+    </release>
     <release version="0.1.12" date="2026-11-22">
       <description>
         <p>A section for the weekly #APRSThursday net (check in, the group's messages, when the next net starts) and a list of saved BBSes in the terminal.</p>

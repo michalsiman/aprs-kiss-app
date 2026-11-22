@@ -19,7 +19,7 @@ from .ax25 import Address
 _LOGGER = logging.getLogger(__name__)
 
 APP_NAME = "aprs-kiss"
-VERSION = "0.1.12"
+VERSION = "0.1.13"
 MIN_BEACON_MINUTES = 10
 
 
@@ -59,6 +59,8 @@ class Config:
     show_internet: bool = True  # map and station list also show stations seen only on APRS-IS
     monitor_internet: bool = True  # the frame monitor also shows APRS-IS lines ([IS])
     map_muted: bool = False  # map tiles faded, so the station labels stand out
+    bbs_enabled: bool = False  # run the BBS server (its own SSID, below)
+    bbs_ssid: int = 1  # the BBS answers on your callsign with this SSID
     bbs_list: str = ""  # saved BBSes and nodes for the terminal: JSON [{"call": ..., "path": ...}]
     check_updates: bool = True  # ask GitHub once a day whether a newer version is out
     theme: str = "auto"  # auto (as the desktop), light, dark
