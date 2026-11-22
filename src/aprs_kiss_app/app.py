@@ -77,6 +77,10 @@ class App:
         page.on_resize = self._on_resize
 
         config = await asyncio.to_thread(load_config, self.folder)
+        if self.mobile and (config.bbs_enabled or config.connection == "serial" or config.gps_source == "usb"):
+            # what a phone cannot do: BBS SERVER, a USB serial TNC, a USB GPS
+            config = Config.from_dict({**config.to_dict(), "bbs_enabled": False, "connection": "tcp",
+                                       "gps_source": "manual"}).validate()
         self.engine = Engine(config, self.folder)
         self.engine.add_listener(self._on_event)
         await self.engine.start()
@@ -143,14 +147,17 @@ class App:
         language_changed = config.language != self.engine.config.language
         old = self.engine.config
         mode_changed = (config.bbs_enabled, config.tak_enabled) != (old.bbs_enabled, old.tak_enabled)
+        t0 = time.monotonic()
         await asyncio.to_thread(save_config, config, self.folder)
         await self.engine.reconfigure(config)
+        t1 = time.monotonic()
         if language_changed or mode_changed:
             self.build()
             # stay in the section whose switch was turned (on or off)
             self.select(("tak" if config.tak_enabled != old.tak_enabled else "bbs") if mode_changed else "settings")
         self.toast(self.t("saved"))
         self.refresh_now()
+        _LOGGER.info("Settings applied: radio %.2f s, screen %.2f s", t1 - t0, time.monotonic() - t1)
 
     async def set_position(self, lat: float, lon: float) -> None:
         """From the map: becomes my position, saved at once and shown in Settings."""
@@ -161,15 +168,20 @@ class App:
 
     # ─── layout ───────────────────────────────────────────────────────────
 
-    def _is_compact(self) -> bool:
+    @property
+    def mobile(self) -> bool:
+        """A phone or tablet (Android, iOS): no BBS SERVER, no USB serial or USB GPS."""
+        return self.page.platform in (ft.PagePlatform.ANDROID, ft.PagePlatform.IOS)
+
+    def _is_compact(self, width: float | None = None) -> bool:
         page = self.page
         if page.platform in (ft.PagePlatform.ANDROID, ft.PagePlatform.IOS):
             return True
-        width = getattr(page, "width", None) or 0
+        width = width or getattr(page, "width", None) or 0
         return bool(width) and width < COMPACT_WIDTH
 
-    def _on_resize(self, _e) -> None:
-        if self.views and self._is_compact() != self.compact:
+    def _on_resize(self, e) -> None:
+        if self.views and self._is_compact(getattr(e, "width", None)) != self.compact:
             self.build()
 
     async def _open_menu(self, _e=None) -> None:
@@ -184,7 +196,10 @@ class App:
         self.compact = self._is_compact()
         key = self.current_key if self.views else "map"
         mode = self.engine.exclusive_mode
-        self.views = [cls(self) for cls in (BBS_VIEWS if mode == "bbs" else TAK_VIEWS if mode == "tak" else VIEWS)]
+        classes = BBS_VIEWS if mode == "bbs" else TAK_VIEWS if mode == "tak" else VIEWS
+        if self.mobile:  # BBS SERVER is for computers only
+            classes = [c for c in classes if c is not BbsView]
+        self.views = [cls(self) for cls in classes]
         if key not in {v.key for v in self.views}:
             key = self.views[0].key
         self.rail = ft.NavigationRail(
@@ -204,7 +219,8 @@ class App:
         )
         self.page.drawer = self.drawer if self.compact else None
         pad = 6 if self.compact else 12
-        self.holders = [ft.Container(v.control, visible=False, expand=True, padding=ft.Padding.all(pad))
+        self.holders = [ft.Container(v.control if v.built else None, visible=False, expand=True,
+                                     padding=ft.Padding.all(pad))
                         for v in self.views]
 
         self.callsign = ft.Text(weight=ft.FontWeight.BOLD, size=18)
@@ -268,7 +284,9 @@ class App:
         return self.views[self.current].key if self.views else ""
 
     def view(self, key: str) -> View:
-        return next(v for v in self.views if v.key == key)
+        v = next(v for v in self.views if v.key == key)
+        v.control  # noqa: B018 - built on first use
+        return v
 
     def has_view(self, key: str) -> bool:
         """In BBS SERVER mode only some of the views exist."""
@@ -279,6 +297,8 @@ class App:
         self.current = index
         self.rail.selected_index = index
         self.drawer.selected_index = index
+        if self.holders[index].content is not self.views[index].control:
+            self.holders[index].content = self.views[index].control  # built the first time it is shown
         for i, holder in enumerate(self.holders):
             holder.visible = i == index
         self.views[index].shown()
@@ -289,7 +309,8 @@ class App:
 
     def _on_event(self, kind: str, data: dict[str, Any]) -> None:
         for v in self.views:
-            v.on_event(kind, data)
+            if v.built:
+                v.on_event(kind, data)
         if kind == "message":
             self._notify_message(data)
         self._schedule_flush()
@@ -397,7 +418,7 @@ class App:
             if up == self.no_internet:  # changed
                 self.no_internet = not up
                 for v in self.views:
-                    if hasattr(v, "base_map_changed"):
+                    if v.built and hasattr(v, "base_map_changed"):
                         v.base_map_changed()
                 if not self.engine.config.map_offline:
                     self.toast(self.t("net_offline") if self.no_internet else self.t("net_online"), seconds=10)

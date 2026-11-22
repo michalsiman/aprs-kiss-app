@@ -79,6 +79,7 @@ def _compact(control: ft.Control) -> None:
 
 class SettingsView(View):
     key = "settings"
+    lazy = True
     icon = ft.Icons.SETTINGS_OUTLINED
     selected_icon = ft.Icons.SETTINGS
 
@@ -90,8 +91,9 @@ class SettingsView(View):
 
         # TNC
         self.connection = ft.Dropdown(label=t("connection"), value=c.connection, width=320,
-                                      options=[ft.DropdownOption(key="tcp", text=t("conn_tcp")),
-                                               ft.DropdownOption(key="serial", text=t("conn_serial"))],
+                                      options=[ft.DropdownOption(key="tcp", text=t("conn_tcp"))]
+                                      # phones: no USB serial from Python yet, only KISS over the network
+                                      + ([] if self.app.mobile else [ft.DropdownOption(key="serial", text=t("conn_serial"))]),
                                       on_select=lambda _e: self._connection_changed())
         self.host = ft.TextField(label=t("host"), value=c.host, width=240)
         self.port = ft.TextField(label=t("port"), value=str(c.port), width=110, input_filter=num)
@@ -195,17 +197,17 @@ class SettingsView(View):
                          ft.Row([self.lat, self.lon], wrap=True),
                          ft.Text(t("position_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
                          self.beacon, self.beacon_is, self.tracked, self.incoming),
-                _section("GPS", self.gps_source, self.gps_row, self.gps_hint),
+                *([] if self.app.mobile else [_section("GPS", self.gps_source, self.gps_row, self.gps_hint)]),
                 _section(t("aprsis"), self.aprsis, self.licence, self.is_fields, self.is_state),
                 _section("VARA FM", ft.Row([self.vara_host, self.vara_port], wrap=True),
                          ft.Text(t("vara_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT)),
                 _section(t("tak"), ft.Row([self.tak_callsign, self.tak_team, self.tak_role], wrap=True),
                          self.tak_interval),
-                _section(t("bbs"), ft.Row([self.bbs_ssid, self.bbs_sessions], wrap=True),
+                *([] if self.app.mobile else [_section(t("bbs"), ft.Row([self.bbs_ssid, self.bbs_sessions], wrap=True),
                          ft.Row([self.bbs_idle, self.bbs_tx, self.bbs_max], wrap=True),
                          ft.Text(t("bbs_welcome"), size=12), ft.Row([self.bbs_welcome]),
                          ft.Text(t("bbs_more"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
-                         ft.Text(short_path(self.engine.bbs_folder()), size=12, font_family="monospace", selectable=True)),
+                         ft.Text(short_path(self.engine.bbs_folder()), size=12, font_family="monospace", selectable=True))]),
                 _section(t("app_section"), ft.Row([self.language, self.theme], wrap=True), self.check_updates,
                          ft.Row([ft.OutlinedButton(t("about"), icon=ft.Icons.INFO_OUTLINE,
                                                    on_click=lambda _e: self._about())])),

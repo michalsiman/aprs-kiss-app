@@ -131,7 +131,11 @@ jobs:
           java-version: "17"
       - run: pip install "flet[all]==1.1.2"
       - name: flet build apk
-        run: flet build apk --yes --no-rich-output --skip-flutter-doctor
+        # The Python-for-Android download now and then breaks off: one more try before giving up.
+        run: |
+          flet build apk --yes --no-rich-output --skip-flutter-doctor || {
+            echo "Retrying the Android build"; sleep 30
+            flet build apk --yes --no-rich-output --skip-flutter-doctor; }
       - name: Rename
         run: |
           V=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")

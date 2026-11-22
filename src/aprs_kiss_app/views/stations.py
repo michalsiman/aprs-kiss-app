@@ -32,6 +32,7 @@ def describe(app, entry: dict) -> str:
 
 class StationsView(View):
     key = "stations"
+    lazy = True
     icon = ft.Icons.CELL_TOWER_OUTLINED
     selected_icon = ft.Icons.CELL_TOWER
 

@@ -33,6 +33,7 @@ def confirmed(text: str) -> bool:
 
 class BbsView(View):
     key = "bbs"
+    lazy = True
     icon = ft.Icons.DNS_OUTLINED
     selected_icon = ft.Icons.DNS
 

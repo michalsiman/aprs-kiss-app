@@ -21,9 +21,25 @@ class View:
     icon = ft.Icons.CIRCLE
     selected_icon: ft.IconData | None = None
 
+    # Heavy screens (maps, long forms) are built the first time they are shown: switching modes or
+    # starting the app then sends far less to the window. Their on_event only marks them stale.
+    lazy = False
+
     def __init__(self, app: App) -> None:
         self.app = app
-        self.control = self.build()
+        self._control: ft.Control | None = None
+        if not self.lazy:
+            self._control = self.build()
+
+    @property
+    def built(self) -> bool:
+        return self._control is not None
+
+    @property
+    def control(self) -> ft.Control:
+        if self._control is None:
+            self._control = self.build()
+        return self._control
 
     @property
     def t(self):

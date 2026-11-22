@@ -33,6 +33,7 @@ def tak_confirmed(text: str) -> bool:
 
 class TakView(View):
     key = "tak"
+    lazy = True
     icon = ft.Icons.RADAR_OUTLINED if hasattr(ft.Icons, "RADAR_OUTLINED") else ft.Icons.RADAR
     selected_icon = ft.Icons.RADAR
 
@@ -63,7 +64,8 @@ class TakView(View):
         self.offline_btn = ft.IconButton(ft.Icons.CLOUD_OFF_OUTLINED, selected_icon=ft.Icons.CLOUD_OFF,
                                          selected=self.app.offline_map(), tooltip=self.t("map_offline"),
                                          on_click=self._toggle_offline)
-        self.stations = ft.ListView(spacing=0, height=170)
+        compact = self.app.compact
+        self.stations = ft.ListView(spacing=0, height=90 if compact else 170)
         self.chat = ft.ListView(expand=True, spacing=6, auto_scroll=True, padding=ft.Padding.all(6))
         self.to = ft.Dropdown(dense=True, width=150, value="", options=[ft.DropdownOption(key="", text=self.t("tak_everybody"))])
         self.text = ft.TextField(hint_text=self.t("type_here"), expand=True, dense=True, on_submit=self._send)
@@ -76,8 +78,11 @@ class TakView(View):
                 ft.Container(self.chat, expand=True, border_radius=8, bgcolor=ft.Colors.SURFACE_CONTAINER_LOWEST),
                 ft.Row([self.to, self.text, ft.IconButton(ft.Icons.SEND, tooltip=self.t("send"), on_click=self._send)]),
             ], expand=True, spacing=6),
-            width=380,
+            width=None if compact else 380,
+            expand=compact,
         )
+        if compact:  # a phone: the map above, stations and GeoChat below
+            return ft.Column([header, ft.Container(self.map, expand=True, border_radius=8), panel], expand=True)
         return ft.Column([header, ft.Row([ft.Container(self.map, expand=True, border_radius=8), panel], expand=True,
                                          vertical_alignment=ft.CrossAxisAlignment.STRETCH)], expand=True)
 

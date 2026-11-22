@@ -23,6 +23,7 @@ MUTED_OPACITY = 0.45  # muted map: tiles faded over a neutral background, so the
 
 class MapView(View):
     key = "map"
+    lazy = True
     icon = ft.Icons.MAP_OUTLINED
     selected_icon = ft.Icons.MAP
 
@@ -56,19 +57,26 @@ class MapView(View):
         )
         self.only_recent = ft.Checkbox(label=self.t("last_2h"), value=False, on_change=lambda _e: self.force())
         self.internet = internet_checkbox(self.app)
+        buttons = [
+            ft.IconButton(ft.Icons.MY_LOCATION, tooltip=self.t("centre_me"), on_click=self._centre_me),
+            self._muted_btn(),
+            self._offline_btn(),
+        ]
+        legend = lambda _e: show_legend(self.app)  # noqa: E731
+        if self.app.compact:  # a phone: the buttons on one line, the two filters below
+            bar = ft.Column([
+                ft.Row([*buttons, ft.IconButton(ft.Icons.HELP_OUTLINE, tooltip=self.t("legend"), on_click=legend)],
+                       tight=True, spacing=0),
+                ft.Row([self.internet, self.only_recent], tight=True, spacing=0),
+            ], tight=True, spacing=0)
+        else:
+            bar = ft.Row([*buttons, self.internet, self.only_recent,
+                          ft.TextButton(self.t("legend"), icon=ft.Icons.HELP_OUTLINE, on_click=legend)],
+                         tight=True, wrap=True)
         overlay = ft.Container(
-            ft.Row([
-                ft.IconButton(ft.Icons.MY_LOCATION, tooltip=self.t("centre_me"), on_click=self._centre_me),
-                self._muted_btn(),
-                self._offline_btn(),
-                self.internet,
-                self.only_recent,
-                ft.TextButton(self.t("legend"), icon=ft.Icons.HELP_OUTLINE,
-                              on_click=lambda _e: show_legend(self.app)),
-            ], tight=True, wrap=True),
+            bar,
             bgcolor=ft.Colors.with_opacity(0.85, ft.Colors.SURFACE),
             border_radius=8, padding=ft.Padding.symmetric(horizontal=4), left=8, top=8,
-            right=8 if self.app.compact else None,  # on a phone the buttons wrap onto a second line
         )
         return ft.Stack([self.menu, overlay], expand=True)
 
