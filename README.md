@@ -32,7 +32,8 @@ Builds for **Linux** and **Windows**; **macOS** is planned, Android and iOS late
   BBS frequency, never on 144.800); switching it on takes a typed confirmation.
   See the **[BBS SERVER guide](docs/BBS.md)**
 - **Packet chat** (plain text to CQ, QST, ALL or you; automatic frames such as digipeater DX reports
-  stay out) and a TNC-style **frame monitor**, which can hide the APRS-IS lines
+  stay out; see the **[chat specification](docs/CHAT.md)** to use it from other software) and a
+  TNC-style **frame monitor**, which can hide the APRS-IS lines
 - **APRS-IS** (internet) with optional RX and TX iGate; messages an iGate relays to you by radio
   are received and acknowledged
 - Position beacon, status, unproto

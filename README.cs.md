@@ -32,7 +32,8 @@ Sestavení pro **Linux** a **Windows**; **macOS** je v plánu, Android a iOS poz
   na kmitočtu BBS, nikdy ne na 144.800); zapnutí vyžaduje napsat potvrzovací větu.
   Viz **[návod k BBS SERVER](docs/BBS.cs.md)**
 - **Packet chat** (prostý text na CQ, QST, ALL nebo vám; automatické rámce jako DX hlášení
-  digipeaterů do chatu nepatří) a **monitor rámců** jako na TNC, který umí skrýt řádky z APRS-IS
+  digipeaterů do chatu nepatří; jak ho použít v jiném softwaru popisuje **[specifikace chatu](docs/CHAT.cs.md)**)
+  a **monitor rámců** jako na TNC, který umí skrýt řádky z APRS-IS
 - **APRS-IS** (internet) s volitelným iGate pro příjem i vysílání; zprávy, které vám iGate pošle
   rádiem, se přijmou a potvrdí
 - Maják polohy, status, unproto
