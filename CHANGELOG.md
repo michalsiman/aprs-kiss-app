@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.19 – 2026-11-22
+
+- Fix: outside TAK mode, TAK frames heard on the radio (binary, to `TAK`) were read as APRS and could
+  add a bogus station to the map and the station list. They are now left to TAK mode (the monitor still
+  shows them decoded).
+- The VARA FM hint in Settings names the terminal's *Connection* choice.
+- The simulated TNC can send TAK stations and GeoChat (`tests/fake_tnc.py --tak`).
+- README: all features described, new screenshots (offline map, terminal over VARA FM, TAK, more settings).
+
 ## 0.1.18 – 2026-11-22
 
 - **Terminal over VARA FM**: with VARA FM's address set in Settings › VARA FM, the terminal offers

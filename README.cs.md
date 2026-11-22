@@ -16,68 +16,100 @@ Sestavení pro **Linux** a **Windows**; **macOS** je v plánu, Android a iOS poz
 
 ## Co umí
 
-- **Mapa** slyšených stanic (OpenStreetMap), vaše poloha, zvýrazněné sledované značky;
-  popisky značek v rámečku a tlačítko *Tlumená mapa*, které mapu ztlumí, aby stanice vynikly;
-  **offline mapa** přímo v aplikaci (hranice států, pobřeží, větší města), na kterou se mapa sama
-  přepne, když není internet
-- **APRS zprávy** jako konverzace, opakované až do potvrzení, se stavem doručení;
-  příchozí zprávy se potvrzují automaticky
+### APRS
+
+- **Mapa** slyšených stanic (OpenStreetMap) s APRS symboly a popisky značek v rámečku, vaše poloha,
+  zvýrazněné sledované značky. Tlačítka pro vycentrování na vás, *Tlumená mapa*, která mapu ztlumí,
+  aby stanice vynikly, stanice z internetu zapnout/vypnout, jen *Posledních 2 h* a legenda
+  symbolů. Pravé tlačítko na mapě: *Nastavit jako moji polohu*.
+- **Offline mapa** přímo v aplikaci: hranice států, pobřeží a asi 1 000 větších měst (Natural Earth),
+  s přiblížením přibývají další. Přepíná se jedním tlačítkem; **když není internet, mapa se na ni
+  přepne sama** a oznámí to, a jakmile se internet vrátí, vrátí se k OpenStreetMap.
+- **Zprávy** jako konverzace: opakované až do potvrzení, se stavem doručení, příchozí se potvrzují
+  automaticky; nová zpráva na libovolnou značku; upozornění, když nějaká přijde.
 - **#APRSThursday**: vlastní sekce pro čtvrteční síť HOTG přes ANSRVR – zapojení jedním tlačítkem,
-  zprávy skupiny zvlášť mimo běžné zprávy, kdy začíná další akce, odhlášení ze skupiny
-- **Stanice** slyšené rádiem nebo viděné na APRS-IS: vzdálenost, směr, komentář, počasí;
-  objeví se i stanice, které iGate pošle z internetu do rádia (pakety třetí strany)
-- **Packet terminál**: AX.25 spojení s BBS a nody, seznam **uložených BBS** k výběru,
-  počet pokusů o připojení s tlačítkem *Zastavit připojování*, volitelně příchozí spojení; také
-  **přes VARA FM** (VARA běží zvlášť s rádiem na zvukové kartě, např. kabelem AIOC)
-- **BBS SERVER**: vlastní packetová BBS na vaší značce s vlastním SSID – klasické příkazy W0RLI / MBL / FBB,
-  osobní zprávy a bulletiny, nastavení a texty v obyčejných souborech (bbs.toml, welcome.txt, …),
-  každá zpráva v jednom textovém souboru. Dokud běží, je všechno ostatní v aplikaci vypnuté (rádio je
-  na kmitočtu BBS, nikdy ne na 144.800); zapnutí vyžaduje napsat potvrzovací větu.
-  Viz **[návod k BBS SERVER](docs/BBS.cs.md)**
-- **TAK**: aplikace jako TAK stanice přes rádio – polohy a GeoChat kompatibilní s ATAK (TAK Protocol v1
-  v AX.25 UI rámcích), stanice na mapě barevně podle týmu, zprávy všem nebo jedné stanici.
-  Stejně jako BBS SERVER vypne všechno ostatní. Viz **[specifikace TAK](docs/TAK.cs.md)**
+  zprávy skupiny zvlášť mimo běžné zprávy, kdy začíná další akce, odhlášení ze skupiny.
+- **Stanice** slyšené rádiem nebo viděné na APRS-IS: vzdálenost, směr, komentář, počasí, cesta;
+  filtr a legenda. Objeví se i stanice, které iGate pošle z internetu do rádia (pakety třetí strany).
+- **Maják polohy** každých N minut a tlačítko *Poslat polohu teď* v horní liště; status a unproto.
+  Ikona (APRS symbol), komentář, SSID a cesta v Nastavení.
+- **APRS-IS** (internet) s volitelným **iGate** pro příjem i vysílání; zprávy, které vám iGate pošle
+  rádiem, se přijmou a potvrdí.
 - **USB GPS modul** (NMEA, u-blox/VK-172 a podobné, rychlost se zjistí sama): s fixem používá jeho polohu
-  mapa, maják (i s výškou) a TAK; stav GPS v horní liště
-- **Packet chat** (prostý text na CQ, QST, ALL nebo vám; automatické rámce jako DX hlášení
-  digipeaterů do chatu nepatří; jak ho použít v jiném softwaru popisuje **[specifikace chatu](docs/CHAT.cs.md)**)
-  a **monitor rámců** jako na TNC, který umí skrýt řádky z APRS-IS
-- **APRS-IS** (internet) s volitelným iGate pro příjem i vysílání; zprávy, které vám iGate pošle
-  rádiem, se přijmou a potvrdí
-- Maják polohy, status, unproto
-- 16 jazyků: brazilská portugalština, čeština, dánština, angličtina, francouzština, chorvatština,
+  mapa, maják (i s výškou) a TAK; stav GPS je v horní liště.
+
+### Packet rádio
+
+- **Terminál**: AX.25 spojení s BBS a nody, klidně přes digipeatery; seznam **uložených BBS** k výběru;
+  pokusy o připojení s časy a tlačítko *Zastavit připojování*; volitelně příchozí spojení.
+- **Terminál přes VARA FM**: stejný terminál přes VARA FM místo AX.25 – *Připojení: VARA FM*.
+  VARA běží zvlášť (Windows, nebo Wine na Linuxu) s rádiem na zvukové kartě, např. kabelem AIOC;
+  aplikace s ní mluví přes její TCP rozhraní (porty 8300/8301) a ukazuje průběh spojení, PTT
+  a buffer pro vysílání.
+- **Chat**: prostý text na CQ, QST, ALL nebo vám, slyší ho všichni na kmitočtu; automatické rámce jako
+  DX hlášení digipeaterů do chatu nepatří. Jak ho použít v jiném softwaru popisuje
+  **[specifikace chatu](docs/CHAT.cs.md)**.
+- **Monitor**: všechny přijaté i odeslané rámce jako na TNC, s pozastavením a vymazáním; umí skrýt
+  řádky z APRS-IS a TAK rámce ukazuje dekódované.
+- **BBS SERVER**: vlastní packetová BBS na vaší značce s vlastním SSID – klasické příkazy W0RLI / MBL / FBB,
+  osobní zprávy a bulletiny, limity pro počet klientů, nečinnost, čas vysílání a počet uložených zpráv;
+  nastavení a texty v obyčejných souborech (bbs.toml, welcome.txt, …), každá zpráva v jednom textovém
+  souboru. Dokud běží, je všechno ostatní v aplikaci vypnuté (rádio je na kmitočtu BBS, nikdy ne na
+  144.800); zapnutí vyžaduje napsat potvrzovací větu. Viz **[návod k BBS SERVER](docs/BBS.cs.md)**.
+- **TAK**: aplikace jako TAK stanice přes rádio – polohy a GeoChat kompatibilní s ATAK (TAK Protocol v1
+  v AX.25 UI rámcích), vlastní mapa se stanicemi barevně podle týmu, seznam stanic, zprávy všem nebo
+  jedné stanici; tým, role a značka v Nastavení. Stejně jako BBS SERVER vypne všechno ostatní.
+  Viz **[specifikace TAK](docs/TAK.cs.md)**.
+
+### Aplikace
+
+- **KISS přes TCP** (Direwolf, síťový most) nebo **sériový/USB port** (seznam portů, na Linuxu se
+  stálými názvy `/dev/serial/by-id`); TX delay pro TNC; po výpadku se připojí sama.
+- **16 jazyků**: brazilská portugalština, čeština, dánština, angličtina, francouzština, chorvatština,
   italština, němčina, norština (bokmål), polština, slovenština, slovinština, srbština (cyrilice),
-  španělština, švédština a ukrajinština; řídí se jazykem systému, nebo si ho vyberete v Nastavení
+  španělština, švédština a ukrajinština; řídí se jazykem systému, nebo si ho vyberete v Nastavení.
+- **Světlý a tmavý** vzhled podle systému, nebo podle volby v Nastavení.
 - Dá vědět, když vyjde nová verze: nejvýš jednou denně se zeptá GitHubu na poslední vydání,
-  nic o vás neposílá; v Nastavení se dá vypnout
+  nic o vás neposílá; v Nastavení se dá vypnout.
 
 > **Vysílání je ve výchozím stavu vypnuté.** *Vysílání* v horní liště zapněte jen tehdy, když máte
 > radioamatérské oprávnění. APRS-IS jde zapnout až po napsání věty o licenci.
 
 ## Snímky obrazovky
 
-Pořízené se simulovaným TNC (`tests/fake_tnc.py`); kliknutím se zvětší. Řídí se vzhledem vašeho
-GitHubu, stejně jako aplikace, která používá světlý nebo tmavý režim systému.
+Pořízené se simulovaným TNC a VARA (`tests/fake_tnc.py --tak`, `tests/fake_vara.py`); kliknutím se
+zvětší. Řídí se motivem GitHubu, stejně jako aplikace: používá světlý nebo tmavý režim systému.
 
 <table>
 <tr>
-<td colspan="2"><a href="assets/cs/map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/map-light.png"><img src="assets/cs/map.png" alt="Mapa slyšených stanic s APRS symboly"></picture></a></td>
+<td colspan="2"><a href="assets/cs/map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/map-light.png"><img src="assets/cs/map.png" alt="Mapa slyšených stanic s APRS symboly"></picture></a><br><sub>Mapa slyšených stanic</sub></td>
 </tr>
 <tr>
-<td width="50%"><a href="assets/cs/messages.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/messages-light.png"><img src="assets/cs/messages.png" alt="APRS zprávy, odeslaná je potvrzená"></picture></a></td>
-<td width="50%"><a href="assets/cs/thursday.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/thursday-light.png"><img src="assets/cs/thursday.png" alt="APRS Thursday: síť HOTG s vlastními zprávami"></picture></a></td>
+<td width="50%"><a href="assets/cs/map-offline.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/map-offline-light.png"><img src="assets/cs/map-offline.png" alt="Offline mapa: hranice a města bez internetu"></picture></a><br><sub>Offline mapa (bez internetu)</sub></td>
+<td width="50%"><a href="assets/cs/messages.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/messages-light.png"><img src="assets/cs/messages.png" alt="APRS zprávy, odeslaná potvrzená"></picture></a><br><sub>Zprávy, odeslaná je potvrzená</sub></td>
 </tr>
 <tr>
-<td><a href="assets/cs/stations.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/stations-light.png"><img src="assets/cs/stations.png" alt="Slyšené stanice se vzdáleností a směrem"></picture></a></td>
-<td><a href="assets/cs/terminal.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/terminal-light.png"><img src="assets/cs/terminal.png" alt="Packet terminál: uložená BBS, připojeno"></picture></a></td>
+<td width="50%"><a href="assets/cs/thursday.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/thursday-light.png"><img src="assets/cs/thursday.png" alt="APRS Thursday: síť HOTG s vlastním přehledem"></picture></a><br><sub>#APRSThursday</sub></td>
+<td width="50%"><a href="assets/cs/stations.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/stations-light.png"><img src="assets/cs/stations.png" alt="Slyšené stanice se vzdáleností a směrem"></picture></a><br><sub>Stanice se vzdáleností a směrem</sub></td>
 </tr>
 <tr>
-<td><a href="assets/cs/chat.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/chat-light.png"><img src="assets/cs/chat.png" alt="Packet chat"></picture></a></td>
-<td><a href="assets/cs/monitor.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/monitor-light.png"><img src="assets/cs/monitor.png" alt="Monitor rámců"></picture></a></td>
+<td width="50%"><a href="assets/cs/terminal.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/terminal-light.png"><img src="assets/cs/terminal.png" alt="Packet terminál: uložená BBS, spojení přes AX.25"></picture></a><br><sub>Terminál přes AX.25 packet</sub></td>
+<td width="50%"><a href="assets/cs/terminal-vara.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/terminal-vara-light.png"><img src="assets/cs/terminal-vara.png" alt="Packet terminál přes VARA FM"></picture></a><br><sub>Terminál přes VARA FM</sub></td>
 </tr>
 <tr>
-<td><a href="assets/cs/bbs.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/bbs-light.png"><img src="assets/cs/bbs.png" alt="BBS SERVER: aplikace jako packetová BBS"></picture></a></td>
-<td><a href="assets/cs/settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/settings-light.png"><img src="assets/cs/settings.png" alt="Nastavení: připojení k TNC a stanice"></picture></a></td>
+<td width="50%"><a href="assets/cs/chat.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/chat-light.png"><img src="assets/cs/chat.png" alt="Packet chat"></picture></a><br><sub>Packet chat</sub></td>
+<td width="50%"><a href="assets/cs/monitor.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/monitor-light.png"><img src="assets/cs/monitor.png" alt="Monitor rámců, TAK rámce dekódované"></picture></a><br><sub>Monitor rámců</sub></td>
+</tr>
+<tr>
+<td colspan="2"><a href="assets/cs/tak.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/tak-light.png"><img src="assets/cs/tak.png" alt="TAK: stanice podle týmů na mapě a GeoChat"></picture></a><br><sub>TAK: stanice podle týmů a GeoChat</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="assets/cs/bbs.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/bbs-light.png"><img src="assets/cs/bbs.png" alt="BBS SERVER: aplikace jako packetová BBS"></picture></a><br><sub>BBS SERVER</sub></td>
+<td width="50%"><a href="assets/cs/bbs-confirm.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/bbs-confirm-light.png"><img src="assets/cs/bbs-confirm.png" alt="Zapnutí BBS SERVER vyžaduje napsat větu"></picture></a><br><sub>BBS SERVER se zapíná napsáním věty</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="assets/cs/settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/settings-light.png"><img src="assets/cs/settings.png" alt="Nastavení: připojení TNC a stanice"></picture></a><br><sub>Nastavení: TNC a stanice</sub></td>
+<td width="50%"><a href="assets/cs/settings-more.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/settings-more-light.png"><img src="assets/cs/settings-more.png" alt="Nastavení: GPS, APRS-IS, VARA FM a TAK"></picture></a><br><sub>Nastavení: GPS, APRS-IS, VARA FM, TAK</sub></td>
 </tr>
 </table>
 
@@ -149,7 +181,14 @@ Nastavení a historie zpráv jsou v `~/.local/share/aprs-kiss/` (změníte prom�
 
 Simulované TNC: každých pár sekund přijdou stanice, meteo hlášení a zprávy, potvrzuje vaše zprávy,
 odpovídá v chatu a provozuje malou BBS (`OK0BBS`: H, L, B). Aplikaci nasměrujte na
-`127.0.0.1:8001`.
+`127.0.0.1:8001`. S `--tak` posílá i TAK stanice a GeoChat pro režim TAK.
+
+```bash
+.venv/bin/python tests/fake_vara.py --port 8300
+```
+
+Simulovaná VARA FM pro terminál: v Nastavení › VARA FM zadejte `127.0.0.1`, port 8300, a připojte se
+přes *Připojení: VARA FM* na libovolnou značku (odpoví malá BBS: L, B; `NOANSWER` neodpoví nikdy).
 
 ### Balíčky
 
@@ -162,11 +201,12 @@ Workflow *Release packages* jednou spustí `flet build linux` a z výsledku udě
 ```
 src/
   aprs_kiss_core/   rádio, bez uživatelského rozhraní: KISS, AX.25 (UI i spojení), APRS,
-                    APRS-IS/iGate, stanice (potvrzení, opakování, limity), BBS server (bbs/)
+                    APRS-IS/iGate, stanice (potvrzení, opakování, limity), BBS server (bbs/),
+                    TAK (tak.py), USB GPS (gps.py), VARA FM (vara.py), APRS Thursday (thursday.py)
                     a Engine, který to spojuje a hlásí události posluchačům
-  aprs_kiss_app/    uživatelské rozhraní ve Fletu: jedna obrazovka = jeden view
+  aprs_kiss_app/    uživatelské rozhraní ve Fletu: jedna obrazovka = jeden view; data offline mapy (offline/)
   main.py           vstupní bod pro `flet run` / `flet build`
-tests/              testy jednotek, testy enginu proti fake_tnc.py
+tests/              testy jednotek, testy enginu proti fake_tnc.py a fake_vara.py
 ```
 
 - **Flet** (Python, vykresluje Flutter): jeden kód pro počítač i mobil, nativní okno,
@@ -184,6 +224,8 @@ tests/              testy jednotek, testy enginu proti fake_tnc.py
 | KISS přes TCP | ✅ | ✅ | v plánu | v plánu | v plánu |
 | USB sériový port | ✅ | ✅ (COM porty) | v plánu | potřebuje USB host | ❌ (iOS) |
 | Bluetooth TNC | – | – | – | v plánu | jen BLE |
+| USB GPS modul | ✅ | ✅ (COM porty) | v plánu | potřebuje USB host | ❌ |
+| VARA FM | ✅ (VARA ve Wine) | ✅ | v plánu | VARA na jiném počítači | VARA na jiném počítači |
 | Běh na pozadí | ✅ | ✅ | ✅ | potřebuje službu na popředí | omezeno iOS |
 
 ## Testy

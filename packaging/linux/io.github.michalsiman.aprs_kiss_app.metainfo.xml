@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.19" date="2026-11-22">
+      <description>
+        <p>TAK frames are no longer mistaken for APRS stations outside TAK mode.</p>
+      </description>
+    </release>
     <release version="0.1.18" date="2026-11-22">
       <description>
         <p>The terminal can connect over VARA FM as well as over AX.25 packet.</p>

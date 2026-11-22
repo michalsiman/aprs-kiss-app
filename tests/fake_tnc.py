@@ -5,6 +5,7 @@ It plays the radio channel:
 - every --interval seconds it "receives" an APRS packet (positions, a status,
   a message to our callsign) and sends it to the client;
 - it answers APRS messages addressed to it with an ack;
+- with --tak, TAK stations send positions and GeoChat (TAK Protocol v1 to TAK);
 - it is a small BBS (OK0BBS by default) that accepts AX.25 connections and
   answers commands (H for help, L to list, B to say bye).
 
@@ -29,6 +30,7 @@ def _load(name):
 ax25 = _load("ax25")
 aprs = _load("aprs")
 session = _load("session")
+tak = _load("tak")
 
 A = ax25.Address.parse
 
@@ -43,6 +45,19 @@ SAMPLES = [
     ("OK1JKL-9", "APRS", ["OK0DIG*"], "=4939.60N/01328.90E>On the way to Klatovy"),
     ("OK1MNO-7", "APRS", ["WIDE1-1"], "=4948.30N/01317.20E[Hiking, 2 m handheld"),
     ("OK2PQR-5", "APRS", ["OK0DIG*", "WIDE2-1"], "=4933.10N/01309.80Eb Cycling around Prestice"),
+]
+
+
+TAK_TEAM = [  # (uid, callsign, lat, lon, team, role)
+    ("ANDROID-a1b2c3", "ALFA-1", 49.6120, 13.1470, "Cyan", "Team Lead"),
+    ("ANDROID-d4e5f6", "ALFA-2", 49.6320, 13.1890, "Cyan", "Team Member"),
+    ("ANDROID-0718aa", "MEDIC", 49.6010, 13.1820, "Red", "Medic"),
+    ("ANDROID-99bb01", "RTO", 49.6400, 13.1350, "Green", "RTO"),
+]
+TAK_CHAT = [
+    ("ANDROID-a1b2c3", "ALFA-1", "Checkpoint 2 reached, moving north"),
+    ("ANDROID-0718aa", "MEDIC", "All OK here, standing by"),
+    ("ANDROID-99bb01", "RTO", "Radio check, all stations report"),
 ]
 
 
@@ -70,6 +85,21 @@ class FakeTnc:
                 self.msg_no += 1
                 text = f":{aprs.addressee(self.args.mycall)}:Test message {self.msg_no} from the simulator{{{self.msg_no}"
                 await self.send_to_client(ax25.Frame(A("APRS"), A("OK1ABC-9"), [A("WIDE1-1")], text.encode()))
+
+    async def tak_traffic(self):
+        """TAK stations around Stod: positions now and then, a GeoChat every third round (--tak)."""
+        n = 0
+        while True:
+            for uid, call, lat, lon, team, role in TAK_TEAM:
+                ev = tak.pli(uid, call, lat + 0.0007 * (n % 5), lon + 0.001 * (n % 3), team, role)
+                await self.send_to_client(ax25.Frame(A(tak.DESTINATION), A("OK1ABC-9"), [], ev.encode()))
+                await asyncio.sleep(1)
+            if n % 3 == 0:
+                uid, call, text = TAK_CHAT[(n // 3) % len(TAK_CHAT)]
+                ev = tak.geochat(uid, call, text)
+                await self.send_to_client(ax25.Frame(A(tak.DESTINATION), A("OK1ABC-9"), [], ev.encode()))
+            n += 1
+            await asyncio.sleep(self.args.interval)
 
     def bbs_session(self, remote: ax25.Address):
         key = str(remote)
@@ -139,7 +169,8 @@ class FakeTnc:
         server = await asyncio.start_server(self.client, "0.0.0.0", self.args.port)
         print(f"fake KISS TNC on :{self.args.port}, BBS {self.bbs_call}", flush=True)
         async with server:
-            await asyncio.gather(server.serve_forever(), self.beacons())
+            await asyncio.gather(server.serve_forever(), self.beacons(),
+                                 *([self.tak_traffic()] if self.args.tak else []))
 
 
 if __name__ == "__main__":
@@ -148,5 +179,6 @@ if __name__ == "__main__":
     p.add_argument("--mycall", default="OK1SIM-7")
     p.add_argument("--bbs", default="OK0BBS")
     p.add_argument("--interval", type=float, default=20)
+    p.add_argument("--tak", action="store_true", help="also send TAK positions and GeoChat")
     p.add_argument("--message-every", type=int, default=3, help="a message to us every N packets, 0 = never")
     asyncio.run(FakeTnc(p.parse_args()).run())

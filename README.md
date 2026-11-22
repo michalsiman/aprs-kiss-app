@@ -16,67 +16,102 @@ Builds for **Linux** and **Windows**; **macOS** is planned, Android and iOS late
 
 ## What it does
 
-- **Map** of heard stations (OpenStreetMap), your own position, tracked callsigns highlighted;
-  framed callsign labels and a *Muted map* button that fades the map so the stations stand out;
-  a bundled **offline map** (country borders, coastlines, bigger cities) that the map switches to by itself
-  when there is no internet
-- **APRS messages** as conversations, retried until acknowledged, delivery state shown;
-  incoming messages acknowledged automatically
+### APRS
+
+- **Map** of heard stations (OpenStreetMap) with APRS symbols and framed callsign labels, your own
+  position, tracked callsigns highlighted. Buttons to centre on you, a *Muted map* that fades the map
+  so the stations stand out, stations from the internet on or off, *Last 2 hours* only, and a legend
+  of the symbols. Right-click the map: *Set as my position*.
+- **Offline map** bundled with the app: country borders, coastlines and about 1,000 bigger cities
+  (Natural Earth), more of them as you zoom in. One button switches to it; **with no internet the map
+  switches to it by itself** and tells you so, and goes back to OpenStreetMap when the internet returns.
+- **Messages** as conversations: retried until acknowledged, delivery state shown, incoming messages
+  acknowledged automatically; a new message to any callsign; a notice when one arrives.
 - **#APRSThursday**: its own section for the weekly HOTG net through ANSRVR – check in with one
-  button, read the group's messages apart from your inbox, see when the next net starts, leave the group
-- **Stations** heard on the radio or seen on APRS-IS: distance, direction, comment, weather;
-  stations an iGate relays from the internet by radio (third-party packets) show up too
-- **Packet terminal**: AX.25 connected mode to BBSes and nodes, a list of **saved BBSes** to pick
-  from, connect attempts shown with a *Stop connecting* button, optional incoming connections; also
-  **over VARA FM** (VARA running on its own with the radio on a sound card such as an AIOC cable)
-- **BBS SERVER**: run your own packet BBS on your callsign with its own SSID – classic W0RLI / MBL / FBB
-  commands, personal messages and bulletins, settings and texts in plain files (bbs.toml, welcome.txt,
-  …), one text file per message. While it runs, everything else in the app is off (the radio sits on the
-  BBS frequency, never on 144.800); switching it on takes a typed confirmation.
-  See the **[BBS SERVER guide](docs/BBS.md)**
-- **TAK**: the app as a TAK station over the radio – ATAK-compatible positions and GeoChat (TAK Protocol v1
-  in AX.25 UI frames), the stations on the map coloured by team, messages to everybody or one station.
-  Like BBS SERVER it switches everything else off. See the **[TAK specification](docs/TAK.md)**
+  button, read the group's messages apart from your inbox, see when the next net starts, leave the group.
+- **Stations** heard on the radio or seen on APRS-IS: distance, direction, comment, weather, the path;
+  a filter and a legend. Stations an iGate relays from the internet by radio (third-party packets)
+  show up too.
+- **Position beacon** every N minutes and a *Send position now* button in the top bar; status and
+  unproto. Icon (APRS symbol), comment, SSID and path in Settings.
+- **APRS-IS** (internet) with an optional RX and TX **iGate**; messages an iGate relays to you by
+  radio are received and acknowledged.
 - **USB GPS module** (NMEA, u-blox/VK-172 and the like, speed found automatically): with a fix the map,
-  the beacon (with altitude) and TAK use its position; GPS state in the top bar
-- **Packet chat** (plain text to CQ, QST, ALL or you; automatic frames such as digipeater DX reports
-  stay out; see the **[chat specification](docs/CHAT.md)** to use it from other software) and a
-  TNC-style **frame monitor**, which can hide the APRS-IS lines
-- **APRS-IS** (internet) with optional RX and TX iGate; messages an iGate relays to you by radio
-  are received and acknowledged
-- Position beacon, status, unproto
-- In 16 languages: Brazilian Portuguese, Croatian, Czech, Danish, English, French, German, Italian, Norwegian (Bokmål), Polish, Serbian (Cyrillic), Slovak, Slovenian, Spanish, Swedish and Ukrainian; it follows the system language
-  or you pick one in Settings
+  the beacon (with altitude) and TAK use its position; the GPS state is shown in the top bar.
+
+### Packet radio
+
+- **Terminal**: AX.25 connected mode to BBSes and nodes, through digipeaters if you like; a list of
+  **saved BBSes** to pick from; the connect attempts with their times and a *Stop connecting* button;
+  optional incoming connections.
+- **Terminal over VARA FM**: the same terminal over VARA FM instead of AX.25 – *Connection: VARA FM*.
+  VARA runs on its own (Windows, or Wine on Linux) with the radio on a sound card such as an AIOC cable;
+  the app talks to it over its TCP interface (ports 8300/8301) and shows its progress, PTT and the
+  transmit buffer.
+- **Chat**: plain text to CQ, QST, ALL or you, heard by everybody on the frequency; automatic frames
+  such as digipeater DX reports stay out. See the **[chat specification](docs/CHAT.md)** to use it
+  from other software.
+- **Monitor**: every frame received and sent, TNC style, with pause and clear; it can hide the APRS-IS
+  lines, and shows TAK frames decoded.
+- **BBS SERVER**: run your own packet BBS on your callsign with its own SSID – classic W0RLI / MBL / FBB
+  commands, personal messages and bulletins, limits for clients, idle time, airtime and stored messages;
+  settings and texts in plain files (bbs.toml, welcome.txt, …), one text file per message. While it runs,
+  everything else in the app is off (the radio sits on the BBS frequency, never on 144.800); switching
+  it on takes a typed confirmation. See the **[BBS SERVER guide](docs/BBS.md)**.
+- **TAK**: the app as a TAK station over the radio – ATAK-compatible positions and GeoChat (TAK Protocol v1
+  in AX.25 UI frames), its own map with the stations coloured by team, a list of stations, messages to
+  everybody or one station, your team, role and callsign in Settings. Like BBS SERVER it switches
+  everything else off. See the **[TAK specification](docs/TAK.md)**.
+
+### The app
+
+- **KISS over TCP** (Direwolf, a network bridge) or a **serial/USB port** (the list shows the ports,
+  with stable `/dev/serial/by-id` names on Linux); TX delay for the TNC; reconnects by itself.
+- In **16 languages**: Brazilian Portuguese, Croatian, Czech, Danish, English, French, German, Italian,
+  Norwegian (Bokmål), Polish, Serbian (Cyrillic), Slovak, Slovenian, Spanish, Swedish and Ukrainian;
+  it follows the system language or you pick one in Settings.
+- **Light and dark** appearance, following the system or chosen in Settings.
 - Tells you when a new version is out: asks GitHub at most once a day for the latest release,
-  sends nothing about you; can be switched off in Settings
+  sends nothing about you; can be switched off in Settings.
 
 > **Transmitting is off by default.** Switch *Transmit* on in the top bar only if you hold an amateur
 > radio licence. APRS-IS can be switched on only after typing the licence statement.
 
 ## Screenshots
 
-Taken with the simulated TNC (`tests/fake_tnc.py`); click for full size. They follow your
-GitHub theme, and so does the app: it uses the system's light or dark mode.
+Taken with the simulated TNC and VARA (`tests/fake_tnc.py --tak`, `tests/fake_vara.py`); click for
+full size. They follow your GitHub theme, and so does the app: it uses the system's light or dark mode.
 
 <table>
 <tr>
-<td colspan="2"><a href="assets/map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/map-light.png"><img src="assets/map.png" alt="Map of heard stations with APRS symbols"></picture></a></td>
+<td colspan="2"><a href="assets/map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/map-light.png"><img src="assets/map.png" alt="Map of heard stations with APRS symbols"></picture></a><br><sub>Map of heard stations</sub></td>
 </tr>
 <tr>
-<td width="50%"><a href="assets/messages.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/messages-light.png"><img src="assets/messages.png" alt="APRS messages, the sent one acknowledged"></picture></a></td>
-<td width="50%"><a href="assets/thursday.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/thursday-light.png"><img src="assets/thursday.png" alt="APRS Thursday: the HOTG net with its own feed"></picture></a></td>
+<td width="50%"><a href="assets/map-offline.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/map-offline-light.png"><img src="assets/map-offline.png" alt="The offline map: borders and cities without internet"></picture></a><br><sub>Offline map (no internet needed)</sub></td>
+<td width="50%"><a href="assets/messages.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/messages-light.png"><img src="assets/messages.png" alt="APRS messages, the sent one acknowledged"></picture></a><br><sub>Messages, the sent one acknowledged</sub></td>
 </tr>
 <tr>
-<td><a href="assets/stations.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/stations-light.png"><img src="assets/stations.png" alt="Stations heard, with distance and direction"></picture></a></td>
-<td><a href="assets/terminal.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/terminal-light.png"><img src="assets/terminal.png" alt="Packet terminal: a saved BBS, connected"></picture></a></td>
+<td width="50%"><a href="assets/thursday.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/thursday-light.png"><img src="assets/thursday.png" alt="APRS Thursday: the HOTG net with its own feed"></picture></a><br><sub>#APRSThursday</sub></td>
+<td width="50%"><a href="assets/stations.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/stations-light.png"><img src="assets/stations.png" alt="Stations heard, with distance and direction"></picture></a><br><sub>Stations with distance and direction</sub></td>
 </tr>
 <tr>
-<td><a href="assets/chat.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/chat-light.png"><img src="assets/chat.png" alt="Packet chat"></picture></a></td>
-<td><a href="assets/monitor.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/monitor-light.png"><img src="assets/monitor.png" alt="Frame monitor"></picture></a></td>
+<td width="50%"><a href="assets/terminal.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/terminal-light.png"><img src="assets/terminal.png" alt="Packet terminal: a saved BBS, connected over AX.25"></picture></a><br><sub>Terminal over AX.25 packet</sub></td>
+<td width="50%"><a href="assets/terminal-vara.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/terminal-vara-light.png"><img src="assets/terminal-vara.png" alt="Packet terminal over VARA FM"></picture></a><br><sub>Terminal over VARA FM</sub></td>
 </tr>
 <tr>
-<td><a href="assets/bbs.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/bbs-light.png"><img src="assets/bbs.png" alt="BBS SERVER: the app as a packet BBS"></picture></a></td>
-<td><a href="assets/settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-light.png"><img src="assets/settings.png" alt="Settings: TNC connection and station"></picture></a></td>
+<td width="50%"><a href="assets/chat.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/chat-light.png"><img src="assets/chat.png" alt="Packet chat"></picture></a><br><sub>Packet chat</sub></td>
+<td width="50%"><a href="assets/monitor.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/monitor-light.png"><img src="assets/monitor.png" alt="Frame monitor, TAK frames decoded"></picture></a><br><sub>Frame monitor</sub></td>
+</tr>
+<tr>
+<td colspan="2"><a href="assets/tak.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/tak-light.png"><img src="assets/tak.png" alt="TAK: stations by team on the map and GeoChat"></picture></a><br><sub>TAK: stations by team and GeoChat</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="assets/bbs.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/bbs-light.png"><img src="assets/bbs.png" alt="BBS SERVER: the app as a packet BBS"></picture></a><br><sub>BBS SERVER</sub></td>
+<td width="50%"><a href="assets/bbs-confirm.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/bbs-confirm-light.png"><img src="assets/bbs-confirm.png" alt="Switching BBS SERVER on takes a typed sentence"></picture></a><br><sub>BBS SERVER is switched on with a typed sentence</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="assets/settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-light.png"><img src="assets/settings.png" alt="Settings: TNC connection and station"></picture></a><br><sub>Settings: TNC and station</sub></td>
+<td width="50%"><a href="assets/settings-more.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-more-light.png"><img src="assets/settings-more.png" alt="Settings: GPS, APRS-IS, VARA FM and TAK"></picture></a><br><sub>Settings: GPS, APRS-IS, VARA FM, TAK</sub></td>
 </tr>
 </table>
 
@@ -148,7 +183,14 @@ Settings and message history live in `~/.local/share/aprs-kiss/` (`APRS_KISS_DAT
 
 A simulated TNC: stations, a weather report and messages arrive every few seconds, it acknowledges
 your messages, answers chat and runs a small BBS (`OK0BBS`: H, L, B). Point the app at
-`127.0.0.1:8001`.
+`127.0.0.1:8001`. With `--tak` it also sends TAK stations and GeoChat for TAK mode.
+
+```bash
+.venv/bin/python tests/fake_vara.py --port 8300
+```
+
+A pretend VARA FM for the terminal: set Settings › VARA FM to `127.0.0.1`, port 8300, and connect
+with *Connection: VARA FM* to any callsign (a small BBS answers: L, B; `NOANSWER` never answers).
 
 ### Packages
 
@@ -161,11 +203,12 @@ The *Release packages* workflow runs `flet build linux` once and makes the tarba
 ```
 src/
   aprs_kiss_core/   the radio, no user interface: KISS, AX.25 (UI + connected mode), APRS,
-                    APRS-IS/iGate, the station (acks, retries, limits), the BBS server (bbs/) and the Engine that
-                    ties it together and announces events to listeners
-  aprs_kiss_app/    the Flet user interface: one view per screen
+                    APRS-IS/iGate, the station (acks, retries, limits), the BBS server (bbs/),
+                    TAK (tak.py), USB GPS (gps.py), VARA FM (vara.py), APRS Thursday (thursday.py)
+                    and the Engine that ties it together and announces events to listeners
+  aprs_kiss_app/    the Flet user interface: one view per screen; the offline map data (offline/)
   main.py           entry point for `flet run` / `flet build`
-tests/              unit tests, engine tests against fake_tnc.py
+tests/              unit tests, engine tests against fake_tnc.py and fake_vara.py
 ```
 
 - **Flet** (Python, drawn by Flutter): one code base for desktop and mobile, a native window,
@@ -183,6 +226,8 @@ tests/              unit tests, engine tests against fake_tnc.py
 | KISS over TCP | ✅ | ✅ | planned | planned | planned |
 | USB serial | ✅ | ✅ (COM ports) | planned | needs a USB-host transport | ❌ (iOS) |
 | Bluetooth TNC | – | – | – | planned | BLE only |
+| USB GPS module | ✅ | ✅ (COM ports) | planned | needs a USB-host transport | ❌ |
+| VARA FM | ✅ (VARA in Wine) | ✅ | planned | VARA on another computer | VARA on another computer |
 | Running in the background | ✅ | ✅ | ✅ | needs a foreground service | limited by iOS |
 
 ## Tests

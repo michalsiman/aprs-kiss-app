@@ -595,6 +595,8 @@ class Engine:
                 self._tak_frame(frame)
             return  # only TAK listens
         if frame.is_ui:
+            if frame.destination.call == tak.DESTINATION:
+                return  # TAK (binary protobuf), only in TAK mode; never an APRS station or chat
             self._chat_frame(frame)
             self.station.handle_frame(raw)
             return

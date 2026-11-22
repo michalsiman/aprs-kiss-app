@@ -106,5 +106,17 @@ class EngineTakTest(unittest.IsolatedAsyncioTestCase):
             self.assertTrue(any("TAK GeoChat PEPA → All: jsem na místě" in line for line in eng.monitor))
 
 
+    async def test_tak_frames_are_not_aprs_outside_tak_mode(self):
+        # A TAK PLI whose protobuf bytes happen to look like an APRS position must not become a station.
+        with tempfile.TemporaryDirectory() as tmp:
+            eng = Engine(Config(callsign="OK1SIM-7", latitude=49.62, longitude=13.16).validate(), pathlib.Path(tmp))
+            for i in range(20):
+                ev = tak.pli(f"ANDROID-{i:06x}", f"T{i}", 49.6 + i / 100, 13.1, team="Cyan")
+                eng._on_frame(Frame(Address.parse("TAK"), Address.parse("OK1ABC-9"), [], ev.encode()).encode())
+            self.assertEqual(eng.station.heard, {})
+            self.assertEqual(list(eng.chat), [])
+            self.assertTrue(any("TAK PLI T0" in line for line in eng.monitor))
+
+
 if __name__ == "__main__":
     unittest.main()
