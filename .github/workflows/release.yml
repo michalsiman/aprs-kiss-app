@@ -1,6 +1,7 @@
 name: Release packages
 
-# Every v* tag: the Linux build, a .deb and a .flatpak, the Windows installer and zip, attached to the GitHub release,
+# Every v* tag: the Linux build, a .deb and a .flatpak, the Windows installer and zip, the Android .apk,
+# the macOS .dmg/.zip and an unsigned iOS .ipa, attached to the GitHub release,
 # and the app added to our Flatpak repository on GitHub Pages (packaging/flatpak/publish-repo.sh).
 # Run by hand to just build them (artifacts of the run), or to also publish to the Flatpak repository.
 on:
@@ -117,9 +118,96 @@ jobs:
           name: windows
           path: dist/*
 
+  android:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - run: pip install "flet[all]==1.1.2"
+      - name: flet build apk
+        run: flet build apk --yes --no-rich-output --skip-flutter-doctor
+      - name: Rename
+        run: |
+          V=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          ls -la build/apk
+          mkdir -p dist
+          APK=$(ls build/apk/*.apk | head -1)
+          cp "$APK" "dist/aprs-kiss-$V-android.apk"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: dist/*
+
+  macos:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install "flet[all]==1.1.2"
+      - name: flet build macos
+        run: flet build macos --yes --no-rich-output --skip-flutter-doctor
+      - name: Disk image and zip
+        run: |
+          V=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          ls -la build/macos
+          APP=$(ls -d build/macos/*.app | head -1)
+          mkdir -p dist dmg
+          cp -R "$APP" dmg/
+          ln -s /Applications dmg/Applications
+          hdiutil create -volname "APRS & Packet $V" -srcfolder dmg -ov -format UDZO "dist/aprs-kiss-$V-macos.dmg"
+          ditto -c -k --keepParent "$APP" "dist/aprs-kiss-$V-macos.zip"
+          ls -la dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: macos
+          path: dist/*
+
+  ios:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install "flet[all]==1.1.2"
+      # Without an Apple developer account the app cannot be signed here: this makes an unsigned .ipa,
+      # which sideloading tools (AltStore, Sideloadly) sign with the user's own Apple ID.
+      - name: flet build ipa (unsigned)
+        run: flet build ipa --yes --no-rich-output --skip-flutter-doctor || echo "flet build ipa ended with $?"
+      - name: Unsigned .ipa
+        run: |
+          V=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          find build -maxdepth 6 \( -name "*.ipa" -o -name "*.xcarchive" -o -name "Runner.app" \) -print || true
+          APP=$(find build -path "*Products/Applications/*.app" -maxdepth 8 | head -1)
+          if [ -z "$APP" ]; then
+            (cd build/flutter && flutter build ios --release --no-codesign) || true
+            APP=$(find build/flutter/build/ios -name "*.app" -maxdepth 4 | head -1)
+          fi
+          test -n "$APP"
+          echo "App: $APP"
+          mkdir -p dist ipa/Payload
+          cp -R "$APP" ipa/Payload/
+          (cd ipa && zip -qr "../dist/aprs-kiss-$V-ios-unsigned.ipa" Payload)
+          ls -la dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios
+          path: dist/*
+
   release:
-    if: startsWith(github.ref, 'refs/tags/v')
-    needs: [linux, flatpak, windows]
+    # The mobile and Apple builds are new: a failing one leaves its file out instead of stopping the release.
+    if: >-
+      startsWith(github.ref, 'refs/tags/v') && !cancelled() && needs.linux.result == 'success'
+      && needs.flatpak.result == 'success' && needs.windows.result == 'success'
+    needs: [linux, flatpak, windows, android, macos, ios]
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/download-artifact@v4
@@ -128,9 +216,14 @@ jobs:
       - run: find out -type f
       - uses: softprops/action-gh-release@v2
         with:
+          fail_on_unmatched_files: false
           files: |
             out/linux/*.tar.gz
             out/linux/*.deb
             out/flatpak/*.flatpak
             out/windows/*.exe
             out/windows/*.zip
+            out/android/*.apk
+            out/macos/*.dmg
+            out/macos/*.zip
+            out/ios/*.ipa
