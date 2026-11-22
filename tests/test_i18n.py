@@ -39,10 +39,10 @@ class TranslationsTest(unittest.TestCase):
 
     def test_picker_lists_every_language(self):
         self.assertEqual(set(LANGUAGES), set(TEXTS))
-        self.assertEqual(len(LANGUAGES), 15)
+        self.assertEqual(len(LANGUAGES), 16)
 
     def test_system_locale(self):
-        cases = {"de_AT.UTF-8": "de", "cs_CZ.UTF-8": "cs", "sk_SK": "sk", "pt_BR.UTF-8": "pt_BR",
+        cases = {"de_AT.UTF-8": "de", "cs_CZ.UTF-8": "cs", "sk_SK": "sk", "pl_PL.UTF-8": "pl", "pt_BR.UTF-8": "pt_BR",
                  "pt_PT.UTF-8": "pt_BR", "nb_NO.UTF-8": "nb", "nn_NO": "nb", "no": "nb",
                  "sr_RS@latin": "sr", "uk_UA.UTF-8": "uk", "sv_FI.UTF-8": "sv", "en_GB:en": "en",
                  "ja_JP.UTF-8": None, "C": None, "": None}

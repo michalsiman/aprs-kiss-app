@@ -68,6 +68,22 @@ class EngineTest(unittest.IsolatedAsyncioTestCase):
         self.assertGreaterEqual(len(self.engine.monitor_rf), 2)
         self.assertTrue(all("[IS] " in line for line in list(self.engine.monitor)[-500:]))
 
+    async def test_chat_shows_only_frames_meant_for_people(self):
+        from aprs_kiss_core.ax25 import Address, Frame
+
+        def ui(src, dst, text):
+            return Frame(Address.parse(dst), Address.parse(src), [], text.encode()).encode()
+
+        self.engine._on_frame(ui("OK0BAD-2", "DX", "DX de OK0BAD-2>144800.0  OK0DBF-1  077 dg frm OK0BAD-2  204km"))
+        self.engine._on_frame(ui("OK0BAD-2", "ID", "OK0BAD-2/R WIDE1-1"))
+        self.engine._on_frame(ui("OK1AAA", "QST", "net tonight at 20:00"))
+        self.engine._on_frame(ui("OK1BBB", MYCALL, "hi, are you there?"))
+        texts = [e["text"] for e in self.engine.chat]
+        self.assertIn("net tonight at 20:00", texts)
+        self.assertIn("hi, are you there?", texts)
+        self.assertFalse(any("DX de" in t or "/R WIDE" in t for t in texts))
+        self.assertTrue(any("DX de" in line for line in self.engine.monitor))
+
     async def test_transmit_is_off_by_default(self):
         self.assertFalse(self.engine.tx_enabled)
         with self.assertRaises(TransmitRefused):

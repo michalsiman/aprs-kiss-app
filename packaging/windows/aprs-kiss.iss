@@ -67,6 +67,9 @@ Name: "it"; MessagesFile: "compiler:Languages\Italian.isl"
 #if FileExists(CompilerPath + "Languages\Norwegian.isl")
 Name: "nb"; MessagesFile: "compiler:Languages\Norwegian.isl"
 #endif
+#if FileExists(CompilerPath + "Languages\Polish.isl")
+Name: "pl"; MessagesFile: "compiler:Languages\Polish.isl"
+#endif
 #if FileExists(CompilerPath + "Languages\BrazilianPortuguese.isl")
 Name: "pt_BR"; MessagesFile: "compiler:Languages\BrazilianPortuguese.isl"
 #endif

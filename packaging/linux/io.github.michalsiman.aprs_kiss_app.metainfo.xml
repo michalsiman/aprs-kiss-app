@@ -111,6 +111,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.10" date="2026-11-22">
+      <description>
+        <p>Polish translation. The chat no longer shows automatic frames such as digipeater DX reports.</p>
+      </description>
+    </release>
     <release version="0.1.9" date="2026-11-22">
       <description>
         <p>Stations and messages that an iGate relays from the internet by radio are now shown: the station on the map, the message in your inbox, acknowledged by radio.</p>

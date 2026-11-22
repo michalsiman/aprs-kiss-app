@@ -197,7 +197,7 @@ TEXTS: dict[str, dict[str, str]] = {
 # Code → name in that language, as the language picker lists them.
 LANGUAGES: dict[str, str] = {"cs": "Čeština", "en": "English"}
 SSID_LABELS: dict[str, list[str]] = {}
-EXTRA = ("da", "de", "es", "fr", "hr", "it", "nb", "pt_BR", "sk", "sl", "sr", "sv", "uk")
+EXTRA = ("da", "de", "es", "fr", "hr", "it", "nb", "pl", "pt_BR", "sk", "sl", "sr", "sv", "uk")
 for _code in EXTRA:
     _mod = importlib.import_module(f".lang.{_code}", __package__)
     TEXTS[_code] = _mod.TEXTS

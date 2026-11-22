@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.10 – 2026-11-22
+
+- Polish: 16 languages in all.
+- Chat shows only text meant for people: frames to CQ, QST, ALL or your own callsign. Automatic
+  frames, such as a digipeater's "DX de …" report of the farthest station it heard or station IDs,
+  stay in the monitor.
+
 ## 0.1.9 – 2026-11-22
 
 - Third-party packets (`}`), which an iGate uses to put an internet station on the air, are now

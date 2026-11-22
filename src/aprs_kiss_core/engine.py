@@ -48,6 +48,9 @@ LOCAL_SECONDS = 1800
 SAVE_DELAY = 5.0
 # First character of an APRS information field (APRS 1.0.1, data type identifiers).
 APRS_TYPES = set("!=/@;)`':>?<$_{}*#")
+# Packet chat is text meant for people: frames to these, or to our own callsign. Automatic
+# frames (a digipeater's "DX de ..." report to DX, station IDs to ID or BEACON) stay in the monitor.
+CHAT_DESTINATIONS = {"CQ", "QST", "ALL"}
 
 Listener = Callable[[str, dict[str, Any]], None]
 
@@ -454,6 +457,8 @@ class Engine:
     def _chat_frame(self, frame: Frame) -> None:
         # Packet chat only: APRS packets never show up in the chat.
         if not frame.info or frame.source == self.me or self.is_aprs(frame):
+            return
+        if frame.destination.call not in CHAT_DESTINATIONS and frame.destination != self.me:
             return
         now = time.time()
         key = f"{frame.source}|{frame.info!r}"
