@@ -422,7 +422,9 @@ class App:
                 spacing=6 if self.compact else 16,
                 vertical_alignment=ft.CrossAxisAlignment.CENTER,
             ),
-            padding=ft.Padding.symmetric(horizontal=2 if self.compact else 16, vertical=2 if self.compact else 6),
+            # a phone: the menu button close to the left edge, the TX lamp a little away from the right one
+            padding=ft.Padding.only(left=2, right=10, top=2, bottom=2) if self.compact
+            else ft.Padding.symmetric(horizontal=16, vertical=6),
             bgcolor=ft.Colors.SURFACE_CONTAINER,
         )
         self.page.controls.clear()
