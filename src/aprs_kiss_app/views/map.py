@@ -10,7 +10,7 @@ import flet as ft
 import flet_map as fm
 
 from ..legend import COLOR_ME, show_legend, station_color, visible
-from ..offline_map import MIN_ZOOM, BaseMap, Region, gestures
+from ..offline_map import MIN_ZOOM, BaseMap, Region, ScaleBar, gestures
 from ..symbols import emoji
 from .base import View, toggle
 
@@ -79,7 +79,9 @@ class MapView(View):
             border_radius=8, padding=ft.Padding.symmetric(horizontal=2), left=8, top=8,
         )
         self.controls = MapControls(self.map, self.t, lambda: self.app.page.run_task(self._ask_camera, 0.7))
-        return ft.Stack([self.menu, overlay, self.controls.control, self.base.credit], expand=True)
+        self.scale = ScaleBar()
+        self.scale.show(center[0], self._zoom)
+        return ft.Stack([self.menu, overlay, self.controls.control, self.scale.control, self.base.credit], expand=True)
 
     def _toggle_recent(self, _e) -> None:
         self.only_recent.selected = not self.only_recent.selected
@@ -143,7 +145,9 @@ class MapView(View):
         self._look(camera.center.latitude, lon, camera.zoom)
 
     def _look(self, lat: float, lon: float, zoom: float) -> None:
-        changed = self.base.moved(lat, lon, zoom, self.app.offline_map())
+        self.base.moved(lat, lon, zoom, self.app.offline_map())
+        self.scale.show(lat, zoom)
+        changed = True  # at least the scale follows the zoom (the update sends only what changed)
         if not self._area.covers(lat, lon, zoom):
             self._area = Region.around(lat, lon, zoom)
             self._signature = None

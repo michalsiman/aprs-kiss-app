@@ -218,3 +218,39 @@ class BaseMap:
         """Remember where the map is; True when the offline layers were refilled and need an update."""
         self.center, self.zoom = (lat, lon), zoom
         return bool(self.offline and offline and self.offline.moved(lat, lon, zoom))
+
+
+class ScaleBar:
+    """The map's scale: a short bar with its length ("500 m", "10 km") in the lower left corner.
+
+    The map library has none, so it is drawn here from the zoom and the latitude (Web Mercator: a
+    pixel is 156543 m × cos(latitude) / 2^zoom), and redrawn whenever the app learns where the map is.
+    """
+
+    MAX_PX = 90  # the bar is at most this long; its length is a round 1, 2 or 5 × 10^n
+
+    def __init__(self) -> None:
+        self.label = ft.Text(size=10, weight=ft.FontWeight.BOLD, color=ft.Colors.ON_SURFACE)
+        self.bar = ft.Container(height=4, border=ft.Border.only(
+            left=ft.BorderSide(1.5, ft.Colors.ON_SURFACE), right=ft.BorderSide(1.5, ft.Colors.ON_SURFACE),
+            bottom=ft.BorderSide(1.5, ft.Colors.ON_SURFACE)))
+        self.control = ft.Container(
+            ft.Column([self.label, self.bar], spacing=1, tight=True,
+                      horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+            left=8, bottom=6, padding=ft.Padding.symmetric(horizontal=4, vertical=1), border_radius=4,
+            bgcolor=ft.Colors.with_opacity(0.6, ft.Colors.SURFACE),
+        )
+
+    @staticmethod
+    def pick(metres_per_px: float, max_px: float) -> tuple[float, float]:
+        """(metres, pixels): the longest round distance that fits in max_px."""
+        most = metres_per_px * max_px
+        step = 10 ** math.floor(math.log10(most))
+        metres = max(m for m in (step, 2 * step, 5 * step) if m <= most)
+        return metres, metres / metres_per_px
+
+    def show(self, lat: float, zoom: float) -> None:
+        per_px = 156543.03392 * math.cos(math.radians(max(-85.0, min(85.0, lat)))) / 2 ** zoom
+        metres, px = self.pick(per_px, self.MAX_PX)
+        self.bar.width = px
+        self.label.value = f"{metres / 1000:g} km" if metres >= 1000 else f"{metres:g} m"

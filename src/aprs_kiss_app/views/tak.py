@@ -16,7 +16,7 @@ from aprs_kiss_core.config import Config
 from ..i18n import TEXTS
 from .base import View, clock, distance_km
 from .bbs import _plain
-from ..offline_map import MIN_ZOOM, BaseMap, gestures
+from ..offline_map import MIN_ZOOM, BaseMap, ScaleBar, gestures
 from .base import toggle
 from .map import MapControls
 
@@ -97,7 +97,10 @@ class TakView(View):
         self.controls = MapControls(self.map, self.t, lambda: self.app.page.run_task(self._ask_camera, 0.7))
         map_tools = ft.Container(self.offline_btn, left=8, top=8, border_radius=8,
                                  bgcolor=ft.Colors.with_opacity(0.85, ft.Colors.SURFACE))
-        map_box = ft.Container(ft.Stack([self.map, map_tools, self.controls.control, self.base.credit], expand=True),
+        self.scale = ScaleBar()
+        self.scale.show((here or (49.8, 15.5))[0], self._zoom)
+        map_box = ft.Container(ft.Stack([self.map, map_tools, self.controls.control, self.scale.control,
+                                         self.base.credit], expand=True),
                                expand=True, border_radius=8)
         self.stations = ft.ListView(spacing=0, height=170)
         self.chat = ft.ListView(expand=True, spacing=6, auto_scroll=True, padding=ft.Padding.all(6))
@@ -168,9 +171,10 @@ class TakView(View):
         except Exception:  # noqa: BLE001 - the map is not on screen
             return
         lon = (camera.center.longitude + 180) % 360 - 180
-        turned = self.controls.rotated(camera.rotation)
-        if self.base.moved(camera.center.latitude, lon, camera.zoom, self.app.offline_map()) or turned:
-            self.app.page.update()
+        self.controls.rotated(camera.rotation)
+        self.scale.show(camera.center.latitude, camera.zoom)
+        self.base.moved(camera.center.latitude, lon, camera.zoom, self.app.offline_map())
+        self.app.page.update()  # the needle, the scale, the offline map: only what changed is sent
 
     def on_event(self, kind, data) -> None:
         if kind in ("tak", "gps", "update"):

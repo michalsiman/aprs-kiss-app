@@ -65,6 +65,18 @@ class OfflineMapTest(unittest.TestCase):
         self.assertTrue(world.contains(-33.9, 151.2))
         self.assertLess(sum(map(len, offline_map.clip(d["coast"], world))), sum(map(len, d["coast"])) / 2)
 
+    def test_scale_bar(self):
+        if offline_map is None:
+            self.skipTest("flet is not installed")
+        self.assertEqual(offline_map.ScaleBar.pick(10, 90), (500, 50))  # 10 m/px: 500 m in 50 px
+        self.assertEqual(offline_map.ScaleBar.pick(100, 90)[0], 5000)
+        self.assertEqual(offline_map.ScaleBar.pick(30, 90)[0], 2000)
+        bar = offline_map.ScaleBar()
+        bar.show(49.7, 10)  # Plzeň, zoom 10: about 98 m per pixel
+        self.assertEqual(bar.label.value, "5 km")
+        bar.show(49.7, 16)
+        self.assertEqual(bar.label.value, "100 m")
+
     def test_clip_line_reaches_the_edge(self):
         if offline_map is None:
             self.skipTest("flet is not installed")
