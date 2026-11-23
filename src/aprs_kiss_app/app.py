@@ -83,6 +83,9 @@ class App:
         config = await asyncio.to_thread(load_config, self.folder)
         if config.gps_source == "phone" and not self.mobile:  # settings copied from a phone
             config = Config.from_dict({**config.to_dict(), "gps_source": "manual"}).validate()
+        if self.mobile and config.gps_source == "manual" and not config.has_position:
+            # a phone with no position typed in: its own GPS, so the map and the beacon know where we are
+            config = Config.from_dict({**config.to_dict(), "gps_source": "phone"}).validate()
         if self.mobile and (config.bbs_enabled or config.connection == "serial" or config.gps_source == "usb"):
             # what a phone does not do: BBS SERVER, a USB GPS; a serial TNC is reached through USB instead
             config = Config.from_dict({**config.to_dict(), "bbs_enabled": False,

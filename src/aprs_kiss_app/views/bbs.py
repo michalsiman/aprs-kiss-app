@@ -159,6 +159,9 @@ class BbsView(View):
         if not e.control.value:
             await self._apply(False)
             return
+        if self.engine.config.bbs_sentence_ok:  # the sentence was typed once already (kept across updates)
+            await self._apply(True)
+            return
         e.control.value = False  # only after the sentence
         self.app.page.update()
         field = ft.TextField(autofocus=True, width=520)
@@ -170,6 +173,7 @@ class BbsView(View):
                 self.app.page.update()
                 return
             self.app.page.pop_dialog()
+            self.engine.config.bbs_sentence_ok = True
             await self._apply(True)
 
         field.on_submit = enable
@@ -186,7 +190,7 @@ class BbsView(View):
         ))
 
     async def _apply(self, on: bool) -> None:
-        data = {**self.engine.config.to_dict(), "bbs_enabled": on}
+        data = {**self.engine.config.to_dict(), "bbs_enabled": on}  # carries bbs_sentence_ok
         if on:
             data["tak_enabled"] = False  # one exclusive mode at a time
         conf = Config.from_dict(data).validate()

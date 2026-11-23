@@ -169,6 +169,9 @@ class SettingsView(View):
                                  capitalization=ft.TextCapitalization.CHARACTERS)
         self.lat = ft.TextField(label=t("latitude"), value="" if c.latitude is None else str(c.latitude), width=160)
         self.lon = ft.TextField(label=t("longitude"), value="" if c.longitude is None else str(c.longitude), width=160)
+        # with a GPS chosen: where it says we are, under the (then unused) typed-in fields
+        self.gps_now = ft.Text(size=13, weight=ft.FontWeight.BOLD, color=ft.Colors.PRIMARY, visible=False)
+        self._gps_changed(update=False)
         self.beacon = ft.TextField(label=t("beacon"), value=str(c.beacon_minutes or 0), width=420, input_filter=num)
         self.beacon_is = ft.Checkbox(label=t("beacon_is"), value=c.beacon_is)
         self.tracked = ft.TextField(label=t("tracked"), value=c.tracked_callsigns, width=420,
@@ -216,7 +219,7 @@ class SettingsView(View):
                 _section(t("tnc_section"), ft.Icons.CABLE, self.connection, self.tcp_row, self.serial_row, self.txdelay, expanded=first),
                 _section(t("station"), ft.Icons.PERSON_PIN_CIRCLE, ft.Row([self.call, self.ssid], wrap=True), self.symbol,
                          ft.Row([self.comment]), self.path,
-                         ft.Row([self.lat, self.lon], wrap=True),
+                         ft.Row([self.lat, self.lon], wrap=True), self.gps_now,
                          ft.Text(t("position_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
                          self.beacon, self.beacon_is, self.tracked, self.incoming, expanded=first),
                 _section("GPS", ft.Icons.GPS_FIXED, self.gps_source, self.gps_phone_hint) if self.app.mobile else
@@ -283,10 +286,22 @@ class SettingsView(View):
 
     def _aprsis_changed(self, update: bool = True) -> None:
         on = bool(self.aprsis.value)
-        self.licence.visible = on and not self.engine.config.aprsis_on
+        self.licence.visible = on and not self.engine.config.licence_confirmed  # typed once is enough
         self.is_fields.visible = on
 
+    def _show_gps_now(self) -> None:
+        if not self.gps_now.visible:
+            return
+        source = self.t("gps_phone") if self.gps_source.value == "phone" else self.t("gps_usb")
+        fix = self.engine.gps_fix()
+        if fix and self.gps_source.value == self.engine.config.gps_source:
+            accuracy = f" (±{fix.accuracy_m:.0f} m)" if fix.accuracy_m else ""
+            self.gps_now.value = f"{source}: {fix.latitude:.5f}, {fix.longitude:.5f}{accuracy}"
+        else:
+            self.gps_now.value = f"{source}: {self.t('gps_nofix')}"
+
     def refresh(self) -> None:
+        self._show_gps_now()
         s = self.engine.status().get("aprsis")
         if not s:
             self.is_state.value = ""
@@ -303,6 +318,13 @@ class SettingsView(View):
         usb = self.gps_source.value == "usb"
         self.gps_row.visible = self.gps_hint.visible = usb
         self.gps_phone_hint.visible = self.gps_source.value == "phone"
+        if not hasattr(self, "gps_now"):
+            return  # still building the form: called again once the position fields exist
+        gps = self.gps_source.value in ("phone", "usb")
+        self.lat.disabled = self.lon.disabled = gps
+        self.lat.hint_text = self.lon.hint_text = "GPS" if gps else None
+        self.gps_now.visible = gps
+        self._show_gps_now()
         if update:
             self.app.page.update()
 
@@ -383,7 +405,7 @@ class SettingsView(View):
                         float(data[key])
                     except ValueError:
                         raise ValueError(self.t(key)) from None
-            if data["aprsis_enabled"] and not old.aprsis_on:
+            if data["aprsis_enabled"] and not old.licence_confirmed:
                 # Switching APRS-IS on needs the licence statement typed out.
                 statements = [texts["licence_text"] for texts in TEXTS.values() if "licence_text" in texts]
                 if not licence_confirmed(self.licence.value, statements):

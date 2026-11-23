@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.33 – 2026-11-23
+
+- **Confirmation sentences only once**: the sentences typed to switch on TAK, BBS SERVER and APRS-IS
+  (the licence) are asked for the first time only; afterwards, and after updates, switching on just works.
+- **Phone GPS by default**: on a phone with no position typed in, the app uses the phone's GPS.
+- **Settings show the GPS position**: with the phone's (or a USB) GPS chosen, the latitude and longitude
+  fields are greyed out and the position from the GPS (with its accuracy) is shown under them.
+- **Android keeps no backup of the app's settings**: an uninstall really starts afresh (a restored old
+  settings file had skipped the language question and the licence warning).
+- **TAK on a phone**: who you are, the team and the number of stations are on their own line, whole.
+- **Handheld radio** in the APRS symbols: "/[" is the person / handheld (HT) symbol, now shown as 📻.
+
 ## 0.1.32 – 2026-11-23
 
 - **The phone's language is recognised**: the app asks the device for its languages (Android and iOS do

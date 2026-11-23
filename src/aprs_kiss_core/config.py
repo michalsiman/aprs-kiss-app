@@ -19,7 +19,7 @@ from .ax25 import Address
 _LOGGER = logging.getLogger(__name__)
 
 APP_NAME = "aprs-kiss"
-VERSION = "0.1.32"
+VERSION = "0.1.33"
 MIN_BEACON_MINUTES = 10
 
 
@@ -75,7 +75,9 @@ class Config:
     bbs_list: str = ""  # saved BBSes and nodes for the terminal: JSON [{"call": ..., "path": ...}]
     check_updates: bool = True  # ask GitHub once a day whether a newer version is out
     disclaimer_accepted: bool = False  # the first-start warning (transmitting needs a licence) was accepted
-    language_asked: bool = False  # the first start asked which language to use
+    language_asked: bool = False
+    bbs_sentence_ok: bool = False  # the BBS SERVER sentence was typed once: not asked again
+    tak_sentence_ok: bool = False  # the same for TAK  # the first start asked which language to use
     sound_tx: bool = False  # a short beep whenever the radio transmits
     sound_messages: bool = True  # a sound for a new APRS message
     sound_chat: bool = True  # … for a new packet chat line
@@ -121,9 +123,7 @@ class Config:
             self.beacon_minutes = MIN_BEACON_MINUTES
         if self.connection == "tcp" and not (0 < int(self.port) < 65536):
             raise ValueError("Invalid TCP port")
-        if not self.aprsis_enabled:
-            self.licence_confirmed = False
-        return self
+        return self  # licence_confirmed stays when APRS-IS is switched off: the sentence is typed once
 
     def saved_bbs(self) -> list[dict[str, str]]:
         """The terminal's saved stations, each {"call", "path"}, in the order they were saved."""

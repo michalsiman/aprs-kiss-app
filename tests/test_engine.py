@@ -162,7 +162,7 @@ class ConfigTest(unittest.TestCase):
     def test_aprsis_needs_the_licence(self):
         self.assertFalse(Config(aprsis_enabled=True).aprsis_on)
         self.assertTrue(Config(aprsis_enabled=True, licence_confirmed=True).aprsis_on)
-        self.assertFalse(Config(aprsis_enabled=False, licence_confirmed=True).validate().licence_confirmed)
+        self.assertTrue(Config(aprsis_enabled=False, licence_confirmed=True).validate().licence_confirmed)  # kept
 
 
 if __name__ == "__main__":

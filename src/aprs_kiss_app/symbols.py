@@ -4,7 +4,7 @@
 SYMBOLS: list[tuple[str, str, str, str]] = [
     ('/-', '🏠', 'House', 'Dům'),
     ('/>', '🚗', 'Car', 'Auto'),
-    ('/[', '🚶', 'Person (jogger)', 'Osoba (chodec)'),
+    ('/[', '📻', 'Handheld radio, person (HT)', 'Ruční stanice, osoba (HT)'),
     ('/b', '🚲', 'Bicycle', 'Kolo'),
     ('/<', '🏍️', 'Motorcycle', 'Motorka'),
     ('/k', '🛻', 'Pickup truck', 'Pick-up'),
@@ -83,7 +83,7 @@ ALL: dict[str, tuple[str, str, str]] = {
     "/X": ("🚁", "Helicopter", "Vrtulník"),
     "/Y": ("⛵", "Yacht (sail)", "Plachetnice"),
     "/Z": ("🪟", "WinAPRS", "WinAPRS"),
-    "/[": ("🚶", "Person (jogger)", "Osoba (chodec)"),
+    "/[": ("📻", "Handheld radio, person (HT)", "Ruční stanice, osoba (HT)"),
     "/\\": ("🔺", "DF station", "Zaměřovací stanice"),
     "/]": ("📮", "Post office", "Pošta"),
     "/^": ("✈️", "Large aircraft", "Velké letadlo"),

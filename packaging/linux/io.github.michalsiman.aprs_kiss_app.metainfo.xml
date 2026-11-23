@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.33" date="2026-11-23">
+      <description>
+        <p>Confirmation sentences asked only once; the phone's GPS by default and its position shown in Settings; a handheld radio symbol.</p>
+      </description>
+    </release>
     <release version="0.1.32" date="2026-11-23">
       <description>
         <p>The phone's language is recognised and asked for at the first start; settings folded up in blocks; sounds for transmitting and new messages.</p>

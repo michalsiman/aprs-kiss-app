@@ -67,10 +67,18 @@ class TakView(View):
         self.chat_tab = toggle(ft.Icons.CHAT_OUTLINED, ft.Icons.CHAT, False, self.t("tak_chat"),
                                lambda _e: self._show("chat"))
         position = ft.IconButton(ft.Icons.MY_LOCATION, tooltip=self.t("tak_send_position"), on_click=self._position)
+        if compact:  # a phone: the buttons on one line, who we are on the next, whole
+            self.state.expand, self.state.no_wrap = False, False
+            line = ft.Column([
+                ft.Row([self.map_tab, self.chat_tab, ft.Container(expand=True), self.tx_warn, position, self.switch],
+                       spacing=2, vertical_alignment=ft.CrossAxisAlignment.CENTER),
+                ft.Container(self.state, padding=ft.Padding.only(left=8, bottom=4)),
+            ], spacing=0, tight=True)
+        else:
+            line = ft.Row([ft.Icon(ft.Icons.RADAR, color=ft.Colors.PRIMARY), self.state, self.tx_warn, position,
+                           self.switch], spacing=2, vertical_alignment=ft.CrossAxisAlignment.CENTER)
         header = ft.Container(
-            ft.Row([*([self.map_tab, self.chat_tab] if compact else [ft.Icon(ft.Icons.RADAR, color=ft.Colors.PRIMARY)]),
-                    self.state, self.tx_warn, position, self.switch], spacing=2,
-                   vertical_alignment=ft.CrossAxisAlignment.CENTER),
+            line,
             padding=ft.Padding.symmetric(horizontal=4), border_radius=8, bgcolor=ft.Colors.SURFACE_CONTAINER,
         )
         here = self.engine.my_position()
@@ -186,8 +194,7 @@ class TakView(View):
         self._signature = signature
         conf = eng.config
         if eng.tak_mode:
-            self.state.value = (f"{eng.tak_callsign} · {conf.tak_team} · {len(stations)}" if self.app.compact else
-                                self.t("tak_running", call=eng.tak_callsign, team=conf.tak_team, n=len(stations)))
+            self.state.value = self.t("tak_running", call=eng.tak_callsign, team=conf.tak_team, n=len(stations))
             self.state.tooltip = self.t("tak_running", call=eng.tak_callsign, team=conf.tak_team, n=len(stations))
             self.state.color = ft.Colors.GREEN
             self.hint.value = "" if eng.station.tx_enabled else self.t("tak_tx_needed")
@@ -315,6 +322,9 @@ class TakView(View):
         if not e.control.value:
             await self._apply(False)
             return
+        if self.engine.config.tak_sentence_ok:  # the sentence was typed once already (kept across updates)
+            await self._apply(True)
+            return
         e.control.value = False
         self.app.page.update()
         field = ft.TextField(autofocus=True, width=520)
@@ -326,6 +336,7 @@ class TakView(View):
                 self.app.page.update()
                 return
             self.app.page.pop_dialog()
+            self.engine.config.tak_sentence_ok = True
             await self._apply(True)
 
         field.on_submit = enable
@@ -339,7 +350,7 @@ class TakView(View):
         ))
 
     async def _apply(self, on: bool) -> None:
-        data = {**self.engine.config.to_dict(), "tak_enabled": on}
+        data = {**self.engine.config.to_dict(), "tak_enabled": on}  # carries tak_sentence_ok
         if on:
             data["bbs_enabled"] = False  # one exclusive mode at a time
         await self.app.apply_config(Config.from_dict(data).validate())
