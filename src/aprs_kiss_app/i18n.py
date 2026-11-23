@@ -34,6 +34,7 @@ TEXTS: dict[str, dict[str, str]] = {
         # settings
         "tnc_section": "TNC connection", "connection": "Connection", "conn_tcp": "KISS over TCP (network)",
         "conn_serial": "Serial port (USB)", "conn_usb": "TNC on USB (OTG cable)", "host": "Host", "port": "Port", "device": "Serial port",
+        "lang_title": "Language", "lang_detected": "Your device uses: {name}. Keep following the device, or pick a language:", "lang_later": "It can be changed later in Settings › App.", "sounds": "Sounds", "sound_test": "Play them", "sound_tx": "Beep when the radio transmits", "sound_messages": "Sound for a new APRS message", "sound_chat": "Sound for a new packet chat message", "sound_tak": "Sound for a new TAK GeoChat message",
         "tak_appeared": "{call} appeared on the map", "tak_moved": "{call} moved {far}",
         "term_new": "New station…",
         "disc_title": "Before you start: this app makes a radio transmit", "disc_intro": "APRS & Packet controls a radio transmitter through the connected TNC: it can send beacons, messages, packet connections, BBS and TAK traffic.", "disc_licence": "Only a holder of a valid amateur radio licence may transmit, and only on the frequencies, with the power and the modes their licence and their country's rules allow.", "disc_harm": "A wrong setting or transmitting on an unsuitable frequency can interfere with other stations and services, including emergency, aviation and distress communications, and so put people and property at risk. Causing interference is against the law and can be punished.", "disc_rx": "Without a licence, use the app for receiving only and leave transmitting switched off (the Transmit switch).", "disc_resp": "You are responsible for everything your station transmits. The app is provided as is, without any warranty (MIT licence); its author is not liable for any damage caused by its use.", "disc_accept": "I understand and agree", "disc_decline": "Decline", "disc_declined": "The app cannot be used without agreeing. If you do not want to agree, uninstall it.", "disc_again": "Show it again",
@@ -131,6 +132,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "beacon_now": "Poslat polohu teď", "position_sent": "Poloha odeslána",
         "tnc_section": "Připojení k TNC", "connection": "Připojení", "conn_tcp": "KISS přes TCP (síť)",
         "conn_serial": "Sériový port (USB)", "conn_usb": "TNC na USB (OTG kabel)", "host": "Adresa", "port": "Port", "device": "Sériový port",
+        "lang_title": "Jazyk", "lang_detected": "Zařízení používá: {name}. Nech jazyk podle zařízení, nebo si vyber jiný:", "lang_later": "Změnit ho jde později v Nastavení › Aplikace.", "sounds": "Zvuky", "sound_test": "Přehrát", "sound_tx": "Pípnout při vysílání", "sound_messages": "Zvuk při nové APRS zprávě", "sound_chat": "Zvuk při nové zprávě v packet chatu", "sound_tak": "Zvuk při nové zprávě v TAK GeoChatu",
         "tak_appeared": "{call} se objevil na mapě", "tak_moved": "{call} se posunul o {far}",
         "term_new": "Nová stanice…",
         "disc_title": "Než začneš: tato aplikace ovládá vysílač", "disc_intro": "APRS & Packet přes připojený TNC ovládá radiový vysílač: umí vysílat majáky, zprávy, packetová spojení, provoz BBS a TAK.", "disc_licence": "Vysílat smí jen držitel platného radioamatérského oprávnění (licence), a to jen na kmitočtech, s výkonem a druhy provozu, které mu oprávnění a předpisy jeho země dovolují.", "disc_harm": "Špatné nastavení nebo vysílání na nevhodném kmitočtu může rušit jiné stanice a služby, včetně záchranných, leteckých a tísňových spojení, a tím ohrozit lidi i majetek. Způsobování rušení je protiprávní a může být potrestáno.", "disc_rx": "Bez licence používej aplikaci jen pro příjem a vysílání nech vypnuté (přepínač Vysílání).", "disc_resp": "Za všechno, co tvoje stanice vyšle, odpovídáš ty. Aplikace je poskytována tak, jak je, bez jakékoli záruky (licence MIT); autor neodpovídá za škody způsobené jejím použitím.", "disc_accept": "Rozumím a souhlasím", "disc_decline": "Odmítnout", "disc_declined": "Bez souhlasu aplikaci nelze používat. Pokud souhlasit nechceš, odinstaluj ji.", "disc_again": "Zobrazit znovu",
@@ -241,7 +243,12 @@ def match_language(value: str) -> str | None:
     return _ALIASES.get(base)
 
 
+DEVICE_LANGUAGE: str | None = None  # what the phone / computer says (Flet's device info), set by the app
+
+
 def system_language() -> str:
+    if DEVICE_LANGUAGE:
+        return DEVICE_LANGUAGE
     for var in ("LC_ALL", "LC_MESSAGES", "LANG", "LANGUAGE"):
         value = os.environ.get(var, "")
         if value:

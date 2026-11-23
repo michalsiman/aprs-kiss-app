@@ -19,7 +19,8 @@ from . import theme
 from aprs_kiss_core.engine import Engine, TransmitRefused
 
 from .about import show_about
-from . import disclaimer, distribution, updates
+from . import disclaimer, distribution, language, updates
+from .sounds import Sounds
 from .i18n import Translator
 from .phone_gps import PhoneGps
 from .symbols import symbol_info
@@ -89,15 +90,23 @@ class App:
                                        if config.connection == "serial" else config.connection,
                                        "gps_source": "manual"}).validate()
         self.engine = Engine(config, self.folder)
+        self.sounds = Sounds(self)
         self.engine.add_listener(self._on_event)
         await self.engine.start()
         self.phone_gps = PhoneGps(self)
+        await language.detect(page)  # phones say their language only this way
         await self.apply_theme()
         self.build()
         if not config.configured:
             self.select("settings")
-        if disclaimer.needed(self):
-            disclaimer.show(self)  # the very first start: transmitting needs a licence
+        if language.needed(self) and config.disclaimer_accepted:
+            config.language_asked = True  # an existing install: its language is set already
+            self.save_config_soon()
+        first_warning = lambda: disclaimer.show(self) if disclaimer.needed(self) else None  # noqa: E731
+        if language.needed(self):
+            language.show(self, then=first_warning)  # the very first start: the language, then the warning
+        else:
+            first_warning()
         self.phone_gps.sync()
         page.run_task(self._tick)
         page.run_task(self._check_updates_later)
@@ -428,6 +437,7 @@ class App:
     # ─── engine events ────────────────────────────────────────────────────
 
     def _on_event(self, kind: str, data: dict[str, Any]) -> None:
+        self.sounds.on_event(kind, data)
         for v in self.views:
             if v.built:
                 v.on_event(kind, data)
@@ -452,6 +462,8 @@ class App:
     def refresh_now(self) -> None:
         if self._closing or not self.views:
             return
+        if getattr(getattr(self.page, "session", None), "connection", True) is None:
+            return  # the browser went away (web): nothing to draw until it reconnects
         self._update_status()
         try:
             self.views[self.current].refresh()

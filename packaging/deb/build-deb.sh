@@ -31,7 +31,8 @@ Version: $VERSION
 Architecture: amd64
 Maintainer: Michal Šiman (OK1SIM) <michalsiman@users.noreply.github.com>
 Installed-Size: $SIZE
-Depends: libc6 (>= 2.34), libgtk-3-0t64 | libgtk-3-0, libstdc++6, libepoxy0
+Depends: libc6 (>= 2.34), libgtk-3-0t64 | libgtk-3-0, libstdc++6, libepoxy0, libgstreamer1.0-0, libgstreamer-plugins-base1.0-0
+Recommends: gstreamer1.0-plugins-good
 Section: hamradio
 Priority: optional
 Homepage: https://github.com/michalsiman/aprs-kiss-app

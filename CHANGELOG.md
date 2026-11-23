@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.32 – 2026-11-23
+
+- **The phone's language is recognised**: the app asks the device for its languages (Android and iOS do
+  not tell them the way computers do), so a phone set to Czech starts in Czech.
+- **The very first start asks for the language**: the one the device uses is offered ("System"), any other
+  can be picked; then the licence warning comes in that language. Asked once.
+- **Settings are folded up in blocks** (TNC, Station, GPS, APRS-IS, VARA FM, TAK, Sounds, App); a tap on
+  a block opens it. The first time, the blocks that must be filled in are open.
+- **Sounds**: a short beep when the radio transmits, and sounds for a new APRS message, packet chat line
+  and TAK GeoChat message; each can be switched on or off in Settings › Sounds, with a button to hear
+  them. On phones and computers.
+- The map no longer logs errors every few seconds after the browser of the web version went away.
+
 ## 0.1.31 – 2026-11-23
 
 - **TAK takes less room**: while TAK runs, its header is one slim line – who you are, the team and the

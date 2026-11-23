@@ -19,7 +19,7 @@ from .ax25 import Address
 _LOGGER = logging.getLogger(__name__)
 
 APP_NAME = "aprs-kiss"
-VERSION = "0.1.31"
+VERSION = "0.1.32"
 MIN_BEACON_MINUTES = 10
 
 
@@ -75,6 +75,11 @@ class Config:
     bbs_list: str = ""  # saved BBSes and nodes for the terminal: JSON [{"call": ..., "path": ...}]
     check_updates: bool = True  # ask GitHub once a day whether a newer version is out
     disclaimer_accepted: bool = False  # the first-start warning (transmitting needs a licence) was accepted
+    language_asked: bool = False  # the first start asked which language to use
+    sound_tx: bool = False  # a short beep whenever the radio transmits
+    sound_messages: bool = True  # a sound for a new APRS message
+    sound_chat: bool = True  # … for a new packet chat line
+    sound_tak: bool = True  # … for a new TAK GeoChat message
     theme: str = "auto"  # auto (as the desktop), light, dark
 
     @property

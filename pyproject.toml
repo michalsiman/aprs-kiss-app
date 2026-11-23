@@ -1,6 +1,6 @@
 [project]
 name = "aprs-kiss"
-version = "0.1.31"
+version = "0.1.32"
 description = "APRS station and packet radio terminal for a KISS TNC, for computers and phones"
 readme = "README.md"
 license = "MIT"
@@ -10,6 +10,7 @@ dependencies = [
     "flet==1.1.2",
     "flet-map==1.1.2",
     "flet-geolocator==1.1.2",  # the phone's own GPS (Android, iOS)
+    "flet-audio==1.1.2",  # beeps on transmit and new messages
     "aprslib>=0.7.2",
     "platformdirs>=4",
     "certifi",  # HTTPS certificates for the update check on Android and iOS

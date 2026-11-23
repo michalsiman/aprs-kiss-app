@@ -50,11 +50,17 @@ def serial_ports() -> list[tuple[str, str]]:
 TEXT = 14
 
 
-def _section(title: str, *controls: ft.Control) -> ft.Control:
+def _section(title: str, icon: str, *controls: ft.Control, expanded: bool = False) -> ft.Control:
+    """One block of settings, folded up: a tap on its title opens it (the values stay while it is closed)."""
+    shape = ft.RoundedRectangleBorder(radius=12)
     return ft.Card(
-        ft.Container(
-            ft.Column([ft.Text(title, size=15, weight=ft.FontWeight.BOLD), *controls], spacing=8),
-            padding=ft.Padding.symmetric(horizontal=14, vertical=10),
+        ft.ExpansionTile(
+            title=ft.Text(title, size=15, weight=ft.FontWeight.BOLD),
+            leading=ft.Icon(icon, color=ft.Colors.PRIMARY),
+            controls=[ft.Container(ft.Column(list(controls), spacing=8),
+                                   padding=ft.Padding.only(left=14, right=14, bottom=12))],
+            expanded=expanded, maintain_state=True, shape=shape, collapsed_shape=shape,
+            expanded_cross_axis_alignment=ft.CrossAxisAlignment.START,
         ),
     )
 
@@ -184,6 +190,8 @@ class SettingsView(View):
                                     self.igate_rx, self.igate_tx], spacing=12)
 
         # App
+        self.sound_boxes = {key: ft.Checkbox(label=t(key), value=getattr(c, key))
+                            for key in ("sound_tx", "sound_messages", "sound_chat", "sound_tak")}
         self.check_updates = ft.Checkbox(label=t("check_updates"), value=c.check_updates,
                                          visible=not distribution.store_updates())  # Google Play updates it
         self.theme = ft.Dropdown(label=t("theme"), value=c.theme if c.theme in ("auto", "light", "dark") else "auto",
@@ -201,28 +209,33 @@ class SettingsView(View):
         self.intro = ft.Text(t("first_run"), color=ft.Colors.PRIMARY, visible=not c.configured)
         self._connection_changed(update=False)
         self._aprsis_changed(update=False)
+        first = not c.configured  # the very first time: the blocks that must be filled in are open
         form = ft.Column(
             [
                 self.intro,
-                _section(t("tnc_section"), self.connection, self.tcp_row, self.serial_row, self.txdelay),
-                _section(t("station"), ft.Row([self.call, self.ssid], wrap=True), self.symbol,
+                _section(t("tnc_section"), ft.Icons.CABLE, self.connection, self.tcp_row, self.serial_row, self.txdelay, expanded=first),
+                _section(t("station"), ft.Icons.PERSON_PIN_CIRCLE, ft.Row([self.call, self.ssid], wrap=True), self.symbol,
                          ft.Row([self.comment]), self.path,
                          ft.Row([self.lat, self.lon], wrap=True),
                          ft.Text(t("position_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
-                         self.beacon, self.beacon_is, self.tracked, self.incoming),
-                _section("GPS", self.gps_source, self.gps_phone_hint) if self.app.mobile else
-                _section("GPS", self.gps_source, self.gps_row, self.gps_hint),
-                _section(t("aprsis"), self.aprsis, self.licence, self.is_fields, self.is_state),
-                _section("VARA FM", ft.Row([self.vara_host, self.vara_port], wrap=True),
+                         self.beacon, self.beacon_is, self.tracked, self.incoming, expanded=first),
+                _section("GPS", ft.Icons.GPS_FIXED, self.gps_source, self.gps_phone_hint) if self.app.mobile else
+                _section("GPS", ft.Icons.GPS_FIXED, self.gps_source, self.gps_row, self.gps_hint),
+                _section(t("aprsis"), ft.Icons.PUBLIC, self.aprsis, self.licence, self.is_fields, self.is_state),
+                _section("VARA FM", ft.Icons.SETTINGS_INPUT_ANTENNA, ft.Row([self.vara_host, self.vara_port], wrap=True),
                          ft.Text(t("vara_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT)),
-                _section(t("tak"), ft.Row([self.tak_callsign, self.tak_team, self.tak_role], wrap=True),
+                _section(t("tak"), ft.Icons.RADAR, ft.Row([self.tak_callsign, self.tak_team, self.tak_role], wrap=True),
                          self.tak_interval),
-                *([] if self.app.mobile else [_section(t("bbs"), ft.Row([self.bbs_ssid, self.bbs_sessions], wrap=True),
+                *([] if self.app.mobile else [_section(t("bbs"), ft.Icons.DNS, ft.Row([self.bbs_ssid, self.bbs_sessions], wrap=True),
                          ft.Row([self.bbs_idle, self.bbs_tx, self.bbs_max], wrap=True),
                          ft.Text(t("bbs_welcome"), size=12), ft.Row([self.bbs_welcome]),
                          ft.Text(t("bbs_more"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
                          ft.Text(short_path(self.engine.bbs_folder()), size=12, font_family="monospace", selectable=True))]),
-                _section(t("app_section"), ft.Row([self.language, self.theme], wrap=True), self.check_updates,
+                _section(t("sounds"), ft.Icons.VOLUME_UP, *self.sound_boxes.values(),
+                         ft.Row([ft.OutlinedButton(t("sound_test"), icon=ft.Icons.PLAY_ARROW,
+                                                   on_click=self._test_sounds)])),
+                _section(t("app_section"), ft.Icons.TUNE, ft.Row([self.language, self.theme], wrap=True),
+                         self.check_updates,
                          ft.Row([ft.OutlinedButton(t("about"), icon=ft.Icons.INFO_OUTLINE,
                                                    on_click=lambda _e: self._about())])),
                 self.error,
@@ -236,6 +249,12 @@ class SettingsView(View):
         )
         _compact(form)
         return form
+
+    async def _test_sounds(self, _e) -> None:
+        """Each sound once, so they can be heard before choosing."""
+        for kind in ("tx", "message", "chat", "tak"):
+            self.app.sounds.play(kind, force=True)
+            await asyncio.sleep(0.8)
 
     def show_position(self, lat: float, lon: float) -> None:
         self.lat.value, self.lon.value = str(lat), str(lon)
@@ -354,6 +373,7 @@ class SettingsView(View):
             "igate_rx": self.igate_rx.value, "igate_tx": self.igate_tx.value,
             "language": self.language.value or "",
             "check_updates": self.check_updates.value,
+            **{key: box.value for key, box in self.sound_boxes.items()},
             "theme": self.theme.value or "auto",
         }
         try:
