@@ -7,7 +7,6 @@
   before. When you move by more than a tenth of the radius, the server gets the new area.
 - **Phone top bar**: all lamps in the same frame and spacing, a satellite icon instead of "GPS", the
   "send my position" button framed too, and the TX lamp a little away from the edge.
-- Bluetooth: the device field is called "Bluetooth device" and an empty list says how to pair one.
 
 ## 0.1.37 – 2026-11-23
 
