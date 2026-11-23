@@ -18,6 +18,24 @@ COLOR_IS = ft.Colors.BLUE_GREY
 COLOR_TRACKED = ft.Colors.ORANGE
 COLOR_ME = ft.Colors.RED
 
+# On the map the labels are always light (the map itself is light, also in the dark theme), with deeper
+# shades of the same colours, which read well on white.
+MAP_TEXT = {COLOR_RF: "#1565C0", COLOR_IS: "#546E7A", COLOR_TRACKED: "#E65100", COLOR_ME: "#C62828"}
+MAP_TEXT_OTHER = "#263238"
+
+
+def map_label(text: str, color=None, bold: bool = False, opacity: float = 1.0) -> ft.Control:
+    """A station's name on the map: dark text on a light, slightly see-through tag with a soft shadow."""
+    return ft.Container(
+        ft.Text(text, size=11, no_wrap=True, color=MAP_TEXT.get(color, MAP_TEXT_OTHER),
+                weight=ft.FontWeight.BOLD if bold else ft.FontWeight.W_600),
+        bgcolor=ft.Colors.with_opacity(0.92, ft.Colors.WHITE),
+        border=ft.Border.all(0.8, ft.Colors.with_opacity(0.18, ft.Colors.BLACK)),
+        shadow=ft.BoxShadow(blur_radius=3, spread_radius=0, color=ft.Colors.with_opacity(0.25, ft.Colors.BLACK),
+                            offset=ft.Offset(0, 1)),
+        padding=ft.Padding.symmetric(horizontal=5, vertical=1), border_radius=6, opacity=opacity,
+    )
+
 
 def station_color(app: App, entry: dict) -> str:
     if entry["call"].upper() in app.tracked():
@@ -42,10 +60,7 @@ def _row(left: ft.Control, text: str) -> ft.Control:
 
 
 def _swatch(color, bold=False) -> ft.Control:
-    return ft.Container(ft.Text("OK1ABC", size=10, no_wrap=True, color=color,
-                                weight=ft.FontWeight.BOLD if bold else None),
-                        bgcolor=ft.Colors.with_opacity(0.8, ft.Colors.SURFACE), border_radius=4,
-                        padding=ft.Padding.symmetric(horizontal=3))
+    return map_label("OK1ABC", color, bold)  # just as on the map
 
 
 def show_legend(app: App) -> None:

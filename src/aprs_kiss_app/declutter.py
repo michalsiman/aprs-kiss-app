@@ -13,9 +13,9 @@ from __future__ import annotations
 import math
 
 TILE = 256
-CLOSE_X = 60  # pixels: markers nearer than this side by side…
+CLOSE_X = 66  # pixels: markers nearer than this side by side…
 CLOSE_Y = 40  # …and this one above the other cover each other's label
-RINGS = (48, 70, 96, 124)  # pixels: the circles tried around a station's own place
+RINGS = (48, 74, 100, 128)  # pixels: the circles tried around a station's own place
 DIRECTIONS = 8
 MAX_SHIFT = RINGS[-1]
 

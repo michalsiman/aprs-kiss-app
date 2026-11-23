@@ -14,6 +14,7 @@ import flet_map as fm
 from aprs_kiss_core.config import Config
 
 from ..i18n import TEXTS
+from ..legend import map_label
 from .map_source import MapSourceButton
 from .base import View, clock, distance_km
 from .bbs import _plain
@@ -277,11 +278,7 @@ class TakView(View):
         dot = ft.Container(width=16 if me else 14, height=16 if me else 14, border_radius=8, bgcolor=color,
                            border=ft.Border.all(2, ft.Colors.WHITE if me else ft.Colors.BLACK),
                            opacity=0.45 if stale else 1.0)
-        tag = ft.Container(ft.Text(label, size=10, weight=ft.FontWeight.BOLD, no_wrap=True),
-                           bgcolor=ft.Colors.with_opacity(0.9, ft.Colors.SURFACE),
-                           border=ft.Border.all(1, ft.Colors.with_opacity(0.55, ft.Colors.BLACK)),
-                           padding=ft.Padding.symmetric(horizontal=3), border_radius=4,
-                           opacity=0.6 if stale else 1.0)
+        tag = map_label(label, bold=True, opacity=0.6 if stale else 1.0)
         return fm.Marker(coordinates=fm.MapLatitudeLongitude(lat, lon), width=120, height=44,
                          content=ft.Column([dot, tag], spacing=2, tight=True,
                                            horizontal_alignment=ft.CrossAxisAlignment.CENTER))

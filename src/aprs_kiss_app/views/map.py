@@ -9,7 +9,7 @@ import time
 import flet as ft
 import flet_map as fm
 
-from ..legend import COLOR_ME, show_legend, station_color, visible
+from ..legend import COLOR_ME, map_label, show_legend, station_color, visible
 from ..offline_map import MIN_ZOOM, BaseMap, Region, ScaleBar, gestures
 from ..symbols import emoji
 from ..declutter import spread
@@ -210,14 +210,7 @@ class MapView(View):
                 ft.Column(
                     [
                         ft.Text(icon, size=20),
-                        ft.Container(
-                            ft.Text(label, size=10, weight=ft.FontWeight.BOLD if bold else None, color=color,
-                                    no_wrap=True),
-                            bgcolor=ft.Colors.with_opacity(0.9, ft.Colors.SURFACE),
-                            # A thin dark frame keeps the label readable on a busy, colourful map.
-                            border=ft.Border.all(1, ft.Colors.with_opacity(0.55, ft.Colors.BLACK)),
-                            padding=ft.Padding.symmetric(horizontal=3), border_radius=4,
-                        ),
+                        map_label(label, color, bold),
                     ],
                     spacing=0, tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 ),
