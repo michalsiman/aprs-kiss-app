@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.45 – 2026-11-23
+
+- **Fix: the map was not redrawn after zooming with the fingers**: the new zoom was asked for only once,
+  just after the fingers lifted; a fling going on (or a question still pending) left the markers, the
+  lines and the scale as they were (grey lines over half of Europe, "10 km" at continent size). While the
+  map is on screen it is now asked every second where it looks, and redrawn when that changed.
+
 ## 0.1.44 – 2026-11-23
 
 - **Your own trail**: with trails on, your station gets one too, from the GPS (the last half hour, in
