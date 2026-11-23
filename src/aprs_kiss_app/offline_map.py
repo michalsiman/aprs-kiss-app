@@ -27,7 +27,7 @@ def data() -> dict:
     try:
         return json.loads(DATA.read_text(encoding="utf-8"))
     except (OSError, ValueError):
-        return {"borders": [], "coast": [], "cities": [], "towns": [], "peaks": []}
+        return {"borders": [], "coast": [], "cities": [], "towns": [], "peaks": [], "motorways": [], "roads": []}
 
 
 MIN_ZOOM = 3  # further out the world repeats side by side
@@ -144,8 +144,11 @@ def city_markers(level: int, region: Region | None = None) -> list[fm.Marker]:
     return out
 
 
-TOWN_TIERS = ((8.5, None), (9.5, 20000), (10.5, 10000), (99, 0))  # (up to zoom, smallest town shown)
-PEAK_TIERS = ((7.0, None), (8.5, 1), (10.0, 5), (99, 99))  # (up to zoom, how many of each country's highest)
+TOWN_TIERS = ((8.5, None), (9.5, 20000), (10.5, 10000), (11.5, 5000), (12.5, 2000), (99, 0))  # (up to zoom, smallest)
+PEAK_TIERS = ((7.0, None), (8.5, 1), (10.0, 5), (11.0, 15), (99, 99))  # (up to zoom, each country's N highest)
+ROAD_TIERS = ((5.0, False, False), (7.5, True, False), (99, True, True))  # (up to zoom, motorways, main roads)
+MOTORWAY = "#E57373"
+MAIN_ROAD = "#FFB74D"
 PEAK_COLOR = "#8D6E63"
 
 
@@ -192,6 +195,7 @@ class OfflineLayers:
 
     def __init__(self, lat: float, lon: float, zoom: float) -> None:
         self.coast = fm.PolylineLayer(polylines=[])
+        self.roads = fm.PolylineLayer(polylines=[])  # under the borders: motorways, closer up main roads too
         self.borders = fm.PolylineLayer(polylines=[])
         self.cities = fm.MarkerLayer(markers=[])
         self.region: Region | None = None
@@ -200,7 +204,7 @@ class OfflineLayers:
 
     @property
     def layers(self) -> list:
-        return [self.coast, self.borders, self.cities]
+        return [self.coast, self.roads, self.borders, self.cities]
 
     def moved(self, lat: float, lon: float, zoom: float) -> bool:
         """The map moved: refill the layers when the box no longer covers it; True when they changed."""
@@ -210,6 +214,10 @@ class OfflineLayers:
             self.region = region = Region.around(lat, lon, zoom)
             self.coast.polylines = _polylines(clip(d["coast"], region), COAST, 1.0)
             self.borders.polylines = _polylines(clip(d["borders"], region), BORDER, 1.4)
+            _, motorways, main = next(t for t in ROAD_TIERS if zoom < t[0])
+            self.roads.polylines = (
+                (_polylines(clip(d.get("roads", []), region), MAIN_ROAD, 1.2) if main else [])
+                + (_polylines(clip(d.get("motorways", []), region), MOTORWAY, 2.0) if motorways else []))
             changed = True
         if not (self.places and self.places.covers(lat, lon, zoom)):
             # names only around what is on screen (about a screen and a half each way): close up there

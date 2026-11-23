@@ -2,8 +2,8 @@
 
 **English** · [Česky](README.cs.md)
 
-An APRS station and packet radio terminal for a radio with a **KISS TNC**, as a normal desktop
-application – no Home Assistant, no web server. It is the standalone sibling of the
+An APRS station and packet radio terminal for a radio with a **KISS TNC**, as a normal application for
+computers and **Android phones** – no Home Assistant, no web server. It is the standalone sibling of the
 [APRS & Packet Home Assistant integration](https://github.com/michalsiman/aprs-kiss-ha) and shares
 its radio core.
 
@@ -12,7 +12,8 @@ and its [KISS TNC app](https://github.com/armel/uv-k1-k5v3-firmware-custom/wiki/
 (Direwolf, a hardware TNC, the radio's USB serial port, or the KISS TCP bridge from the integration).
 
 **Status: actively developed** – new versions come out often (see [CHANGELOG](CHANGELOG.md)).
-Builds for **Linux**, **Windows**, **macOS**, **Android** and **iOS** (see [Platforms](#platforms)).
+Ready for **Linux**, **Windows** and **Android**; **macOS** and **iOS** builds exist but nobody has tried
+them on a real Mac, iPhone or iPad yet – **testers wanted** (see [Platforms](#platforms)).
 
 ## What it does
 
@@ -21,10 +22,13 @@ Builds for **Linux**, **Windows**, **macOS**, **Android** and **iOS** (see [Plat
 - **Map** of heard stations (OpenStreetMap) with APRS symbols and framed callsign labels, your own
   position, tracked callsigns highlighted. Buttons to centre on you, a *Muted map* that fades the map
   so the stations stand out, stations from the internet on or off, *Last 2 hours* only, and a legend
-  of the symbols. Right-click the map: *Set as my position*.
+  of the symbols – small icons that light up when on. Zoom buttons, a compass that turns the map north
+  up again, a scale bar; two fingers turn the map only with a clear twist. Right-click (long press on a
+  phone) the map: *Set as my position*. Only the stations around what is on screen are drawn, so the map
+  stays quick also on a phone.
 - **Offline map** bundled with the app: country borders, coastlines and about 1,000 bigger cities
-  (Natural Earth), in Europe also some 17,000 towns of 5,000 people and more and each country's highest
-  peaks (GeoNames), more of them as you zoom in. One button switches to it; **with no internet the map
+  (Natural Earth); in Europe also motorways and main roads (Natural Earth), some 67,000 places of 1,000
+  people and more and each country's 30 highest peaks (GeoNames) – more of them as you zoom in. One button switches to it; **with no internet the map
   switches to it by itself** and tells you so, and goes back to OpenStreetMap when the internet returns.
 - **Messages** as conversations: retried until acknowledged, delivery state shown, incoming messages
   acknowledged automatically; a new message to any callsign; a notice when one arrives.
@@ -37,7 +41,8 @@ Builds for **Linux**, **Windows**, **macOS**, **Android** and **iOS** (see [Plat
   unproto. Icon (APRS symbol), comment, SSID and path in Settings.
 - **APRS-IS** (internet) with an optional RX and TX **iGate**; messages an iGate relays to you by
   radio are received and acknowledged.
-- **USB GPS module** (NMEA, u-blox/VK-172 and the like, speed found automatically): with a fix the map,
+- **Your position from a GPS**: the phone's own GPS (the default on a phone with no position typed in;
+  Settings shows where it says you are), or a **USB GPS module** (NMEA, u-blox/VK-172 and the like, speed found automatically): with a fix the map,
   the beacon (with altitude) and TAK use its position; the GPS state is shown in the top bar.
 
 ### Packet radio
@@ -61,8 +66,10 @@ Builds for **Linux**, **Windows**, **macOS**, **Android** and **iOS** (see [Plat
   it on takes a typed confirmation. See the **[BBS SERVER guide](docs/BBS.md)**.
 - **TAK**: the app as a TAK station over the radio – ATAK-compatible positions and GeoChat (TAK Protocol v1
   in AX.25 UI frames), its own map with the stations coloured by team, a list of stations, messages to
-  everybody or one station, your team, role and callsign in Settings. Like BBS SERVER it switches
-  everything else off. See the **[TAK specification](docs/TAK.md)**.
+  everybody or one station, your team, role and callsign in Settings; who appeared on the map and who
+  moved how far is shown in GeoChat. On a phone the map and GeoChat are two screens, with the number of
+  unread messages on the GeoChat icon. Its frames fit LoRa KISS modems too (MeshCore). Like BBS SERVER
+  it switches everything else off. See the **[TAK specification](docs/TAK.md)**.
 
 ### The app
 
@@ -72,8 +79,26 @@ Builds for **Linux**, **Windows**, **macOS**, **Android** and **iOS** (see [Plat
   Norwegian (Bokmål), Polish, Serbian (Cyrillic), Slovak, Slovenian, Spanish, Swedish and Ukrainian;
   it follows the system language or you pick one in Settings.
 - **Light and dark** appearance, following the system or chosen in Settings.
+- **Sounds**: a beep when the radio transmits, sounds for a new APRS message, chat line and TAK GeoChat
+  message – each on or off in Settings.
+- **Keep the screen on**: never, while TAK runs, or always.
+- **Settings in folded blocks**; the callsign is required (framed red until it is saved). The
+  confirmation sentences (TAK, BBS SERVER, the licence for APRS-IS) are typed once, not every time.
+- **The first start** asks for the language (the device's is offered) and shows a warning that has to
+  be accepted: transmitting needs an amateur radio licence.
 - Tells you when a new version is out: asks GitHub at most once a day for the latest release,
-  sends nothing about you; can be switched off in Settings.
+  sends nothing about you; can be switched off in Settings. On Android *Download* fetches the new .apk.
+
+### On a phone (Android)
+
+- The screens are in a menu that slides in from the side (☰); the top bar is a dashboard: **TNC**, **IS**
+  and **GPS** lamps green when working, **TX** with a red frame while transmitting is on and all red while
+  a frame goes out on air – a tap on TX switches transmitting, a tap on TNC or GPS tells their state.
+- **The TNC on the phone's USB port** (OTG cable): the Quansheng with the F4HWN KISS firmware and other
+  CDC-ACM TNCs, CP210x and FTDI cables; or over the network.
+- **The phone's GPS** as your position.
+- **Running in the background** (Settings › Background and screen): receiving, beacons, messages and TAK
+  go on when the app is not on screen or the phone is locked, with a notification.
 
 > **Transmitting is off by default.** Switch *Transmit* on in the top bar only if you hold an amateur
 > radio licence. APRS-IS can be switched on only after typing the licence statement.
@@ -86,6 +111,9 @@ full size. They follow your GitHub theme, and so does the app: it uses the syste
 <table>
 <tr>
 <td colspan="2"><a href="assets/map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/map-light.png"><img src="assets/map.png" alt="Map of heard stations with APRS symbols"></picture></a><br><sub>Map of heard stations</sub></td>
+</tr>
+<tr>
+<td colspan="2"><a href="assets/phone-map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-map-light.png"><img src="assets/phone-map.png" width="19%" alt="Phone: the map, the top bar as a dashboard"></picture></a> <a href="assets/phone-menu.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-menu-light.png"><img src="assets/phone-menu.png" width="19%" alt="Phone: the menu"></picture></a> <a href="assets/phone-tak.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-tak-light.png"><img src="assets/phone-tak.png" width="19%" alt="Phone: TAK map"></picture></a> <a href="assets/phone-tak-chat.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-tak-chat-light.png"><img src="assets/phone-tak-chat.png" width="19%" alt="Phone: TAK GeoChat with the team's moves"></picture></a> <a href="assets/phone-settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-settings-light.png"><img src="assets/phone-settings.png" width="19%" alt="Phone: Settings, background and screen"></picture></a><br><sub>On a phone: the map, the menu, TAK map and GeoChat, Settings</sub></td>
 </tr>
 <tr>
 <td width="50%"><a href="assets/map-offline.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/map-offline-light.png"><img src="assets/map-offline.png" alt="The offline map: borders and cities without internet"></picture></a><br><sub>Offline map (no internet needed)</sub></td>
@@ -112,7 +140,7 @@ full size. They follow your GitHub theme, and so does the app: it uses the syste
 </tr>
 <tr>
 <td width="50%"><a href="assets/settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-light.png"><img src="assets/settings.png" alt="Settings: TNC connection and station"></picture></a><br><sub>Settings: TNC and station</sub></td>
-<td width="50%"><a href="assets/settings-more.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-more-light.png"><img src="assets/settings-more.png" alt="Settings: GPS, APRS-IS, VARA FM and TAK"></picture></a><br><sub>Settings: GPS, APRS-IS, VARA FM, TAK</sub></td>
+<td width="50%"><a href="assets/settings-more.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-more-light.png"><img src="assets/settings-more.png" alt="Settings: background and screen, sounds"></picture></a><br><sub>Settings: background and screen, sounds</sub></td>
 </tr>
 </table>
 
@@ -129,7 +157,8 @@ Download **`aprs-kiss-…-macos.dmg`** from the
 *APRS & Packet* to Applications. The app is not signed by Apple (no paid developer account), so the
 first time **right-click it › Open › Open**, or allow it in *System Settings › Privacy & Security ›
 Open Anyway*. The radio on USB shows up as `/dev/cu.usbserial…` / `/dev/cu.usbmodem…` in Settings.
-The macOS build is made on GitHub without a Mac to try it on: tell us if something does not work.
+The macOS build is made on GitHub without a Mac to try it on – **testers wanted**: tell us in the
+[issues](https://github.com/michalsiman/aprs-kiss-app/issues) how it went.
 
 ## Install (Android)
 
@@ -142,6 +171,9 @@ to allow the app to use it) or **over the network (KISS over TCP)**: Direwolf on
 shared with [`kiss_tcp_bridge.py`](https://github.com/michalsiman/aprs-kiss-ha/tree/main/bridge), or a
 Wi-Fi TNC. The screens fit a phone and are switched in a menu that slides in from the side (☰). Your position can come
 from **the phone's GPS** (Settings › GPS). BBS SERVER and USB GPS modules are for computers only.
+The .apk is signed with the project's own key, so a new version installs over the previous one (from
+0.1.30 on; an older one has to be uninstalled once); the app tells you when one is out and downloads it.
+A Google Play release is being prepared.
 
 ## Install (iPhone, iPad)
 
@@ -149,8 +181,9 @@ Apple lets apps onto an iPhone only through the App Store or signed by a develop
 project does not have. The release has an **unsigned `aprs-kiss-…-ios-unsigned.ipa`** that you can put on
 your device with a sideloading tool such as [AltStore](https://altstore.io/) or
 [Sideloadly](https://sideloadly.io/), which signs it with your own Apple ID (with a free Apple ID it has
-to be refreshed every 7 days). Like on Android, the TNC is reached over the network. It is built on
-GitHub and not tried on a real iPhone yet.
+to be refreshed every 7 days). Like on Android, the TNC is reached over the network.
+**Not tried on a real iPhone or iPad yet – testers wanted:** if you can try it, please tell us how it went
+in the [issues](https://github.com/michalsiman/aprs-kiss-app/issues).
 
 ## Install (Linux)
 
@@ -253,7 +286,9 @@ Privacy: the app collects nothing; see the [privacy policy](https://michalsiman.
 
 ## Platforms
 
-| | Linux | Windows | macOS | Android | iOS |
+Linux, Windows and Android are used every day; macOS and iOS are built but untested (testers wanted).
+
+| | Linux | Windows | macOS (untested) | Android | iOS (untested) |
 |---|---|---|---|---|---|
 | KISS over TCP | ✅ | ✅ | ✅ | ✅ | ✅ (sideloaded) |
 | USB serial | ✅ | ✅ (COM ports) | ✅ | ✅ (OTG: CDC-ACM, CP210x, FTDI) | ❌ (iOS) |
@@ -263,6 +298,7 @@ Privacy: the app collects nothing; see the [privacy policy](https://michalsiman.
 | VARA FM | ✅ (VARA in Wine) | ✅ | VARA on another computer | VARA on another computer | VARA on another computer |
 | BBS SERVER | ✅ | ✅ | ✅ | – (computers only) | – (computers only) |
 | Running in the background | ✅ | ✅ | ✅ | ✅ (Settings, with a notification) | limited by iOS |
+| Keep the screen on, sounds | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 ## Tests
 

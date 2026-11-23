@@ -2,9 +2,10 @@
 
     python3 tools/build_offline_map.py <folder with the Natural Earth .geojson files> [<GeoNames folder>]
 
-The GeoNames folder (optional) holds countryInfo.txt, cities5000.txt and the per-country dumps
-<CC>.zip of the European countries, from https://download.geonames.org/export/dump/ : the towns of
-5000 people and more, and the highest peaks of each country.
+The Natural Earth folder may also hold ne_10m_roads.geojson (Europe's motorways and main roads).
+The GeoNames folder (optional) holds countryInfo.txt, cities1000.txt and the per-country dumps
+<CC>.zip of the European countries, from https://download.geonames.org/export/dump/ : the places of
+1000 people and more, and the highest peaks of each country.
 
 Needs ne_50m_admin_0_boundary_lines_land, ne_50m_coastline and ne_10m_populated_places_simple
 from https://github.com/nvkelso/natural-earth-vector/tree/master/geojson.
@@ -67,8 +68,8 @@ def cities(path):
 
 
 PLACE_CODES = {"PPL", "PPLA", "PPLA2", "PPLA3", "PPLA4", "PPLC", "PPLG", "PPLS", "PPLF", "PPLR"}
-PEAKS_PER_COUNTRY = 15
-PEAK_SPACING_KM = 25  # one peak per range or so, not fifteen around the highest one
+PEAKS_PER_COUNTRY = 30
+PEAK_SPACING_KM = 12  # spread over the ranges, not thirty around the highest one
 
 
 def _km(a, b):
@@ -81,10 +82,10 @@ def _europe_codes(folder):
 
 
 def towns(folder, cities_already):
-    """European towns of 5000 people and more; parts of cities and places already among the cities dropped."""
+    """European places of 1000 people and more; parts of cities and places already among the cities dropped."""
     eu = _europe_codes(folder)
     rows = []
-    for line in (folder / "cities5000.txt").read_text(encoding="utf-8").splitlines():
+    for line in (folder / "cities1000.txt").read_text(encoding="utf-8").splitlines():
         f = line.split("\t")
         if f[8] in eu and f[7] in PLACE_CODES:
             rows.append([f[1], round(float(f[4]), 3), round(float(f[5]), 3), int(f[14] or 0)])
@@ -95,8 +96,9 @@ def towns(folder, cities_already):
     for name, lat, lon, pop in rows:
         cell = (round(lat * 20), round(lon * 12))  # ~5 km cells, to look for a bigger place nearby fast
         near = [p for dx in (-1, 0, 1) for dy in (-1, 0, 1) for p in grid.get((cell[0] + dx, cell[1] + dy), [])]
-        if any(_km((lat, lon), p) < 3 for p in near) or any(_km((lat, lon), p) < 3 for p in big if
-                                                              abs(p[0] - lat) < 0.1):
+        # a bigger place within 1.5 km: this one is a part of it (villages are often 2-3 km apart)
+        if any(_km((lat, lon), p) < 1.5 for p in near) or any(_km((lat, lon), p) < 1.5 for p in big if
+                                                                abs(p[0] - lat) < 0.1):
             continue  # a district of a bigger town, or a town the cities list has already
         grid.setdefault(cell, []).append((lat, lon))
         out.append([name, lat, lon, pop])
@@ -139,6 +141,29 @@ def peaks(folder):
     return kept
 
 
+MOTORWAYS = ("Major Highway", "Beltway")
+MAIN_ROADS = ("Secondary Highway",)
+
+
+def roads(path):
+    """Europe's motorways and main roads from Natural Earth: (motorways, main roads) as lists of lines."""
+    motorways, main = [], []
+    for f in json.loads(path.read_text())["features"]:
+        p = f["properties"]
+        if p.get("continent") != "Europe":
+            continue
+        kind = motorways if p.get("type") in MOTORWAYS or p.get("expressway") == 1 else main if p.get(
+            "type") in MAIN_ROADS else None
+        if kind is None:
+            continue
+        g = f["geometry"]
+        for part in g["coordinates"] if g["type"] == "MultiLineString" else [g["coordinates"]]:
+            line = [[round(lat, 3), round(lon, 3)] for lat, lon in simplify([[c[1], c[0]] for c in part], 0.005)]
+            if len(line) > 1:
+                kind.append(line)
+    return motorways, main
+
+
 def main(folder, geonames=None):
     d = pathlib.Path(folder)
     data = {
@@ -147,6 +172,8 @@ def main(folder, geonames=None):
         "coast": lines(d / "ne_50m_coastline.geojson", 0.02),
         "cities": cities(d / "ne_10m_populated_places_simple.geojson"),
     }
+    if (d / "ne_10m_roads.geojson").exists():
+        data["motorways"], data["roads"] = roads(d / "ne_10m_roads.geojson")
     if geonames:
         g = pathlib.Path(geonames)
         data["source"] += "; GeoNames (CC BY 4.0), geonames.org"
@@ -155,7 +182,8 @@ def main(folder, geonames=None):
     OUT.write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     pts = {k: sum(len(x) for x in data[k]) for k in ("borders", "coast")}
     print(OUT, OUT.stat().st_size // 1024, "kB", pts, len(data["cities"]), "cities",
-          len(data.get("towns", [])), "towns", len(data.get("peaks", [])), "peaks")
+          len(data.get("towns", [])), "towns", len(data.get("peaks", [])), "peaks",
+          len(data.get("motorways", [])), "motorways", len(data.get("roads", [])), "roads")
 
 
 if __name__ == "__main__":

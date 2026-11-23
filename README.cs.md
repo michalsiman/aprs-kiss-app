@@ -2,8 +2,8 @@
 
 [English](README.md) · **Česky**
 
-APRS stanice a packet radio terminál pro rádio s **KISS TNC** jako obyčejná aplikace pro počítač –
-bez Home Assistantu, bez webového serveru. Je to samostatný sourozenec
+APRS stanice a packet radio terminál pro rádio s **KISS TNC** jako obyčejná aplikace pro počítač
+i **telefon s Androidem** – bez Home Assistantu, bez webového serveru. Je to samostatný sourozenec
 [integrace APRS & Packet pro Home Assistant](https://github.com/michalsiman/aprs-kiss-ha) a sdílí
 s ní rádiové jádro.
 
@@ -12,7 +12,8 @@ a jeho [aplikací KISS TNC](https://github.com/armel/uv-k1-k5v3-firmware-custom/
 s jakýmkoliv KISS TNC (Direwolf, hardwarové TNC, USB sériový port rádia nebo KISS TCP most z integrace).
 
 **Stav: aktivní vývoj** – nové verze vycházejí často (viz [CHANGELOG](CHANGELOG.md), anglicky).
-Sestavení pro **Linux**, **Windows**, **macOS**, **Android** a **iOS** (viz [Platformy](#platformy)).
+Připravená pro **Linux**, **Windows** a **Android**; sestavení pro **macOS** a **iOS** existují, ale na
+skutečném Macu, iPhonu ani iPadu je zatím nikdo nevyzkoušel – **hledáme testery** (viz [Platformy](#platformy)).
 
 ## Co umí
 
@@ -21,10 +22,13 @@ Sestavení pro **Linux**, **Windows**, **macOS**, **Android** a **iOS** (viz [Pl
 - **Mapa** slyšených stanic (OpenStreetMap) s APRS symboly a popisky značek v rámečku, vaše poloha,
   zvýrazněné sledované značky. Tlačítka pro vycentrování na vás, *Tlumená mapa*, která mapu ztlumí,
   aby stanice vynikly, stanice z internetu zapnout/vypnout, jen *Posledních 2 h* a legenda
-  symbolů. Pravé tlačítko na mapě: *Nastavit jako moji polohu*.
+  symbolů – malé ikonky, které svítí, když jsou zapnuté. Tlačítka zoomu, kompas, který mapu vrátí severem
+  nahoru, měřítko; dvěma prsty se mapa otočí jen výrazným natočením. Pravé tlačítko (na telefonu podržení
+  prstu) na mapě: *Nastavit jako moji polohu*. Kreslí se jen stanice v okolí toho, co je na obrazovce,
+  takže mapa zůstává svižná i na telefonu.
 - **Offline mapa** přímo v aplikaci: hranice států, pobřeží a asi 1 000 větších měst (Natural Earth),
-  v Evropě i asi 17 000 obcí nad 5 000 obyvatel a nejvyšší hory každé země (GeoNames); s přiblížením
-  přibývají další. Přepíná se jedním tlačítkem; **když není internet, mapa se na ni
+  v Evropě i dálnice a hlavní silnice (Natural Earth), asi 67 000 obcí nad 1 000 obyvatel a 30 nejvyšších
+  hor každé země (GeoNames) – s přiblížením přibývají další. Přepíná se jedním tlačítkem; **když není internet, mapa se na ni
   přepne sama** a oznámí to, a jakmile se internet vrátí, vrátí se k OpenStreetMap.
 - **Zprávy** jako konverzace: opakované až do potvrzení, se stavem doručení, příchozí se potvrzují
   automaticky; nová zpráva na libovolnou značku; upozornění, když nějaká přijde.
@@ -36,7 +40,8 @@ Sestavení pro **Linux**, **Windows**, **macOS**, **Android** a **iOS** (viz [Pl
   Ikona (APRS symbol), komentář, SSID a cesta v Nastavení.
 - **APRS-IS** (internet) s volitelným **iGate** pro příjem i vysílání; zprávy, které vám iGate pošle
   rádiem, se přijmou a potvrdí.
-- **USB GPS modul** (NMEA, u-blox/VK-172 a podobné, rychlost se zjistí sama): s fixem používá jeho polohu
+- **Poloha z GPS**: z GPS telefonu (na telefonu bez ručně zadané polohy výchozí; Nastavení ukazuje,
+  kde podle ní jste), nebo z **USB GPS modulu** (NMEA, u-blox/VK-172 a podobné, rychlost se zjistí sama): s fixem používá jeho polohu
   mapa, maják (i s výškou) a TAK; stav GPS je v horní liště.
 
 ### Packet rádio
@@ -59,7 +64,10 @@ Sestavení pro **Linux**, **Windows**, **macOS**, **Android** a **iOS** (viz [Pl
   144.800); zapnutí vyžaduje napsat potvrzovací větu. Viz **[návod k BBS SERVER](docs/BBS.cs.md)**.
 - **TAK**: aplikace jako TAK stanice přes rádio – polohy a GeoChat kompatibilní s ATAK (TAK Protocol v1
   v AX.25 UI rámcích), vlastní mapa se stanicemi barevně podle týmu, seznam stanic, zprávy všem nebo
-  jedné stanici; tým, role a značka v Nastavení. Stejně jako BBS SERVER vypne všechno ostatní.
+  jedné stanici; tým, role a značka v Nastavení; kdo se objevil na mapě a kdo se posunul jak daleko,
+  ukazuje GeoChat. Na telefonu jsou mapa a GeoChat dvě obrazovky a na ikonce GeoChatu je počet
+  nepřečtených zpráv. Rámce se vejdou i do LoRa KISS modemů (MeshCore). Stejně jako BBS SERVER vypne
+  všechno ostatní.
   Viz **[specifikace TAK](docs/TAK.cs.md)**.
 
 ### Aplikace
@@ -70,8 +78,27 @@ Sestavení pro **Linux**, **Windows**, **macOS**, **Android** a **iOS** (viz [Pl
   italština, němčina, norština (bokmål), polština, slovenština, slovinština, srbština (cyrilice),
   španělština, švédština a ukrajinština; řídí se jazykem systému, nebo si ho vyberete v Nastavení.
 - **Světlý a tmavý** vzhled podle systému, nebo podle volby v Nastavení.
+- **Zvuky**: pípnutí při vysílání, zvuk při nové APRS zprávě, zprávě v chatu a v TAK GeoChatu – každý
+  jde v Nastavení zapnout nebo vypnout.
+- **Nezhasínat obrazovku**: nikdy, když běží TAK, nebo vždy.
+- **Nastavení ve sbalených blocích**; značka je povinná (dokud není uložená, je orámovaná červeně).
+  Potvrzovací věty (TAK, BBS SERVER, licence pro APRS-IS) se opisují jen jednou, ne pokaždé.
+- **Při prvním spuštění** se zeptá na jazyk (nabídne jazyk zařízení) a ukáže upozornění, které je
+  potřeba přijmout: vysílat smí jen držitel radioamatérské licence.
 - Dá vědět, když vyjde nová verze: nejvýš jednou denně se zeptá GitHubu na poslední vydání,
-  nic o vás neposílá; v Nastavení se dá vypnout.
+  nic o vás neposílá; v Nastavení se dá vypnout. Na Androidu *Stáhnout* rovnou stáhne nové .apk.
+
+### Na telefonu (Android)
+
+- Obrazovky jsou v nabídce, která se vysune ze strany (☰); horní lišta je jako přístrojová deska:
+  kontrolky **TNC**, **IS** a **GPS** svítí zeleně, když fungují, **TX** má červený rámeček, když je
+  vysílání zapnuté, a je celá červená, když rámec právě odchází do éteru – klepnutím na TX se vysílání
+  zapne nebo vypne, klepnutí na TNC nebo GPS ukáže jejich stav.
+- **TNC na USB portu telefonu** (OTG kabel): Quansheng s KISS firmwarem F4HWN a další CDC-ACM TNC,
+  kabely CP210x a FTDI; nebo po síti.
+- **GPS telefonu** jako vaše poloha.
+- **Běh na pozadí** (Nastavení › Pozadí a obrazovka): příjem, majáky, zprávy i TAK běží dál, i když
+  aplikace není na obrazovce nebo je telefon zamčený; ukazuje to notifikace.
 
 > **Vysílání je ve výchozím stavu vypnuté.** *Vysílání* v horní liště zapněte jen tehdy, když máte
 > radioamatérské oprávnění. APRS-IS jde zapnout až po napsání věty o licenci.
@@ -84,6 +111,9 @@ zvětší. Řídí se motivem GitHubu, stejně jako aplikace: používá světl�
 <table>
 <tr>
 <td colspan="2"><a href="assets/cs/map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/map-light.png"><img src="assets/cs/map.png" alt="Mapa slyšených stanic s APRS symboly"></picture></a><br><sub>Mapa slyšených stanic</sub></td>
+</tr>
+<tr>
+<td colspan="2"><a href="assets/cs/phone-map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-map-light.png"><img src="assets/cs/phone-map.png" width="19%" alt="Telefon: mapa, horní lišta jako přístrojová deska"></picture></a> <a href="assets/cs/phone-menu.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-menu-light.png"><img src="assets/cs/phone-menu.png" width="19%" alt="Telefon: nabídka"></picture></a> <a href="assets/cs/phone-tak.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-tak-light.png"><img src="assets/cs/phone-tak.png" width="19%" alt="Telefon: mapa TAK"></picture></a> <a href="assets/cs/phone-tak-chat.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-tak-chat-light.png"><img src="assets/cs/phone-tak-chat.png" width="19%" alt="Telefon: TAK GeoChat s pohybem týmu"></picture></a> <a href="assets/cs/phone-settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-settings-light.png"><img src="assets/cs/phone-settings.png" width="19%" alt="Telefon: Nastavení, pozadí a obrazovka"></picture></a><br><sub>Na telefonu: mapa, nabídka, mapa a GeoChat v TAK, Nastavení</sub></td>
 </tr>
 <tr>
 <td width="50%"><a href="assets/cs/map-offline.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/map-offline-light.png"><img src="assets/cs/map-offline.png" alt="Offline mapa: hranice a města bez internetu"></picture></a><br><sub>Offline mapa (bez internetu)</sub></td>
@@ -110,7 +140,7 @@ zvětší. Řídí se motivem GitHubu, stejně jako aplikace: používá světl�
 </tr>
 <tr>
 <td width="50%"><a href="assets/cs/settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/settings-light.png"><img src="assets/cs/settings.png" alt="Nastavení: připojení TNC a stanice"></picture></a><br><sub>Nastavení: TNC a stanice</sub></td>
-<td width="50%"><a href="assets/cs/settings-more.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/settings-more-light.png"><img src="assets/cs/settings-more.png" alt="Nastavení: GPS, APRS-IS, VARA FM a TAK"></picture></a><br><sub>Nastavení: GPS, APRS-IS, VARA FM, TAK</sub></td>
+<td width="50%"><a href="assets/cs/settings-more.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/settings-more-light.png"><img src="assets/cs/settings-more.png" alt="Nastavení: pozadí a obrazovka, zvuky"></picture></a><br><sub>Nastavení: pozadí a obrazovka, zvuky</sub></td>
 </tr>
 </table>
 
@@ -127,8 +157,8 @@ Stáhněte **`aprs-kiss-…-macos.dmg`** z
 *APRS & Packet* do Aplikací. Aplikace není podepsaná u Applu (bez placeného vývojářského účtu), takže
 poprvé na ni **klikněte pravým › Otevřít › Otevřít**, nebo ji povolte v *Nastavení systému › Soukromí
 a zabezpečení › Přesto otevřít*. Rádio na USB se v Nastavení ukáže jako `/dev/cu.usbserial…` /
-`/dev/cu.usbmodem…`. Verze pro macOS se sestavuje na GitHubu bez Macu, na kterém by se dala vyzkoušet:
-dejte vědět, když něco nefunguje.
+`/dev/cu.usbmodem…`. Verze pro macOS se sestavuje na GitHubu bez Macu, na kterém by se dala vyzkoušet – **hledáme testery**:
+napište do [issues](https://github.com/michalsiman/aprs-kiss-app/issues), jak to dopadlo.
 
 ## Instalace (Android)
 
@@ -141,6 +171,9 @@ zeptá, jestli to aplikaci povolí) nebo **po síti (KISS přes TCP)**: Direwolf
 přes [`kiss_tcp_bridge.py`](https://github.com/michalsiman/aprs-kiss-ha/tree/main/bridge) nebo Wi-Fi TNC.
 Obrazovky jsou upravené pro telefon a přepínají se v nabídce, která se vysune ze strany (☰). Polohu může aplikace
 brát z **GPS telefonu** (Nastavení › GPS). BBS SERVER a USB GPS moduly jsou jen pro počítače.
+Soubor .apk je podepsaný vlastním klíčem projektu, takže nová verze se nainstaluje přes předchozí (od 0.1.30;
+starší je potřeba jednou odinstalovat); aplikace dá vědět, když nová verze vyjde, a stáhne ji.
+Připravuje se vydání v Google Play.
 
 ## Instalace (iPhone, iPad)
 
@@ -148,8 +181,9 @@ Apple pouští aplikace do iPhonu jen přes App Store nebo podepsané vývojář
 projekt nemá. Ve vydání je **nepodepsaný `aprs-kiss-…-ios-unsigned.ipa`**, který si do zařízení dáte
 nástrojem pro sideloading jako [AltStore](https://altstore.io/) nebo [Sideloadly](https://sideloadly.io/);
 ten ho podepíše vaším vlastním Apple ID (s bezplatným Apple ID je potřeba ho každých 7 dní obnovit).
-Stejně jako na Androidu se k TNC připojuje po síti. Sestavuje se na GitHubu a na skutečném iPhonu
-zatím vyzkoušený není.
+Stejně jako na Androidu se k TNC připojuje po síti.
+**Na skutečném iPhonu ani iPadu zatím vyzkoušený není – hledáme testery:** pokud to můžete zkusit,
+napište prosím, jak to dopadlo, do [issues](https://github.com/michalsiman/aprs-kiss-app/issues).
 
 ## Instalace (Linux)
 
@@ -252,7 +286,9 @@ Soukromí: aplikace nic nesbírá; viz [zásady ochrany osobních údajů](https
 
 ## Platformy
 
-| | Linux | Windows | macOS | Android | iOS |
+Linux, Windows a Android se používají každý den; macOS a iOS se sestavují, ale nejsou vyzkoušené (hledáme testery).
+
+| | Linux | Windows | macOS (nevyzkoušeno) | Android | iOS (nevyzkoušeno) |
 |---|---|---|---|---|---|
 | KISS přes TCP | ✅ | ✅ | ✅ | ✅ | ✅ (sideloading) |
 | USB sériový port | ✅ | ✅ (COM porty) | ✅ | ✅ (OTG: CDC-ACM, CP210x, FTDI) | ❌ (iOS) |
@@ -262,6 +298,7 @@ Soukromí: aplikace nic nesbírá; viz [zásady ochrany osobních údajů](https
 | VARA FM | ✅ (VARA ve Wine) | ✅ | VARA na jiném počítači | VARA na jiném počítači | VARA na jiném počítači |
 | BBS SERVER | ✅ | ✅ | ✅ | – (jen počítače) | – (jen počítače) |
 | Běh na pozadí | ✅ | ✅ | ✅ | ✅ (v Nastavení, s notifikací) | omezeno iOS |
+| Nezhasínání obrazovky, zvuky | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 ## Testy
 

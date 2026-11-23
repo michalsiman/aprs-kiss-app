@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.36 – 2026-11-23
+
+- **Offline map with roads and more places** (Europe): motorways (from the whole country's view) and main
+  roads (closer up) from Natural Earth; places of 1,000 people and more (one level smaller than before,
+  shown close up) and each country's 30 highest peaks (before 15). About 0.9 MB more in the packages.
+- SSID 0 is labelled "no SSID" too (on air it is the same).
+- README with new screenshots from the computer and the phone, and all the features described again;
+  macOS and iOS are built but untested: testers wanted.
+
 ## 0.1.35 – 2026-11-23
 
 - **Android: keeps running in the background** (Settings › Background and screen): receiving, beacons,

@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.36" date="2026-11-23">
+      <description>
+        <p>Offline map with motorways, main roads, smaller places and more peaks.</p>
+      </description>
+    </release>
     <release version="0.1.35" date="2026-11-23">
       <description>
         <p>Android: keeps running in the background with a notification. Keep the screen on: never, while TAK runs, or always.</p>
