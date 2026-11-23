@@ -17,7 +17,7 @@ from ..i18n import TEXTS
 from .base import View, clock
 from .bbs import _plain
 from ..offline_map import MIN_ZOOM, BaseMap
-from .map import toggle
+from .map import MapControls, toggle
 
 TEAM_COLORS = {
     "White": "#9E9E9E", "Yellow": "#F9A825", "Orange": "#EF6C00", "Magenta": "#D81B60", "Red": "#E53935",
@@ -64,7 +64,9 @@ class TakView(View):
         )
         self.offline_btn = toggle(ft.Icons.CLOUD_OFF_OUTLINED, ft.Icons.CLOUD_OFF, self.app.offline_map(),
                                   self.t("map_offline"), self._toggle_offline)
-        map_box = ft.Container(ft.Stack([self.map, self.base.credit], expand=True), expand=True, border_radius=8)
+        self.controls = MapControls(self.map, self.t, lambda: self.app.page.run_task(self._ask_camera, 0.7))
+        map_box = ft.Container(ft.Stack([self.map, self.controls.control, self.base.credit], expand=True),
+                               expand=True, border_radius=8)
         compact = self.app.compact
         self.stations = ft.ListView(spacing=0, height=90 if compact else 170)
         self.chat = ft.ListView(expand=True, spacing=6, auto_scroll=True, padding=ft.Padding.all(6))
@@ -112,7 +114,8 @@ class TakView(View):
         except Exception:  # noqa: BLE001 - the map is not on screen
             return
         lon = (camera.center.longitude + 180) % 360 - 180
-        if self.base.moved(camera.center.latitude, lon, camera.zoom, self.app.offline_map()):
+        turned = self.controls.rotated(camera.rotation)
+        if self.base.moved(camera.center.latitude, lon, camera.zoom, self.app.offline_map()) or turned:
             self.app.page.update()
 
     def on_event(self, kind, data) -> None:

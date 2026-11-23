@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import math
 import time
 
 import flet as ft
@@ -76,7 +77,8 @@ class MapView(View):
             bgcolor=ft.Colors.with_opacity(0.85, ft.Colors.SURFACE),
             border_radius=8, padding=ft.Padding.symmetric(horizontal=2), left=8, top=8,
         )
-        return ft.Stack([self.menu, overlay, self.base.credit], expand=True)
+        self.controls = MapControls(self.map, self.t, lambda: self.app.page.run_task(self._ask_camera, 0.7))
+        return ft.Stack([self.menu, overlay, self.controls.control, self.base.credit], expand=True)
 
     def _toggle_recent(self, _e) -> None:
         self.only_recent.selected = not self.only_recent.selected
@@ -135,6 +137,8 @@ class MapView(View):
         finally:
             self._camera_busy = False
         lon = (camera.center.longitude + 180) % 360 - 180
+        if self.controls.rotated(camera.rotation) and self.app.current_key == self.key:
+            self.controls.needle.update()
         self._look(camera.center.latitude, lon, camera.zoom)
 
     def _look(self, lat: float, lon: float, zoom: float) -> None:
@@ -274,3 +278,50 @@ def toggle(icon: str, selected_icon: str, selected: bool, tooltip: str, on_click
     return ft.IconButton(icon, selected_icon=selected_icon, selected=selected, tooltip=tooltip, on_click=on_click,
                          style=ft.ButtonStyle(bgcolor={ft.ControlState.SELECTED:
                                                        ft.Colors.with_opacity(0.18, ft.Colors.PRIMARY)}))
+
+
+class MapControls:
+    """Small buttons in the map's corner: zoom in, zoom out, and a compass that turns the map north up.
+
+    The needle points where north is when the map has been turned (two fingers on a phone); a tap on it
+    turns the map back.
+    """
+
+    SIZE = 34
+
+    def __init__(self, map_: fm.Map, t, after) -> None:
+        self.map, self.after = map_, after
+        self.needle = ft.Icon(ft.Icons.NAVIGATION, size=18, color=ft.Colors.RED_400, rotate=ft.Rotate(0))
+        column = ft.Column([
+            self._button(ft.Icon(ft.Icons.ADD, size=20), t("zoom_in"), self._zoom_in),
+            self._button(ft.Icon(ft.Icons.REMOVE, size=20), t("zoom_out"), self._zoom_out),
+            self._button(self.needle, t("north_up"), self._north),
+        ], spacing=0, tight=True)
+        self.control = ft.Container(column, bgcolor=ft.Colors.with_opacity(0.85, ft.Colors.SURFACE),
+                                    border_radius=self.SIZE // 2, right=8, bottom=22)
+
+    def _button(self, content: ft.Control, tooltip: str, on_click) -> ft.Container:
+        return ft.Container(content, width=self.SIZE, height=self.SIZE, alignment=ft.Alignment.CENTER,
+                            border_radius=self.SIZE // 2, tooltip=tooltip, on_click=on_click, ink=True)
+
+    async def _zoom_in(self, _e) -> None:
+        await self.map.zoom_in()
+        self.after()
+
+    async def _zoom_out(self, _e) -> None:
+        await self.map.zoom_out()
+        self.after()
+
+    async def _north(self, _e) -> None:
+        await self.map.reset_rotation()
+        self.rotated(0)
+        self.needle.update()
+        self.after()
+
+    def rotated(self, degrees: float | None) -> bool:
+        """Turn the needle with the map; True when it moved."""
+        angle = math.radians(degrees or 0)
+        if abs(angle - self.needle.rotate.angle) < 0.01:
+            return False
+        self.needle.rotate = ft.Rotate(angle)
+        return True

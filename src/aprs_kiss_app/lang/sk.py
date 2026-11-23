@@ -25,6 +25,7 @@ TEXTS = {
     "beacon_now": "Poslať polohu teraz", "position_sent": "Poloha odoslaná",
     "tnc_section": "Pripojenie k TNC", "connection": "Pripojenie", "conn_tcp": "KISS cez TCP (sieť)",
     "conn_serial": "Sériový port (USB)", "conn_usb": "TNC na USB (OTG kábel)", "host": "Adresa", "port": "Port", "device": "Sériový port",
+    "zoom_in": "Priblížiť", "zoom_out": "Oddialiť", "north_up": "Sever hore",
     "gps_phone": "GPS telefónu", "gps_phone_hint": "Mapa aj maják používajú polohu telefónu. Android sa prvýkrát opýta na povolenie; poloha musí byť zapnutá.", "gps_phone_denied": "Aplikácia nesmie používať polohu: povoľ ju v nastaveniach telefónu pre túto aplikáciu", "gps_phone_off": "Poloha v telefóne je vypnutá", "no_position": "Zatiaľ žiadna poloha: zadaj ju v Nastaveniach, použi GPS, alebo podrž prst na mape",
     "baudrate": "Rýchlosť (baud)", "refresh_ports": "Hľadať sériové porty",
     "no_ports": "Nenašiel sa žiadny sériový port", "txdelay": "TX delay pre TNC (ms, 0 = nemeniť)",

@@ -26,6 +26,7 @@ TEXTS = {
     "beacon_now": "Envoyer la position maintenant", "position_sent": "Position envoyée",
     "tnc_section": "Connexion au TNC", "connection": "Connexion", "conn_tcp": "KISS sur TCP (réseau)",
     "conn_serial": "Port série (USB)", "conn_usb": "TNC sur USB (câble OTG)", "host": "Adresse", "port": "Port", "device": "Port série",
+    "zoom_in": "Zoom avant", "zoom_out": "Zoom arrière", "north_up": "Nord en haut",
     "gps_phone": "GPS du téléphone", "gps_phone_hint": "La carte et la balise utilisent la position du téléphone. Android demande l'autorisation la première fois ; la localisation doit être activée.", "gps_phone_denied": "Localisation non autorisée : autorisez-la dans les réglages du téléphone pour cette application", "gps_phone_off": "La localisation du téléphone est désactivée", "no_position": "Pas encore de position : saisissez-la dans les Réglages, utilisez le GPS ou appuyez longuement sur la carte",
     "baudrate": "Vitesse (bauds)", "refresh_ports": "Chercher les ports série",
     "no_ports": "Aucun port série trouvé", "txdelay": "TX delay envoyé au TNC (ms, 0 = ne pas changer)",

@@ -34,6 +34,7 @@ TEXTS: dict[str, dict[str, str]] = {
         # settings
         "tnc_section": "TNC connection", "connection": "Connection", "conn_tcp": "KISS over TCP (network)",
         "conn_serial": "Serial port (USB)", "conn_usb": "TNC on USB (OTG cable)", "host": "Host", "port": "Port", "device": "Serial port",
+        "zoom_in": "Zoom in", "zoom_out": "Zoom out", "north_up": "North up",
         "gps_phone": "The phone's GPS", "gps_phone_hint": "The map and the beacon use the phone's location. Android asks for the permission the first time; the location must be switched on.", "gps_phone_denied": "Not allowed to use the location: allow it in the phone's settings for this app", "gps_phone_off": "The phone's location is switched off", "no_position": "No position yet: type it in Settings, use GPS, or long-press the map",
         "baudrate": "Speed (baud)", "refresh_ports": "Look for serial ports",
         "no_ports": "No serial ports found", "txdelay": "TX delay sent to the TNC (ms, 0 = leave)",
@@ -126,6 +127,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "beacon_now": "Poslat polohu teď", "position_sent": "Poloha odeslána",
         "tnc_section": "Připojení k TNC", "connection": "Připojení", "conn_tcp": "KISS přes TCP (síť)",
         "conn_serial": "Sériový port (USB)", "conn_usb": "TNC na USB (OTG kabel)", "host": "Adresa", "port": "Port", "device": "Sériový port",
+        "zoom_in": "Přiblížit", "zoom_out": "Oddálit", "north_up": "Sever nahoru",
         "gps_phone": "GPS telefonu", "gps_phone_hint": "Mapa i maják používají polohu telefonu. Android se poprvé zeptá na povolení; poloha musí být zapnutá.", "gps_phone_denied": "Aplikace nesmí používat polohu: povol ji v nastavení telefonu pro tuto aplikaci", "gps_phone_off": "Poloha v telefonu je vypnutá", "no_position": "Zatím žádná poloha: zadej ji v Nastavení, použij GPS, nebo podrž prst na mapě",
         "baudrate": "Rychlost (baud)", "refresh_ports": "Hledat sériové porty",
         "no_ports": "Žádné sériové porty nenalezeny", "txdelay": "TX delay pro TNC (ms, 0 = neměnit)",

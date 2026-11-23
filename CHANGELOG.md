@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.27 – 2026-11-23
+
+- **Map: zoom buttons and a compass** in the lower right corner, small so they take little of the map
+  (on the APRS and the TAK map, on phones and computers). The compass needle shows where north is when
+  the map has been turned; a tap turns it north up again.
+
 ## 0.1.26 – 2026-11-23
 
 - **Android: the app icon is blue to the edges**, with no white margin around it; the launcher shapes

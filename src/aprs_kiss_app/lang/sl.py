@@ -25,6 +25,7 @@ TEXTS = {
     "beacon_now": "Pošlji položaj zdaj", "position_sent": "Položaj poslan",
     "tnc_section": "Povezava s TNC", "connection": "Povezava", "conn_tcp": "KISS prek TCP (omrežje)",
     "conn_serial": "Serijska vrata (USB)", "conn_usb": "TNC na USB (kabel OTG)", "host": "Naslov", "port": "Vrata", "device": "Serijska vrata",
+    "zoom_in": "Povečaj", "zoom_out": "Pomanjšaj", "north_up": "Sever navzgor",
     "gps_phone": "GPS telefona", "gps_phone_hint": "Zemljevid in svetilnik uporabljata lokacijo telefona. Android prvič vpraša za dovoljenje; lokacija mora biti vklopljena.", "gps_phone_denied": "Lokacija ni dovoljena: dovoli jo v nastavitvah telefona za to aplikacijo", "gps_phone_off": "Lokacija telefona je izklopljena", "no_position": "Še ni položaja: vpiši ga v Nastavitvah, uporabi GPS ali pridrži prst na zemljevidu",
     "baudrate": "Hitrost (baud)", "refresh_ports": "Poišči serijska vrata",
     "no_ports": "Ni najdenih serijskih vrat", "txdelay": "TX delay za TNC (ms, 0 = ne spreminjaj)",

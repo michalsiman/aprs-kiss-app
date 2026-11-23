@@ -25,6 +25,7 @@ TEXTS = {
     "beacon_now": "Position jetzt senden", "position_sent": "Position gesendet",
     "tnc_section": "TNC-Verbindung", "connection": "Verbindung", "conn_tcp": "KISS über TCP (Netzwerk)",
     "conn_serial": "Serielle Schnittstelle (USB)", "conn_usb": "TNC über USB (OTG-Kabel)", "host": "Adresse", "port": "Port", "device": "Serielle Schnittstelle",
+    "zoom_in": "Vergrößern", "zoom_out": "Verkleinern", "north_up": "Norden oben",
     "gps_phone": "GPS des Telefons", "gps_phone_hint": "Karte und Bake nutzen den Standort des Telefons. Android fragt beim ersten Mal nach der Berechtigung; der Standort muss eingeschaltet sein.", "gps_phone_denied": "Standort nicht erlaubt: in den Telefoneinstellungen für diese App erlauben", "gps_phone_off": "Der Standort des Telefons ist ausgeschaltet", "no_position": "Noch keine Position: in den Einstellungen eingeben, GPS nutzen oder lange auf die Karte drücken",
     "baudrate": "Geschwindigkeit (Baud)", "refresh_ports": "Serielle Schnittstellen suchen",
     "no_ports": "Keine seriellen Schnittstellen gefunden", "txdelay": "TX-Delay für den TNC (ms, 0 = nicht ändern)",
