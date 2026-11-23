@@ -85,3 +85,22 @@ class EngineTrackerTest(unittest.IsolatedAsyncioTestCase):
         eng.set_tracking(False)
         self.assertIsNone(await eng.tracker_tick(5000))
         self.assertEqual(len(sent), 2)
+
+
+class SendNowTest(unittest.IsolatedAsyncioTestCase):
+    async def test_position_now_follows_the_aprsis_switch(self):
+        import pathlib
+        import tempfile
+        from unittest import mock
+
+        from aprs_kiss_core.config import Config
+        from aprs_kiss_core.engine import Engine
+
+        for on in (False, True):
+            tmp = tempfile.TemporaryDirectory()
+            self.addCleanup(tmp.cleanup)
+            eng = Engine(Config(callsign="OK1SIM-7", latitude=49.7, longitude=13.4, beacon_is=on).validate(),
+                         pathlib.Path(tmp.name))
+            eng.station.send_position = mock.AsyncMock()
+            await eng.send_position()
+            self.assertEqual(eng.station.send_position.call_args.kwargs["to_is"], on)

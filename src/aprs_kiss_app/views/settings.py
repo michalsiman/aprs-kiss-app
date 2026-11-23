@@ -205,7 +205,7 @@ class SettingsView(View):
         self.igate_rx = ft.Checkbox(label=t("igate_rx"), value=c.igate_rx)
         self.igate_tx = ft.Checkbox(label=t("igate_tx"), value=c.igate_tx)
         self.is_state = ft.Text(color=ft.Colors.ON_SURFACE_VARIANT)
-        self.is_fields = ft.Column([ft.Row([self.is_host, self.is_port], wrap=True), self.passcode, self.radius,
+        self.is_fields = ft.Column([self.beacon_is, ft.Row([self.is_host, self.is_port], wrap=True), self.passcode, self.radius,
                                     self.igate_rx, self.igate_tx], spacing=12)
 
         # App
@@ -265,7 +265,7 @@ class SettingsView(View):
                          ft.Row([self.comment]), self.path,
                          ft.Row([self.lat, self.lon], wrap=True), self.gps_now,
                          ft.Text(t("position_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
-                         self.beacon, self.beacon_is, self.tracked, self.incoming, expanded=first),
+                         self.beacon, self.tracked, self.incoming, expanded=first),
                 _section("GPS", ft.Icons.GPS_FIXED, self.gps_source, self.gps_phone_hint) if self.app.mobile else
                 _section("GPS", ft.Icons.GPS_FIXED, self.gps_source, self.gps_row, self.gps_hint),
                 _section(t("trk_section"), ft.Icons.ROUTE, self.trk_mode,

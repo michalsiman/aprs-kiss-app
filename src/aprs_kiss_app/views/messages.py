@@ -37,7 +37,8 @@ class MessagesView(View):
                                  on_change=self._count)
         self.count = ft.Text(f"0/{MAX_TEXT}", size=12, color=ft.Colors.ON_SURFACE_VARIANT)
         self.via = ft.Dropdown(
-            width=120 if compact else 200, dense=True, value="both",
+            width=120 if compact else 200, dense=True,
+            value="both" if self.engine.config.beacon_is else "radio",  # the APRS-IS switch in Settings
             options=[ft.DropdownOption(key=k, text=self.t(f"via_{k}")) for k in ("radio", "internet", "both")],
         )
         # On a phone one side at a time: the conversations, or one conversation with a back button.
@@ -112,11 +113,15 @@ class MessagesView(View):
         states = tuple(self.engine.message_state(m.get("msg_no")) for m in self.engine.messages
                        if m["direction"] == "out")
         signature = (len(self.engine.messages), self.selected, states, tuple(sorted(self.unread)),
-                     self.engine.aprsis is not None)
+                     self.engine.aprsis is not None, self.engine.config.beacon_is)
         if signature == self._signature:
             return
         self._signature = signature
         self.via.visible = self.engine.aprsis is not None
+        wanted = self.engine.config.beacon_is
+        if wanted != getattr(self, "_via_for", wanted):  # the switch in Settings changed: a new default
+            self.via.value = "both" if wanted else "radio"
+        self._via_for = wanted
         self.conversations.controls = [self._conversation_tile(call, msgs) for call, msgs in groups.items()]
         if not groups:
             self.conversations.controls = [ft.Text(self.t("no_messages"), color=ft.Colors.ON_SURFACE_VARIANT)]

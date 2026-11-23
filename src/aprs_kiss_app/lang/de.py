@@ -102,7 +102,7 @@ TEXTS = {
     "set_my_position": "Als meine Position setzen", "copy_coordinates": "{lat}, {lon} kopieren",
     "copied": "Kopiert", "position_set": "Meine Position ist jetzt {lat}, {lon}",
     "beacon": "Position senden alle (Minuten, 0 = aus, mindestens 10)",
-    "beacon_is": "Regelmäßig auch über das Internet senden (APRS-IS)",
+    "beacon_is": "Auch über das Internet senden: meine Position (jetzt, regelmäßig, Tracker) und Nachrichten",
     "tracked": "Rufzeichen, die auf der Karte hervorgehoben werden (durch Komma getrennt)",
     "incoming": "Eingehende Packet-Verbindungen annehmen",
     "aprsis": "APRS-IS (Internet)", "aprsis_on": "Mit APRS-IS verbinden", "server": "Server",

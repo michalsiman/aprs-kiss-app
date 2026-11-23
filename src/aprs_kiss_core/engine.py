@@ -841,7 +841,8 @@ class Engine:
                 raise ValueError("No position set")
             lat, lon = position
             comment = self._position_comment(self.config.comment if comment is None else comment)
-        await self.station.send_position(lat, lon, comment)
+        # over the internet too only when chosen (Settings › APRS-IS), like the beacon and the tracker
+        await self.station.send_position(lat, lon, comment, to_is=self.config.beacon_is)
 
     async def send_status(self, text: str) -> None:
         self._not_in_bbs_mode()

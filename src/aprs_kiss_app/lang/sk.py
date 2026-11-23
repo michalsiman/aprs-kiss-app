@@ -102,7 +102,7 @@ TEXTS = {
     "set_my_position": "Nastaviť ako moju polohu", "copy_coordinates": "Kopírovať {lat}, {lon}",
     "copied": "Skopírované", "position_set": "Moja poloha nastavená na {lat}, {lon}",
     "beacon": "Posielať polohu každých (minút, 0 = nie, najmenej 10)",
-    "beacon_is": "Posielať pravidelne aj cez internet (APRS-IS)",
+    "beacon_is": "Posielať aj cez internet: moju polohu (teraz, pravidelne, tracker) a správy",
     "tracked": "Značky zvýraznené na mape (oddelené čiarkou)",
     "incoming": "Prijímať prichádzajúce packet spojenia",
     "aprsis": "APRS-IS (internet)", "aprsis_on": "Pripojiť k APRS-IS", "server": "Server",

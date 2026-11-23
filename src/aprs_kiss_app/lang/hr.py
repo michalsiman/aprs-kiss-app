@@ -102,7 +102,7 @@ TEXTS = {
     "set_my_position": "Postavi kao moju poziciju", "copy_coordinates": "Kopiraj {lat}, {lon}",
     "copied": "Kopirano", "position_set": "Moja pozicija je sada {lat}, {lon}",
     "beacon": "Šalji poziciju svakih (minuta, 0 = ne, najmanje 10)",
-    "beacon_is": "Redovito je šalji i preko interneta (APRS-IS)",
+    "beacon_is": "Šalji i preko interneta: moj položaj (sada, redovito, tracker) i poruke",
     "tracked": "Pozivni znakovi istaknuti na karti (odvojeni zarezom)",
     "incoming": "Prihvaćaj dolazne packet veze",
     "aprsis": "APRS-IS (internet)", "aprsis_on": "Spoji se na APRS-IS", "server": "Poslužitelj",

@@ -103,7 +103,7 @@ TEXTS = {
     "set_my_position": "Imposta come mia posizione", "copy_coordinates": "Copia {lat}, {lon}",
     "copied": "Copiato", "position_set": "La mia posizione ora è {lat}, {lon}",
     "beacon": "Invia la posizione ogni (minuti, 0 = no, almeno 10)",
-    "beacon_is": "Inviala regolarmente anche via internet (APRS-IS)",
+    "beacon_is": "Invia anche via internet: la mia posizione (ora, periodica, tracker) e i messaggi",
     "tracked": "Nominativi evidenziati sulla mappa (separati da virgola)",
     "incoming": "Accetta connessioni packet in arrivo",
     "aprsis": "APRS-IS (internet)", "aprsis_on": "Connetti ad APRS-IS", "server": "Server",

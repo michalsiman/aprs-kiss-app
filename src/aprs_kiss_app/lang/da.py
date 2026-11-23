@@ -102,7 +102,7 @@ TEXTS = {
     "set_my_position": "Brug som min position", "copy_coordinates": "Kopiér {lat}, {lon}",
     "copied": "Kopieret", "position_set": "Min position er nu {lat}, {lon}",
     "beacon": "Send position hvert (minut, 0 = fra, mindst 10)",
-    "beacon_is": "Send den også regelmæssigt over internettet (APRS-IS)",
+    "beacon_is": "Send også via internettet: min position (nu, regelmæssigt, tracker) og beskeder",
     "tracked": "Kaldesignaler fremhævet på kortet (kommasepareret)",
     "incoming": "Accepter indgående packet-forbindelser",
     "aprsis": "APRS-IS (internet)", "aprsis_on": "Forbind til APRS-IS", "server": "Server",
