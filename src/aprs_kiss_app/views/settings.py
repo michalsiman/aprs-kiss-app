@@ -66,6 +66,8 @@ def _section(title: str, icon: str, *controls: ft.Control, expanded: bool = Fals
                                    padding=ft.Padding.only(left=14, right=14, top=8, bottom=12))],
             expanded=expanded, maintain_state=True, shape=shape, collapsed_shape=shape,
             expanded_cross_axis_alignment=ft.CrossAxisAlignment.START,
+            expanded_alignment=ft.Alignment.TOP_LEFT,  # Flutter centres the open block: in a wide window
+                                                       # the fields stood in the middle
         ),
     )
 
