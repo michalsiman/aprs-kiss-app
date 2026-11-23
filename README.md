@@ -139,8 +139,8 @@ to allow installing apps from the browser or file manager once. On the phone the
 Quansheng with the F4HWN KISS firmware and other CDC-ACM TNCs, CP210x and FTDI cables; Android asks once
 to allow the app to use it) or **over the network (KISS over TCP)**: Direwolf on a computer, the radio
 shared with [`kiss_tcp_bridge.py`](https://github.com/michalsiman/aprs-kiss-ha/tree/main/bridge), or a
-Wi-Fi TNC. The screens fit a phone and are switched in a bar along the bottom. BBS SERVER and USB GPS
-are for computers only.
+Wi-Fi TNC. The screens fit a phone and are switched in a bar along the bottom. Your position can come
+from **the phone's GPS** (Settings › GPS). BBS SERVER and USB GPS modules are for computers only.
 
 ## Install (iPhone, iPad)
 
@@ -256,6 +256,7 @@ tests/              unit tests, engine tests against fake_tnc.py and fake_vara.p
 | USB serial | ✅ | ✅ (COM ports) | ✅ | ✅ (OTG: CDC-ACM, CP210x, FTDI) | ❌ (iOS) |
 | Bluetooth TNC | – | – | – | planned | BLE only |
 | USB GPS module | ✅ | ✅ (COM ports) | ✅ | – | ❌ |
+| Phone's own GPS | – | – | – | ✅ | ✅ |
 | VARA FM | ✅ (VARA in Wine) | ✅ | VARA on another computer | VARA on another computer | VARA on another computer |
 | BBS SERVER | ✅ | ✅ | ✅ | – (computers only) | – (computers only) |
 | Running in the background | ✅ | ✅ | ✅ | needs a foreground service | limited by iOS |

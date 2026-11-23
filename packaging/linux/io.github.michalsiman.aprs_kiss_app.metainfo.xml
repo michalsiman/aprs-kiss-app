@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.23" date="2026-11-23">
+      <description>
+        <p>The phone's own GPS as your position. Map filters as icons, a smaller map credit, instant switching between the offline and the online map.</p>
+      </description>
+    </release>
     <release version="0.1.22" date="2026-11-23">
       <description>
         <p>Android: a TNC on the phone's USB port. Phone layout fixes and callsigns always in capitals.</p>

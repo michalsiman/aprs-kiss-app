@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.23 – 2026-11-23
+
+- **The phone's own GPS** (Settings › GPS: The phone's GPS): the map and the beacon use the phone's
+  location; Android asks for the permission once. A tap on "GPS" in the top bar tells its state.
+- **Map**: the "Stations from the internet" and "Last 2 hours" filters are icons next to the map buttons
+  (lit when on), so the bar takes one line; the OpenStreetMap credit is a small line in the corner.
+- **Switching between the offline and the online map is immediate**: the offline map is sent to the
+  screen once and then only shown or hidden.
+- **"Centre on my position" with no position** now says how to set one instead of doing nothing.
+
 ## 0.1.22 – 2026-11-23
 
 - **Android: a TNC on the phone's USB port** (Settings › Connection: TNC on USB, through an OTG cable):

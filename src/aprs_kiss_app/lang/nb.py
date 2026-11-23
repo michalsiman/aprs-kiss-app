@@ -25,6 +25,7 @@ TEXTS = {
     "beacon_now": "Send posisjon nå", "position_sent": "Posisjon sendt",
     "tnc_section": "TNC-tilkobling", "connection": "Tilkobling", "conn_tcp": "KISS over TCP (nettverk)",
     "conn_serial": "Seriell port (USB)", "conn_usb": "TNC på USB (OTG-kabel)", "host": "Adresse", "port": "Port", "device": "Seriell port",
+    "gps_phone": "Telefonens GPS", "gps_phone_hint": "Kartet og beaconen bruker telefonens posisjon. Android spør om tillatelse første gang; posisjon må være slått på.", "gps_phone_denied": "Ingen tilgang til posisjon: tillat det i telefonens innstillinger for denne appen", "gps_phone_off": "Telefonens posisjon er slått av", "no_position": "Ingen posisjon ennå: skriv den inn i Innstillinger, bruk GPS, eller hold fingeren på kartet",
     "baudrate": "Hastighet (baud)", "refresh_ports": "Søk etter serielle porter",
     "no_ports": "Fant ingen serielle porter", "txdelay": "TX delay til TNC-en (ms, 0 = ikke endre)",
     "station": "Stasjon", "callsign": "Kallesignal", "ssid": "SSID", "symbol": "Ikon (APRS-symbol)",

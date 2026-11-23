@@ -7,14 +7,11 @@ import time
 import flet as ft
 import flet_map as fm
 
-from ..offline_map import ATTRIBUTION, MIN_ZOOM, OfflineLayers
-from ..legend import COLOR_ME, internet_checkbox, show_legend, station_color, visible
+from ..legend import COLOR_ME, show_legend, station_color, visible
+from ..offline_map import MIN_ZOOM, BaseMap
 from ..symbols import emoji
 from .base import View
 
-TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-# OpenStreetMap's tile usage policy asks for an identifying User-Agent.
-USER_AGENT = "io.github.michalsiman.aprs_kiss_app"
 DEFAULT_CENTER = (49.8, 15.5)  # Czechia
 REBUILD_SECONDS = 2.0
 MAX_MARKERS = 400
@@ -34,17 +31,16 @@ class MapView(View):
         here = self.engine.my_position()
         center = here or DEFAULT_CENTER
         self.markers = fm.MarkerLayer(markers=[])
-        self.tiles = fm.TileLayer(url_template=TILES, user_agent_package_name=USER_AGENT, max_zoom=19,
-                                  opacity=MUTED_OPACITY if conf.map_muted else 1.0)
         self._zoom = 10 if here else 7
-        self.offline: OfflineLayers | None = None
+        self.base = BaseMap(self.markers, self._zoom, MUTED_OPACITY if conf.map_muted else 1.0)
+        self.tiles = self.base.tiles
         self.map = fm.Map(
             expand=True,
             bgcolor=ft.Colors.SURFACE,
             initial_center=fm.MapLatitudeLongitude(*center),
             initial_zoom=self._zoom,
             min_zoom=MIN_ZOOM,
-            layers=self._layers(),
+            layers=self.base.layers(self.app.offline_map()),
             # Right click (long press on touch screens): "set as my position".
             on_secondary_tap=self._menu,
             on_long_press=self._menu,
@@ -55,36 +51,32 @@ class MapView(View):
             self.map, primary_trigger=None, secondary_trigger=None, tertiary_trigger=None,
             on_select=self._menu_select, expand=True,
         )
-        self.only_recent = ft.Checkbox(label=self.t("last_2h"), value=False, on_change=lambda _e: self.force())
-        self.internet = internet_checkbox(self.app)
-        buttons = [
+        # The filters are icons that light up when on, like the map buttons: they take little of the map.
+        self.only_recent = toggle(ft.Icons.HISTORY_TOGGLE_OFF, ft.Icons.HISTORY, False, self.t("last_2h"),
+                                  self._toggle_recent)
+        self.internet = toggle(ft.Icons.PUBLIC_OFF, ft.Icons.PUBLIC, conf.show_internet, self.t("show_internet"),
+                               lambda _e: self.app.set_show_internet(not self.engine.config.show_internet))
+        bar = ft.Row([
             ft.IconButton(ft.Icons.MY_LOCATION, tooltip=self.t("centre_me"), on_click=self._centre_me),
-            self._muted_btn(),
-            self._offline_btn(),
-        ]
-        legend = lambda _e: show_legend(self.app)  # noqa: E731
-        if self.app.compact:  # a phone: the buttons on one line, the two filters below
-            bar = ft.Column([
-                ft.Row([*buttons, ft.IconButton(ft.Icons.HELP_OUTLINE, tooltip=self.t("legend"), on_click=legend)],
-                       tight=True, spacing=0),
-                ft.Row([self.internet, self.only_recent], tight=True, spacing=0, run_spacing=0, wrap=True),
-            ], tight=True, spacing=0)
-        else:
-            bar = ft.Row([*buttons, self.internet, self.only_recent,
-                          ft.TextButton(self.t("legend"), icon=ft.Icons.HELP_OUTLINE, on_click=legend)],
-                         tight=True, wrap=True)
+            self.internet, self.only_recent, self._muted_btn(), self._offline_btn(),
+            ft.IconButton(ft.Icons.HELP_OUTLINE, tooltip=self.t("legend"), on_click=lambda _e: show_legend(self.app)),
+        ], tight=True, spacing=0, wrap=True, run_spacing=0)
         overlay = ft.Container(
             bar,
             bgcolor=ft.Colors.with_opacity(0.85, ft.Colors.SURFACE),
-            border_radius=8, padding=ft.Padding.symmetric(horizontal=4), left=8, top=8,
-            right=8 if self.app.compact else None,  # a phone: bounded, so the filters wrap
+            border_radius=8, padding=ft.Padding.symmetric(horizontal=2), left=8, top=8,
         )
-        return ft.Stack([self.menu, overlay], expand=True)
+        return ft.Stack([self.menu, overlay, self.base.credit], expand=True)
+
+    def _toggle_recent(self, _e) -> None:
+        self.only_recent.selected = not self.only_recent.selected
+        self.force()
+        self.app.page.update()
 
     def _muted_btn(self) -> ft.IconButton:
-        self.muted = ft.IconButton(ft.Icons.FILTER_B_AND_W_OUTLINED, selected_icon=ft.Icons.FILTER_B_AND_W,
-                                   selected=self.engine.config.map_muted, tooltip=self.t("map_muted"),
-                                   on_click=self._toggle_muted, disabled=self.engine.config.map_offline)
+        self.muted = toggle(ft.Icons.FILTER_B_AND_W_OUTLINED, ft.Icons.FILTER_B_AND_W, self.engine.config.map_muted,
+                            self.t("map_muted"), self._toggle_muted)
+        self.muted.disabled = self.app.offline_map()
         return self.muted
 
     def _toggle_muted(self, _e) -> None:
@@ -101,40 +93,25 @@ class MapView(View):
     def base_map_changed(self) -> None:
         """Called by the app when the internet goes away or returns."""
         if hasattr(self, "map"):
-            self.map.layers = self._layers()
-            self.offline_btn.selected = self.app.offline_map()
-            self.muted.disabled = self.app.offline_map()
-
-    def _layers(self) -> list:
-        if self.app.offline_map():
-            if self.offline is None:
-                self.offline = OfflineLayers(self._zoom)
-            base, credit = self.offline.layers, f"{ATTRIBUTION} (offline)"
-        else:
-            base, credit = [self.tiles], "© OpenStreetMap contributors"
-        return [*base, self.markers, fm.SimpleAttribution(text=credit, alignment=ft.Alignment.BOTTOM_RIGHT)]
+            self.map.layers = self.base.layers(self.app.offline_map())
+            self.offline_btn.selected = self.muted.disabled = self.app.offline_map()
 
     def _offline_btn(self) -> ft.IconButton:
-        self.offline_btn = ft.IconButton(ft.Icons.CLOUD_OFF_OUTLINED, selected_icon=ft.Icons.CLOUD_OFF,
-                                         selected=self.app.offline_map(), tooltip=self.t("map_offline"),
-                                         on_click=self._toggle_offline)
+        self.offline_btn = toggle(ft.Icons.CLOUD_OFF_OUTLINED, ft.Icons.CLOUD_OFF, self.app.offline_map(),
+                                  self.t("map_offline"), self._toggle_offline)
         return self.offline_btn
 
     def _toggle_offline(self, _e) -> None:
         conf = self.engine.config
         conf.map_offline = not conf.map_offline
-        self.offline_btn.selected = self.muted.disabled = self.app.offline_map()
-        self.map.layers = self._layers()
+        self.base_map_changed()
         self.app.save_config_soon()
         self.app.page.update()
 
     def _moved(self, e) -> None:
         zoom = getattr(getattr(e, "camera", None), "zoom", None)
-        if zoom is None:
-            return
-        self._zoom = zoom
-        if self.offline and self.app.offline_map() and self.offline.zoomed(zoom):
-            self.offline.cities.update()
+        if zoom is not None and self.base.zoomed(zoom, self.app.offline_map()):
+            self.base.offline.cities.update()
 
     def _centre_on_first_fix(self) -> None:
         """The first GPS fix moves the map to where we are, once, while the map is on screen."""
@@ -146,7 +123,7 @@ class MapView(View):
             self.app.page.run_task(self.centre, here.latitude, here.longitude, 11)
 
     def force(self) -> None:
-        self.internet.value = self.engine.config.show_internet
+        self.internet.selected = self.engine.config.show_internet
         self._signature = None
         self._last_build = 0
         self.refresh()
@@ -186,7 +163,7 @@ class MapView(View):
         self._last_build = now
         markers = []
         conf = self.engine.config
-        recent = 7200 if self.only_recent.value else None
+        recent = 7200 if self.only_recent.selected else None
         for e in list(reversed(heard.values()))[:MAX_MARKERS]:
             if e.get("latitude") is None or e.get("longitude") is None:
                 continue
@@ -231,7 +208,15 @@ class MapView(View):
         await self.map.center_on(fm.MapLatitudeLongitude(lat, lon), zoom)
 
     async def _centre_me(self, _e) -> None:
-        conf = self.engine.config
         here = self.engine.my_position()
         if here:
-            await self.centre(*here, 11)
+            await self.centre(*here, max(self.base.zoom, 11))
+        else:
+            self.app.toast(self.t("no_position"))
+
+
+def toggle(icon: str, selected_icon: str, selected: bool, tooltip: str, on_click) -> ft.IconButton:
+    """An on/off icon: the plain (or crossed-out) icon when off, the filled one on a tinted background when on."""
+    return ft.IconButton(icon, selected_icon=selected_icon, selected=selected, tooltip=tooltip, on_click=on_click,
+                         style=ft.ButtonStyle(bgcolor={ft.ControlState.SELECTED:
+                                                       ft.Colors.with_opacity(0.18, ft.Colors.PRIMARY)}))

@@ -26,6 +26,7 @@ TEXTS = {
     "beacon_now": "Wyślij pozycję teraz", "position_sent": "Pozycja wysłana",
     "tnc_section": "Połączenie z TNC", "connection": "Połączenie", "conn_tcp": "KISS przez TCP (sieć)",
     "conn_serial": "Port szeregowy (USB)", "conn_usb": "TNC przez USB (kabel OTG)", "host": "Adres", "port": "Port", "device": "Port szeregowy",
+    "gps_phone": "GPS telefonu", "gps_phone_hint": "Mapa i beacon używają lokalizacji telefonu. Android za pierwszym razem pyta o zgodę; lokalizacja musi być włączona.", "gps_phone_denied": "Brak zgody na lokalizację: zezwól w ustawieniach telefonu dla tej aplikacji", "gps_phone_off": "Lokalizacja w telefonie jest wyłączona", "no_position": "Brak pozycji: wpisz ją w Ustawieniach, użyj GPS lub przytrzymaj palec na mapie",
     "baudrate": "Prędkość (baud)", "refresh_ports": "Szukaj portów szeregowych",
     "no_ports": "Nie znaleziono portów szeregowych", "txdelay": "TX delay dla TNC (ms, 0 = bez zmian)",
     "station": "Stacja", "callsign": "Znak", "ssid": "SSID", "symbol": "Ikona (symbol APRS)",

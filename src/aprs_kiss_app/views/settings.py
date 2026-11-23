@@ -124,10 +124,11 @@ class SettingsView(View):
         self.bbs_ssid = ft.Dropdown(label=t("bbs_ssid"), value=str(c.bbs_ssid), width=200,
                                     options=[ft.DropdownOption(key=str(i), text=str(i)) for i in range(1, 16)])
         self._build_bbs_fields(t)
-        self.gps_source = ft.Dropdown(label=t("gps_source"), value=c.gps_source if c.gps_source in ("manual", "usb")
+        # a phone: its own GPS; a computer: a USB GPS module
+        sources = ("manual", "phone") if self.app.mobile else ("manual", "usb")
+        self.gps_source = ft.Dropdown(label=t("gps_source"), value=c.gps_source if c.gps_source in sources
                                       else "manual", width=320, on_select=lambda _e: self._gps_changed(),
-                                      options=[ft.DropdownOption(key="manual", text=t("gps_manual")),
-                                               ft.DropdownOption(key="usb", text=t("gps_usb"))])
+                                      options=[ft.DropdownOption(key=k, text=t(f"gps_{k}")) for k in sources])
         self.gps_device = ft.Dropdown(label=t("gps_device"), value=c.gps_device or None, editable=True, expand=True,
                                       options=self._port_options(c.gps_device))
         self.gps_baud = ft.Dropdown(label=t("baudrate"), value=str(c.gps_baudrate or 0), width=170,
@@ -137,6 +138,7 @@ class SettingsView(View):
                                ft.IconButton(ft.Icons.REFRESH, tooltip=t("refresh_ports"),
                                              on_click=lambda _e: self._refresh_gps_ports())])
         self.gps_hint = ft.Text(t("gps_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT)
+        self.gps_phone_hint = ft.Text(t("gps_phone_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT)
         self._gps_changed(update=False)
         self.vara_host = ft.TextField(label=t("vara_host"), value=c.vara_host, width=260, hint_text="127.0.0.1")
         self.vara_port = ft.TextField(label=t("vara_port"), value=str(c.vara_port or 8300), width=260,
@@ -206,7 +208,8 @@ class SettingsView(View):
                          ft.Row([self.lat, self.lon], wrap=True),
                          ft.Text(t("position_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
                          self.beacon, self.beacon_is, self.tracked, self.incoming),
-                *([] if self.app.mobile else [_section("GPS", self.gps_source, self.gps_row, self.gps_hint)]),
+                _section("GPS", self.gps_source, self.gps_phone_hint) if self.app.mobile else
+                _section("GPS", self.gps_source, self.gps_row, self.gps_hint),
                 _section(t("aprsis"), self.aprsis, self.licence, self.is_fields, self.is_state),
                 _section("VARA FM", ft.Row([self.vara_host, self.vara_port], wrap=True),
                          ft.Text(t("vara_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT)),
@@ -278,6 +281,7 @@ class SettingsView(View):
     def _gps_changed(self, update: bool = True) -> None:
         usb = self.gps_source.value == "usb"
         self.gps_row.visible = self.gps_hint.visible = usb
+        self.gps_phone_hint.visible = self.gps_source.value == "phone"
         if update:
             self.app.page.update()
 

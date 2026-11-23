@@ -89,3 +89,44 @@ class OfflineLayers:
         self.level = level
         self.cities.markers = city_markers(level)
         return True
+
+
+TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+# OpenStreetMap's tile usage policy asks for an identifying User-Agent.
+USER_AGENT = "io.github.michalsiman.aprs_kiss_app"
+OSM_CREDIT = "© OpenStreetMap"
+
+
+class BaseMap:
+    """What lies under the markers: OpenStreetMap tiles or the offline map, and a small credit line.
+
+    Switching between the two only shows and hides layers. The offline map (tens of thousands of
+    points) goes to the screen once, the first time it is wanted, and not again on every switch,
+    which made switching slow, above all on phones.
+    """
+
+    def __init__(self, markers: fm.MarkerLayer, zoom: float, tile_opacity: float = 1.0) -> None:
+        self.markers, self.zoom = markers, zoom
+        self.tiles = fm.TileLayer(url_template=TILES, user_agent_package_name=USER_AGENT, max_zoom=19,
+                                  opacity=tile_opacity)
+        self.offline: OfflineLayers | None = None
+        self.credit_text = ft.Text(size=8, color=ft.Colors.ON_SURFACE_VARIANT)
+        # Small and see-through, in the corner: the credit OpenStreetMap asks for, without covering the map.
+        self.credit = ft.Container(self.credit_text, right=0, bottom=0, padding=ft.Padding.symmetric(horizontal=3),
+                                   bgcolor=ft.Colors.with_opacity(0.55, ft.Colors.SURFACE),
+                                   border_radius=ft.BorderRadius.only(top_left=4))
+
+    def layers(self, offline: bool) -> list:
+        if offline and self.offline is None:
+            self.offline = OfflineLayers(self.zoom)
+        self.tiles.visible = not offline
+        extra = self.offline.layers if self.offline else []
+        for layer in extra:
+            layer.visible = offline
+        self.credit_text.value = f"{ATTRIBUTION} (offline)" if offline else OSM_CREDIT
+        return [self.tiles, *extra, self.markers]
+
+    def zoomed(self, zoom: float, offline: bool) -> bool:
+        """Remember the zoom; True when the offline cities changed and need an update."""
+        self.zoom = zoom
+        return bool(self.offline and offline and self.offline.zoomed(zoom))

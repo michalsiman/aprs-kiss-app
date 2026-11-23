@@ -34,7 +34,7 @@ from .ax25 import PF, U_DM, Address, Frame
 from .bbs import BbsConfigError, BbsServer
 from . import tak
 from . import vara as vara_mod
-from .gps import GpsFix, GpsReader
+from .gps import GpsFix, GpsReader, PushedGps
 from .config import MIN_BEACON_MINUTES, VERSION, Config, data_dir, load_state, save_state
 from .connection import KissConnection, TncSettings
 from .parser import parse
@@ -123,7 +123,7 @@ class Engine:
         self.bbs_call: Address | None = None
         self.bbs_error = ""
         self.bbs_sessions: dict[str, Session] = {}
-        self.gps: GpsReader | None = None
+        self.gps: GpsReader | PushedGps | None = None
         self.vara: vara_mod.VaraClient | None = None
         # TAK: the stations heard (uid -> event), the GeoChat messages and the position loop
         self.tak_stations: dict[str, dict[str, Any]] = {}
@@ -215,6 +215,9 @@ class Engine:
     def _build_gps(self) -> None:
         self.gps, self.gps_error, self._gps_shown = None, "", None
         conf = self.config
+        if conf.gps_source == "phone" and not self.bbs_mode:
+            self.gps = PushedGps(self._on_gps_fix, self._on_update)  # the app pushes the phone's fixes
+            return
         if conf.gps_source != "usb" or self.bbs_mode:
             return
         if not conf.gps_device:
@@ -556,6 +559,8 @@ class Engine:
                 "fix": self.gps.fix.usable(),
                 "satellites": self.gps.fix.satellites,
                 "speed": self.gps.speed,
+                "accuracy": self.gps.fix.accuracy_m,
+                "phone": isinstance(self.gps, PushedGps),
                 "error": self.gps.last_error,
             } if self.gps else ({"error": self.gps_error} if self.gps_error else None),
             "vara": {"link": self.vara.link_up, "error": self.vara.last_error, "state": self.vara.state,

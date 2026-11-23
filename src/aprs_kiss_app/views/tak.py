@@ -15,8 +15,8 @@ from aprs_kiss_core.config import Config
 from ..i18n import TEXTS
 from .base import View, clock
 from .bbs import _plain
-from ..offline_map import ATTRIBUTION, MIN_ZOOM, OfflineLayers
-from .map import TILES, USER_AGENT
+from ..offline_map import MIN_ZOOM, BaseMap
+from .map import toggle
 
 TEAM_COLORS = {
     "White": "#9E9E9E", "Yellow": "#F9A825", "Orange": "#EF6C00", "Magenta": "#D81B60", "Red": "#E53935",
@@ -54,16 +54,15 @@ class TakView(View):
         here = self.engine.my_position()
         self.markers = fm.MarkerLayer(markers=[])
         self._zoom = 12 if here else 7
-        self.offline: OfflineLayers | None = None
-        self.tiles = fm.TileLayer(url_template=TILES, user_agent_package_name=USER_AGENT, max_zoom=19)
+        self.base = BaseMap(self.markers, self._zoom)
         self.map = fm.Map(
             expand=True, bgcolor=ft.Colors.SURFACE,
             initial_center=fm.MapLatitudeLongitude(*(here or (49.8, 15.5))), initial_zoom=self._zoom, min_zoom=MIN_ZOOM,
-            layers=self._layers(), on_position_change=self._moved,
+            layers=self.base.layers(self.app.offline_map()), on_position_change=self._moved,
         )
-        self.offline_btn = ft.IconButton(ft.Icons.CLOUD_OFF_OUTLINED, selected_icon=ft.Icons.CLOUD_OFF,
-                                         selected=self.app.offline_map(), tooltip=self.t("map_offline"),
-                                         on_click=self._toggle_offline)
+        self.offline_btn = toggle(ft.Icons.CLOUD_OFF_OUTLINED, ft.Icons.CLOUD_OFF, self.app.offline_map(),
+                                  self.t("map_offline"), self._toggle_offline)
+        map_box = ft.Container(ft.Stack([self.map, self.base.credit], expand=True), expand=True, border_radius=8)
         compact = self.app.compact
         self.stations = ft.ListView(spacing=0, height=90 if compact else 170)
         self.chat = ft.ListView(expand=True, spacing=6, auto_scroll=True, padding=ft.Padding.all(6))
@@ -82,40 +81,27 @@ class TakView(View):
             expand=compact,
         )
         if compact:  # a phone: the map above, stations and GeoChat below
-            return ft.Column([header, ft.Container(self.map, expand=True, border_radius=8), panel], expand=True)
-        return ft.Column([header, ft.Row([ft.Container(self.map, expand=True, border_radius=8), panel], expand=True,
+            return ft.Column([header, map_box, panel], expand=True)
+        return ft.Column([header, ft.Row([map_box, panel], expand=True,
                                          vertical_alignment=ft.CrossAxisAlignment.STRETCH)], expand=True)
 
     def base_map_changed(self) -> None:
         """Called by the app when the internet goes away or returns."""
         if hasattr(self, "map"):
-            self.map.layers = self._layers()
+            self.map.layers = self.base.layers(self.app.offline_map())
             self.offline_btn.selected = self.app.offline_map()
-
-    def _layers(self) -> list:
-        """OpenStreetMap tiles, or the bundled offline map (the same choice as on the APRS map)."""
-        if self.app.offline_map():
-            if self.offline is None:
-                self.offline = OfflineLayers(self._zoom)
-            base, credit = self.offline.layers, f"{ATTRIBUTION} (offline)"
-        else:
-            base, credit = [self.tiles], "© OpenStreetMap contributors"
-        return [*base, self.markers, fm.SimpleAttribution(text=credit, alignment=ft.Alignment.BOTTOM_RIGHT)]
 
     def _toggle_offline(self, _e) -> None:
         conf = self.engine.config
         conf.map_offline = not conf.map_offline
-        self.offline_btn.selected = self.app.offline_map()
-        self.map.layers = self._layers()
+        self.base_map_changed()
         self.app.save_config_soon()
         self.app.page.update()
 
     def _moved(self, e) -> None:
         zoom = getattr(getattr(e, "camera", None), "zoom", None)
-        if zoom is not None:
-            self._zoom = zoom
-            if self.offline and self.app.offline_map() and self.offline.zoomed(zoom):
-                self.offline.cities.update()
+        if zoom is not None and self.base.zoomed(zoom, self.app.offline_map()):
+            self.base.offline.cities.update()
 
     def on_event(self, kind, data) -> None:
         if kind in ("tak", "gps", "update"):

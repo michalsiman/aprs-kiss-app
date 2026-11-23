@@ -1,6 +1,6 @@
 [project]
 name = "aprs-kiss"
-version = "0.1.22"
+version = "0.1.23"
 description = "APRS station and packet radio terminal for a KISS TNC, for computers and phones"
 readme = "README.md"
 license = "MIT"
@@ -9,6 +9,7 @@ requires-python = ">=3.10"
 dependencies = [
     "flet==1.1.2",
     "flet-map==1.1.2",
+    "flet-geolocator==1.1.2",  # the phone's own GPS (Android, iOS)
     "aprslib>=0.7.2",
     "platformdirs>=4",
     "tomli>=2; python_version < '3.11'",
@@ -52,6 +53,12 @@ module = "main"
 
 [tool.flet.android.permission]
 "android.permission.INTERNET" = true
+# Settings › GPS › "The phone's GPS" (asked for only when chosen)
+"android.permission.ACCESS_FINE_LOCATION" = true
+"android.permission.ACCESS_COARSE_LOCATION" = true
+
+[tool.flet.ios.info]
+NSLocationWhenInUseUsageDescription = "Your position for the map and the APRS beacon, when Settings › GPS uses the phone's GPS."
 
 # Android: pyjnius reaches the USB host API for a TNC on the phone's USB port (aprs_kiss_core/android_usb.py)
 [tool.flet.android]
@@ -59,3 +66,4 @@ dependencies = ["pyjnius"]
 
 [tool.flet.android.feature]
 "android.hardware.usb.host" = false  # used when present, not required
+"android.hardware.location.gps" = false  # the phone GPS is optional too

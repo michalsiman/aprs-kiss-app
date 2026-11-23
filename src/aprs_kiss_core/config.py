@@ -19,7 +19,7 @@ from .ax25 import Address
 _LOGGER = logging.getLogger(__name__)
 
 APP_NAME = "aprs-kiss"
-VERSION = "0.1.22"
+VERSION = "0.1.23"
 MIN_BEACON_MINUTES = 10
 
 
@@ -60,7 +60,7 @@ class Config:
     monitor_internet: bool = True  # the frame monitor also shows APRS-IS lines ([IS])
     map_muted: bool = False  # map tiles faded, so the station labels stand out
     map_offline: bool = False  # the bundled offline map (borders, cities) instead of OpenStreetMap tiles
-    gps_source: str = "manual"  # "manual" (latitude/longitude above) or "usb" (an NMEA GPS module)
+    gps_source: str = "manual"  # "manual" (latitude/longitude above), "usb" (an NMEA GPS module), "phone"
     gps_device: str = ""  # its serial port
     gps_baudrate: int = 0  # 0 = find it automatically
     tak_enabled: bool = False  # TAK mode: only TAK positions and GeoChat over the radio

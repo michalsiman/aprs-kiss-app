@@ -138,7 +138,8 @@ připojuje k TNC **přes USB port telefonu** (Nastavení › Připojení: TNC na
 redukci; Quansheng s KISS firmwarem F4HWN a další CDC-ACM TNC, kabely CP210x a FTDI; Android se jednou
 zeptá, jestli to aplikaci povolí) nebo **po síti (KISS přes TCP)**: Direwolf na počítači, rádio sdílené
 přes [`kiss_tcp_bridge.py`](https://github.com/michalsiman/aprs-kiss-ha/tree/main/bridge) nebo Wi-Fi TNC.
-Obrazovky jsou upravené pro telefon a přepínají se v liště dole. BBS SERVER a USB GPS jsou jen pro počítače.
+Obrazovky jsou upravené pro telefon a přepínají se v liště dole. Polohu může aplikace
+brát z **GPS telefonu** (Nastavení › GPS). BBS SERVER a USB GPS moduly jsou jen pro počítače.
 
 ## Instalace (iPhone, iPad)
 
@@ -254,6 +255,7 @@ tests/              testy jednotek, testy enginu proti fake_tnc.py a fake_vara.p
 | USB sériový port | ✅ | ✅ (COM porty) | ✅ | ✅ (OTG: CDC-ACM, CP210x, FTDI) | ❌ (iOS) |
 | Bluetooth TNC | – | – | – | v plánu | jen BLE |
 | USB GPS modul | ✅ | ✅ (COM porty) | ✅ | – | ❌ |
+| GPS telefonu | – | – | – | ✅ | ✅ |
 | VARA FM | ✅ (VARA ve Wine) | ✅ | VARA na jiném počítači | VARA na jiném počítači | VARA na jiném počítači |
 | BBS SERVER | ✅ | ✅ | ✅ | – (jen počítače) | – (jen počítače) |
 | Běh na pozadí | ✅ | ✅ | ✅ | potřebuje službu na popředí | omezeno iOS |

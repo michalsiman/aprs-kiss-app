@@ -111,6 +111,23 @@ class EngineGpsTest(unittest.TestCase):
         self.assertIsNone(eng.gps)
         self.assertIn("another port", eng.status()["gps"]["error"])
 
+    def test_phone_gps(self):
+        eng = self.engine(gps_source="phone")
+        self.assertIsInstance(eng.gps, gps.PushedGps)
+        self.assertEqual(eng.my_position(), (50.0, 14.0))  # nothing from the phone yet
+        eng.gps.set_state(False, "location off")
+        self.assertEqual(eng.status()["gps"]["error"], "location off")
+        eng.gps.push(49.75, 13.38, altitude_m=330.0, speed_ms=0.0, course=0.0, accuracy_m=12.0)
+        self.assertEqual(eng.my_position(), (49.75, 13.38))
+        self.assertEqual(eng._position_comment("x"), "/A=001083 x")
+        st = eng.status()["gps"]
+        self.assertTrue(st["fix"] and st["connected"] and st["phone"])
+        self.assertEqual(st["accuracy"], 12.0)
+        eng.gps.fix.time -= gps.FIX_MAX_AGE + 1  # a phone reports only when it moves: still good
+        self.assertEqual(eng.my_position(), (49.75, 13.38))
+        eng.gps.fix.time -= gps.PHONE_FIX_MAX_AGE
+        self.assertEqual(eng.my_position(), (50.0, 14.0))
+
 
 if __name__ == "__main__":
     unittest.main()

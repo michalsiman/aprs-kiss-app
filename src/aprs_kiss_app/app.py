@@ -21,6 +21,7 @@ from aprs_kiss_core.engine import Engine, TransmitRefused
 from .about import show_about
 from . import updates
 from .i18n import Translator
+from .phone_gps import PhoneGps
 from .symbols import symbol_info
 from .views.base import View, adapt, clock
 from .views.bbs import BbsView
@@ -79,6 +80,8 @@ class App:
 
         android_usb.register()  # Android: a TNC on the phone's USB port
         config = await asyncio.to_thread(load_config, self.folder)
+        if config.gps_source == "phone" and not self.mobile:  # settings copied from a phone
+            config = Config.from_dict({**config.to_dict(), "gps_source": "manual"}).validate()
         if self.mobile and (config.bbs_enabled or config.connection == "serial" or config.gps_source == "usb"):
             # what a phone does not do: BBS SERVER, a USB GPS; a serial TNC is reached through USB instead
             config = Config.from_dict({**config.to_dict(), "bbs_enabled": False,
@@ -88,10 +91,12 @@ class App:
         self.engine = Engine(config, self.folder)
         self.engine.add_listener(self._on_event)
         await self.engine.start()
+        self.phone_gps = PhoneGps(self)
         await self.apply_theme()
         self.build()
         if not config.configured:
             self.select("settings")
+        self.phone_gps.sync()
         page.run_task(self._tick)
         page.run_task(self._check_updates_later)
         page.run_task(self._watch_internet)
@@ -154,6 +159,7 @@ class App:
         t0 = time.monotonic()
         await asyncio.to_thread(save_config, config, self.folder)
         await self.engine.reconfigure(config)
+        self.phone_gps.sync()
         t1 = time.monotonic()
         if language_changed or mode_changed:
             self.build()
@@ -208,6 +214,11 @@ class App:
         st = self.engine.status()
         self.toast(self.tnc_text.value if st["tnc_connected"] else (st.get("tnc_error") or self.tnc_text.value or ""),
                    error=not st["tnc_connected"])
+
+    def _gps_info(self, _e=None) -> None:
+        """A tap on "GPS": its state, or why there is no position."""
+        gps = self.engine.status().get("gps") or {}
+        self.toast(gps.get("error") or self.gps_text.value or "", error=not gps.get("fix"))
 
     def show_dialog(self, dialog: ft.DialogControl) -> None:
         """A dialog or message bar that fits the screen."""
@@ -303,7 +314,7 @@ class App:
         if self.compact:
             self.tx_switch.label = None
         self.callsign.size = 16 if self.compact else 18
-        self.tnc_text.visible = not self.compact
+        self.tnc_text.visible = self.gps_text.visible = not self.compact
         status = ft.Container(
             ft.Row(
                 [
@@ -312,7 +323,7 @@ class App:
                                         tight=True),
                                  on_click=self._tnc_info if self.compact else None),
                     self.is_box,
-                    self.gps_box,
+                    ft.Container(self.gps_box, on_click=self._gps_info if self.compact else None),
                     ft.Container(expand=True),
                     self.update_btn,
                     ft.IconButton(ft.Icons.SHARE_LOCATION, tooltip=self.t("beacon_now"), on_click=self._beacon_now,
@@ -446,7 +457,9 @@ class App:
             # green: a fix · amber: the module talks, no fix yet · red: no module (or a setting is wrong)
             fix, talking = gps.get("fix"), gps.get("connected")
             self.gps_dot.color = ft.Colors.GREEN if fix else ft.Colors.AMBER if talking else ft.Colors.RED
-            self.gps_text.value = (self.t("gps_sats", n=gps["satellites"]) if fix else
+            accuracy = gps.get("accuracy")
+            self.gps_text.value = ((f"±{accuracy:.0f} m" if accuracy else self.t("gps_phone")) if fix and gps.get("phone")
+                                   else self.t("gps_sats", n=gps["satellites"]) if fix else
                                    self.t("gps_nofix") if talking else self.t("disconnected"))
             self.gps_box.tooltip = gps.get("error") or None
         self.tx_switch.value = st["tx_enabled"]

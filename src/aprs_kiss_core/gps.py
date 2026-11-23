@@ -34,10 +34,12 @@ class GpsFix:
     quality: int = 0  # GGA fix quality: 0 none, 1 GPS, 2 DGPS…
     valid: bool = False  # RMC status A
     time: float = 0.0  # when it was received (our clock)
+    accuracy_m: float | None = None  # the phone's estimate; NMEA modules leave it empty
+    max_age: float = FIX_MAX_AGE
 
     def usable(self, now: float | None = None) -> bool:
         return (self.valid and self.latitude is not None and self.longitude is not None
-                and (now or time.time()) - self.time <= FIX_MAX_AGE)
+                and (now or time.time()) - self.time <= self.max_age)
 
 
 def checksum_ok(line: str) -> bool:
@@ -191,3 +193,47 @@ class GpsReader:
                         self._on_fix(self.fix)
             if deadline and time.monotonic() > deadline and not self.connected:
                 return False
+
+
+PHONE_FIX_MAX_AGE = 600.0  # a phone reports only when it moves: its last fix stays good a while
+
+
+class PushedGps:
+    """A GPS whose fixes are handed in from outside: the phone's own location service.
+
+    The app asks the platform (Android, iOS) for the location and calls `push` with each one;
+    the engine treats it like the USB module (same `fix`, `connected`, `last_error`).
+    """
+
+    speed: int | None = None  # no serial speed here
+
+    def __init__(self, on_fix: Callable[[GpsFix], None], on_state: Callable[[], None] | None = None) -> None:
+        self.fix = GpsFix(max_age=PHONE_FIX_MAX_AGE)
+        self.connected = False
+        self.last_error = ""
+        self._on_fix, self._on_state = on_fix, on_state
+
+    async def start(self) -> None:
+        pass
+
+    async def stop(self) -> None:
+        self.set_state(False)
+
+    def set_state(self, connected: bool, error: str = "") -> None:
+        """The location service works (permission given, location on), or why not."""
+        if (connected, error) != (self.connected, self.last_error):
+            self.connected, self.last_error = connected, error
+            if self._on_state:
+                self._on_state()
+
+    def push(self, latitude: float, longitude: float, altitude_m: float | None = None,
+             speed_ms: float | None = None, course: float | None = None, accuracy_m: float | None = None) -> None:
+        fix = self.fix
+        fix.latitude, fix.longitude = latitude, longitude
+        fix.altitude_m = altitude_m or None  # 0.0 means "not known" on phones
+        fix.speed_kmh = speed_ms * 3.6 if speed_ms else None
+        fix.course = course if speed_ms else None
+        fix.accuracy_m = accuracy_m or None
+        fix.valid, fix.quality, fix.time = True, 1, time.time()
+        self.set_state(True)
+        self._on_fix(fix)
