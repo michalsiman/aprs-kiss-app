@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.29" date="2026-11-23">
+      <description>
+        <p>A warning at the first start: transmitting needs an amateur radio licence. Preparations for Google Play.</p>
+      </description>
+    </release>
     <release version="0.1.28" date="2026-11-23">
       <description>
         <p>The new-version check works on phones too; on Android the new package is downloaded straight away. About is in the phone's menu.</p>

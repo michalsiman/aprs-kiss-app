@@ -19,7 +19,7 @@ from .ax25 import Address
 _LOGGER = logging.getLogger(__name__)
 
 APP_NAME = "aprs-kiss"
-VERSION = "0.1.28"
+VERSION = "0.1.29"
 MIN_BEACON_MINUTES = 10
 
 
@@ -74,6 +74,7 @@ class Config:
     bbs_ssid: int = 1  # the BBS answers on your callsign with this SSID
     bbs_list: str = ""  # saved BBSes and nodes for the terminal: JSON [{"call": ..., "path": ...}]
     check_updates: bool = True  # ask GitHub once a day whether a newer version is out
+    disclaimer_accepted: bool = False  # the first-start warning (transmitting needs a licence) was accepted
     theme: str = "auto"  # auto (as the desktop), light, dark
 
     @property

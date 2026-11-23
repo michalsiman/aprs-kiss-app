@@ -19,7 +19,7 @@ from . import theme
 from aprs_kiss_core.engine import Engine, TransmitRefused
 
 from .about import show_about
-from . import updates
+from . import disclaimer, distribution, updates
 from .i18n import Translator
 from .phone_gps import PhoneGps
 from .symbols import symbol_info
@@ -96,6 +96,8 @@ class App:
         self.build()
         if not config.configured:
             self.select("settings")
+        if disclaimer.needed(self):
+            disclaimer.show(self)  # the very first start: transmitting needs a licence
         self.phone_gps.sync()
         page.run_task(self._tick)
         page.run_task(self._check_updates_later)
@@ -519,7 +521,7 @@ class App:
         self.update_state = await asyncio.to_thread(updates.load, self.folder)
         self._show_update()
         await asyncio.sleep(10)
-        if self.engine.config.check_updates and not self._closing:
+        if self.engine.config.check_updates and not self._closing and not distribution.store_updates():
             await self.check_updates(force=False)
 
     async def check_updates(self, force: bool = True) -> None:
@@ -554,6 +556,8 @@ class App:
 
     def _show_update(self) -> None:
         st = self.update_state
+        if distribution.store_updates():  # Google Play updates it
+            st = self.update_state = updates.UpdateState()
         self.update_btn.visible = st.available
         if isinstance(self.update_btn, ft.FilledTonalButton):
             self.update_btn.content = self.t("update_button", version=st.latest)

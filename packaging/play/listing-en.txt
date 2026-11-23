@@ -1,0 +1,28 @@
+Title (max 30):
+APRS & Packet
+
+Short description (max 80):
+APRS map, messages and packet radio terminal for a KISS TNC. For radio amateurs.
+
+Full description (max 4000):
+APRS & Packet turns your phone and a radio with a KISS TNC into a complete APRS station and packet radio terminal.
+
+For licensed radio amateurs. Transmitting needs a valid amateur radio licence; without one, use the app for receiving only.
+
+WHAT IT DOES
+• Map of the stations heard by radio and, optionally, from APRS-IS – OpenStreetMap or a built-in offline map (borders and cities, no internet needed)
+• Your position from the phone's GPS or typed in, and a beacon
+• APRS messages with acknowledgement, conversations, APRS Thursday (HOTG)
+• Packet terminal for BBSes and nodes (AX.25 connected mode), packet chat
+• Frame monitor, station list with distance and direction
+• APRS-IS with an optional iGate (needs your passcode)
+• TAK mode: ATAK-compatible positions and GeoChat over the radio (TAK Protocol v1)
+
+CONNECTING THE RADIO
+• TNC on the phone's USB port (OTG cable): Quansheng UV-K1/UV-K5 V3 with the F4HWN firmware and its KISS TNC app, other CDC-ACM TNCs, CP210x and FTDI cables
+• KISS over TCP: Direwolf on a computer, a Wi-Fi TNC, a radio shared over the network
+
+SAFETY
+Transmitting is off until you switch it on. APRS-IS needs a confirmation that you hold a licence. Nothing is collected by the author: no account, no analytics, no ads.
+
+Open source (MIT): https://github.com/michalsiman/aprs-kiss-app

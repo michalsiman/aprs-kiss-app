@@ -59,6 +59,7 @@ Icon=$URL/icon.png
 GPGKey=$B64
 EOF
 cp "$HERE/site/index.html" site/index.html
+cp "$HERE/site/privacy.html" site/privacy.html  # the privacy policy Google Play links to
 cp "$HERE/../linux/icons/128.png" site/icon.png
 cp "$HERE/aprs-kiss.gpg" site/aprs-kiss.gpg
 touch site/.nojekyll

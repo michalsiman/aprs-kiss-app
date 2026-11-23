@@ -9,6 +9,7 @@ import flet as ft
 
 from aprs_kiss_core.config import VERSION
 
+from . import distribution
 from .views.base import clock
 
 if TYPE_CHECKING:
@@ -87,11 +88,12 @@ def show_about(app: App) -> None:
             ),
             ft.Row([update_text, update_link,
                     ft.TextButton(t("update_check_now"), icon=ft.Icons.REFRESH, on_click=check_now)],
-                   wrap=True, spacing=4),
+                   wrap=True, spacing=4, visible=not distribution.store_updates()),  # Google Play updates it
             ft.Text(t("about_what")),
             ft.Text(t("about_radio"), color=small, size=13),
             ft.Divider(height=8),
-            *[_link(t(key), icon, url) for key, icon, url in LINKS],
+            *[_link(t(key), icon, url) for key, icon, url in LINKS
+              if not (key == "about_releases" and distribution.store_updates())],
             ft.Divider(height=8),
             ft.Text(t("about_author"), weight=ft.FontWeight.BOLD),
             ft.Row([

@@ -21,6 +21,7 @@ from aprs_kiss_core.bbs.storage import (
 )
 from aprs_kiss_core.config import Config
 
+from .. import distribution
 from ..i18n import LANGUAGES, TEXTS, ssid_labels
 from ..symbols import SYMBOLS
 from .base import View, short_path
@@ -183,7 +184,8 @@ class SettingsView(View):
                                     self.igate_rx, self.igate_tx], spacing=12)
 
         # App
-        self.check_updates = ft.Checkbox(label=t("check_updates"), value=c.check_updates)
+        self.check_updates = ft.Checkbox(label=t("check_updates"), value=c.check_updates,
+                                         visible=not distribution.store_updates())  # Google Play updates it
         self.theme = ft.Dropdown(label=t("theme"), value=c.theme if c.theme in ("auto", "light", "dark") else "auto",
                                  width=240,
                                  options=[ft.DropdownOption(key="auto", text=t("theme_auto")),

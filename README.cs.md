@@ -247,6 +247,8 @@ tests/              testy jednotek, testy enginu proti fake_tnc.py a fake_vara.p
 - Moduly jádra jsou stejné jako v integraci pro Home Assistant (tam `hub.py`, tady `engine.py`).
   V plánu je vydat jádro jako jeden balíček, který budou používat obě.
 
+Soukromí: aplikace nic nesbírá; viz [zásady ochrany osobních údajů](https://michalsiman.github.io/aprs-kiss-app/privacy.html).
+
 ## Platformy
 
 | | Linux | Windows | macOS | Android | iOS |

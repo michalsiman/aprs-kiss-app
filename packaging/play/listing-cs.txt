@@ -1,0 +1,28 @@
+Název (max 30):
+APRS & Packet
+
+Krátký popis (max 80):
+APRS mapa, zprávy a packetový terminál pro KISS TNC. Pro radioamatéry.
+
+Úplný popis (max 4000):
+APRS & Packet udělá z telefonu a rádia s KISS TNC kompletní APRS stanici a packetový terminál.
+
+Pro radioamatéry s licencí. Vysílat smí jen držitel platného radioamatérského oprávnění; bez něj aplikaci používej jen pro příjem.
+
+CO UMÍ
+• Mapa stanic slyšených rádiem a volitelně z APRS-IS – OpenStreetMap nebo vestavěná offline mapa (hranice a města, bez internetu)
+• Poloha z GPS telefonu nebo zadaná ručně, maják
+• APRS zprávy s potvrzením, konverzace, APRS Thursday (HOTG)
+• Packetový terminál pro BBS a nody (AX.25 se spojením), packet chat
+• Monitor rámců, seznam stanic se vzdáleností a směrem
+• APRS-IS s volitelnou iGate (potřebuje passcode)
+• Režim TAK: polohy a GeoChat kompatibilní s ATAK přes rádio (TAK Protocol v1)
+
+PŘIPOJENÍ RÁDIA
+• TNC na USB portu telefonu (OTG kabel): Quansheng UV-K1/UV-K5 V3 s firmwarem F4HWN a jeho KISS TNC aplikací, další CDC-ACM TNC, kabely CP210x a FTDI
+• KISS přes TCP: Direwolf na počítači, Wi-Fi TNC, rádio sdílené po síti
+
+BEZPEČNOST
+Vysílání je vypnuté, dokud ho nezapneš. APRS-IS vyžaduje potvrzení, že máš licenci. Autor nic nesbírá: žádný účet, analytika ani reklamy.
+
+Otevřený zdrojový kód (MIT): https://github.com/michalsiman/aprs-kiss-app

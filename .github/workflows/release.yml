@@ -1,6 +1,6 @@
 name: Release packages
 
-# Every v* tag: the Linux build, a .deb and a .flatpak, the Windows installer and zip, the Android .apk,
+# Every v* tag: the Linux build, a .deb and a .flatpak, the Windows installer and zip, the Android .apk (and the .aab for Google Play),
 # the macOS .dmg/.zip and an unsigned iOS .ipa, attached to the GitHub release,
 # and the app added to our Flatpak repository on GitHub Pages (packaging/flatpak/publish-repo.sh).
 # Run by hand to just build them (artifacts of the run), or to also publish to the Flatpak repository.
@@ -130,32 +130,45 @@ jobs:
           distribution: temurin
           java-version: "17"
       - run: pip install "flet[all]==1.1.2"
-      - name: flet build apk
+      - name: flet build apk (GitHub) and aab (Google Play)
         # Signed with the project's own key (secrets ANDROID_KEYSTORE_B64 and ANDROID_KEYSTORE_PASSWORD), so each
-        # release installs over the previous one; without the secrets a throwaway key is used.
+        # release installs over the previous one; without the secrets a throwaway key is used, and no .aab is
+        # made (Google Play needs the same upload key every time).
+        # The build number (Android's versionCode) grows with the version: 0.1.28 -> 1028; Google Play
+        # refuses an upload whose number is not higher than the last one.
         # The Python-for-Android download now and then breaks off: one more try before giving up.
         env:
           KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
+          V=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          BUILD=$(python -c "a,b,c=map(int,'$V'.split('.')); print(a*1000000+b*1000+c)")
           SIGN=()
           if [ -n "$KEYSTORE_B64" ]; then
             echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/release.jks"
             SIGN=(--android-signing-key-store "$RUNNER_TEMP/release.jks" --android-signing-key-alias aprs-kiss
                   --android-signing-key-store-password "$KEYSTORE_PASSWORD" --android-signing-key-password "$KEYSTORE_PASSWORD")
           else
-            echo "::warning::No Android signing key in the secrets: the .apk is signed with a throwaway key"
+            echo "::warning::No Android signing key in the secrets: the .apk is signed with a throwaway key, no .aab"
           fi
-          flet build apk --yes --no-rich-output --skip-flutter-doctor "${SIGN[@]}" || {
-            echo "Retrying the Android build"; sleep 30
-            flet build apk --yes --no-rich-output --skip-flutter-doctor "${SIGN[@]}"; }
-      - name: Rename
-        run: |
-          V=$(python -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
-          ls -la build/apk
+          build() {
+            flet build "$1" --yes --no-rich-output --skip-flutter-doctor --build-number "$BUILD" "${SIGN[@]}" || {
+              echo "Retrying the Android build"; sleep 30
+              flet build "$1" --yes --no-rich-output --skip-flutter-doctor --build-number "$BUILD" "${SIGN[@]}"; }
+          }
           mkdir -p dist
-          APK=$(ls build/apk/*.apk | head -1)
-          cp "$APK" "dist/aprs-kiss-$V-android.apk"
+          build apk
+          ls -la build/apk
+          cp "$(ls build/apk/*.apk | head -1)" "dist/aprs-kiss-$V-android.apk"
+          if [ -n "$KEYSTORE_B64" ]; then
+            # The Google Play build: no new-version check, Google Play updates it (aprs_kiss_app/distribution.py)
+            sed -i 's/^CHANNEL = "github"$/CHANNEL = "play"/' src/aprs_kiss_app/distribution.py
+            grep -q '^CHANNEL = "play"$' src/aprs_kiss_app/distribution.py
+            build aab
+            ls -la build/aab
+            cp "$(ls build/aab/*.aab | head -1)" "dist/aprs-kiss-$V-google-play.aab"
+            git checkout src/aprs_kiss_app/distribution.py
+          fi
       - uses: actions/upload-artifact@v4
         with:
           name: android
@@ -253,6 +266,7 @@ jobs:
             out/windows/*.exe
             out/windows/*.zip
             out/android/*.apk
+            out/android/*.aab
             out/macos/*.dmg
             out/macos/*.zip
             out/ios/*.ipa

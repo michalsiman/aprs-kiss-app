@@ -248,6 +248,8 @@ tests/              unit tests, engine tests against fake_tnc.py and fake_vara.p
 - The core modules are the same as in the Home Assistant integration (`hub.py` there,
   `engine.py` here). The plan is to publish the core as one package both use.
 
+Privacy: the app collects nothing; see the [privacy policy](https://michalsiman.github.io/aprs-kiss-app/privacy.html).
+
 ## Platforms
 
 | | Linux | Windows | macOS | Android | iOS |

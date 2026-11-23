@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.29 – 2026-11-23
+
+- **A warning at the first start**, to be accepted before the app can be used: the app makes a radio
+  transmit, transmitting needs an amateur radio licence, wrong use can interfere with other services
+  (also emergency ones) and put people at risk, you are responsible for what you transmit. Shown once.
+  The checks inside the app (the Transmit switch, the licence sentence for APRS-IS…) stay as they were.
+- **Ready for Google Play** (not published yet): each release also has a signed `.aab` for Google Play
+  (once the signing key is in the GitHub secrets), without the app's own update check, which Google
+  Play does not allow; growing build numbers, Android 16 as the target, a privacy policy page and the
+  store texts and pictures in `packaging/play`.
+- Serbian texts added in the last versions are in Cyrillic like the rest.
+
 ## 0.1.28 – 2026-11-23
 
 - **New versions on phones too**: the check once a day now works on Android and iOS (it could not
