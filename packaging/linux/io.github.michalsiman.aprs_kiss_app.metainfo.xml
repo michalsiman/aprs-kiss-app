@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.41" date="2026-11-23">
+      <description>
+        <p>APRS-IS keeps working after the settings are saved; overlapping station markers are spread out; a tidier map menu.</p>
+      </description>
+    </release>
     <release version="0.1.40" date="2026-11-23">
       <description>
         <p>A tracker with SmartBeaconing; APRS-IS can be switched on again (the licence sentence showed no field); no false "no internet" after the background.</p>

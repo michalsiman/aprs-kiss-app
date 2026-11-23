@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.41 – 2026-11-23
+
+- **Fix: APRS-IS went quiet after saving the settings** (e.g. a new SSID or symbol): the app logged in
+  again without the area around your position, and the server sends nothing without one; only a restart
+  helped. The GPS position now carries over and the area is always set by the first fix. The stations
+  heard also stay on the map after saving.
+- **Overlapping markers spread out**: stations at the same or nearly the same place (a digipeater and
+  an iGate on one mast) are laid out in a small circle, each with a thin line to where it really is; your
+  own station stays in place. Zooming in they return to their places.
+- **Map menu**: long names (Online map / OpenStreetMap) on two lines, so they stay inside the menu.
+
 ## 0.1.40 – 2026-11-23
 
 - **Tracker**: the position button in the top bar now opens a menu: send the position now, or start the
