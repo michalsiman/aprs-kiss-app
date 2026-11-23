@@ -25,6 +25,7 @@ TEXTS = {
     "beacon_now": "Pošalji poziciju sada", "position_sent": "Pozicija poslana",
     "tnc_section": "Veza s TNC-om", "connection": "Veza", "conn_tcp": "KISS preko TCP-a (mreža)",
     "conn_serial": "Serijski port (USB)", "conn_usb": "TNC na USB-u (OTG kabel)", "host": "Adresa", "port": "Port", "device": "Serijski port",
+    "call_required": "Upiši svoj pozivni znak i spremi: bez njega aplikacija ne može raditi.",
     "lang_title": "Jezik", "lang_detected": "Uređaj koristi: {name}. Prati uređaj ili odaberi jezik:", "lang_later": "Može se kasnije promijeniti u Postavke › Aplikacija.", "sounds": "Zvukovi", "sound_test": "Reproduciraj", "sound_tx": "Zvučni signal pri odašiljanju", "sound_messages": "Zvuk za novu APRS poruku", "sound_chat": "Zvuk za novu poruku u packet chatu", "sound_tak": "Zvuk za novu TAK GeoChat poruku",
     "tak_appeared": "{call} se pojavio na karti", "tak_moved": "{call} se pomaknuo za {far}",
     "term_new": "Nova stanica…",

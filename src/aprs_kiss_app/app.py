@@ -61,6 +61,7 @@ class App:
         self._closing = False
         self.update_state = updates.UpdateState()
         self._desktop_dark: bool | None = None
+        self._building = False
         self.compact = False  # a phone: a menu sliding in from the side instead of the rail, a slimmer top bar
 
     # ─── start and stop ───────────────────────────────────────────────────
@@ -409,7 +410,11 @@ class App:
                 expand=True,
             )
         )
-        self.select(key)
+        self._building = True
+        try:
+            self.select(key)
+        finally:
+            self._building = False
 
     @property
     def current_key(self) -> str:
@@ -425,6 +430,12 @@ class App:
         return any(v.key == key for v in self.views)
 
     def select(self, key: str) -> None:
+        if key != "settings" and not self.engine.config.configured and self.has_view("settings"):
+            # no callsign saved yet: nothing else can work, so Settings stays, with the callsign field
+            key = "settings"
+            if not self._building:  # a tap in the menu, not the screen being put together
+                self.toast(self.t("call_required"), error=True)
+                self.page.run_task(self.view("settings").require_call)
         index = next(i for i, v in enumerate(self.views) if v.key == key)
         self.current = index
         self.rail.selected_index = index

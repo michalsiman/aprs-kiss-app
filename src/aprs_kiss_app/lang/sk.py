@@ -25,6 +25,7 @@ TEXTS = {
     "beacon_now": "Poslať polohu teraz", "position_sent": "Poloha odoslaná",
     "tnc_section": "Pripojenie k TNC", "connection": "Pripojenie", "conn_tcp": "KISS cez TCP (sieť)",
     "conn_serial": "Sériový port (USB)", "conn_usb": "TNC na USB (OTG kábel)", "host": "Adresa", "port": "Port", "device": "Sériový port",
+    "call_required": "Vyplň svoju volaciu značku a ulož: bez nej aplikácia nemôže fungovať.",
     "lang_title": "Jazyk", "lang_detected": "Zariadenie používa: {name}. Nechaj jazyk podľa zariadenia alebo si vyber iný:", "lang_later": "Zmeniť ho môžeš neskôr v Nastaveniach › Aplikácia.", "sounds": "Zvuky", "sound_test": "Prehrať", "sound_tx": "Pípnuť pri vysielaní", "sound_messages": "Zvuk pri novej APRS správe", "sound_chat": "Zvuk pri novej správe v packet chate", "sound_tak": "Zvuk pri novej správe v TAK GeoChate",
     "tak_appeared": "{call} sa objavil na mape", "tak_moved": "{call} sa posunul o {far}",
     "term_new": "Nová stanica…",

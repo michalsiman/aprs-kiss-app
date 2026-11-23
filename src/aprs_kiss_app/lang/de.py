@@ -25,6 +25,7 @@ TEXTS = {
     "beacon_now": "Position jetzt senden", "position_sent": "Position gesendet",
     "tnc_section": "TNC-Verbindung", "connection": "Verbindung", "conn_tcp": "KISS über TCP (Netzwerk)",
     "conn_serial": "Serielle Schnittstelle (USB)", "conn_usb": "TNC über USB (OTG-Kabel)", "host": "Adresse", "port": "Port", "device": "Serielle Schnittstelle",
+    "call_required": "Rufzeichen eintragen und speichern: ohne es funktioniert die App nicht.",
     "lang_title": "Sprache", "lang_detected": "Dein Gerät verwendet: {name}. Dem Gerät folgen oder eine Sprache wählen:", "lang_later": "Später änderbar unter Einstellungen › App.", "sounds": "Töne", "sound_test": "Abspielen", "sound_tx": "Piepton beim Senden", "sound_messages": "Ton bei neuer APRS-Nachricht", "sound_chat": "Ton bei neuer Packet-Chat-Nachricht", "sound_tak": "Ton bei neuer TAK-GeoChat-Nachricht",
     "tak_appeared": "{call} ist auf der Karte erschienen", "tak_moved": "{call} hat sich um {far} bewegt",
     "term_new": "Neue Station…",

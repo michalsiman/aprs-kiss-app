@@ -25,6 +25,7 @@ TEXTS = {
     "beacon_now": "Send position nu", "position_sent": "Position sendt",
     "tnc_section": "TNC-forbindelse", "connection": "Forbindelse", "conn_tcp": "KISS over TCP (netværk)",
     "conn_serial": "Seriel port (USB)", "conn_usb": "TNC på USB (OTG-kabel)", "host": "Adresse", "port": "Port", "device": "Seriel port",
+    "call_required": "Udfyld dit kaldesignal og gem: uden det kan appen ikke fungere.",
     "lang_title": "Sprog", "lang_detected": "Din enhed bruger: {name}. Følg enheden, eller vælg et sprog:", "lang_later": "Kan ændres senere under Indstillinger › App.", "sounds": "Lyde", "sound_test": "Afspil", "sound_tx": "Bip når radioen sender", "sound_messages": "Lyd ved ny APRS-besked", "sound_chat": "Lyd ved ny packet-chatbesked", "sound_tak": "Lyd ved ny TAK GeoChat-besked",
     "tak_appeared": "{call} dukkede op på kortet", "tak_moved": "{call} flyttede sig {far}",
     "term_new": "Ny station…",

@@ -34,6 +34,7 @@ TEXTS: dict[str, dict[str, str]] = {
         # settings
         "tnc_section": "TNC connection", "connection": "Connection", "conn_tcp": "KISS over TCP (network)",
         "conn_serial": "Serial port (USB)", "conn_usb": "TNC on USB (OTG cable)", "host": "Host", "port": "Port", "device": "Serial port",
+        "call_required": "Fill in your callsign and save: without it the app cannot work.",
         "lang_title": "Language", "lang_detected": "Your device uses: {name}. Keep following the device, or pick a language:", "lang_later": "It can be changed later in Settings › App.", "sounds": "Sounds", "sound_test": "Play them", "sound_tx": "Beep when the radio transmits", "sound_messages": "Sound for a new APRS message", "sound_chat": "Sound for a new packet chat message", "sound_tak": "Sound for a new TAK GeoChat message",
         "tak_appeared": "{call} appeared on the map", "tak_moved": "{call} moved {far}",
         "term_new": "New station…",
@@ -132,6 +133,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "beacon_now": "Poslat polohu teď", "position_sent": "Poloha odeslána",
         "tnc_section": "Připojení k TNC", "connection": "Připojení", "conn_tcp": "KISS přes TCP (síť)",
         "conn_serial": "Sériový port (USB)", "conn_usb": "TNC na USB (OTG kabel)", "host": "Adresa", "port": "Port", "device": "Sériový port",
+        "call_required": "Vyplň svou volací značku a ulož: bez ní aplikace nemůže fungovat.",
         "lang_title": "Jazyk", "lang_detected": "Zařízení používá: {name}. Nech jazyk podle zařízení, nebo si vyber jiný:", "lang_later": "Změnit ho jde později v Nastavení › Aplikace.", "sounds": "Zvuky", "sound_test": "Přehrát", "sound_tx": "Pípnout při vysílání", "sound_messages": "Zvuk při nové APRS zprávě", "sound_chat": "Zvuk při nové zprávě v packet chatu", "sound_tak": "Zvuk při nové zprávě v TAK GeoChatu",
         "tak_appeared": "{call} se objevil na mapě", "tak_moved": "{call} se posunul o {far}",
         "term_new": "Nová stanice…",

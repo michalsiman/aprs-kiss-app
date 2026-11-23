@@ -26,6 +26,7 @@ TEXTS = {
     "beacon_now": "Wyślij pozycję teraz", "position_sent": "Pozycja wysłana",
     "tnc_section": "Połączenie z TNC", "connection": "Połączenie", "conn_tcp": "KISS przez TCP (sieć)",
     "conn_serial": "Port szeregowy (USB)", "conn_usb": "TNC przez USB (kabel OTG)", "host": "Adres", "port": "Port", "device": "Port szeregowy",
+    "call_required": "Wpisz swój znak wywoławczy i zapisz: bez niego aplikacja nie działa.",
     "lang_title": "Język", "lang_detected": "Urządzenie używa: {name}. Zostaw język urządzenia albo wybierz inny:", "lang_later": "Można go później zmienić w Ustawienia › Aplikacja.", "sounds": "Dźwięki", "sound_test": "Odtwórz", "sound_tx": "Sygnał przy nadawaniu", "sound_messages": "Dźwięk przy nowej wiadomości APRS", "sound_chat": "Dźwięk przy nowej wiadomości czatu packet", "sound_tak": "Dźwięk przy nowej wiadomości TAK GeoChat",
     "tak_appeared": "{call} pojawił się na mapie", "tak_moved": "{call} przesunął się o {far}",
     "term_new": "Nowa stacja…",

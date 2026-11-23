@@ -124,7 +124,8 @@ class SettingsView(View):
 
         # Station
         self.call = ft.TextField(label=t("callsign"), value=call, width=160,
-                                 capitalization=ft.TextCapitalization.CHARACTERS)
+                                 capitalization=ft.TextCapitalization.CHARACTERS,
+                                 autofocus=not c.configured, on_change=lambda _e: self._mark_call())
         self.ssid = ft.Dropdown(label=t("ssid"), value=ssid or "0", width=330,
                                 options=[ft.DropdownOption(key=str(i), text=label)
                                          for i, label in enumerate(ssid_labels(t.language))])
@@ -217,7 +218,7 @@ class SettingsView(View):
             [
                 self.intro,
                 _section(t("tnc_section"), ft.Icons.CABLE, self.connection, self.tcp_row, self.serial_row, self.txdelay, expanded=first),
-                _section(t("station"), ft.Icons.PERSON_PIN_CIRCLE, ft.Row([self.call, self.ssid], wrap=True), self.symbol,
+                station := _section(t("station"), ft.Icons.PERSON_PIN_CIRCLE, ft.Row([self.call, self.ssid], wrap=True), self.symbol,
                          ft.Row([self.comment]), self.path,
                          ft.Row([self.lat, self.lon], wrap=True), self.gps_now,
                          ft.Text(t("position_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
@@ -251,7 +252,31 @@ class SettingsView(View):
             spacing=8,
         )
         _compact(form)
+        self.station_tile = station.content
+        self._mark_call()
         return form
+
+    def _mark_call(self) -> None:
+        """Without a callsign nothing works: the field is framed red until there is one (and it is saved)."""
+        missing = not (self.call.value or "").strip() or not self.engine.config.configured
+        empty = not (self.call.value or "").strip()
+        self.call.border_color = ft.Colors.ERROR if missing else None
+        self.call.focused_border_color = ft.Colors.ERROR if missing else None
+        self.call.error = "!" if empty else None  # short: the field is narrow, the message says the rest
+        try:
+            self.call.update()
+        except RuntimeError:  # not on the screen yet: drawn with the rest
+            pass
+
+    async def require_call(self) -> None:
+        """Someone wants to leave Settings with no callsign saved: back to its field."""
+        self.station_tile.expanded = True
+        self._mark_call()
+        self.app.page.update()
+        try:
+            await self.call.focus()
+        except RuntimeError:
+            pass
 
     async def _test_sounds(self, _e) -> None:
         """Each sound once, so they can be heard before choosing."""
@@ -416,6 +441,10 @@ class SettingsView(View):
             self.error.value = f"{self.t('invalid')}: {err}"
             return
         self.error.value = ""
+        if not call:  # the one thing that is needed
+            self.error.value = self.t("call_required")
+            await self.require_call()
+            return
         if data["gps_source"] == "usb" and not data["gps_device"]:
             self.error.value = f"{self.t('invalid')}: {self.t('gps_device')}"
             return
@@ -429,4 +458,5 @@ class SettingsView(View):
             self.error.value = f"{self.t('invalid')}: {err}"
             return
         await self.app.apply_config(conf)
+        self._mark_call()
         await asyncio.sleep(0)

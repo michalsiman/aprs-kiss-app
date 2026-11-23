@@ -26,6 +26,7 @@ TEXTS = {
     "beacon_now": "Invia la posizione ora", "position_sent": "Posizione inviata",
     "tnc_section": "Connessione al TNC", "connection": "Connessione", "conn_tcp": "KISS su TCP (rete)",
     "conn_serial": "Porta seriale (USB)", "conn_usb": "TNC su USB (cavo OTG)", "host": "Indirizzo", "port": "Porta", "device": "Porta seriale",
+    "call_required": "Inserisci il tuo nominativo e salva: senza l'app non può funzionare.",
     "lang_title": "Lingua", "lang_detected": "Il dispositivo usa: {name}. Seguire il dispositivo o scegliere una lingua:", "lang_later": "Si può cambiare in seguito in Impostazioni › App.", "sounds": "Suoni", "sound_test": "Riproduci", "sound_tx": "Bip quando la radio trasmette", "sound_messages": "Suono per un nuovo messaggio APRS", "sound_chat": "Suono per un nuovo messaggio della chat packet", "sound_tak": "Suono per un nuovo messaggio TAK GeoChat",
     "tak_appeared": "{call} è comparso sulla mappa", "tak_moved": "{call} si è spostato di {far}",
     "term_new": "Nuova stazione…",
