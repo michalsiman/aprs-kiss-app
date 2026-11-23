@@ -543,7 +543,8 @@ class SettingsView(View):
         update_settings(folder, values)
         write_text(folder, "welcome.txt", self.bbs_welcome.value or "")
 
-    async def _save(self, _e) -> None:
+    def _form(self) -> tuple[str, dict]:
+        """(the callsign typed, the settings as the form shows them)."""
         old = self.engine.config
         call = (self.call.value or "").strip().upper()
         ssid = self.ssid.value or "0"
@@ -577,6 +578,26 @@ class SettingsView(View):
             "run_background": bool(self.run_bg.value), "keep_screen_on": self.keep_screen.value or "never",
             "theme": self.theme.value or "auto",
         }
+        return call, data
+
+    def discard(self) -> None:
+        """Forget what was typed: the form is built again from the saved settings next time."""
+        self._control = None
+
+    def dirty(self) -> bool:
+        """Something changed in the form and not saved yet."""
+        if not self.built:
+            return False
+        _call, data = self._form()
+        try:
+            return Config.from_dict(data).to_dict() != self.engine.config.to_dict()
+        except (ValueError, TypeError):
+            return True  # something typed that cannot even be read: certainly a change
+
+    async def _save(self, _e) -> bool:
+        """Check and apply the form; True when it was saved."""
+        old = self.engine.config
+        call, data = self._form()
         try:
             for key in ("latitude", "longitude"):
                 if data[key]:
@@ -593,25 +614,26 @@ class SettingsView(View):
             conf = Config.from_dict(data).validate()
         except ValueError as err:
             self.error.value = f"{self.t('invalid')}: {err}"
-            return
+            return False
         self.error.value = ""
         if not call:  # the one thing that is needed
             self.error.value = self.t("call_required")
             await self.require_call()
-            return
+            return False
         if data["gps_source"] == "usb" and not data["gps_device"]:
             self.error.value = f"{self.t('invalid')}: {self.t('gps_device')}"
-            return
+            return False
         if (data["gps_source"] == "usb" and data["connection"] == "serial"
                 and data["gps_device"] == data["device"]):
             self.error.value = f"{self.t('invalid')}: {self.t('gps_same_port')}"
-            return
+            return False
         try:
             await asyncio.to_thread(self._save_bbs)
         except (BbsConfigError, OSError, ValueError) as err:
             self.error.value = f"{self.t('invalid')}: {err}"
-            return
+            return False
         await self.app.apply_config(conf)
         self._mark_call()
         self._aprsis_changed()  # the licence sentence, once typed, goes away
         await asyncio.sleep(0)
+        return True

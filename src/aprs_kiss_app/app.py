@@ -58,6 +58,7 @@ class App:
         self.engine: Engine | None = None
         self.views: list[View] = []
         self.current = 0
+        self._history: list[str] = []  # the screens shown before, for the back gesture
         self._flush_pending = False
         self._closing = False
         self.update_state = updates.UpdateState()
@@ -317,16 +318,95 @@ class App:
             self.build()
 
     async def _open_menu(self, _e=None) -> None:
+        self._drawer_open = True
+        self._update_back()
         await self.page.show_drawer()
 
-    async def _menu_about(self, _e=None) -> None:
+    async def _close_menu(self) -> None:
+        self._drawer_open = False
+        self._update_back()
         await self.page.close_drawer()
+
+    def _menu_dismissed(self, _e=None) -> None:
+        self._drawer_open = False
+        self._update_back()
+        self.page.update()
+
+    async def _menu_about(self, _e=None) -> None:
+        await self._close_menu()
         show_about(self)
 
     async def _menu_selected(self, e) -> None:
         """A screen picked in the phone's menu: the menu slides away and the screen opens."""
-        await self.page.close_drawer()
+        await self._close_menu()
         self.select(self.views[e.control.selected_index].key)
+
+    # ─── Android's back gesture ───────────────────────────────────────────
+    # It closes the menu when it is open, else goes back to the screen shown before (like a browser),
+    # and only from the first one leaves the app. Settings with unsaved changes ask first.
+
+    _drawer_open = False
+    MAX_HISTORY = 30
+
+    def _update_back(self) -> None:
+        """Let the system handle the gesture (leave the app) only when there is nothing to go back to."""
+        view = self.page.views[0] if self.page.views else None
+        if view is None:
+            return
+        can = not (self._drawer_open or self._history or self.current_key == "settings")
+        if view.can_pop != can or view.on_confirm_pop is None:
+            view.can_pop = can
+            view.on_confirm_pop = self._back
+
+    async def _back(self, e) -> None:
+        view = e.control
+        await view.confirm_pop(False)  # the app decides: never let the view itself go
+        if self._drawer_open:
+            await self._close_menu()
+            return
+        while self._history and not self.has_view(self._history[-1]):
+            self._history.pop()  # a screen of another mode (BBS, TAK) that is gone
+        target = self._history[-1] if self._history else None
+        if target is None and self.current_key == "settings" and self.has_view("settings") \
+                and self.view("settings").dirty():
+            target = "map" if self.has_view("map") and self.engine.config.configured else None
+        if target is None:
+            self._leave_app()
+            return
+        self.select(target, back=True)
+
+    def _leave_app(self) -> None:
+        """Nothing to go back to: to the background, as Android's own back does (receiving goes on)."""
+        try:
+            from aprs_kiss_core import android_usb  # noqa: PLC0415
+            if android_usb.available():
+                android_usb._activity().moveTaskToBack(True)
+                return
+        except Exception:  # noqa: BLE001 - not Android, or the call failed
+            _LOGGER.debug("moveTaskToBack failed", exc_info=True)
+
+    def _ask_unsaved(self, then: str, back: bool) -> None:
+        """Leaving Settings with changes not saved: save them, or throw them away."""
+        settings = self.view("settings")
+
+        async def save(_e) -> None:
+            self.page.pop_dialog()
+            if await settings._save(None):
+                self.select(then, back=back, force=True)
+            else:
+                self.page.update()  # the form shows what is wrong
+
+        def discard(_e) -> None:
+            self.page.pop_dialog()
+            settings.discard()
+            self.select(then, back=back, force=True)
+
+        self.show_dialog(ft.AlertDialog(
+            title=ft.Text(self.t("unsaved_title")),
+            content=ft.Text(self.t("unsaved_text")),
+            actions=[ft.TextButton(self.t("unsaved_discard"), on_click=discard),
+                     ft.FilledButton(self.t("save"), icon=ft.Icons.SAVE, on_click=save)],
+        ))
 
     def build(self) -> None:
         self.t = Translator(self.engine.config.language)
@@ -357,7 +437,7 @@ class App:
             + [ft.NavigationDrawerDestination(icon=ft.Icon(v.icon), selected_icon=v.selected_icon, label=self.t(v.key))
                for v in self.views]
             + [ft.Divider(), self.about_item],
-            on_change=self._menu_selected,
+            on_change=self._menu_selected, on_dismiss=self._menu_dismissed,
         )
         self.page.drawer = self.drawer if self.compact else None
         self.menu_btn = ft.IconButton(ft.Icons.MENU, tooltip=self.t("menu"), on_click=self._open_menu,
@@ -463,7 +543,17 @@ class App:
         """In BBS SERVER mode only some of the views exist."""
         return any(v.key == key for v in self.views)
 
-    def select(self, key: str) -> None:
+    def select(self, key: str, back: bool = False, force: bool = False) -> None:
+        current = self.current_key if self.views and getattr(self, "current", None) is not None else None
+        if (not force and not self._building and current == "settings" and key != "settings"
+                and self.engine.config.configured and self.view("settings").dirty()):
+            self._ask_unsaved(key, back)
+            return
+        if back:
+            if self._history and self._history[-1] == key:
+                self._history.pop()
+        elif current and current != key and not self._building:
+            self._history = [k for k in self._history if k != current][-self.MAX_HISTORY:] + [current]
         if key != "settings" and not self.engine.config.configured and self.has_view("settings"):
             # no callsign saved yet: nothing else can work, so Settings stays, with the callsign field
             key = "settings"
@@ -480,6 +570,7 @@ class App:
             holder.visible = i == index or (self.views[i].keep_alive and holder.content is not None)
         self.views[index].shown()
         self._update_status()
+        self._update_back()
         self.page.update()
 
     # ─── engine events ────────────────────────────────────────────────────
