@@ -18,6 +18,7 @@ CLOSE_Y = 48  # …and this one above the other cover each other's label
 RINGS = (54, 78, 104, 132, 160)  # pixels: the circles tried around a station's own place
 DIRECTIONS = 12
 MAX_SHIFT = RINGS[-1]
+MIN_ZOOM = 9.0  # further out (a whole region) the markers stay where they are: spreading would be a web of lines
 
 
 def to_px(lat: float, lon: float, zoom: float) -> tuple[float, float]:
@@ -53,6 +54,8 @@ def spread(points: list[tuple[float, float]], zoom: float, fixed: int | None = N
 
     fixed: a point placed first and never moved (our own station)."""
     shown = list(points)
+    if zoom < MIN_ZOOM:
+        return shown
     grid: dict[tuple[int, int], list[tuple[float, float]]] = {}
 
     def free(x: float, y: float) -> bool:

@@ -308,13 +308,16 @@ class MapView(View):
                 call, _lat, _lon, icon, color, bold = key[:6]
                 click = None if len(key) > 6 else (lambda _e, c=call: self.app.show_station(c))
                 marker = self._marker(slat, slon, call, icon, color, on_click=click, bold=bold)
+            if ckey in cache:
+                continue  # the same station twice (cannot happen, but one marker twice breaks the map)
             cache[ckey] = marker
             markers.append(marker)
             if moved:  # a thin line to where the station really is, and a dot there
                 leaders.append(("leader", ((round(slat, 7), round(slon, 7)), (key[1], key[2]))))
                 dkey = ("dot", key[1], key[2])
-                cache[dkey] = self._cache.get(dkey) or self._dot(key[1], key[2])
-                dots.append(cache[dkey])
+                if dkey not in cache:  # two stations at one place share one dot: never one marker twice
+                    cache[dkey] = self._cache.get(dkey) or self._dot(key[1], key[2])
+                    dots.append(cache[dkey])
         markers = dots + markers  # the dots under the markers
         self._cache = cache
         if [id(m) for m in markers] != [id(m) for m in self.markers.markers]:
@@ -325,14 +328,14 @@ class MapView(View):
         """A thin red line joining where the station was (the marker shows where it is now); unchanged ones
         are not sent again."""
         cache, lines = {}, []
-        for key in sorted(trails):
+        for key in sorted(set(trails)):  # one line object only once
             line = self._trail_cache.get(key)
             if line is None:
                 kind, points = key
                 leader = kind == "leader"
                 line = fm.PolylineMarker(coordinates=[fm.MapLatitudeLongitude(lat, lon) for lat, lon in points],
                                          color=LEADER_COLOR if leader else TRAIL_COLOR,
-                                         stroke_width=1.6 if leader else 2)
+                                         stroke_width=1.5 if leader else 2.5)
             cache[key] = line
             lines.append(line)
         self._trail_cache = cache
