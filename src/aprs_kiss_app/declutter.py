@@ -14,8 +14,8 @@ import math
 
 TILE = 256
 CLOSE_X = 66  # pixels: markers nearer than this side by side…
-CLOSE_Y = 40  # …and this one above the other cover each other's label
-RINGS = (48, 74, 100, 128)  # pixels: the circles tried around a station's own place
+CLOSE_Y = 48  # …and this one above the other cover each other's label
+RINGS = (54, 78, 104, 132)  # pixels: the circles tried around a station's own place
 DIRECTIONS = 8
 MAX_SHIFT = RINGS[-1]
 

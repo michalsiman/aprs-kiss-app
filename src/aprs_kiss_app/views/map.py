@@ -225,18 +225,30 @@ class MapView(View):
     def _marker(self, lat: float, lon: float, label: str, icon: str, color, on_click=None, bold=False) -> fm.Marker:
         return fm.Marker(
             coordinates=fm.MapLatitudeLongitude(lat, lon),
-            width=110, height=50,
+            width=110, height=56,
             content=ft.Container(
                 ft.Column(
                     [
-                        ft.Text(icon, size=20),
+                        # the symbol on a small light disc: it no longer melts into a green or brown map
+                        ft.Container(ft.Text(icon, size=18), width=30, height=30, alignment=ft.Alignment.CENTER,
+                                     border_radius=15, bgcolor=ft.Colors.with_opacity(0.88, ft.Colors.WHITE),
+                                     border=ft.Border.all(0.8, ft.Colors.with_opacity(0.18, ft.Colors.BLACK)),
+                                     shadow=ft.BoxShadow(blur_radius=3, offset=ft.Offset(0, 1),
+                                                         color=ft.Colors.with_opacity(0.25, ft.Colors.BLACK))),
                         map_label(label, color, bold),
                     ],
-                    spacing=0, tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    spacing=1, tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 ),
                 on_click=on_click,
             ),
         )
+
+    @staticmethod
+    def _dot(lat: float, lon: float) -> fm.Marker:
+        """Where a moved marker's station really is: a small grey dot at the end of its line."""
+        return fm.Marker(coordinates=fm.MapLatitudeLongitude(lat, lon), width=10, height=10,
+                         content=ft.Container(width=10, height=10, border_radius=5, bgcolor=LEADER_COLOR,
+                                              border=ft.Border.all(1.5, ft.Colors.WHITE)))
 
     def refresh(self) -> None:
         self._centre_on_first_fix()
@@ -283,7 +295,7 @@ class MapView(View):
         self._layout_zoom = self._zoom
         me = len(wanted) - 1 if here else None  # our own station stays where it is
         shown = spread([(k[1], k[2]) for k in wanted], self._zoom, fixed=me)
-        cache, markers, leaders = {}, [], []
+        cache, markers, leaders, dots = {}, [], [], []
         for key, (slat, slon) in zip(wanted, shown):
             moved = (slat, slon) != (key[1], key[2])
             ckey = (key, round(slat, 7), round(slon, 7))
@@ -294,8 +306,12 @@ class MapView(View):
                 marker = self._marker(slat, slon, call, icon, color, on_click=click, bold=bold)
             cache[ckey] = marker
             markers.append(marker)
-            if moved:  # a thin line to where the station really is
+            if moved:  # a thin line to where the station really is, and a dot there
                 leaders.append(("leader", ((round(slat, 7), round(slon, 7)), (key[1], key[2]))))
+                dkey = ("dot", key[1], key[2])
+                cache[dkey] = self._cache.get(dkey) or self._dot(key[1], key[2])
+                dots.append(cache[dkey])
+        markers = dots + markers  # the dots under the markers
         self._cache = cache
         if [id(m) for m in markers] != [id(m) for m in self.markers.markers]:
             self.markers.markers = markers
