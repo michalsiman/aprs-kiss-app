@@ -1,9 +1,13 @@
 """The Android USB serial driver, against stand-ins for Android's USB host classes."""
 
+import pathlib
 import struct
+import sys
 import unittest
 
-from aprs_kiss_core import android_usb as au
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "src"))
+
+from aprs_kiss_core import android_usb as au  # noqa: E402
 
 
 class Endpoint:
