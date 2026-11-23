@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.43" date="2026-11-23">
+      <description>
+        <p>Measure distances on the map; station symbols on a light disc; a dot where a moved marker's station is.</p>
+      </description>
+    </release>
     <release version="0.1.42" date="2026-11-23">
       <description>
         <p>Android back gesture goes back through the screens; Settings ask about unsaved changes; nicer station labels; markers no longer jump when zooming.</p>

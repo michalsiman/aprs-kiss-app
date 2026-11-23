@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.43 – 2026-11-23
+
+- **Measure a distance on the map**: long press › *Measure distance from here* and tap the other point (or
+  *Distance from my position*): a dashed line and the distance with the direction in degrees from north
+  (handy for pointing an antenna). Another tap moves the far end, ✕ ends it.
+- **Station symbols on a small light disc** with a soft shadow: they no longer melt into green forests or
+  brown hills.
+- **A grey dot** at the end of the line from a moved marker: where the station really is.
+
 ## 0.1.42 – 2026-11-23
 
 - **Android back gesture**: closes the open menu, otherwise goes back to the screen shown before (Settings
