@@ -220,6 +220,7 @@ class Engine:
         position typed in). Without it the server sends nothing but our own traffic."""
         radius = int(self.config.aprsis_radius_km or 0)
         here = self.my_position()
+        self._is_center = None  # not yet known: the first fix sets the area (a stale one would block that)
         if radius <= 0 or here is None:
             return ""
         self._is_center = here
@@ -242,10 +243,13 @@ class Engine:
     # ─── own position: typed in, or from a USB GPS module ────────────────
 
     def _build_gps(self) -> None:
+        old = getattr(self, "gps", None)
         self.gps, self.gps_error, self._gps_shown = None, "", None
         conf = self.config
         if conf.gps_source == "phone" and not self.bbs_mode:
             self.gps = PushedGps(self._on_gps_fix, self._on_update)  # the app pushes the phone's fixes
+            if isinstance(old, PushedGps):  # settings saved: where we are is still known (APRS-IS area, beacon)
+                self.gps.fix, self.gps.connected = old.fix, old.connected
             return
         if conf.gps_source != "usb" or self.bbs_mode:
             return
@@ -538,9 +542,11 @@ class Engine:
     async def reconfigure(self, config: Config) -> None:
         """Apply new settings: stop, rebuild, start again. History and the Transmit switch stay."""
         tx = self.station.tx_enabled and config.callsign == self.config.callsign
+        heard = self.station.heard
         await self.stop()
         self.config = config
         self._build(tx_enabled=tx)
+        self.station.heard = heard  # the stations heard stay on the map and in the list
         await self.start()
 
     async def save(self) -> None:

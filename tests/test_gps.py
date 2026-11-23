@@ -145,3 +145,39 @@ class EngineGpsTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ReconfigureTest(unittest.IsolatedAsyncioTestCase):
+    """Saving the settings with a new SSID (OK1SIM -> OK1SIM-7) rebuilds the engine: APRS-IS must keep
+    its area (the server sends nothing without one) and the map its stations."""
+
+    async def test_new_ssid_keeps_the_aprsis_area_and_the_heard_stations(self):
+        from unittest import mock
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        conf = dict(callsign="OK1SIM", gps_source="phone", aprsis_enabled=True, licence_confirmed=True,
+                    aprsis_radius_km=50)
+        eng = Engine(Config(**conf).validate(), pathlib.Path(tmp.name))
+        eng.gps.push(49.7477, 13.3776)
+        self.assertEqual(eng.aprsis.filter, "r/49.748/13.378/50")
+        eng.station.heard["OK0BR-10"] = {"call": "OK0BR-10", "count": 1, "last_heard": time.time()}
+        with mock.patch.object(Engine, "start", mock.AsyncMock()), mock.patch.object(Engine, "stop", mock.AsyncMock()):
+            await eng.reconfigure(Config(**{**conf, "callsign": "OK1SIM-7", "symbol": "/["}).validate())
+        self.assertEqual(str(eng.me), "OK1SIM-7")
+        self.assertEqual(eng.aprsis.filter, "r/49.748/13.378/50")  # the last fix carried over
+        self.assertIn("OK0BR-10", eng.station.heard)
+
+    async def test_area_set_by_the_first_fix_after_a_rebuild(self):
+        from unittest import mock
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        conf = dict(callsign="OK1SIM", gps_source="phone", aprsis_enabled=True, licence_confirmed=True,
+                    aprsis_radius_km=50)
+        eng = Engine(Config(**conf).validate(), pathlib.Path(tmp.name))
+        eng.gps.push(49.7477, 13.3776)
+        eng.gps.fix.time = 0  # the fix went stale before the settings were saved
+        with mock.patch.object(Engine, "start", mock.AsyncMock()), mock.patch.object(Engine, "stop", mock.AsyncMock()):
+            await eng.reconfigure(Config(**{**conf, "callsign": "OK1SIM-7"}).validate())
+        self.assertEqual(eng.aprsis.filter, "")
+        eng.gps.push(49.7478, 13.3777)  # the same place again: still the area must be set
+        self.assertEqual(eng.aprsis.filter, "r/49.748/13.378/50")
