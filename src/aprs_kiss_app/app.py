@@ -293,9 +293,13 @@ class App:
         bottom_bar = ft.Container(self.tabs, bgcolor=ft.Colors.SURFACE_CONTAINER,
                                   padding=ft.Padding.symmetric(horizontal=4, vertical=4))
         pad = 6 if self.compact else 12
+        # The map stays on screen under the other screens (they are opaque): hiding it would make
+        # Flutter throw it away and build it again, tiles and all, at every return to it.
         self.holders = [ft.Container(v.control if v.built else None, visible=False, expand=True,
-                                     padding=ft.Padding.all(pad))
+                                     padding=ft.Padding.all(pad), bgcolor=None if v.keep_alive else ft.Colors.SURFACE,
+                                     left=0, top=0, right=0, bottom=0)
                         for v in self.views]
+        stacked = sorted(range(len(self.views)), key=lambda i: not self.views[i].keep_alive)  # the map at the bottom
 
         self.callsign = ft.Text(weight=ft.FontWeight.BOLD, size=18)
         self.tnc_dot = ft.Icon(ft.Icons.CIRCLE, size=12)
@@ -343,7 +347,7 @@ class App:
             ft.SafeArea(
                 ft.Row(
                     ([] if self.compact else [self.rail, ft.VerticalDivider(width=1)])
-                    + [ft.Column([status, ft.Stack(self.holders, expand=True)]
+                    + [ft.Column([status, ft.Stack([self.holders[i] for i in stacked], expand=True)]
                                  + ([ft.Divider(height=1), bottom_bar] if self.compact else []),
                                  expand=True, spacing=0)],
                     expand=True,
@@ -377,7 +381,7 @@ class App:
         if self.holders[index].content is not self.views[index].control:
             self.holders[index].content = self.views[index].control  # built the first time it is shown
         for i, holder in enumerate(self.holders):
-            holder.visible = i == index
+            holder.visible = i == index or (self.views[i].keep_alive and holder.content is not None)
         self.views[index].shown()
         self._update_status()
         self.page.update()

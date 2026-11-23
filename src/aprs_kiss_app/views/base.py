@@ -25,6 +25,7 @@ class View:
     # Heavy screens (maps, long forms) are built the first time they are shown: switching modes or
     # starting the app then sends far less to the window. Their on_event only marks them stale.
     lazy = False
+    keep_alive = False  # stays under the other screens instead of being hidden (the map)
 
     def __init__(self, app: App) -> None:
         self.app = app

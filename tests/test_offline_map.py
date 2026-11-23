@@ -38,10 +38,39 @@ class OfflineMapTest(unittest.TestCase):
         self.assertEqual(offline_map.tier(5), 1)
         self.assertEqual(offline_map.tier(7), 2)
         self.assertEqual(offline_map.tier(9), 3)
-        layers = offline_map.OfflineLayers(3)
-        self.assertFalse(layers.zoomed(3.5))
-        self.assertTrue(layers.zoomed(8))
-        self.assertEqual(len(layers.cities.markers), all_)
+        layers = offline_map.OfflineLayers(49.7, 13.4, 3)  # the whole world
+        self.assertEqual(len(layers.cities.markers), counts[0])
+        self.assertFalse(layers.moved(20, -60, 3.2))
+        self.assertTrue(layers.moved(49.7, 13.4, 9))  # zoomed in: all cities, but only around Plzeň
+        self.assertLess(len(layers.cities.markers), all_ / 5)
+        names = {m.content.controls[1].value for m in layers.cities.markers}
+        self.assertIn("Prague", names)
+        self.assertNotIn("Madrid", names)
+
+    @unittest.skipIf(offline_map is None, "flet is not installed")
+    def test_region(self):
+        """Zoomed in, only a box around the middle goes to the screen, and much fewer points."""
+        d = offline_map.data()
+        everything = sum(map(len, d["borders"])) + sum(map(len, d["coast"]))
+        near = offline_map.Region.around(49.7, 13.4, 9)
+        self.assertTrue(near.contains(50.08, 14.43))  # Prague, ~90 km
+        self.assertFalse(near.contains(40.4, -3.7))  # Madrid
+        self.assertGreater(near.north - near.south, 5)  # at least ~300 km each way
+        points = sum(map(len, offline_map.clip(d["borders"] + d["coast"], near)))
+        self.assertLess(points, everything / 20)
+        self.assertTrue(near.covers(49.9, 13.6, 9.2))  # a short pan: nothing new
+        self.assertFalse(near.covers(49.7, 13.4, 11))  # zoomed: finer lines
+        self.assertFalse(near.covers(53.5, 13.4, 9))  # far away
+        world = offline_map.Region.around(49.7, 13.4, 3)
+        self.assertTrue(world.contains(-33.9, 151.2))
+        self.assertLess(sum(map(len, offline_map.clip(d["coast"], world))), sum(map(len, d["coast"])) / 2)
+
+    def test_clip_line_reaches_the_edge(self):
+        if offline_map is None:
+            self.skipTest("flet is not installed")
+        region = offline_map.Region(0, 10, 0, 10, 0.01, 5)
+        pieces = offline_map.clip([[[5, -5], [5, 5], [5, 15], [5, 25]]], region)
+        self.assertEqual(pieces, [[[5, -5], [5, 5], [5, 15]]])
 
 
 if __name__ == "__main__":

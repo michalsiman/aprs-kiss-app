@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.24 – 2026-11-23
+
+- **A much faster map, above all on phones**:
+  - the offline map sends only the area around what is on screen (at least ~300 km each way), thinned
+    out to what the zoom can show, instead of the whole world (hundreds to a few thousand points
+    instead of ~50,000); it is refilled when the map is moved far or zoomed;
+  - only the stations in that area are drawn (at most 150 on a phone), and a station that did not
+    change keeps its marker, so nothing is sent again for it;
+  - the map no longer reports every frame of a pan or zoom to the app; where it looks is asked for
+    after a gesture;
+  - switching to another screen and back no longer throws the map away and builds it again.
+
 ## 0.1.23 – 2026-11-23
 
 - **The phone's own GPS** (Settings › GPS: The phone's GPS): the map and the beacon use the phone's

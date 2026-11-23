@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.24" date="2026-11-23">
+      <description>
+        <p>A much faster map, above all on phones: only the area on screen is sent, unchanged stations are not sent again, and switching screens keeps the map.</p>
+      </description>
+    </release>
     <release version="0.1.23" date="2026-11-23">
       <description>
         <p>The phone's own GPS as your position. Map filters as icons, a smaller map credit, instant switching between the offline and the online map.</p>

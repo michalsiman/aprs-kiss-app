@@ -5,6 +5,7 @@ Switching it on takes a typed sentence and turns everything else off, like BBS S
 
 from __future__ import annotations
 
+import asyncio
 import time
 
 import flet as ft
@@ -54,11 +55,12 @@ class TakView(View):
         here = self.engine.my_position()
         self.markers = fm.MarkerLayer(markers=[])
         self._zoom = 12 if here else 7
-        self.base = BaseMap(self.markers, self._zoom)
+        self.base = BaseMap(self.markers, here or (49.8, 15.5), self._zoom)
+        self._camera_asked = 0.0
         self.map = fm.Map(
             expand=True, bgcolor=ft.Colors.SURFACE,
             initial_center=fm.MapLatitudeLongitude(*(here or (49.8, 15.5))), initial_zoom=self._zoom, min_zoom=MIN_ZOOM,
-            layers=self.base.layers(self.app.offline_map()), on_position_change=self._moved,
+            layers=self.base.layers(self.app.offline_map()), on_pointer_up=self._gesture_end,
         )
         self.offline_btn = toggle(ft.Icons.CLOUD_OFF_OUTLINED, ft.Icons.CLOUD_OFF, self.app.offline_map(),
                                   self.t("map_offline"), self._toggle_offline)
@@ -98,10 +100,20 @@ class TakView(View):
         self.app.save_config_soon()
         self.app.page.update()
 
-    def _moved(self, e) -> None:
-        zoom = getattr(getattr(e, "camera", None), "zoom", None)
-        if zoom is not None and self.base.zoomed(zoom, self.app.offline_map()):
-            self.base.offline.cities.update()
+    def _gesture_end(self, _e=None) -> None:
+        self.app.page.run_task(self._ask_camera, 0.8)
+
+    async def _ask_camera(self, delay: float = 0) -> None:
+        """Where the map looks (asked after a gesture, not sent for every frame): the offline map follows."""
+        await asyncio.sleep(delay)
+        self._camera_asked = time.monotonic()
+        try:
+            camera = await self.map.get_camera()
+        except Exception:  # noqa: BLE001 - the map is not on screen
+            return
+        lon = (camera.center.longitude + 180) % 360 - 180
+        if self.base.moved(camera.center.latitude, lon, camera.zoom, self.app.offline_map()):
+            self.app.page.update()
 
     def on_event(self, kind, data) -> None:
         if kind in ("tak", "gps", "update"):
@@ -111,6 +123,9 @@ class TakView(View):
 
     def refresh(self) -> None:
         eng = self.engine
+        if hasattr(self, "map") and self.app.offline_map() and time.monotonic() - self._camera_asked > 2:
+            self._camera_asked = time.monotonic()
+            self.app.page.run_task(self._ask_camera)
         now = time.time()
         stations = eng.tak_stations
         here = eng.my_position()

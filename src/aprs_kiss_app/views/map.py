@@ -2,25 +2,29 @@
 
 from __future__ import annotations
 
+import asyncio
 import time
 
 import flet as ft
 import flet_map as fm
 
 from ..legend import COLOR_ME, show_legend, station_color, visible
-from ..offline_map import MIN_ZOOM, BaseMap
+from ..offline_map import MIN_ZOOM, BaseMap, Region
 from ..symbols import emoji
 from .base import View
 
 DEFAULT_CENTER = (49.8, 15.5)  # Czechia
 REBUILD_SECONDS = 2.0
-MAX_MARKERS = 400
+MAX_MARKERS = 400  # the most recently heard stations in the area on screen
+MAX_MARKERS_PHONE = 150
+CAMERA_SECONDS = 2.0  # while the map is shown, where it is looking is asked for no more often than this
 MUTED_OPACITY = 0.45  # muted map: tiles faded over a neutral background, so the colours recede
 
 
 class MapView(View):
     key = "map"
     lazy = True
+    keep_alive = True
     icon = ft.Icons.MAP_OUTLINED
     selected_icon = ft.Icons.MAP
 
@@ -32,7 +36,11 @@ class MapView(View):
         center = here or DEFAULT_CENTER
         self.markers = fm.MarkerLayer(markers=[])
         self._zoom = 10 if here else 7
-        self.base = BaseMap(self.markers, self._zoom, MUTED_OPACITY if conf.map_muted else 1.0)
+        self._cache: dict[tuple, fm.Marker] = {}  # unchanged stations keep their marker: nothing to resend
+        self._area = Region.around(*center, self._zoom)  # stations outside it are not put on the map
+        self._camera_asked = 0.0
+        self._camera_busy = False
+        self.base = BaseMap(self.markers, center, self._zoom, MUTED_OPACITY if conf.map_muted else 1.0)
         self.tiles = self.base.tiles
         self.map = fm.Map(
             expand=True,
@@ -44,7 +52,9 @@ class MapView(View):
             # Right click (long press on touch screens): "set as my position".
             on_secondary_tap=self._menu,
             on_long_press=self._menu,
-            on_position_change=self._moved,
+            # Not on_position_change: that sends an event for every frame of a pan or zoom, which on a
+            # phone floods the app. Where the map looks is asked for after a gesture and now and then.
+            on_pointer_up=self._gesture_end,
         )
         self._picked: tuple[float, float] | None = None
         self.menu = ft.ContextMenu(
@@ -108,10 +118,35 @@ class MapView(View):
         self.app.save_config_soon()
         self.app.page.update()
 
-    def _moved(self, e) -> None:
-        zoom = getattr(getattr(e, "camera", None), "zoom", None)
-        if zoom is not None and self.base.zoomed(zoom, self.app.offline_map()):
-            self.base.offline.cities.update()
+    def _gesture_end(self, _e=None) -> None:
+        self.app.page.run_task(self._ask_camera, 0.8)  # after the fling has (mostly) stopped
+
+    async def _ask_camera(self, delay: float = 0) -> None:
+        """Where the map looks now: the offline map and the markers follow it."""
+        if self._camera_busy:
+            return
+        self._camera_busy = True
+        try:
+            await asyncio.sleep(delay)
+            self._camera_asked = time.monotonic()
+            camera = await self.map.get_camera()
+        except Exception:  # noqa: BLE001 - the map is not on screen (yet)
+            return
+        finally:
+            self._camera_busy = False
+        lon = (camera.center.longitude + 180) % 360 - 180
+        self._look(camera.center.latitude, lon, camera.zoom)
+
+    def _look(self, lat: float, lon: float, zoom: float) -> None:
+        changed = self.base.moved(lat, lon, zoom, self.app.offline_map())
+        if not self._area.covers(lat, lon, zoom):
+            self._area = Region.around(lat, lon, zoom)
+            self._signature = None
+            self._last_build = 0
+            self.refresh()
+            changed = True
+        if changed and self.app.current_key == self.key:
+            self.app.page.update()
 
     def _centre_on_first_fix(self) -> None:
         """The first GPS fix moves the map to where we are, once, while the map is on screen."""
@@ -153,6 +188,10 @@ class MapView(View):
 
     def refresh(self) -> None:
         self._centre_on_first_fix()
+        if (self.app.current_key == self.key and not self._camera_busy
+                and time.monotonic() - self._camera_asked > CAMERA_SECONDS):
+            self._camera_asked = time.monotonic()
+            self.app.page.run_task(self._ask_camera)
         now = time.time()
         heard = self.engine.station.heard
         signature = (len(heard), next(reversed(heard), None),
@@ -161,26 +200,40 @@ class MapView(View):
             return
         self._signature = signature
         self._last_build = now
-        markers = []
         conf = self.engine.config
         recent = 7200 if self.only_recent.selected else None
-        for e in list(reversed(heard.values()))[:MAX_MARKERS]:
-            if e.get("latitude") is None or e.get("longitude") is None:
+        area = self._area
+        limit = MAX_MARKERS_PHONE if self.app.mobile else MAX_MARKERS
+        wanted = []
+        for e in reversed(heard.values()):
+            lat, lon = e.get("latitude"), e.get("longitude")
+            if lat is None or lon is None or not area.contains(lat, lon):
                 continue
             if recent and now - e["last_heard"] > recent:
                 continue
             if not visible(self.app, e):
                 continue
-            call = e["call"]
-            markers.append(self._marker(e["latitude"], e["longitude"], call,
-                                        emoji(e.get("symbol_table"), e.get("symbol")), station_color(self.app, e),
-                                        on_click=lambda _e, c=call: self.app.show_station(c),
-                                        bold=bool(e.get("last_rf"))))
+            wanted.append((e["call"], lat, lon, emoji(e.get("symbol_table"), e.get("symbol")),
+                           station_color(self.app, e), bool(e.get("last_rf"))))
+            if len(wanted) >= limit:
+                break
+        wanted.sort()  # a steady order: the list changes only where stations come, go or move
         here = self.engine.my_position()
         if here:
-            markers.append(self._marker(*here, self.engine.status()["callsign"] or self.t("my_position"),
-                                        emoji(conf.symbol[:1], conf.symbol[1:]), COLOR_ME, bold=True))
-        self.markers.markers = markers
+            wanted.append((self.engine.status()["callsign"] or self.t("my_position"), *here,
+                           emoji(conf.symbol[:1], conf.symbol[1:]), COLOR_ME, True, "me"))
+        cache, markers = {}, []
+        for key in wanted:
+            marker = self._cache.get(key)
+            if marker is None:
+                call, lat, lon, icon, color, bold = key[:6]
+                click = None if len(key) > 6 else (lambda _e, c=call: self.app.show_station(c))
+                marker = self._marker(lat, lon, call, icon, color, on_click=click, bold=bold)
+            cache[key] = marker
+            markers.append(marker)
+        self._cache = cache
+        if [id(m) for m in markers] != [id(m) for m in self.markers.markers]:
+            self.markers.markers = markers
 
     async def _menu(self, e) -> None:
         lon = (e.coordinates.longitude + 180) % 360 - 180  # the map wraps around the world
@@ -205,6 +258,7 @@ class MapView(View):
             self.app.toast(self.t("copied"))
 
     async def centre(self, lat: float, lon: float, zoom: float = 12) -> None:
+        self._look(lat, lon, zoom)  # the offline map and the stations there first, then the move
         await self.map.center_on(fm.MapLatitudeLongitude(lat, lon), zoom)
 
     async def _centre_me(self, _e) -> None:
