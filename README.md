@@ -139,7 +139,7 @@ to allow installing apps from the browser or file manager once. On the phone the
 Quansheng with the F4HWN KISS firmware and other CDC-ACM TNCs, CP210x and FTDI cables; Android asks once
 to allow the app to use it) or **over the network (KISS over TCP)**: Direwolf on a computer, the radio
 shared with [`kiss_tcp_bridge.py`](https://github.com/michalsiman/aprs-kiss-ha/tree/main/bridge), or a
-Wi-Fi TNC. The screens fit a phone and are switched in a bar along the bottom. Your position can come
+Wi-Fi TNC. The screens fit a phone and are switched in a menu that slides in from the side (☰). Your position can come
 from **the phone's GPS** (Settings › GPS). BBS SERVER and USB GPS modules are for computers only.
 
 ## Install (iPhone, iPad)

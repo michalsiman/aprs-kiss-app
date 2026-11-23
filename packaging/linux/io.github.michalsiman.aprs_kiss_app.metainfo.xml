@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.25" date="2026-11-23">
+      <description>
+        <p>On phones the screens are in a menu sliding in from the side (the menu button) instead of a bar along the bottom.</p>
+      </description>
+    </release>
     <release version="0.1.24" date="2026-11-23">
       <description>
         <p>A much faster map, above all on phones: only the area on screen is sent, unchanged stations are not sent again, and switching screens keeps the map.</p>

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.25 – 2026-11-23
+
+- **Phone: the screens are in a menu again**, sliding in from the left with the ☰ button in the top bar
+  and hiding when a screen is picked, so the whole screen below the top bar is for the content. Unread
+  messages show on the ☰ button.
+
 ## 0.1.24 – 2026-11-23
 
 - **A much faster map, above all on phones**:
