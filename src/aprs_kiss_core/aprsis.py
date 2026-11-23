@@ -147,6 +147,15 @@ class AprsIsClient:
                 await self._task
         self._set(False)
 
+    def set_filter(self, filter_: str) -> None:
+        """A new server-side filter (e.g. the area moved with the GPS): sent at once if connected."""
+        if filter_ == self.filter:
+            return
+        self.filter = filter_
+        if self._writer is not None and filter_:
+            with contextlib.suppress(Exception):
+                self._writer.write(f"#filter {filter_}\r\n".encode())  # the server takes it as a command
+
     def _set(self, connected: bool) -> None:
         if connected != self.connected:
             self.connected = connected

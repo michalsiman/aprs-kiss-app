@@ -236,9 +236,12 @@ class App:
                    error=not st["tnc_connected"])
 
     @staticmethod
-    def _lamp(text: str, on_click) -> ft.Container:
-        return ft.Container(ft.Text(text, size=12, weight=ft.FontWeight.BOLD), on_click=on_click,
-                            padding=ft.Padding.symmetric(horizontal=5, vertical=1), border_radius=5,
+    def _lamp(content: str | ft.Control, on_click, tooltip: str | None = None) -> ft.Container:
+        """One dashboard lamp: all the same height and frame, a word or an icon inside."""
+        if isinstance(content, str):
+            content = ft.Text(content, size=12, weight=ft.FontWeight.BOLD)
+        return ft.Container(content, on_click=on_click, tooltip=tooltip, height=26, alignment=ft.Alignment.CENTER,
+                            padding=ft.Padding.symmetric(horizontal=6), border_radius=5,
                             border=ft.Border.all(1.5, ft.Colors.OUTLINE))
 
     def _light(self, key: str, state: str | None) -> None:
@@ -373,8 +376,8 @@ class App:
                               visible=False)
         open_release = lambda _e: self.page.run_task(self._open_release)  # noqa: E731
         # a phone: only an icon, the top bar is narrow (the version is in the message and in About)
-        self.update_btn = (ft.IconButton(ft.Icons.NEW_RELEASES, icon_color=ft.Colors.PRIMARY, visible=False,
-                                         on_click=open_release) if self.compact else
+        self.update_btn = (self._lamp(ft.Icon(ft.Icons.NEW_RELEASES, size=16, color=ft.Colors.PRIMARY), open_release)
+                           if self.compact else
                            ft.FilledTonalButton(icon=ft.Icons.NEW_RELEASES, visible=False, on_click=open_release))
         self._show_update()
         self.tx_switch = ft.Switch(label=self.t("transmit"), on_change=self._tx_changed)
@@ -386,17 +389,18 @@ class App:
         # a phone: TNC, IS, GPS and TX as lamps on a dashboard - green when working, grey when not,
         # TX red while transmitting is on; a tap tells the state (TX: switches it)
         self.lamps = {key: self._lamp(text, on_click) for key, text, on_click in (
-            ("tnc", "TNC", self._tnc_info), ("is", "IS", None), ("gps", "GPS", self._gps_info),
+            ("tnc", "TNC", self._tnc_info), ("is", "IS", None),
+            ("gps", ft.Icon(ft.Icons.SATELLITE_ALT, size=16), self._gps_info),  # a satellite instead of a word
             ("tx", "TX", self._tx_tap))}
         if self.compact:
             self.callsign.expand = True
             self.callsign.no_wrap = True
             self.callsign.overflow = ft.TextOverflow.ELLIPSIS
+            beacon = self._lamp(ft.Icon(ft.Icons.SHARE_LOCATION, size=16, color=ft.Colors.ON_SURFACE),
+                                self._beacon_now, self.t("beacon_now"))  # "send my position" in the same frame
+            beacon.visible = not self.engine.exclusive_mode
             row = [self.menu_btn, self.callsign, self.lamps["tnc"], self.lamps["is"], self.lamps["gps"],
-                   self.update_btn,
-                   ft.IconButton(ft.Icons.SHARE_LOCATION, tooltip=self.t("beacon_now"), on_click=self._beacon_now,
-                                 visible=not self.engine.exclusive_mode),
-                   self.lamps["tx"]]
+                   self.update_btn, beacon, self.lamps["tx"]]
         status = ft.Container(
             ft.Row(
                 row if self.compact else [
@@ -415,7 +419,7 @@ class App:
                     ft.IconButton(ft.Icons.INFO_OUTLINE, tooltip=self.t("about"),
                                   on_click=lambda _e: show_about(self), visible=not self.compact),
                 ],
-                spacing=4 if self.compact else 16,
+                spacing=6 if self.compact else 16,
                 vertical_alignment=ft.CrossAxisAlignment.CENTER,
             ),
             padding=ft.Padding.symmetric(horizontal=2 if self.compact else 16, vertical=2 if self.compact else 6),

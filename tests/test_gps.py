@@ -128,6 +128,20 @@ class EngineGpsTest(unittest.TestCase):
         eng.gps.fix.time -= gps.PHONE_FIX_MAX_AGE
         self.assertEqual(eng.my_position(), (50.0, 14.0))
 
+    def test_aprsis_area_follows_the_phone_gps(self):
+        """A phone with no position typed in: the APRS-IS filter comes from the GPS, and follows it."""
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        eng = Engine(Config(callsign="OK1SIM-7", gps_source="phone", aprsis_enabled=True, licence_confirmed=True,
+                            aprsis_radius_km=50).validate(), pathlib.Path(tmp.name))
+        self.assertEqual(eng.aprsis.filter, "")  # nothing known yet
+        eng.gps.push(49.7477, 13.3776)
+        self.assertEqual(eng.aprsis.filter, "r/49.748/13.378/50")
+        eng.gps.push(49.75, 13.38)  # a few hundred metres: the same area
+        self.assertEqual(eng.aprsis.filter, "r/49.748/13.378/50")
+        eng.gps.push(50.08, 14.43)  # Prague
+        self.assertEqual(eng.aprsis.filter, "r/50.080/14.430/50")
+
 
 if __name__ == "__main__":
     unittest.main()

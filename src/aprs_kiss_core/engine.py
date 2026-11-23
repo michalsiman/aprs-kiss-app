@@ -202,15 +202,39 @@ class Engine:
                                             self._vara_state, self._vara_text, self._on_update)
         self.aprsis: AprsIsClient | None = None
         if conf.aprsis_on and conf.callsign and not self.exclusive_mode:
-            radius = int(conf.aprsis_radius_km or 0)
             code = conf.aprsis_passcode or passcode(str(self.me))
-            area = (f"r/{conf.latitude:.3f}/{conf.longitude:.3f}/{radius}"
-                    if radius > 0 and conf.has_position else "")
+            area = self._is_area()
             self.aprsis = AprsIsClient(
                 conf.aprsis_host, int(conf.aprsis_port), str(self.me), int(code), area,
                 f"aprs-kiss {VERSION}", self._on_is_line, self._on_is_state,
             )
             self.station.send_is = self._send_own_to_is
+
+    _is_center: tuple[float, float] | None = None
+
+    def _is_area(self) -> str:
+        """APRS-IS filter: the stations within the chosen radius of where we are (the GPS fix or the
+        position typed in). Without it the server sends nothing but our own traffic."""
+        radius = int(self.config.aprsis_radius_km or 0)
+        here = self.my_position()
+        if radius <= 0 or here is None:
+            return ""
+        self._is_center = here
+        return f"r/{here[0]:.3f}/{here[1]:.3f}/{radius}"
+
+    def _follow_is_area(self) -> None:
+        """The GPS moved (or got its first fix): the APRS-IS area follows, past a tenth of its radius."""
+        if not self.aprsis:
+            return
+        here = self.my_position()
+        if here is None:
+            return
+        radius = int(self.config.aprsis_radius_km or 0)
+        if self._is_center is not None:
+            moved_km = ((here[0] - self._is_center[0]) * 111) ** 2 + ((here[1] - self._is_center[1]) * 72) ** 2
+            if moved_km < (max(radius, 10) / 10) ** 2:
+                return
+        self.aprsis.set_filter(self._is_area())
 
     # ─── own position: typed in, or from a USB GPS module ────────────────
 
@@ -235,6 +259,7 @@ class Engine:
         shown = (fix.usable(), round(fix.latitude or 0, 5), round(fix.longitude or 0, 5), fix.satellites)
         if shown != self._gps_shown:
             self._gps_shown = shown
+            self._follow_is_area()
             self._emit("gps")
             self._on_update()
 
