@@ -8,7 +8,7 @@ import os
 
 import flet as ft
 
-from aprs_kiss_core import android_usb
+from aprs_kiss_core import android_bt, android_usb
 from aprs_kiss_core.aprsis import licence_confirmed
 from aprs_kiss_core.bbs import BbsConfigError
 from aprs_kiss_core.bbs.storage import (
@@ -107,7 +107,8 @@ class SettingsView(View):
         self.connection = ft.Dropdown(label=t("connection"), value=c.connection, width=320,
                                       options=[ft.DropdownOption(key="tcp", text=t("conn_tcp"))]
                                       # Android: a TNC on the phone's USB port (OTG); computers: a serial port
-                                      + ([ft.DropdownOption(key="usb", text=t("conn_usb"))] if self.usb_ok
+                                      + ([ft.DropdownOption(key="usb", text=t("conn_usb")),
+                                          ft.DropdownOption(key="bt", text=t("conn_bt"))] if self.usb_ok
                                          else [] if self.app.mobile
                                          else [ft.DropdownOption(key="serial", text=t("conn_serial"))]),
                                       on_select=lambda _e: self._connection_changed())
@@ -304,7 +305,11 @@ class SettingsView(View):
         show_about(self.app)
 
     def _port_options(self, current: str = "") -> list[ft.DropdownOption]:
-        ports = [(d, d) for d in android_usb.list_devices()] if self.usb_ok else serial_ports()
+        kind = self.connection.value if hasattr(self, "connection") else self.engine.config.connection
+        if kind == "bt":  # the paired Bluetooth devices
+            ports = [(d, d) for d in android_bt.list_devices()]
+        else:
+            ports = [(d, d) for d in android_usb.list_devices()] if self.usb_ok else serial_ports()
         options = [ft.DropdownOption(key=d, text=desc) for d, desc in ports]
         if current and not any(d == current for d, _ in ports):
             options.insert(0, ft.DropdownOption(key=current, text=current))
@@ -316,9 +321,15 @@ class SettingsView(View):
             self.app.toast(self.t("no_ports"))
 
     def _connection_changed(self, update: bool = True) -> None:
-        serial = self.connection.value in ("serial", "usb")
+        serial = self.connection.value in ("serial", "usb", "bt")
         self.tcp_row.visible = not serial
         self.serial_row.visible = serial
+        self.baudrate.visible = self.connection.value != "bt"  # a Bluetooth link has no line speed
+        if update:
+            self.device.options = self._port_options(self.device.value or "")
+            if self.connection.value == "bt" and not self.device.options:
+                self.app.toast(self.t("bt_none"))
+            self.app.page.update()
 
     def _aprsis_changed(self, update: bool = True) -> None:
         on = bool(self.aprsis.value)

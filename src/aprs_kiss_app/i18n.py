@@ -34,6 +34,7 @@ TEXTS: dict[str, dict[str, str]] = {
         # settings
         "tnc_section": "TNC connection", "connection": "Connection", "conn_tcp": "KISS over TCP (network)",
         "conn_serial": "Serial port (USB)", "conn_usb": "TNC on USB (OTG cable)", "host": "Host", "port": "Port", "device": "Serial port",
+        "conn_bt": "TNC over Bluetooth (paired)", "bt_none": "No paired Bluetooth device: pair the TNC in Android's Bluetooth settings, then tap refresh.",
         "bg_section": "Background and screen", "run_background": "Keep running in the background (Android)", "bg_hint": "Receiving, beacons, messages and TAK go on when the app is not on screen or the phone is locked. Android shows a notification while it runs and needs the location permission for it. Uses more battery.", "keep_screen": "Keep the screen on", "keep_never": "No", "keep_tak": "While TAK runs", "keep_always": "Always (while the app is open)", "bg_notification": "Running: receiving and transmitting go on", "bg_channel": "Running in the background",
         "call_required": "Fill in your callsign and save: without it the app cannot work.",
         "lang_title": "Language", "lang_detected": "Your device uses: {name}. Keep following the device, or pick a language:", "lang_later": "It can be changed later in Settings › App.", "sounds": "Sounds", "sound_test": "Play them", "sound_tx": "Beep when the radio transmits", "sound_messages": "Sound for a new APRS message", "sound_chat": "Sound for a new packet chat message", "sound_tak": "Sound for a new TAK GeoChat message",
@@ -134,6 +135,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "beacon_now": "Poslat polohu teď", "position_sent": "Poloha odeslána",
         "tnc_section": "Připojení k TNC", "connection": "Připojení", "conn_tcp": "KISS přes TCP (síť)",
         "conn_serial": "Sériový port (USB)", "conn_usb": "TNC na USB (OTG kabel)", "host": "Adresa", "port": "Port", "device": "Sériový port",
+        "conn_bt": "TNC přes Bluetooth (spárované)", "bt_none": "Žádné spárované Bluetooth zařízení: spáruj TNC v nastavení Bluetooth v Androidu a pak klepni na obnovit.",
         "bg_section": "Pozadí a obrazovka", "run_background": "Běžet na pozadí (Android)", "bg_hint": "Příjem, majáky, zprávy i TAK běží dál, i když aplikace není na obrazovce nebo je telefon zamčený. Android po tu dobu ukazuje notifikaci a potřebuje k tomu povolení polohy. Víc to vybíjí baterii.", "keep_screen": "Nezhasínat obrazovku", "keep_never": "Ne", "keep_tak": "Když běží TAK", "keep_always": "Vždy (když je aplikace otevřená)", "bg_notification": "Běží: příjem a vysílání pokračují", "bg_channel": "Běh na pozadí",
         "call_required": "Vyplň svou volací značku a ulož: bez ní aplikace nemůže fungovat.",
         "lang_title": "Jazyk", "lang_detected": "Zařízení používá: {name}. Nech jazyk podle zařízení, nebo si vyber jiný:", "lang_later": "Změnit ho jde později v Nastavení › Aplikace.", "sounds": "Zvuky", "sound_test": "Přehrát", "sound_tx": "Pípnout při vysílání", "sound_messages": "Zvuk při nové APRS zprávě", "sound_chat": "Zvuk při nové zprávě v packet chatu", "sound_tak": "Zvuk při nové zprávě v TAK GeoChatu",

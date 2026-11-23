@@ -25,6 +25,7 @@ TEXTS = {
     "beacon_now": "Pošalji poziciju sada", "position_sent": "Pozicija poslana",
     "tnc_section": "Veza s TNC-om", "connection": "Veza", "conn_tcp": "KISS preko TCP-a (mreža)",
     "conn_serial": "Serijski port (USB)", "conn_usb": "TNC na USB-u (OTG kabel)", "host": "Adresa", "port": "Port", "device": "Serijski port",
+    "conn_bt": "TNC preko Bluetootha (uparen)", "bt_none": "Nema uparenog Bluetooth uređaja: upari TNC u Bluetooth postavkama Androida, zatim dodirni osvježi.",
     "bg_section": "Pozadina i zaslon", "run_background": "Radi u pozadini (Android)", "bg_hint": "Prijem, beaconi, poruke i TAK rade dalje i kad aplikacija nije na zaslonu ili je telefon zaključan. Android tada prikazuje obavijest i treba dopuštenje za lokaciju. Troši više baterije.", "keep_screen": "Ne gasi zaslon", "keep_never": "Ne", "keep_tak": "Dok radi TAK", "keep_always": "Uvijek (dok je aplikacija otvorena)", "bg_notification": "Radi: prijem i odašiljanje se nastavljaju", "bg_channel": "Rad u pozadini",
     "call_required": "Upiši svoj pozivni znak i spremi: bez njega aplikacija ne može raditi.",
     "lang_title": "Jezik", "lang_detected": "Uređaj koristi: {name}. Prati uređaj ili odaberi jezik:", "lang_later": "Može se kasnije promijeniti u Postavke › Aplikacija.", "sounds": "Zvukovi", "sound_test": "Reproduciraj", "sound_tx": "Zvučni signal pri odašiljanju", "sound_messages": "Zvuk za novu APRS poruku", "sound_chat": "Zvuk za novu poruku u packet chatu", "sound_tak": "Zvuk za novu TAK GeoChat poruku",

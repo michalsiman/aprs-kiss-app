@@ -12,7 +12,7 @@ from typing import Any
 
 import flet as ft
 
-from aprs_kiss_core import android_usb
+from aprs_kiss_core import android_bt, android_usb
 from aprs_kiss_core.config import VERSION, Config, data_dir, load_config, save_config
 
 from . import theme
@@ -81,7 +81,10 @@ class App:
         page.on_resize = self._on_resize
 
         android_usb.register()  # Android: a TNC on the phone's USB port
+        android_bt.register()  # … or over Bluetooth (SPP)
         config = await asyncio.to_thread(load_config, self.folder)
+        if config.connection in ("usb", "bt") and not self.mobile:  # settings copied from a phone
+            config = Config.from_dict({**config.to_dict(), "connection": "tcp"}).validate()
         if config.gps_source == "phone" and not self.mobile:  # settings copied from a phone
             config = Config.from_dict({**config.to_dict(), "gps_source": "manual"}).validate()
         if self.mobile and config.gps_source == "manual" and not config.has_position:

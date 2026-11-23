@@ -26,6 +26,7 @@ TEXTS = {
     "beacon_now": "Wyślij pozycję teraz", "position_sent": "Pozycja wysłana",
     "tnc_section": "Połączenie z TNC", "connection": "Połączenie", "conn_tcp": "KISS przez TCP (sieć)",
     "conn_serial": "Port szeregowy (USB)", "conn_usb": "TNC przez USB (kabel OTG)", "host": "Adres", "port": "Port", "device": "Port szeregowy",
+    "conn_bt": "TNC przez Bluetooth (sparowane)", "bt_none": "Brak sparowanego urządzenia Bluetooth: sparuj TNC w ustawieniach Bluetooth Androida, potem dotknij odśwież.",
     "bg_section": "Tło i ekran", "run_background": "Działaj w tle (Android)", "bg_hint": "Odbiór, beacony, wiadomości i TAK działają dalej, gdy aplikacja nie jest na ekranie lub telefon jest zablokowany. Android pokazuje wtedy powiadomienie i wymaga zgody na lokalizację. Zużywa więcej baterii.", "keep_screen": "Nie wygaszaj ekranu", "keep_never": "Nie", "keep_tak": "Gdy działa TAK", "keep_always": "Zawsze (gdy aplikacja jest otwarta)", "bg_notification": "Działa: odbiór i nadawanie trwają", "bg_channel": "Praca w tle",
     "call_required": "Wpisz swój znak wywoławczy i zapisz: bez niego aplikacja nie działa.",
     "lang_title": "Język", "lang_detected": "Urządzenie używa: {name}. Zostaw język urządzenia albo wybierz inny:", "lang_later": "Można go później zmienić w Ustawienia › Aplikacja.", "sounds": "Dźwięki", "sound_test": "Odtwórz", "sound_tx": "Sygnał przy nadawaniu", "sound_messages": "Dźwięk przy nowej wiadomości APRS", "sound_chat": "Dźwięk przy nowej wiadomości czatu packet", "sound_tak": "Dźwięk przy nowej wiadomości TAK GeoChat",

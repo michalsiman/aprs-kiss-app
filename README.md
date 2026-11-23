@@ -10,6 +10,7 @@ its radio core.
 Made for the Quansheng UV-K1/UV-K5 V3 with the [F4HWN firmware](https://github.com/armel/uv-k1-k5v3-firmware-custom)
 and its [KISS TNC app](https://github.com/armel/uv-k1-k5v3-firmware-custom/wiki/App-KISS-TNC), but any KISS TNC works
 (Direwolf, a hardware TNC, the radio's USB serial port, or the KISS TCP bridge from the integration).
+Verified also with the **VGC VR-N76** and **AnyTone UV890** handhelds.
 
 **Status: actively developed** – new versions come out often (see [CHANGELOG](CHANGELOG.md)).
 Ready for **Linux**, **Windows** and **Android**; **macOS** and **iOS** builds exist but nobody has tried
@@ -95,7 +96,8 @@ them on a real Mac, iPhone or iPad yet – **testers wanted** (see [Platforms](#
   and **GPS** lamps green when working, **TX** with a red frame while transmitting is on and all red while
   a frame goes out on air – a tap on TX switches transmitting, a tap on TNC or GPS tells their state.
 - **The TNC on the phone's USB port** (OTG cable): the Quansheng with the F4HWN KISS firmware and other
-  CDC-ACM TNCs, CP210x and FTDI cables; or over the network.
+  CDC-ACM TNCs, CP210x and FTDI cables; **over Bluetooth** (a paired TNC or radio with the serial port
+  profile, e.g. Mobilinkd TNC3 or a handheld with a Bluetooth KISS TNC); or over the network.
 - **The phone's GPS** as your position.
 - **Running in the background** (Settings › Background and screen): receiving, beacons, messages and TAK
   go on when the app is not on screen or the phone is locked, with a notification.
@@ -292,7 +294,7 @@ Linux, Windows and Android are used every day; macOS and iOS are built but untes
 |---|---|---|---|---|---|
 | KISS over TCP | ✅ | ✅ | ✅ | ✅ | ✅ (sideloaded) |
 | USB serial | ✅ | ✅ (COM ports) | ✅ | ✅ (OTG: CDC-ACM, CP210x, FTDI) | ❌ (iOS) |
-| Bluetooth TNC | – | – | – | planned | BLE only |
+| Bluetooth TNC (SPP) | ✅ (as a serial port: rfcomm) | ✅ (as a COM port) | – | ✅ (paired, in Settings) | ❌ (BLE only) |
 | USB GPS module | ✅ | ✅ (COM ports) | ✅ | – | ❌ |
 | Phone's own GPS | – | – | – | ✅ | ✅ |
 | VARA FM | ✅ (VARA in Wine) | ✅ | VARA on another computer | VARA on another computer | VARA on another computer |

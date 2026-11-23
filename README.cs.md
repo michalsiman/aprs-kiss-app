@@ -10,6 +10,7 @@ s ní rádiové jádro.
 Dělaná pro Quansheng UV-K1/UV-K5 V3 s [firmwarem F4HWN](https://github.com/armel/uv-k1-k5v3-firmware-custom)
 a jeho [aplikací KISS TNC](https://github.com/armel/uv-k1-k5v3-firmware-custom/wiki/App-KISS-TNC), ale funguje
 s jakýmkoliv KISS TNC (Direwolf, hardwarové TNC, USB sériový port rádia nebo KISS TCP most z integrace).
+Ověřená funkčnost i s ručkami **VGC VR-N76** a **AnyTone UV890**.
 
 **Stav: aktivní vývoj** – nové verze vycházejí často (viz [CHANGELOG](CHANGELOG.md), anglicky).
 Připravená pro **Linux**, **Windows** a **Android**; sestavení pro **macOS** a **iOS** existují, ale na
@@ -95,7 +96,8 @@ skutečném Macu, iPhonu ani iPadu je zatím nikdo nevyzkoušel – **hledáme t
   vysílání zapnuté, a je celá červená, když rámec právě odchází do éteru – klepnutím na TX se vysílání
   zapne nebo vypne, klepnutí na TNC nebo GPS ukáže jejich stav.
 - **TNC na USB portu telefonu** (OTG kabel): Quansheng s KISS firmwarem F4HWN a další CDC-ACM TNC,
-  kabely CP210x a FTDI; nebo po síti.
+  kabely CP210x a FTDI; **přes Bluetooth** (spárované TNC nebo rádio se sériovým profilem SPP, např.
+  Mobilinkd TNC3 nebo ručka s Bluetooth KISS TNC); nebo po síti.
 - **GPS telefonu** jako vaše poloha.
 - **Běh na pozadí** (Nastavení › Pozadí a obrazovka): příjem, majáky, zprávy i TAK běží dál, i když
   aplikace není na obrazovce nebo je telefon zamčený; ukazuje to notifikace.
@@ -292,7 +294,7 @@ Linux, Windows a Android se používají každý den; macOS a iOS se sestavují,
 |---|---|---|---|---|---|
 | KISS přes TCP | ✅ | ✅ | ✅ | ✅ | ✅ (sideloading) |
 | USB sériový port | ✅ | ✅ (COM porty) | ✅ | ✅ (OTG: CDC-ACM, CP210x, FTDI) | ❌ (iOS) |
-| Bluetooth TNC | – | – | – | v plánu | jen BLE |
+| Bluetooth TNC (SPP) | ✅ (jako sériový port: rfcomm) | ✅ (jako COM port) | – | ✅ (spárované, v Nastavení) | ❌ (jen BLE) |
 | USB GPS modul | ✅ | ✅ (COM porty) | ✅ | – | ❌ |
 | GPS telefonu | – | – | – | ✅ | ✅ |
 | VARA FM | ✅ (VARA ve Wine) | ✅ | VARA na jiném počítači | VARA na jiném počítači | VARA na jiném počítači |

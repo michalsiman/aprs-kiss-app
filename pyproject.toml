@@ -64,6 +64,10 @@ module = "main"
 "android.permission.FOREGROUND_SERVICE_LOCATION" = true
 "android.permission.WAKE_LOCK" = true
 "android.permission.POST_NOTIFICATIONS" = true
+# Settings › Connection › TNC over Bluetooth: Android 12+ asks for "Nearby devices" (BLUETOOTH_CONNECT);
+# older Android versions need BLUETOOTH
+"android.permission.BLUETOOTH_CONNECT" = true
+"android.permission.BLUETOOTH" = { maxSdkVersion = "30" }
 
 [tool.flet.ios.info]
 NSLocationWhenInUseUsageDescription = "Your position for the map and the APRS beacon, when Settings › GPS uses the phone's GPS."
@@ -80,3 +84,4 @@ target_sdk_version = 36
 [tool.flet.android.feature]
 "android.hardware.usb.host" = false  # used when present, not required
 "android.hardware.location.gps" = false  # the phone GPS is optional too
+"android.hardware.bluetooth" = false  # and Bluetooth
