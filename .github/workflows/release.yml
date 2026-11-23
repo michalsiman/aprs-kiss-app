@@ -20,6 +20,7 @@ permissions:
 jobs:
   linux:
     runs-on: ubuntu-24.04
+    timeout-minutes: 40  # a hung download (e.g. Flathub) must not block the release for hours
     outputs:
       version: ${{ steps.version.outputs.version }}
     steps:
@@ -52,6 +53,7 @@ jobs:
   flatpak:
     needs: linux
     runs-on: ubuntu-24.04
+    timeout-minutes: 30  # a hung download (e.g. Flathub) must not block the release for hours
     env:
       ID: io.github.michalsiman.aprs_kiss_app
     steps:
@@ -87,6 +89,7 @@ jobs:
 
   windows:
     runs-on: windows-latest
+    timeout-minutes: 40  # a hung download (e.g. Flathub) must not block the release for hours
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -120,6 +123,7 @@ jobs:
 
   android:
     runs-on: ubuntu-24.04
+    timeout-minutes: 45  # a hung download (e.g. Flathub) must not block the release for hours
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -176,6 +180,7 @@ jobs:
 
   macos:
     runs-on: macos-26
+    timeout-minutes: 45  # a hung download (e.g. Flathub) must not block the release for hours
     steps:
       - uses: actions/checkout@v4
       # Flet's plugins (connectivity_plus) need the macOS/iOS 26 SDK, i.e. Xcode 26.
@@ -208,6 +213,7 @@ jobs:
 
   ios:
     runs-on: macos-26
+    timeout-minutes: 45  # a hung download (e.g. Flathub) must not block the release for hours
     steps:
       - uses: actions/checkout@v4
       # Flet's plugins (connectivity_plus) need the macOS/iOS 26 SDK, i.e. Xcode 26.
@@ -245,10 +251,11 @@ jobs:
           path: dist/*
 
   release:
-    # The mobile and Apple builds are new: a failing one leaves its file out instead of stopping the release.
+    # A failing build (a hung Flatpak download, the macOS disk image…) leaves its file out instead of
+    # stopping the release: the Linux and Windows builds are what it needs.
     if: >-
       startsWith(github.ref, 'refs/tags/v') && !cancelled() && needs.linux.result == 'success'
-      && needs.flatpak.result == 'success' && needs.windows.result == 'success'
+      && needs.windows.result == 'success'
     needs: [linux, flatpak, windows, android, macos, ios]
     runs-on: ubuntu-24.04
     steps:
