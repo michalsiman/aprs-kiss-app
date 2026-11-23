@@ -81,6 +81,12 @@ class FakeTnc:
             src, dst, path, info = SAMPLES[i % len(SAMPLES)]
             i += 1
             await self.send_to_client(ax25.Frame(A(dst), A(src), [A(p) for p in path], info.encode()))
+            if i % 3 == 0:  # a car driving east from Plzeň towards Rokycany: its trail grows on the map
+                step = (i // 3) % 40
+                lat, lon = 49.745 + 0.0012 * step - 0.00002 * step * step, 13.40 + 0.012 * step
+                pos = f"={int(lat):02d}{(lat % 1) * 60:05.2f}N/{int(lon):03d}{(lon % 1) * 60:05.2f}E>"
+                await self.send_to_client(ax25.Frame(A("APRS"), A("OK1CAR-9"), [A("WIDE1-1")],
+                                                     (pos + "On the road to Rokycany").encode()))
             if self.args.message_every and i % self.args.message_every == 0:
                 self.msg_no += 1
                 text = f":{aprs.addressee(self.args.mycall)}:Test message {self.msg_no} from the simulator{{{self.msg_no}"

@@ -250,8 +250,8 @@ class BaseMap:
     """
 
     def __init__(self, markers: fm.MarkerLayer, center: tuple[float, float], zoom: float,
-                 tile_opacity: float = 1.0) -> None:
-        self.markers, self.center, self.zoom = markers, center, zoom
+                 tile_opacity: float = 1.0, trails: fm.PolylineLayer | None = None) -> None:
+        self.markers, self.center, self.zoom, self.trails = markers, center, zoom, trails
         self.tiles = fm.TileLayer(url_template=TILES, user_agent_package_name=USER_AGENT, max_zoom=19,
                                   opacity=tile_opacity)
         self.offline: OfflineLayers | None = None
@@ -269,7 +269,7 @@ class BaseMap:
         for layer in extra:
             layer.visible = offline
         self.credit_text.value = f"{ATTRIBUTION} (offline)" if offline else OSM_CREDIT
-        return [self.tiles, *extra, self.markers]
+        return [self.tiles, *extra, *([self.trails] if self.trails else []), self.markers]
 
     def moved(self, lat: float, lon: float, zoom: float, offline: bool) -> bool:
         """Remember where the map is; True when the offline layers were refilled and need an update."""

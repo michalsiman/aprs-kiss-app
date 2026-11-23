@@ -19,6 +19,8 @@ REBUILD_SECONDS = 2.0
 MAX_MARKERS = 400  # the most recently heard stations in the area on screen
 MAX_MARKERS_PHONE = 150
 CAMERA_SECONDS = 2.0  # while the map is shown, where it is looking is asked for no more often than this
+TRAIL_SECONDS = 1800  # the trails show the last half hour
+TRAIL_COLOR = "#E53935"  # one red, like aprs.fi
 MUTED_OPACITY = 0.45  # muted map: tiles faded over a neutral background, so the colours recede
 
 
@@ -41,7 +43,9 @@ class MapView(View):
         self._area = Region.around(*center, self._zoom)  # stations outside it are not put on the map
         self._camera_asked = 0.0
         self._camera_busy = False
-        self.base = BaseMap(self.markers, center, self._zoom, MUTED_OPACITY if conf.map_muted else 1.0)
+        self.trails = fm.PolylineLayer(polylines=[])  # where moving stations went in the last hour
+        self._trail_cache: dict[tuple, fm.PolylineMarker] = {}
+        self.base = BaseMap(self.markers, center, self._zoom, MUTED_OPACITY if conf.map_muted else 1.0, self.trails)
         self.tiles = self.base.tiles
         self.map = fm.Map(
             expand=True,
@@ -64,13 +68,15 @@ class MapView(View):
             on_select=self._menu_select, expand=True,
         )
         # The filters are icons that light up when on, like the map buttons: they take little of the map.
+        self.trails_btn = toggle(ft.Icons.TIMELINE, ft.Icons.TIMELINE, conf.map_trails, self.t("map_trails"),
+                                 self._toggle_trails)
         self.only_recent = toggle(ft.Icons.HISTORY_TOGGLE_OFF, ft.Icons.HISTORY, False, self.t("last_2h"),
                                   self._toggle_recent)
         self.internet = toggle(ft.Icons.PUBLIC_OFF, ft.Icons.PUBLIC, conf.show_internet, self.t("show_internet"),
                                lambda _e: self.app.set_show_internet(not self.engine.config.show_internet))
         bar = ft.Row([
             ft.IconButton(ft.Icons.MY_LOCATION, tooltip=self.t("centre_me"), on_click=self._centre_me),
-            self.internet, self.only_recent, self._muted_btn(), self._offline_btn(),
+            self.internet, self.only_recent, self.trails_btn, self._muted_btn(), self._offline_btn(),
             ft.IconButton(ft.Icons.HELP_OUTLINE, tooltip=self.t("legend"), on_click=lambda _e: show_legend(self.app)),
         ], tight=True, spacing=0, wrap=True, run_spacing=0)
         overlay = ft.Container(
@@ -82,6 +88,14 @@ class MapView(View):
         self.scale = ScaleBar()
         self.scale.show(center[0], self._zoom)
         return ft.Stack([self.menu, overlay, self.controls.control, self.scale.control, self.base.credit], expand=True)
+
+    def _toggle_trails(self, _e) -> None:
+        conf = self.engine.config
+        conf.map_trails = not conf.map_trails
+        self.trails_btn.selected = conf.map_trails
+        self.app.save_config_soon()
+        self.force()
+        self.app.page.update()
 
     def _toggle_recent(self, _e) -> None:
         self.only_recent.selected = not self.only_recent.selected
@@ -214,6 +228,7 @@ class MapView(View):
         area = self._area
         limit = MAX_MARKERS_PHONE if self.app.mobile else MAX_MARKERS
         wanted = []
+        trails = []
         for e in reversed(heard.values()):
             lat, lon = e.get("latitude"), e.get("longitude")
             if lat is None or lon is None or not area.contains(lat, lon):
@@ -224,6 +239,10 @@ class MapView(View):
                 continue
             wanted.append((e["call"], lat, lon, emoji(e.get("symbol_table"), e.get("symbol")),
                            station_color(self.app, e), bool(e.get("last_rf"))))
+            if conf.map_trails:
+                points = tuple((p[1], p[2]) for p in e.get("track", ()) if now - p[0] <= TRAIL_SECONDS)
+                if len(points) >= 2:
+                    trails.append((e["call"], points))
             if len(wanted) >= limit:
                 break
         wanted.sort()  # a steady order: the list changes only where stations come, go or move
@@ -243,6 +262,23 @@ class MapView(View):
         self._cache = cache
         if [id(m) for m in markers] != [id(m) for m in self.markers.markers]:
             self.markers.markers = markers
+        self._draw_trails(trails)
+
+    def _draw_trails(self, trails: list) -> None:
+        """A thin red line joining where the station was (the marker shows where it is now); unchanged ones
+        are not sent again."""
+        cache, lines = {}, []
+        for key in sorted(trails):
+            line = self._trail_cache.get(key)
+            if line is None:
+                _call, points = key
+                line = fm.PolylineMarker(coordinates=[fm.MapLatitudeLongitude(lat, lon) for lat, lon in points],
+                                         color=TRAIL_COLOR, stroke_width=2)
+            cache[key] = line
+            lines.append(line)
+        self._trail_cache = cache
+        if [id(x) for x in lines] != [id(x) for x in self.trails.polylines]:
+            self.trails.polylines = lines
 
     async def _menu(self, e) -> None:
         lon = (e.coordinates.longitude + 180) % 360 - 180  # the map wraps around the world

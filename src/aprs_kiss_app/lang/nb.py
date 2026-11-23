@@ -25,6 +25,7 @@ TEXTS = {
     "beacon_now": "Send posisjon nå", "position_sent": "Posisjon sendt",
     "tnc_section": "TNC-tilkobling", "connection": "Tilkobling", "conn_tcp": "KISS over TCP (nettverk)",
     "conn_serial": "Seriell port (USB)", "conn_usb": "TNC på USB (OTG-kabel)", "host": "Adresse", "port": "Port", "device": "Seriell port",
+    "map_trails": "Spor (hvor stasjonene kjørte den siste halvtimen)",
     "bt_device": "Bluetooth-enhet",
     "digi": "Digipeater", "digi_mode": "APRS-digipeater", "digi_off": "Av", "digi_fillin": "Fill-in (WIDE1-1) – hjemmestasjon", "digi_wide": "Full (WIDEn-N) – digipeater på et høyt sted", "digi_hops": "Høyst hopp (WIDEn-N)", "digi_aliases": "Gjenta også for (aliaser, f.eks. RELAY)", "digi_hint": "Gjentar APRS-pakker fra stasjoner rundt deg, bare når Sending er på. Fill-in hjelper håndholdte og biler med å nå nærmeste store digipeater og er riktig for en hjemmestasjon. En full digipeater bare etter avtale med det lokale APRS-nettet. Rammer adressert til kallesignalet ditt gjentas også; samme pakke bare én gang per 30 sekunder.",
     "conn_bt": "TNC via Bluetooth (paret)", "bt_none": "Ingen paret Bluetooth-enhet: par TNC-en i Androids Bluetooth-innstillinger, og trykk så på oppdater.",

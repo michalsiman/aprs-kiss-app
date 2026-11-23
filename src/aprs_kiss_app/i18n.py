@@ -34,6 +34,7 @@ TEXTS: dict[str, dict[str, str]] = {
         # settings
         "tnc_section": "TNC connection", "connection": "Connection", "conn_tcp": "KISS over TCP (network)",
         "conn_serial": "Serial port (USB)", "conn_usb": "TNC on USB (OTG cable)", "host": "Host", "port": "Port", "device": "Serial port",
+        "map_trails": "Trails (where stations went in the last half hour)",
         "bt_device": "Bluetooth device",
         "digi": "Digipeater", "digi_mode": "APRS digipeater", "digi_off": "Off", "digi_fillin": "Fill-in (WIDE1-1) – a home station", "digi_wide": "Full (WIDEn-N) – a site digipeater", "digi_hops": "Hops at most (WIDEn-N)", "digi_aliases": "Also repeat for (aliases, e.g. RELAY)", "digi_hint": "Repeats APRS packets for stations around you, only while Transmit is on. Fill-in helps handhelds and cars reach the nearest big digipeater and is what a home station should run. A full digipeater only in agreement with the local APRS network. Frames addressed to your callsign are repeated too; the same packet only once in 30 seconds.",
         "conn_bt": "TNC over Bluetooth (paired)", "bt_none": "No paired Bluetooth device: pair the TNC in Android's Bluetooth settings, then tap refresh.",
@@ -137,6 +138,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "beacon_now": "Poslat polohu teď", "position_sent": "Poloha odeslána",
         "tnc_section": "Připojení k TNC", "connection": "Připojení", "conn_tcp": "KISS přes TCP (síť)",
         "conn_serial": "Sériový port (USB)", "conn_usb": "TNC na USB (OTG kabel)", "host": "Adresa", "port": "Port", "device": "Sériový port",
+        "map_trails": "Ocásky (kudy stanice jely za poslední půlhodinu)",
         "bt_device": "Bluetooth zařízení",
         "digi": "Digipeater", "digi_mode": "APRS digipeater", "digi_off": "Vypnutý", "digi_fillin": "Fill-in (WIDE1-1) – domácí stanice", "digi_wide": "Plný (WIDEn-N) – digipeater na kótě", "digi_hops": "Nejvýš hopů (WIDEn-N)", "digi_aliases": "Přeposílat i pro (aliasy, např. RELAY)", "digi_hint": "Přeposílá APRS pakety stanic kolem vás, jen když je zapnuté Vysílání. Fill-in pomáhá ručkám a autům dosáhnout na nejbližší velký digipeater a je to správná volba pro domácí stanici. Plný digipeater jen po dohodě s místní APRS sítí. Přeposílají se i rámce adresované vaší značce; stejný paket jen jednou za 30 sekund.",
         "conn_bt": "TNC přes Bluetooth (spárované)", "bt_none": "Žádné spárované Bluetooth zařízení: spáruj TNC v nastavení Bluetooth v Androidu a pak klepni na obnovit.",

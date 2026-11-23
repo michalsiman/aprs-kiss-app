@@ -31,6 +31,9 @@ MIN_TX_GAP = 3.0
 MAX_TX_PER_10_MIN = 30
 MAX_HEARD = 500
 IS_COPIES_SECONDS = 60  # copies of one packet through several iGates arrive within this time
+TRACK_SECONDS = 3600  # where each station was in the last hour, kept in memory only (the map's trails)
+TRACK_POINTS = 120
+TRACK_MIN_MOVE_DEG = 0.0003  # about 30 m: a new point only when the station really moved
 
 
 @dataclass
@@ -189,6 +192,8 @@ class Station:
         for k in ("latitude", "longitude", "symbol", "symbol_table", "comment", "speed", "course", "altitude", "status", "weather"):
             if packet.get(k) not in (None, {}, ""):
                 entry[k] = packet[k]
+        if packet.get("latitude") is not None and packet.get("longitude") is not None:
+            _track(entry, now, packet["latitude"], packet["longitude"])
         weather = packet.get("weather")
         if isinstance(weather, dict):
             weather = dict(weather)
@@ -335,3 +340,14 @@ class Station:
             task.cancel()
             with contextlib.suppress(asyncio.CancelledError, Exception):
                 await task
+
+
+def _track(entry: dict[str, Any], now: float, lat: float, lon: float) -> None:
+    """Add a position to the station's last hour, when it moved; older points drop out."""
+    track = entry.setdefault("track", [])
+    if track and abs(track[-1][1] - lat) < TRACK_MIN_MOVE_DEG and abs(track[-1][2] - lon) < TRACK_MIN_MOVE_DEG:
+        track[-1][0] = now  # still there: just when it was last seen there
+    else:
+        track.append([now, lat, lon])
+    while track and (now - track[0][0] > TRACK_SECONDS or len(track) > TRACK_POINTS):
+        track.pop(0)
