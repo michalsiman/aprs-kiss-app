@@ -12,16 +12,26 @@ import flet as ft
 ICONS = {"online": ft.Icons.CLOUD_OUTLINED, "imported": ft.Icons.TERRAIN, "basic": ft.Icons.CLOUD_OFF}
 
 
+def _label(text: str) -> ft.Control:
+    """"Online map (OpenStreetMap)": the part in brackets on a second, smaller line, so long names
+    stay inside the menu on a phone."""
+    if text.endswith(")") and " (" in text:
+        main, sub = text[:-1].split(" (", 1)
+        return ft.Column([ft.Text(main), ft.Text(sub, size=12, color=ft.Colors.ON_SURFACE_VARIANT)],
+                         spacing=0, tight=True)
+    return ft.Text(text)
+
+
 class MapSourceButton:
     def __init__(self, app, extra: list | None = None) -> None:
         self.app = app
         t = app.t
         self.items = {
-            "online": ft.PopupMenuItem(t("map_src_online"), icon=ICONS["online"],
+            "online": ft.PopupMenuItem(_label(t("map_src_online")), icon=ICONS["online"],
                                        on_click=lambda _e: self._pick("online")),
-            "imported": ft.PopupMenuItem(t("map_src_imported"), icon=ICONS["imported"],
+            "imported": ft.PopupMenuItem(_label(t("map_src_imported")), icon=ICONS["imported"],
                                          on_click=lambda _e: self._pick("imported")),
-            "basic": ft.PopupMenuItem(t("map_src_basic"), icon=ICONS["basic"],
+            "basic": ft.PopupMenuItem(_label(t("map_src_basic")), icon=ICONS["basic"],
                                       on_click=lambda _e: self._pick("basic")),
         }
         manage = ft.PopupMenuItem(t("map_src_manage"), icon=ft.Icons.FOLDER_OPEN,
@@ -38,7 +48,7 @@ class MapSourceButton:
         for key, item in self.items.items():
             item.checked = key == self.app.wanted_map_mode()
         self.items["imported"].disabled = not has_imported
-        self.items["imported"].content = self.app.t("map_src_imported" if has_imported else "map_src_none")
+        self.items["imported"].content = _label(self.app.t("map_src_imported" if has_imported else "map_src_none"))
         self.icon.icon = ICONS[mode]
         self.icon.color = ft.Colors.PRIMARY if mode != "online" else None
         self.face.bgcolor = ft.Colors.with_opacity(0.18, ft.Colors.PRIMARY) if mode != "online" else None
