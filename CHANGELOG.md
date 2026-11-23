@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.42 – 2026-11-23
+
+- **Android back gesture**: closes the open menu, otherwise goes back to the screen shown before (Settings
+  → Messages → Map …) and only from the first one leaves the app (to the background; receiving goes on).
+- **Unsaved changes in Settings**: leaving them with something changed and not saved asks: Save or Discard.
+- **Station labels**: always light tags with deeper colours and a soft shadow, also in the dark theme
+  (the map itself is light); the same in TAK and in the legend.
+- **Fix: markers jumped by kilometres when zooming**: overlapping markers now move only a little around
+  their own place (a chain of nearby stations no longer becomes one big group); the line to the real
+  place is clearer.
+
 ## 0.1.41 – 2026-11-23
 
 - **Fix: APRS-IS went quiet after saving the settings** (e.g. a new SSID or symbol): the app logged in

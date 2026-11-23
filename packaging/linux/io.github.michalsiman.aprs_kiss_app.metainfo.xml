@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.42" date="2026-11-23">
+      <description>
+        <p>Android back gesture goes back through the screens; Settings ask about unsaved changes; nicer station labels; markers no longer jump when zooming.</p>
+      </description>
+    </release>
     <release version="0.1.41" date="2026-11-23">
       <description>
         <p>APRS-IS keeps working after the settings are saved; overlapping station markers are spread out; a tidier map menu.</p>
