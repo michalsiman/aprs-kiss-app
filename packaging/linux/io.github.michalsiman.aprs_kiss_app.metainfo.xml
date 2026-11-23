@@ -117,12 +117,7 @@
   <releases>
     <release version="0.1.27" date="2026-11-23">
       <description>
-        <p>Map: small zoom buttons and a compass that turns the map north up.</p>
-      </description>
-    </release>
-    <release version="0.1.26" date="2026-11-23">
-      <description>
-        <p>Android: the app icon is blue to the edges, without a white margin.</p>
+        <p>Map: small zoom buttons and a compass that turns the map north up. Android: the app icon is blue to the edges, without a white margin.</p>
       </description>
     </release>
     <release version="0.1.25" date="2026-11-23">
