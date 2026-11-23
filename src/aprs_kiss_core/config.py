@@ -78,6 +78,8 @@ class Config:
     language_asked: bool = False
     bbs_sentence_ok: bool = False  # the BBS SERVER sentence was typed once: not asked again
     tak_sentence_ok: bool = False  # the same for TAK  # the first start asked which language to use
+    run_background: bool = False  # Android: keep running when not on screen (a notification shows it)
+    keep_screen_on: str = "never"  # "never", "tak" (while TAK runs) or "always": the screen does not go dark
     sound_tx: bool = False  # a short beep whenever the radio transmits
     sound_messages: bool = True  # a sound for a new APRS message
     sound_chat: bool = True  # … for a new packet chat line

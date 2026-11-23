@@ -112,6 +112,7 @@ class App:
         else:
             first_warning()
         self.phone_gps.sync()
+        await self.apply_screen()
         page.run_task(self._tick)
         page.run_task(self._check_updates_later)
         page.run_task(self._watch_internet)
@@ -175,6 +176,7 @@ class App:
         await asyncio.to_thread(save_config, config, self.folder)
         await self.engine.reconfigure(config)
         self.phone_gps.sync()
+        await self.apply_screen()
         t1 = time.monotonic()
         if language_changed or mode_changed:
             self.build()
@@ -630,6 +632,23 @@ class App:
                 duration=10000, behavior=ft.SnackBarBehavior.FLOATING, width=520,
             ))
         self.refresh_now()
+
+    _wakelock = None
+    _screen_kept: bool | None = None
+
+    async def apply_screen(self) -> None:
+        """Settings › Keep the screen on: never, while TAK runs, or always (while the app is open)."""
+        mode = self.engine.config.keep_screen_on
+        want = mode == "always" or (mode == "tak" and self.engine.tak_mode)
+        if want == self._screen_kept:
+            return
+        try:
+            if self._wakelock is None:
+                self._wakelock = ft.Wakelock()
+            await (self._wakelock.enable() if want else self._wakelock.disable())
+            self._screen_kept = want
+        except Exception as err:  # noqa: BLE001 - e.g. not supported on this platform
+            _LOGGER.info("Keep the screen on: %s", err)
 
     @property
     def android(self) -> bool:

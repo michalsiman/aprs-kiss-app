@@ -27,10 +27,35 @@ class PhoneGps:
         self.running = False
         self.last: dict | None = None  # the last fix, handed again to a rebuilt engine
         self._task: asyncio.Task | None = None
+        self._background_on = False
+
+    @property
+    def background(self) -> bool:
+        """Android: keep running when the app is not on screen (a foreground service with a notification)."""
+        return self.app.android and self.app.engine.config.run_background
 
     @property
     def wanted(self) -> bool:
-        return self.app.mobile and self.app.engine.config.gps_source == "phone" and not self.app.engine.bbs_mode
+        conf = self.app.engine.config
+        return self.app.mobile and not self.app.engine.bbs_mode and (conf.gps_source == "phone" or self.background)
+
+    def _settings(self):
+        import flet as ft  # noqa: PLC0415
+        import flet_geolocator as fg  # noqa: PLC0415
+
+        if not self.background:
+            return fg.GeolocatorConfiguration(accuracy=fg.GeolocatorPositionAccuracy.HIGH, distance_filter=0)
+        t = self.app.t
+        return background_settings(ft, fg)(
+            accuracy=fg.GeolocatorPositionAccuracy.HIGH, distance_filter=0,
+            interval_duration=ft.Duration(seconds=10),
+            foreground_notification_title="APRS & Packet",
+            foreground_notification_text=t("bg_notification"),
+            foreground_notification_channel_name=t("bg_channel"),
+            foreground_notification_enable_wake_lock=True,  # the CPU keeps running: receiving, beacons, TAK
+            foreground_notification_enable_wifi_lock=True,
+            foreground_notification_set_ongoing=True,
+        )
 
     def _target(self) -> PushedGps | None:
         gps = self.app.engine.gps
@@ -38,6 +63,10 @@ class PhoneGps:
 
     def sync(self, delay: float = 0) -> None:
         """After the start and after the settings change: start or stop following the location."""
+        if self.wanted and self.running and self.geo is not None and self._background_on != self.background:
+            self._background_on = self.background
+            self.geo.configuration = self._settings()
+            self.geo.update()  # the stream starts again, with or without the foreground service
         if self.wanted:
             target = self._target()
             if target and self.last and self.running:
@@ -61,8 +90,8 @@ class PhoneGps:
         await asyncio.sleep(delay)
         t = self.app.t
         if self.geo is None:
-            self.geo = fg.Geolocator(configuration=fg.GeolocatorConfiguration(
-                accuracy=fg.GeolocatorPositionAccuracy.HIGH, distance_filter=0))
+            self._background_on = self.background
+            self.geo = fg.Geolocator(configuration=self._settings())
         while self.wanted and not self.running:
             try:
                 status = await self.geo.request_permission()
@@ -125,3 +154,31 @@ class PhoneGps:
         self.running = False
         self._stop()
         self.sync(delay=RETRY_SECONDS)
+
+
+_BACKGROUND_SETTINGS = None
+
+
+def background_settings(ft, fg):
+    """Android position-stream settings that start the geolocator's foreground service.
+
+    flet-geolocator 1.1.2 sends ForegroundNotificationConfiguration as a nested object, but its Dart side
+    reads flat "foreground_notification_*" keys, so the service never started. These flat fields are what
+    it reads. The service (with its notification and a wake lock) keeps the app, and so the radio link,
+    running while it is not on screen.
+    """
+    global _BACKGROUND_SETTINGS
+    if _BACKGROUND_SETTINGS is None:
+        @ft.value
+        class BackgroundSettings(fg.GeolocatorAndroidConfiguration):
+            # None by default: Flet sends only values that differ from the default, so every value
+            # given here goes out
+            foreground_notification_title: str | None = None
+            foreground_notification_text: str | None = None
+            foreground_notification_channel_name: str | None = None
+            foreground_notification_enable_wake_lock: bool | None = None
+            foreground_notification_enable_wifi_lock: bool | None = None
+            foreground_notification_set_ongoing: bool | None = None
+
+        _BACKGROUND_SETTINGS = BackgroundSettings
+    return _BACKGROUND_SETTINGS

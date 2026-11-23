@@ -25,6 +25,7 @@ TEXTS = {
     "beacon_now": "Pošlji položaj zdaj", "position_sent": "Položaj poslan",
     "tnc_section": "Povezava s TNC", "connection": "Povezava", "conn_tcp": "KISS prek TCP (omrežje)",
     "conn_serial": "Serijska vrata (USB)", "conn_usb": "TNC na USB (kabel OTG)", "host": "Naslov", "port": "Vrata", "device": "Serijska vrata",
+    "bg_section": "Ozadje in zaslon", "run_background": "Delaj v ozadju (Android)", "bg_hint": "Sprejem, svetilniki, sporočila in TAK tečejo naprej, ko aplikacija ni na zaslonu ali je telefon zaklenjen. Android takrat pokaže obvestilo in potrebuje dovoljenje za lokacijo. Porabi več baterije.", "keep_screen": "Ne ugašaj zaslona", "keep_never": "Ne", "keep_tak": "Ko teče TAK", "keep_always": "Vedno (ko je aplikacija odprta)", "bg_notification": "Teče: sprejem in oddajanje se nadaljujeta", "bg_channel": "Delovanje v ozadju",
     "call_required": "Vpiši svoj klicni znak in shrani: brez njega aplikacija ne more delovati.",
     "lang_title": "Jezik", "lang_detected": "Naprava uporablja: {name}. Sledi napravi ali izberi jezik:", "lang_later": "Spremeniš ga lahko pozneje v Nastavitve › Aplikacija.", "sounds": "Zvoki", "sound_test": "Predvajaj", "sound_tx": "Pisk ob oddajanju", "sound_messages": "Zvok ob novem sporočilu APRS", "sound_chat": "Zvok ob novem sporočilu v packet klepetu", "sound_tak": "Zvok ob novem sporočilu TAK GeoChat",
     "tak_appeared": "{call} se je pojavil na zemljevidu", "tak_moved": "{call} se je premaknil za {far}",

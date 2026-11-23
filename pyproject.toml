@@ -58,6 +58,12 @@ module = "main"
 # Settings › GPS › "The phone's GPS" (asked for only when chosen)
 "android.permission.ACCESS_FINE_LOCATION" = true
 "android.permission.ACCESS_COARSE_LOCATION" = true
+# Settings › Running in the background: a foreground service (with its notification) keeps the app,
+# the radio link and the beacons going while it is not on screen
+"android.permission.FOREGROUND_SERVICE" = true
+"android.permission.FOREGROUND_SERVICE_LOCATION" = true
+"android.permission.WAKE_LOCK" = true
+"android.permission.POST_NOTIFICATIONS" = true
 
 [tool.flet.ios.info]
 NSLocationWhenInUseUsageDescription = "Your position for the map and the APRS beacon, when Settings › GPS uses the phone's GPS."

@@ -196,6 +196,11 @@ class SettingsView(View):
                                     self.igate_rx, self.igate_tx], spacing=12)
 
         # App
+        # running in the background (Android) and keeping the screen on
+        self.run_bg = ft.Checkbox(label=t("run_background"), value=c.run_background)
+        self.keep_screen = ft.Dropdown(label=t("keep_screen"), value=c.keep_screen_on if c.keep_screen_on in (
+            "never", "tak", "always") else "never", width=320,
+            options=[ft.DropdownOption(key=k, text=t(f"keep_{k}")) for k in ("never", "tak", "always")])
         self.sound_boxes = {key: ft.Checkbox(label=t(key), value=getattr(c, key))
                             for key in ("sound_tx", "sound_messages", "sound_chat", "sound_tak")}
         self.check_updates = ft.Checkbox(label=t("check_updates"), value=c.check_updates,
@@ -237,6 +242,10 @@ class SettingsView(View):
                          ft.Text(t("bbs_welcome"), size=12), ft.Row([self.bbs_welcome]),
                          ft.Text(t("bbs_more"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
                          ft.Text(short_path(self.engine.bbs_folder()), size=12, font_family="monospace", selectable=True))]),
+                _section(t("bg_section"), ft.Icons.PHONELINK_LOCK,
+                         *([self.run_bg, ft.Text(t("bg_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT)]
+                           if self.app.mobile else []),
+                         self.keep_screen),
                 _section(t("sounds"), ft.Icons.VOLUME_UP, *self.sound_boxes.values(),
                          ft.Row([ft.OutlinedButton(t("sound_test"), icon=ft.Icons.PLAY_ARROW,
                                                    on_click=self._test_sounds)])),
@@ -423,6 +432,7 @@ class SettingsView(View):
             "language": self.language.value or "",
             "check_updates": self.check_updates.value,
             **{key: box.value for key, box in self.sound_boxes.items()},
+            "run_background": bool(self.run_bg.value), "keep_screen_on": self.keep_screen.value or "never",
             "theme": self.theme.value or "auto",
         }
         try:

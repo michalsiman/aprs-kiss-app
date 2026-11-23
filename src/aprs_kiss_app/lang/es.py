@@ -25,6 +25,7 @@ TEXTS = {
     "beacon_now": "Enviar posición ahora", "position_sent": "Posición enviada",
     "tnc_section": "Conexión con el TNC", "connection": "Conexión", "conn_tcp": "KISS por TCP (red)",
     "conn_serial": "Puerto serie (USB)", "conn_usb": "TNC por USB (cable OTG)", "host": "Dirección", "port": "Puerto", "device": "Puerto serie",
+    "bg_section": "Segundo plano y pantalla", "run_background": "Seguir en segundo plano (Android)", "bg_hint": "Recepción, balizas, mensajes y TAK siguen cuando la aplicación no está en pantalla o el teléfono está bloqueado. Android muestra una notificación y necesita el permiso de ubicación. Gasta más batería.", "keep_screen": "Mantener la pantalla encendida", "keep_never": "No", "keep_tak": "Mientras TAK funciona", "keep_always": "Siempre (con la app abierta)", "bg_notification": "En marcha: recepción y transmisión siguen", "bg_channel": "Segundo plano",
     "call_required": "Escribe tu indicativo y guarda: sin él la aplicación no puede funcionar.",
     "lang_title": "Idioma", "lang_detected": "Tu dispositivo usa: {name}. Seguir al dispositivo o elegir un idioma:", "lang_later": "Se puede cambiar luego en Ajustes › Aplicación.", "sounds": "Sonidos", "sound_test": "Reproducir", "sound_tx": "Pitido al transmitir", "sound_messages": "Sonido para un nuevo mensaje APRS", "sound_chat": "Sonido para un nuevo mensaje del chat packet", "sound_tak": "Sonido para un nuevo mensaje TAK GeoChat",
     "tak_appeared": "{call} apareció en el mapa", "tak_moved": "{call} se movió {far}",

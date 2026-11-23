@@ -25,6 +25,7 @@ TEXTS = {
     "beacon_now": "Send position nu", "position_sent": "Position sendt",
     "tnc_section": "TNC-forbindelse", "connection": "Forbindelse", "conn_tcp": "KISS over TCP (netværk)",
     "conn_serial": "Seriel port (USB)", "conn_usb": "TNC på USB (OTG-kabel)", "host": "Adresse", "port": "Port", "device": "Seriel port",
+    "bg_section": "Baggrund og skærm", "run_background": "Kør videre i baggrunden (Android)", "bg_hint": "Modtagelse, beacons, beskeder og TAK fortsætter, når appen ikke er på skærmen eller telefonen er låst. Android viser en notifikation og kræver placeringstilladelse. Bruger mere strøm.", "keep_screen": "Hold skærmen tændt", "keep_never": "Nej", "keep_tak": "Mens TAK kører", "keep_always": "Altid (mens appen er åben)", "bg_notification": "Kører: modtagelse og sending fortsætter", "bg_channel": "Baggrund",
     "call_required": "Udfyld dit kaldesignal og gem: uden det kan appen ikke fungere.",
     "lang_title": "Sprog", "lang_detected": "Din enhed bruger: {name}. Følg enheden, eller vælg et sprog:", "lang_later": "Kan ændres senere under Indstillinger › App.", "sounds": "Lyde", "sound_test": "Afspil", "sound_tx": "Bip når radioen sender", "sound_messages": "Lyd ved ny APRS-besked", "sound_chat": "Lyd ved ny packet-chatbesked", "sound_tak": "Lyd ved ny TAK GeoChat-besked",
     "tak_appeared": "{call} dukkede op på kortet", "tak_moved": "{call} flyttede sig {far}",
