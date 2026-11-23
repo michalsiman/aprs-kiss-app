@@ -23,7 +23,7 @@ class UpdatesTest(unittest.TestCase):
     def test_once_a_day(self):
         with tempfile.TemporaryDirectory() as tmp:
             folder = pathlib.Path(tmp)
-            with mock.patch.object(updates, "fetch_latest", return_value=("9.9.9", "https://x")) as fetch:
+            with mock.patch.object(updates, "fetch_latest", return_value=("9.9.9", "https://x", "https://x/a-android.apk")) as fetch:
                 st = updates.check(folder, now=1000.0)
                 self.assertTrue(st.available)
                 updates.check(folder, now=1000.0 + 3600)

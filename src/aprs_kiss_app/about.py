@@ -60,8 +60,9 @@ def show_about(app: App) -> None:
     small = ft.Colors.ON_SURFACE_VARIANT
     text, color = _update_text(app)
     update_text = ft.Text(text, size=13, color=color)
-    update_link = ft.TextButton(t("update_show"), icon=ft.Icons.NEW_RELEASES, url=app.update_state.url,
-                                visible=app.update_state.available)
+    update_link = ft.TextButton(t("update_download" if app.android else "update_show"), icon=ft.Icons.NEW_RELEASES,
+                                visible=app.update_state.available,
+                                on_click=lambda _e: app.page.run_task(app._open_release))
 
     async def check_now(e) -> None:
         e.control.disabled = True
@@ -70,7 +71,6 @@ def show_about(app: App) -> None:
         await app.check_updates(force=True)
         update_text.value, update_text.color = _update_text(app)
         update_link.visible = app.update_state.available
-        update_link.url = app.update_state.url
         e.control.disabled = False
         app.page.update()
     content = ft.Column(

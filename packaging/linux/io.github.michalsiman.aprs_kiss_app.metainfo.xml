@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.28" date="2026-11-23">
+      <description>
+        <p>The new-version check works on phones too; on Android the new package is downloaded straight away. About is in the phone's menu.</p>
+      </description>
+    </release>
     <release version="0.1.27" date="2026-11-23">
       <description>
         <p>Map: small zoom buttons and a compass that turns the map north up. Android: the app icon is blue to the edges, without a white margin.</p>

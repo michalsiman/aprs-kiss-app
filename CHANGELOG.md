@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.28 – 2026-11-23
+
+- **New versions on phones too**: the check once a day now works on Android and iOS (it could not
+  verify GitHub's HTTPS certificate there). On Android "Download" fetches the new .apk straight away;
+  open it to install. A small icon in the top bar shows a new version.
+- **Phone: About is in the ☰ menu** (with "New version …" when there is one, and "Check now" inside),
+  so the top bar has room.
+
 ## 0.1.27 – 2026-11-23
 
 - **Map: zoom buttons and a compass** in the lower right corner, small so they take little of the map

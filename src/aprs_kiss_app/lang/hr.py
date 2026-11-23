@@ -25,6 +25,7 @@ TEXTS = {
     "beacon_now": "Pošalji poziciju sada", "position_sent": "Pozicija poslana",
     "tnc_section": "Veza s TNC-om", "connection": "Veza", "conn_tcp": "KISS preko TCP-a (mreža)",
     "conn_serial": "Serijski port (USB)", "conn_usb": "TNC na USB-u (OTG kabel)", "host": "Adresa", "port": "Port", "device": "Serijski port",
+    "update_download": "Preuzmi", "update_apk_hint": "Nova verzija se preuzima. Otvori preuzetu datoteku i instaliraj je; prvi put Android pita smije li preglednik instalirati aplikacije.",
     "zoom_in": "Približi", "zoom_out": "Udalji", "north_up": "Sjever gore",
     "gps_phone": "GPS telefona", "gps_phone_hint": "Karta i beacon koriste lokaciju telefona. Android prvi put traži dopuštenje; lokacija mora biti uključena.", "gps_phone_denied": "Lokacija nije dopuštena: dopusti je u postavkama telefona za ovu aplikaciju", "gps_phone_off": "Lokacija telefona je isključena", "no_position": "Još nema položaja: upiši ga u Postavkama, koristi GPS ili zadrži prst na karti",
     "baudrate": "Brzina (baud)", "refresh_ports": "Traži serijske portove",

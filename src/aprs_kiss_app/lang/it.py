@@ -26,6 +26,7 @@ TEXTS = {
     "beacon_now": "Invia la posizione ora", "position_sent": "Posizione inviata",
     "tnc_section": "Connessione al TNC", "connection": "Connessione", "conn_tcp": "KISS su TCP (rete)",
     "conn_serial": "Porta seriale (USB)", "conn_usb": "TNC su USB (cavo OTG)", "host": "Indirizzo", "port": "Porta", "device": "Porta seriale",
+    "update_download": "Scarica", "update_apk_hint": "La nuova versione si sta scaricando. Apri il file scaricato per installarla; la prima volta Android chiede di consentire l'installazione dal browser.",
     "zoom_in": "Ingrandisci", "zoom_out": "Riduci", "north_up": "Nord in alto",
     "gps_phone": "GPS del telefono", "gps_phone_hint": "La mappa e il beacon usano la posizione del telefono. Android chiede il permesso la prima volta; la posizione deve essere attiva.", "gps_phone_denied": "Posizione non consentita: consentila nelle impostazioni del telefono per questa app", "gps_phone_off": "La posizione del telefono è disattivata", "no_position": "Ancora nessuna posizione: inseriscila nelle Impostazioni, usa il GPS o tieni premuto sulla mappa",
     "baudrate": "Velocità (baud)", "refresh_ports": "Cerca porte seriali",

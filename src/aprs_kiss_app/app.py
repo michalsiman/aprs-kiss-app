@@ -248,6 +248,10 @@ class App:
     async def _open_menu(self, _e=None) -> None:
         await self.page.show_drawer()
 
+    async def _menu_about(self, _e=None) -> None:
+        await self.page.close_drawer()
+        show_about(self)
+
     async def _menu_selected(self, e) -> None:
         """A screen picked in the phone's menu: the menu slides away and the screen opens."""
         await self.page.close_drawer()
@@ -272,12 +276,16 @@ class App:
                                                        label=self.t(v.key)) for v in self.views],
             on_change=lambda e: self.select(self.views[e.control.selected_index].key),
         )
+        # a phone: About is at the end of the menu (no room for its button in the top bar)
+        self.about_item = ft.ListTile(leading=ft.Icon(ft.Icons.INFO_OUTLINE), title=ft.Text(self.t("about")),
+                                      on_click=self._menu_about, content_padding=ft.Padding.only(left=28, right=12))
         # a phone: the screens in a menu that slides in from the left (the ☰ button) and hides again
         self.drawer = ft.NavigationDrawer(
             controls=[ft.Container(ft.Text("APRS & Packet", weight=ft.FontWeight.BOLD, size=16),
                                    padding=ft.Padding.only(left=28, top=20, bottom=12))]
             + [ft.NavigationDrawerDestination(icon=ft.Icon(v.icon), selected_icon=v.selected_icon, label=self.t(v.key))
-               for v in self.views],
+               for v in self.views]
+            + [ft.Divider(), self.about_item],
             on_change=self._menu_selected,
         )
         self.page.drawer = self.drawer if self.compact else None
@@ -301,8 +309,11 @@ class App:
         self.gps_text = ft.Text(size=13)
         self.gps_box = ft.Row([self.gps_dot, ft.Text("GPS", size=13), self.gps_text], spacing=4, tight=True,
                               visible=False)
-        self.update_btn = ft.FilledTonalButton(icon=ft.Icons.NEW_RELEASES, visible=False,
-                                               tooltip=self.t("update_tooltip"))
+        open_release = lambda _e: self.page.run_task(self._open_release)  # noqa: E731
+        # a phone: only an icon, the top bar is narrow (the version is in the message and in About)
+        self.update_btn = (ft.IconButton(ft.Icons.NEW_RELEASES, icon_color=ft.Colors.PRIMARY, visible=False,
+                                         on_click=open_release) if self.compact else
+                           ft.FilledTonalButton(icon=ft.Icons.NEW_RELEASES, visible=False, on_click=open_release))
         self._show_update()
         self.tx_switch = ft.Switch(label=self.t("transmit"), on_change=self._tx_changed)
         self.tx_box = ft.Container(self.tx_switch, border_radius=20, padding=ft.Padding.symmetric(horizontal=10))
@@ -326,7 +337,7 @@ class App:
                                   visible=not self.engine.exclusive_mode),
                     self.tx_box,
                     ft.IconButton(ft.Icons.INFO_OUTLINE, tooltip=self.t("about"),
-                                  on_click=lambda _e: show_about(self)),
+                                  on_click=lambda _e: show_about(self), visible=not self.compact),
                 ],
                 spacing=6 if self.compact else 16,
                 vertical_alignment=ft.CrossAxisAlignment.CENTER,
@@ -520,20 +531,36 @@ class App:
             await asyncio.to_thread(updates.save, self.folder, st)
             self.show_dialog(ft.SnackBar(
                 ft.Text(self.t("update_available", version=st.latest)),
-                action=ft.SnackBarAction(label=self.t("update_show"),
+                action=ft.SnackBarAction(label=self.t("update_download" if self.android else "update_show"),
                                          on_click=lambda _e: self.page.run_task(self._open_release)),
                 duration=10000, behavior=ft.SnackBarBehavior.FLOATING, width=520,
             ))
         self.refresh_now()
 
+    @property
+    def android(self) -> bool:
+        return self.page.platform == ft.PagePlatform.ANDROID
+
+    def update_url(self) -> str:
+        """Android: the new .apk itself (the browser downloads it, a tap installs it); elsewhere the release page."""
+        st = self.update_state
+        return st.apk_url if self.android and st.apk_url else st.url
+
     async def _open_release(self) -> None:
-        await ft.UrlLauncher().launch_url(self.update_state.url)
+        url = self.update_url()
+        await ft.UrlLauncher().launch_url(url)
+        if url.endswith(".apk"):
+            self.toast(self.t("update_apk_hint"), seconds=10)
 
     def _show_update(self) -> None:
         st = self.update_state
         self.update_btn.visible = st.available
-        self.update_btn.content = self.t("update_button", version=st.latest)
-        self.update_btn.url = st.url
+        if isinstance(self.update_btn, ft.FilledTonalButton):
+            self.update_btn.content = self.t("update_button", version=st.latest)
+        self.update_btn.tooltip = self.t("update_button", version=st.latest)
+        if self.compact:  # the menu's About item says it too
+            self.about_item.subtitle = ft.Text(self.t("update_button", version=st.latest), color=ft.Colors.PRIMARY,
+                                               size=12) if st.available else None
 
     def _tx_changed(self, e) -> None:
         self.engine.set_tx(bool(e.control.value))

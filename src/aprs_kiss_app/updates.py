@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 import logging
 import re
+import ssl
 import time
 import urllib.request
 from dataclasses import dataclass
@@ -41,6 +42,7 @@ class UpdateState:
     url: str = RELEASES_URL
     notified: str = ""  # version the user was already told about
     error: str = ""
+    apk_url: str = ""  # the Android package of the latest release, downloaded straight away on a phone
 
     @property
     def available(self) -> bool:
@@ -66,15 +68,27 @@ def save(folder: Path, state: UpdateState) -> None:
         _LOGGER.debug("Could not save the update state: %s", err)
 
 
-def fetch_latest() -> tuple[str, str]:
-    """(version, page url) of the latest release. Raises OSError/ValueError on failure."""
+def _tls() -> ssl.SSLContext:
+    """Certificate checking that also works on Android and iOS, where Python finds no system CA list."""
+    try:
+        import certifi  # noqa: PLC0415
+
+        return ssl.create_default_context(cafile=certifi.where())
+    except ImportError:
+        return ssl.create_default_context()
+
+
+def fetch_latest() -> tuple[str, str, str]:
+    """(version, page url, Android package url) of the latest release. Raises OSError/ValueError on failure."""
     req = urllib.request.Request(LATEST_URL, headers={
         "Accept": "application/vnd.github+json",
         "User-Agent": f"aprs-kiss/{VERSION}",
     })
-    with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:  # noqa: S310 - fixed https URL
+    with urllib.request.urlopen(req, timeout=TIMEOUT, context=_tls()) as resp:  # noqa: S310 - fixed https URL
         data = json.loads(resp.read().decode("utf-8"))
-    return str(data.get("tag_name", "")).lstrip("v"), str(data.get("html_url") or RELEASES_URL)
+    apk = next((str(a.get("browser_download_url") or "") for a in data.get("assets") or []
+                if str(a.get("name", "")).endswith("-android.apk")), "")
+    return str(data.get("tag_name", "")).lstrip("v"), str(data.get("html_url") or RELEASES_URL), apk
 
 
 def check(folder: Path, force: bool = False, now: float | None = None) -> UpdateState:
@@ -84,7 +98,7 @@ def check(folder: Path, force: bool = False, now: float | None = None) -> Update
     if not force and state.last_check and now - state.last_check < CHECK_EVERY:
         return state
     try:
-        state.latest, state.url = fetch_latest()
+        state.latest, state.url, state.apk_url = fetch_latest()
         state.error = ""
     except (OSError, ValueError) as err:
         state.error = str(err) or type(err).__name__

@@ -25,6 +25,7 @@ TEXTS = {
     "beacon_now": "Skicka position nu", "position_sent": "Position skickad",
     "tnc_section": "TNC-anslutning", "connection": "Anslutning", "conn_tcp": "KISS över TCP (nätverk)",
     "conn_serial": "Serieport (USB)", "conn_usb": "TNC via USB (OTG-kabel)", "host": "Adress", "port": "Port", "device": "Serieport",
+    "update_download": "Ladda ner", "update_apk_hint": "Den nya versionen laddas ner. Öppna den nedladdade filen för att installera den; första gången frågar Android om webbläsaren får installera appar.",
     "zoom_in": "Zooma in", "zoom_out": "Zooma ut", "north_up": "Norr uppåt",
     "gps_phone": "Telefonens GPS", "gps_phone_hint": "Kartan och fyren använder telefonens position. Android frågar om tillstånd första gången; platstjänster måste vara på.", "gps_phone_denied": "Ingen åtkomst till platsen: tillåt den i telefonens inställningar för den här appen", "gps_phone_off": "Telefonens plats är avstängd", "no_position": "Ingen position än: skriv in den i Inställningar, använd GPS eller håll fingret på kartan",
     "baudrate": "Hastighet (baud)", "refresh_ports": "Sök efter serieportar",
