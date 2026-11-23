@@ -54,6 +54,9 @@ class Config:
     aprsis_radius_km: int = 50
     igate_rx: bool = False
     igate_tx: bool = False
+    digi_mode: str = "off"  # APRS digipeater: "off", "fillin" (WIDE1-1) or "wide" (WIDEn-N up to digi_max_hops)
+    digi_max_hops: int = 2  # the most hops a WIDEn-N path may ask for to be repeated
+    digi_aliases: str = ""  # also repeat frames addressed to these (e.g. RELAY), besides our callsign
     # App
     language: str = ""  # "", "cs" or "en"; empty = from the system
     show_internet: bool = True  # map and station list also show stations seen only on APRS-IS

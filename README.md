@@ -40,6 +40,8 @@ them on a real Mac, iPhone or iPad yet – **testers wanted** (see [Platforms](#
   show up too.
 - **Position beacon** every N minutes and a *Send position now* button in the top bar; status and
   unproto. Icon (APRS symbol), comment, SSID and path in Settings.
+- **Digipeater**: fill-in (WIDE1-1, for a home station) or full (WIDEn-N with a hop limit), frames
+  addressed to your callsign or aliases (e.g. RELAY), the same packet only once in 30 seconds.
 - **APRS-IS** (internet) with an optional RX and TX **iGate**; messages an iGate relays to you by
   radio are received and acknowledged.
 - **Your position from a GPS**: the phone's own GPS (the default on a phone with no position typed in;

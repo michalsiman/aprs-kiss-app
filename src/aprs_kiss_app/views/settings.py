@@ -197,6 +197,16 @@ class SettingsView(View):
                                     self.igate_rx, self.igate_tx], spacing=12)
 
         # App
+        # APRS digipeater
+        self.digi_mode = ft.Dropdown(label=t("digi_mode"), value=c.digi_mode if c.digi_mode in ("off", "fillin", "wide")
+                                     else "off", width=340, on_select=lambda _e: self._digi_changed(),
+                                     options=[ft.DropdownOption(key=k, text=t(f"digi_{k}")) for k in ("off", "fillin", "wide")])
+        self.digi_hops = ft.Dropdown(label=t("digi_hops"), value=str(c.digi_max_hops or 2), width=200,
+                                     options=[ft.DropdownOption(key=str(n), text=str(n)) for n in (1, 2, 3)])
+        self.digi_aliases = ft.TextField(label=t("digi_aliases"), value=c.digi_aliases, width=340, hint_text="RELAY",
+                                         capitalization=ft.TextCapitalization.CHARACTERS)
+        self.digi_hint = ft.Text(t("digi_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT)
+        self._digi_changed(update=False)
         # running in the background (Android) and keeping the screen on
         self.run_bg = ft.Checkbox(label=t("run_background"), value=c.run_background)
         self.keep_screen = ft.Dropdown(label=t("keep_screen"), value=c.keep_screen_on if c.keep_screen_on in (
@@ -233,6 +243,7 @@ class SettingsView(View):
                          self.beacon, self.beacon_is, self.tracked, self.incoming, expanded=first),
                 _section("GPS", ft.Icons.GPS_FIXED, self.gps_source, self.gps_phone_hint) if self.app.mobile else
                 _section("GPS", ft.Icons.GPS_FIXED, self.gps_source, self.gps_row, self.gps_hint),
+                _section(t("digi"), ft.Icons.REPEAT, self.digi_mode, self.digi_hops, self.digi_aliases, self.digi_hint),
                 _section(t("aprsis"), ft.Icons.PUBLIC, self.aprsis, self.licence, self.is_fields, self.is_state),
                 _section("VARA FM", ft.Icons.SETTINGS_INPUT_ANTENNA, ft.Row([self.vara_host, self.vara_port], wrap=True),
                          ft.Text(t("vara_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT)),
@@ -329,6 +340,11 @@ class SettingsView(View):
             self.device.options = self._port_options(self.device.value or "")
             if self.connection.value == "bt" and not self.device.options:
                 self.app.toast(self.t("bt_none"))
+            self.app.page.update()
+
+    def _digi_changed(self, update: bool = True) -> None:
+        self.digi_hops.visible = self.digi_mode.value == "wide"  # WIDE1-1 is always one hop
+        if update:
             self.app.page.update()
 
     def _aprsis_changed(self, update: bool = True) -> None:
@@ -443,6 +459,8 @@ class SettingsView(View):
             "language": self.language.value or "",
             "check_updates": self.check_updates.value,
             **{key: box.value for key, box in self.sound_boxes.items()},
+            "digi_mode": self.digi_mode.value or "off", "digi_max_hops": self.digi_hops.value or "2",
+            "digi_aliases": (self.digi_aliases.value or "").strip().upper(),
             "run_background": bool(self.run_bg.value), "keep_screen_on": self.keep_screen.value or "never",
             "theme": self.theme.value or "auto",
         }

@@ -32,7 +32,7 @@ from . import thursday
 from .aprsis import AprsIsClient, gate_to_is, passcode, third_party
 from .ax25 import PF, U_DM, Address, Frame
 from .bbs import BbsConfigError, BbsServer
-from . import tak
+from . import digipeater, tak
 from . import vara as vara_mod
 from .gps import GpsFix, GpsReader, PushedGps
 from .config import MIN_BEACON_MINUTES, VERSION, Config, data_dir, load_state, save_state
@@ -117,6 +117,8 @@ class Engine:
         self._chat_recent: dict[str, float] = {}
         self.sessions: dict[str, Session] = {}
         self.igate_stats = {"rf_to_is": 0, "is_to_rf": 0, "is_messages": 0}
+        self.digi_dedupe = digipeater.Dedupe()
+        self.digipeated = 0
         self._tasks: set[asyncio.Task] = set()
         self._beacon_task: asyncio.Task | None = None
         self.bbs: BbsServer | None = None
@@ -552,6 +554,7 @@ class Engine:
                 "error": self.aprsis.last_error,
             } if self.aprsis else None,
             "igate_stats": dict(self.igate_stats),
+            "digipeated": self.digipeated,
             "stats": dict(self.station.stats),
             "sessions": self.session_states(),
             "gps": {
@@ -599,6 +602,7 @@ class Engine:
             if frame.is_ui and frame.destination.call == tak.DESTINATION:
                 self._tak_frame(frame)
             return  # only TAK listens
+        self._digipeat(frame)
         if frame.is_ui:
             if frame.destination.call == tak.DESTINATION:
                 return  # TAK (binary protobuf), only in TAK mode; never an APRS station or chat
@@ -621,6 +625,17 @@ class Engine:
             elif sess is None:
                 return
         sess.handle(frame)
+
+    def _digipeat(self, frame: Frame) -> None:
+        """Settings › Digipeater: repeat what the path asks of us (only with transmitting on)."""
+        conf = self.config
+        aliases = digipeater.parse_aliases(conf.digi_aliases)
+        if not self.station.tx_enabled or (conf.digi_mode == "off" and not aliases):
+            return
+        out = digipeater.repeat(frame, self.me, conf.digi_mode, aliases, int(conf.digi_max_hops or 2))
+        if out is not None and self.digi_dedupe.fresh(frame):
+            self.digipeated += 1
+            self._spawn(self._send_quietly(out.encode()))
 
     def _monitor(self, line: str, outgoing: bool = False) -> None:
         entry = f"{time.strftime('%H:%M:%S')} {'>>' if outgoing else '<<'} {line}"

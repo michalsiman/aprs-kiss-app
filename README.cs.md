@@ -39,6 +39,8 @@ skutečném Macu, iPhonu ani iPadu je zatím nikdo nevyzkoušel – **hledáme t
   filtr a legenda. Objeví se i stanice, které iGate pošle z internetu do rádia (pakety třetí strany).
 - **Maják polohy** každých N minut a tlačítko *Poslat polohu teď* v horní liště; status a unproto.
   Ikona (APRS symbol), komentář, SSID a cesta v Nastavení.
+- **Digipeater**: fill-in (WIDE1-1, pro domácí stanici) nebo plný (WIDEn-N s omezením počtu hopů),
+  rámce adresované vaší značce nebo aliasům (např. RELAY), stejný paket jen jednou za 30 sekund.
 - **APRS-IS** (internet) s volitelným **iGate** pro příjem i vysílání; zprávy, které vám iGate pošle
   rádiem, se přijmou a potvrdí.
 - **Poloha z GPS**: z GPS telefonu (na telefonu bez ručně zadané polohy výchozí; Nastavení ukazuje,
