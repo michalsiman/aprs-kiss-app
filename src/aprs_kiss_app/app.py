@@ -80,6 +80,7 @@ class App:
         page.window.min_width = 640
         page.window.min_height = 480
         page.on_resize = self._on_resize
+        page.on_app_lifecycle_state_change = self._lifecycle  # phones: in the background or back
 
         android_usb.register()  # Android: a TNC on the phone's USB port
         android_bt.register()  # … or over Bluetooth (SPP)
@@ -604,19 +605,52 @@ class App:
         except OSError:
             return False
 
+    INTERNET_EVERY = 60  # seconds between checks
+    INTERNET_FAILS = 3  # failed checks in a row before the map goes offline…
+    INTERNET_RETRY = 15  # …this many seconds apart
+    RESUME_GRACE = 20  # back from the background: the phone's network wakes up first
+
+    _foreground = True
+    _resumed_at = 0.0
+
+    def _lifecycle(self, e) -> None:
+        state = getattr(e, "state", None)
+        value = getattr(state, "value", state)
+        if value in ("resume", "show"):
+            if not self._foreground:
+                self._resumed_at = time.monotonic()
+            self._foreground = True
+        elif value in ("pause", "hide", "detach"):
+            self._foreground = False
+
+    def _checking_paused(self) -> bool:
+        """In the background (or just back) a phone may cut the app off the network for a while
+        (battery savers, Xiaomi above all): that is not "no internet" and must not flip the map."""
+        return not self._foreground or time.monotonic() - self._resumed_at < self.RESUME_GRACE
+
     async def _watch_internet(self) -> None:
-        """Every minute: can the map tiles be reached? If not, the maps switch to the offline map by
-        themselves (and back when the internet returns), with a short notice."""
+        """Every minute: can the map tiles be reached? Only after several failed tries in a row the
+        maps switch to the offline map by themselves (and back as soon as the internet answers),
+        with a short notice."""
         await asyncio.sleep(3)  # let the window come up first, so the notice is seen
+        fails, first = 0, True
         while True:
+            if self._checking_paused():
+                await asyncio.sleep(5)
+                continue
             up = await asyncio.to_thread(self._internet_up)
-            if up == self.no_internet:  # changed
+            if self._checking_paused():
+                continue  # it went to the background while asking: the answer means nothing
+            fails = 0 if up else fails + 1
+            need = 1 if first else self.INTERNET_FAILS  # just started with no internet: offline at once
+            first = False
+            if (up and self.no_internet) or (fails >= need and not self.no_internet):
                 self.no_internet = not up
                 self.base_maps_changed()
                 if not self.engine.config.map_offline:
                     self.toast(self.t("net_offline") if self.no_internet else self.t("net_online"), seconds=10)
                 self.page.update()
-            await asyncio.sleep(60)
+            await asyncio.sleep(self.INTERNET_RETRY if 0 < fails < self.INTERNET_FAILS else self.INTERNET_EVERY)
 
     async def set_map_files(self, paths: list[str]) -> list:
         """The imported offline maps changed (settings): reopen them and redraw the maps."""

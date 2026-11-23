@@ -187,8 +187,10 @@ class SettingsView(View):
         self.incoming = ft.Checkbox(label=t("incoming"), value=c.accept_incoming)
 
         # APRS-IS
-        self.aprsis = ft.Checkbox(label=t("aprsis_on"), value=c.aprsis_on, on_change=lambda _e: self._aprsis_changed())
-        self.licence = ft.TextField(label=t("licence_ask"), hint_text=t("licence_text"), helper=t("licence_text"))
+        self.aprsis = ft.Checkbox(label=t("aprsis_on"), value=c.aprsis_enabled, on_change=lambda _e: self._aprsis_changed())
+        self.licence = ft.TextField(hint_text=t("licence_text"), helper=t("licence_text"), width=420)
+        self.licence_box = ft.Column([ft.Text(t("licence_ask"), size=13, color=ft.Colors.PRIMARY), self.licence],
+                                     spacing=4)
         self.is_host = ft.TextField(label=t("server"), value=c.aprsis_host, width=240)
         self.is_port = ft.TextField(label=t("port"), value=str(c.aprsis_port), width=110, input_filter=num)
         self.passcode = ft.TextField(label=t("passcode"), value=c.aprsis_passcode, width=240, password=True,
@@ -263,7 +265,7 @@ class SettingsView(View):
                 _section(t("trk_section"), ft.Icons.ROUTE, self.trk_mode,
                          ft.Row([self.trk_minutes, self.trk_profile, self.trk_still], wrap=True), self.trk_hint),
                 _section(t("digi"), ft.Icons.REPEAT, self.digi_mode, self.digi_hops, self.digi_aliases, self.digi_hint),
-                _section(t("aprsis"), ft.Icons.PUBLIC, self.aprsis, self.licence, self.is_fields, self.is_state),
+                _section(t("aprsis"), ft.Icons.PUBLIC, self.aprsis, self.licence_box, self.is_fields, self.is_state),
                 _section("VARA FM", ft.Icons.SETTINGS_INPUT_ANTENNA, ft.Row([self.vara_host, self.vara_port], wrap=True),
                          ft.Text(t("vara_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT)),
                 _section(t("tak"), ft.Icons.RADAR, ft.Row([self.tak_callsign, self.tak_team, self.tak_role], wrap=True),
@@ -370,7 +372,9 @@ class SettingsView(View):
 
     def _aprsis_changed(self, update: bool = True) -> None:
         on = bool(self.aprsis.value)
-        self.licence.visible = on and not self.engine.config.licence_confirmed  # typed once is enough
+        # typed once is enough; the box, not the field, is shown and hidden: a text field that starts
+        # hidden does not appear when made visible later (Flet), so the sentence could not be typed
+        self.licence_box.visible = on and not self.engine.config.licence_confirmed
         self.is_fields.visible = on
 
     def _show_gps_now(self) -> None:
@@ -605,4 +609,5 @@ class SettingsView(View):
             return
         await self.app.apply_config(conf)
         self._mark_call()
+        self._aprsis_changed()  # the licence sentence, once typed, goes away
         await asyncio.sleep(0)
