@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import math
 import logging
 import time
 from collections import OrderedDict, deque
@@ -167,9 +168,21 @@ class Station:
         return bool(addressee) and addressee.strip().upper() == str(self.me)
 
     def _remember_station(self, packet: dict[str, Any], now: float, via: str = "rf") -> None:
-        """Note a station; `via` is "rf" (heard by the radio) or "is" (seen on APRS-IS)."""
+        """Note a station; `via` is "rf" (heard by the radio) or "is" (seen on APRS-IS).
+
+        An APRS object (a repeater, an event, …) is a place of its own, under its own name: kept under
+        the sender's callsign it moved the sender between all its objects (and drew trails across the
+        country). A killed object goes away."""
         call = packet["from"]
+        owner = None
+        if packet.get("format") == "object" and (packet.get("object_name") or "").strip():
+            owner, call = call, packet["object_name"].strip()
+            if packet.get("alive") is False:
+                self.heard.pop(call, None)
+                return
         entry = self.heard.pop(call, {"call": call, "count": 0})
+        if owner:
+            entry["object_of"] = owner
         entry["count"] += 1
         previous = max(entry.get("last_is") or 0, entry.get("last_rf") or 0)
         entry["last_heard"] = now
@@ -342,9 +355,22 @@ class Station:
                 await task
 
 
+TRACK_MAX_KMH = 400  # faster than this between two positions: not one moving station
+TRACK_SLACK_KM = 2  # GPS jitter and rounding allowed on top
+
+
+def _impossible(last: list, now: float, lat: float, lon: float) -> bool:
+    dlat = math.radians(lat - last[1])
+    dlon = math.radians(lon - last[2]) * math.cos(math.radians((lat + last[1]) / 2))
+    km = 6371.0 * math.hypot(dlat, dlon)
+    return km > TRACK_SLACK_KM + TRACK_MAX_KMH * max(0.0, now - last[0]) / 3600
+
+
 def _track(entry: dict[str, Any], now: float, lat: float, lon: float) -> None:
     """Add a position to the station's last hour, when it moved; older points drop out."""
     track = entry.setdefault("track", [])
+    if track and _impossible(track[-1], now, lat, lon):
+        track.clear()  # a jump no vehicle makes (a wrong position, a shared callsign): start again here
     if track and abs(track[-1][1] - lat) < TRACK_MIN_MOVE_DEG and abs(track[-1][2] - lon) < TRACK_MIN_MOVE_DEG:
         track[-1][0] = now  # still there: just when it was last seen there
     else:

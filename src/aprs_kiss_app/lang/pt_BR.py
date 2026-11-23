@@ -28,6 +28,7 @@ TEXTS = {
     "th_starts_in": "O próximo em {t}",
     "map_trails": "Rastros (por onde as estações passaram na última meia hora)",
     "map_tools_hide": "Ocultar os botões do mapa", "map_tools_show": "Botões do mapa",
+    "object_of": "objeto de {call}",
     "measure_from": "Medir distância daqui",
     "measure_from_me": "Distância da minha posição",
     "measure_hint": "Toque no segundo ponto do mapa",

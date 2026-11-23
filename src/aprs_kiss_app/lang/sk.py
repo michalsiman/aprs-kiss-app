@@ -28,6 +28,7 @@ TEXTS = {
     "th_starts_in": "Ďalší začína o {t}",
     "map_trails": "Chvosty (kadiaľ stanice išli za poslednú polhodinu)",
     "map_tools_hide": "Skryť tlačidlá mapy", "map_tools_show": "Tlačidlá mapy",
+    "object_of": "objekt od {call}",
     "measure_from": "Merať vzdialenosť odtiaľto",
     "measure_from_me": "Vzdialenosť od mojej polohy",
     "measure_hint": "Ťuknite na druhý bod na mape",

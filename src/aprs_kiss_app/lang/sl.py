@@ -28,6 +28,7 @@ TEXTS = {
     "th_starts_in": "Naslednji čez {t}",
     "map_trails": "Sledi (kod so postaje šle v zadnje pol ure)",
     "map_tools_hide": "Skrij gumbe zemljevida", "map_tools_show": "Gumbi zemljevida",
+    "object_of": "objekt od {call}",
     "measure_from": "Izmeri razdaljo od tu",
     "measure_from_me": "Razdalja od mojega položaja",
     "measure_hint": "Tapnite drugo točko na zemljevidu",

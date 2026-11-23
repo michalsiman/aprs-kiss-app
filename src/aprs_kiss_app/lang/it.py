@@ -29,6 +29,7 @@ TEXTS = {
     "th_starts_in": "Il prossimo tra {t}",
     "map_trails": "Tracce (dove sono andate le stazioni nell'ultima mezz'ora)",
     "map_tools_hide": "Nascondi i pulsanti della mappa", "map_tools_show": "Pulsanti della mappa",
+    "object_of": "oggetto di {call}",
     "measure_from": "Misura la distanza da qui",
     "measure_from_me": "Distanza dalla mia posizione",
     "measure_hint": "Tocca il secondo punto sulla mappa",

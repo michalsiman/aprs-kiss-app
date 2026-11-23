@@ -21,6 +21,8 @@ def describe(app, entry: dict) -> str:
     parts.append(app.t("via_heard_rf") if entry.get("last_rf") else app.t("via_heard_is"))
     if entry.get("gated_by"):
         parts.append(f"iGate {entry['gated_by']}")
+    if entry.get("object_of"):
+        parts.append(app.t("object_of", call=entry["object_of"]))  # an APRS object, not a station
     _, name, known = symbol_info(entry.get("symbol_table"), entry.get("symbol"), app.t.language)
     if known:
         parts.append(name)

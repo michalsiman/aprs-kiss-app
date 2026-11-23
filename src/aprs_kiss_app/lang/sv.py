@@ -28,6 +28,7 @@ TEXTS = {
     "th_starts_in": "Nästa om {t}",
     "map_trails": "Spår (var stationerna åkte den senaste halvtimmen)",
     "map_tools_hide": "Dölj kartknapparna", "map_tools_show": "Kartknappar",
+    "object_of": "objekt från {call}",
     "measure_from": "Mät avstånd härifrån",
     "measure_from_me": "Avstånd från min position",
     "measure_hint": "Tryck på den andra punkten på kartan",

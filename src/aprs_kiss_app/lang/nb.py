@@ -28,6 +28,7 @@ TEXTS = {
     "th_starts_in": "Neste om {t}",
     "map_trails": "Spor (hvor stasjonene kjørte den siste halvtimen)",
     "map_tools_hide": "Skjul kartknappene", "map_tools_show": "Kartknapper",
+    "object_of": "objekt fra {call}",
     "measure_from": "Mål avstand herfra",
     "measure_from_me": "Avstand fra posisjonen min",
     "measure_hint": "Trykk på det andre punktet på kartet",

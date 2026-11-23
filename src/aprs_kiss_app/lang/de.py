@@ -28,6 +28,7 @@ TEXTS = {
     "th_starts_in": "Nächster beginnt in {t}",
     "map_trails": "Spuren (wohin die Stationen in der letzten halben Stunde fuhren)",
     "map_tools_hide": "Kartenknöpfe ausblenden", "map_tools_show": "Kartenknöpfe",
+    "object_of": "Objekt von {call}",
     "measure_from": "Entfernung von hier messen",
     "measure_from_me": "Entfernung von meiner Position",
     "measure_hint": "Tippen Sie auf den zweiten Punkt",
