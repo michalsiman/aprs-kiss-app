@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.47 – 2026-11-23
+
+- **One switch for the internet** (Settings › APRS-IS): "Send over the internet too: my position (now,
+  regular, tracker) and messages". It now also governs *Send my position now* (before, that always went
+  to APRS-IS) and sets the default way for messages (radio and internet, or radio only; each message can
+  still choose). Transmit (TX) stays the radio's switch: with TX off and this on, everything goes over the
+  internet only – the app works with APRS-IS alone.
+- **The IS lamp turns red for a second** when something goes out over APRS-IS, like TX on air.
+- **Stations sharing one place** (a digipeater, an iGate and their objects on one mast): all of them now
+  move off the place, which stays free for its grey dot; before, the first marker covered it and you could
+  not tell where the group really is. The dots are drawn on top.
+
 ## 0.1.46 – 2026-11-23
 
 - **Fix: the .flatpak file from the release could not be installed** ("GPG verification enabled, but no

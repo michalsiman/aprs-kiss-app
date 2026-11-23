@@ -31,6 +31,8 @@ them on a real Mac, iPhone or iPad yet – **testers wanted** (see [Platforms](#
   (Natural Earth); in Europe also motorways and main roads (Natural Earth), some 67,000 places of 1,000
   people and more and each country's 30 highest peaks (GeoNames) – more of them as you zoom in. One button switches to it; **with no internet the map
   switches to it by itself** and tells you so, and goes back to OpenStreetMap when the internet returns.
+- **APRS-IS**: one switch sends your position (now, regular, tracker) and messages over the internet too;
+  with transmitting off it all goes over the internet only.
 - **Tracker**: the position button in the top bar sends your position once, or starts the tracker (▶) –
   your GPS position then goes out by itself, at a fixed interval or **smart (SmartBeaconing)** like the APRS
   and LoRa APRS trackers: rarely when standing, more often the faster you go, at once on a turn; course and
