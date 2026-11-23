@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.1.39 – 2026-11-23
+
+- **Your own offline maps** (Settings › Offline maps): import a better map, e.g. a topographic one, from
+  wherever you get it: raster tile maps in MBTiles, PMTiles (v3), SQLiteDB (OsmAnd, Locus), a ZIP of
+  z/x/y tiles (osmdroid/MOBAC), or a ZIP/7z with such files inside (7z on a computer with 7-Zip).
+  Several files at once; on a computer the map is used where it lies, on a phone it moves into the app.
+  Vector maps (Mapsforge, vector MBTiles) are not supported and are refused with a reason.
+- **Map menu**: the map button now chooses between the online map (OpenStreetMap), the imported map and
+  the basic offline map, on the APRS map and on the TAK map; without internet the imported map is used
+  when there is one. Where the imported map has no tiles the basic map shows under it; past its most
+  detailed zoom its tiles are enlarged.
+- **Station trails** (map, the line icon): where each moving station went in the last half hour, a red
+  line like on aprs.fi; off by default, kept in memory only.
+- **Foldable map toolbar**: the bar folds into a gear button and stays folded next time.
+- **APRS Thursday**: one short line ("next one in …"), the rest behind an ⓘ button.
+- **Messages**: the To field and the text each on their own full-width line, the character count by Send.
+- The walking person is back for the `/[` symbol.
+
 ## 0.1.38 – 2026-11-23
 
 - **APRS-IS with the phone's GPS**: the area the server sends stations from ("within 50 km of my position")

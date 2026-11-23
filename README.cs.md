@@ -31,6 +31,10 @@ skutečném Macu, iPhonu ani iPadu je zatím nikdo nevyzkoušel – **hledáme t
   v Evropě i dálnice a hlavní silnice (Natural Earth), asi 67 000 obcí nad 1 000 obyvatel a 30 nejvyšších
   hor každé země (GeoNames) – s přiblížením přibývají další. Přepíná se jedním tlačítkem; **když není internet, mapa se na ni
   přepne sama** a oznámí to, a jakmile se internet vrátí, vrátí se k OpenStreetMap.
+- **Vlastní offline mapa** (Nastavení › Offline mapy): nahrajte si lepší mapu, třeba turistickou,
+  odkudkoli – rastrové dlaždicové mapy **MBTiles, PMTiles, SQLiteDB** (OsmAnd, Locus), **ZIP** s dlaždicemi
+  z/x/y nebo ZIP/7z, ve kterém jsou takové soubory (7z na počítači se 7-Zipem). I víc map naráz; tlačítkem
+  mapy se volí *online*, *stažená* a *základní offline*. Vektorové mapy (Mapsforge, vektorové MBTiles) nejdou.
 - **Zprávy** jako konverzace: opakované až do potvrzení, se stavem doručení, příchozí se potvrzují
   automaticky; nová zpráva na libovolnou značku; upozornění, když nějaká přijde.
 - **#APRSThursday**: vlastní sekce pro čtvrteční síť HOTG přes ANSRVR – zapojení jedním tlačítkem,

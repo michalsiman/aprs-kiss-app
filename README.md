@@ -31,6 +31,11 @@ them on a real Mac, iPhone or iPad yet – **testers wanted** (see [Platforms](#
   (Natural Earth); in Europe also motorways and main roads (Natural Earth), some 67,000 places of 1,000
   people and more and each country's 30 highest peaks (GeoNames) – more of them as you zoom in. One button switches to it; **with no internet the map
   switches to it by itself** and tells you so, and goes back to OpenStreetMap when the internet returns.
+- **Your own offline map** (Settings › Offline maps): import a better map, e.g. a topographic one, from
+  wherever you get it – raster tile maps in **MBTiles, PMTiles, SQLiteDB** (OsmAnd, Locus), a **ZIP** of z/x/y
+  tiles, or a ZIP/7z with such files inside (7z on a computer with 7-Zip). Several maps at once; the map
+  button chooses between *online*, *imported* and *basic offline*. Vector maps (Mapsforge, vector MBTiles)
+  are not supported.
 - **Messages** as conversations: retried until acknowledged, delivery state shown, incoming messages
   acknowledged automatically; a new message to any callsign; a notice when one arrives.
 - **#APRSThursday**: its own section for the weekly HOTG net through ANSRVR – check in with one

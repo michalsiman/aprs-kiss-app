@@ -306,7 +306,7 @@ class BaseMap:
         extra = (self.offline.layers if self.offline else []) + list(self._custom.values())
         for layer in extra:
             layer.visible = offline
-        credits = [source.attribution or source.name for _, source in custom]
+        credits = list(dict.fromkeys(source.attribution or source.name for _, source in custom))  # once each
         self.credit_text.value = (" · ".join([*credits, ATTRIBUTION]) + " (offline)") if offline else OSM_CREDIT
         return [self.tiles, *extra, *([self.trails] if self.trails else []), self.markers]
 
