@@ -20,6 +20,7 @@ DEFAULT_CENTER = (49.8, 15.5)  # Czechia
 REBUILD_SECONDS = 2.0
 MAX_MARKERS = 400  # the most recently heard stations in the area on screen
 MAX_MARKERS_PHONE = 150
+CAMERA_WATCH_SECONDS = 1.0  # while the map is on screen, how often it is asked where it looks
 CAMERA_SECONDS = 2.0  # while the map is shown, where it is looking is asked for no more often than this
 TRAIL_SECONDS = 1800  # the trails show the last half hour
 TRAIL_COLOR = "#E53935"  # one red, like aprs.fi
@@ -47,6 +48,9 @@ class MapView(View):
         self._area = Region.around(*center, self._zoom)  # stations outside it are not put on the map
         self._camera_asked = 0.0
         self._camera_busy = False
+        self._camera_again = False
+        self._camera_seen: tuple | None = None
+        self.app.page.run_task(self._watch_camera)
         self.trails = fm.PolylineLayer(polylines=[])  # where moving stations went in the last hour
         self._trail_cache: dict[tuple, fm.PolylineMarker] = {}
         # measuring a distance: a dashed line between two points, a pin at each end
@@ -169,25 +173,45 @@ class MapView(View):
         return self.source_btn.control
 
     def _gesture_end(self, _e=None) -> None:
-        self.app.page.run_task(self._ask_camera, 0.8)  # after the fling has (mostly) stopped
+        self.app.page.run_task(self._ask_camera, 0.4)  # soon, and the watch below catches the end of a fling
+
+    async def _watch_camera(self) -> None:
+        """While the map is on screen, where it looks is asked for every second. A pinch, a fling or the
+        mouse wheel then always ends with the markers, the lines and the scale redrawn for the new zoom
+        (asking only when the fingers lift missed zooms that went on after it)."""
+        while not self.app._closing and self.built and self in self.app.views:  # a rebuilt app: this view is gone
+            await asyncio.sleep(CAMERA_WATCH_SECONDS)
+            if self.app.current_key == self.key:
+                await self._ask_camera()
 
     async def _ask_camera(self, delay: float = 0) -> None:
         """Where the map looks now: the offline map and the markers follow it."""
+        if delay:
+            await asyncio.sleep(delay)
         if self._camera_busy:
+            self._camera_again = True  # asked while asking: ask once more when this answer is in
             return
         self._camera_busy = True
         try:
-            await asyncio.sleep(delay)
-            self._camera_asked = time.monotonic()
-            camera = await self.map.get_camera()
-        except Exception:  # noqa: BLE001 - the map is not on screen (yet)
-            return
+            while True:
+                self._camera_again = False
+                self._camera_asked = time.monotonic()
+                try:
+                    camera = await self.map.get_camera()
+                except Exception:  # noqa: BLE001 - the map is not on screen (yet)
+                    return
+                lon = (camera.center.longitude + 180) % 360 - 180
+                seen = (round(camera.center.latitude, 6), round(lon, 6), round(camera.zoom, 3),
+                        round(camera.rotation or 0, 1))
+                if seen != self._camera_seen:  # nothing to redraw when the map has not moved
+                    self._camera_seen = seen
+                    if self.controls.rotated(camera.rotation) and self.app.current_key == self.key:
+                        self.controls.needle.update()
+                    self._look(camera.center.latitude, lon, camera.zoom)
+                if not self._camera_again:
+                    break
         finally:
             self._camera_busy = False
-        lon = (camera.center.longitude + 180) % 360 - 180
-        if self.controls.rotated(camera.rotation) and self.app.current_key == self.key:
-            self.controls.needle.update()
-        self._look(camera.center.latitude, lon, camera.zoom)
 
     def _look(self, lat: float, lon: float, zoom: float) -> None:
         self.base.moved(lat, lon, zoom, self.app.offline_map())
