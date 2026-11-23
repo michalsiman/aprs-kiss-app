@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.38" date="2026-11-23">
+      <description>
+        <p>APRS-IS stations around the phone's GPS position; a tidier phone top bar.</p>
+      </description>
+    </release>
     <release version="0.1.37" date="2026-11-23">
       <description>
         <p>APRS digipeater (fill-in or full); on Android a TNC over Bluetooth.</p>
