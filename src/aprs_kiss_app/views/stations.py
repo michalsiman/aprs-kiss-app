@@ -48,7 +48,7 @@ class StationsView(View):
                 ft.Row([self.filter, self.internet, self.count,
                         ft.TextButton(self.t("legend"), icon=ft.Icons.HELP_OUTLINE,
                                       on_click=lambda _e: show_legend(self.app))],
-                       vertical_alignment=ft.CrossAxisAlignment.CENTER),
+                       vertical_alignment=ft.CrossAxisAlignment.CENTER, wrap=self.app.compact, run_spacing=0),
                 self.list,
             ],
             expand=True,

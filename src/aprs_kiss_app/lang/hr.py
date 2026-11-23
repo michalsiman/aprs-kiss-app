@@ -24,7 +24,7 @@ TEXTS = {
     "pause": "Pauza", "resume": "Nastavi",
     "beacon_now": "Pošalji poziciju sada", "position_sent": "Pozicija poslana",
     "tnc_section": "Veza s TNC-om", "connection": "Veza", "conn_tcp": "KISS preko TCP-a (mreža)",
-    "conn_serial": "Serijski port (USB)", "host": "Adresa", "port": "Port", "device": "Serijski port",
+    "conn_serial": "Serijski port (USB)", "conn_usb": "TNC na USB-u (OTG kabel)", "host": "Adresa", "port": "Port", "device": "Serijski port",
     "baudrate": "Brzina (baud)", "refresh_ports": "Traži serijske portove",
     "no_ports": "Nije pronađen nijedan serijski port", "txdelay": "TX delay za TNC (ms, 0 = ne mijenjaj)",
     "station": "Stanica", "callsign": "Pozivni znak", "ssid": "SSID", "symbol": "Ikona (APRS simbol)",

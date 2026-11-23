@@ -24,7 +24,7 @@ TEXTS = {
     "pause": "Pausa", "resume": "Fortsätt",
     "beacon_now": "Skicka position nu", "position_sent": "Position skickad",
     "tnc_section": "TNC-anslutning", "connection": "Anslutning", "conn_tcp": "KISS över TCP (nätverk)",
-    "conn_serial": "Serieport (USB)", "host": "Adress", "port": "Port", "device": "Serieport",
+    "conn_serial": "Serieport (USB)", "conn_usb": "TNC via USB (OTG-kabel)", "host": "Adress", "port": "Port", "device": "Serieport",
     "baudrate": "Hastighet (baud)", "refresh_ports": "Sök efter serieportar",
     "no_ports": "Inga serieportar hittades", "txdelay": "TX delay till TNC:n (ms, 0 = ändra inte)",
     "station": "Station", "callsign": "Anropssignal", "ssid": "SSID", "symbol": "Ikon (APRS-symbol)",

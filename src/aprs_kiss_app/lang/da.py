@@ -24,7 +24,7 @@ TEXTS = {
     "pause": "Pause", "resume": "Fortsæt",
     "beacon_now": "Send position nu", "position_sent": "Position sendt",
     "tnc_section": "TNC-forbindelse", "connection": "Forbindelse", "conn_tcp": "KISS over TCP (netværk)",
-    "conn_serial": "Seriel port (USB)", "host": "Adresse", "port": "Port", "device": "Seriel port",
+    "conn_serial": "Seriel port (USB)", "conn_usb": "TNC på USB (OTG-kabel)", "host": "Adresse", "port": "Port", "device": "Seriel port",
     "baudrate": "Hastighed (baud)", "refresh_ports": "Søg efter serielle porte",
     "no_ports": "Ingen serielle porte fundet", "txdelay": "TX delay til TNC'en (ms, 0 = lad være)",
     "station": "Station", "callsign": "Kaldesignal", "ssid": "SSID", "symbol": "Ikon (APRS-symbol)",

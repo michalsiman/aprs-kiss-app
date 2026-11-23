@@ -24,7 +24,7 @@ TEXTS = {
     "pause": "Пауза", "resume": "Продовжити",
     "beacon_now": "Надіслати позицію зараз", "position_sent": "Позицію надіслано",
     "tnc_section": "Підключення до TNC", "connection": "Підключення", "conn_tcp": "KISS через TCP (мережа)",
-    "conn_serial": "Послідовний порт (USB)", "host": "Адреса", "port": "Порт", "device": "Послідовний порт",
+    "conn_serial": "Послідовний порт (USB)", "conn_usb": "TNC через USB (OTG-кабель)", "host": "Адреса", "port": "Порт", "device": "Послідовний порт",
     "baudrate": "Швидкість (бод)", "refresh_ports": "Шукати послідовні порти",
     "no_ports": "Послідовних портів не знайдено", "txdelay": "TX delay для TNC (мс, 0 = не змінювати)",
     "station": "Станція", "callsign": "Позивний", "ssid": "SSID", "symbol": "Значок (символ APRS)",

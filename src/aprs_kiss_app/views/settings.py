@@ -8,6 +8,7 @@ import os
 
 import flet as ft
 
+from aprs_kiss_core import android_usb
 from aprs_kiss_core.aprsis import licence_confirmed
 from aprs_kiss_core.bbs import BbsConfigError
 from aprs_kiss_core.bbs.storage import (
@@ -83,6 +84,11 @@ class SettingsView(View):
     icon = ft.Icons.SETTINGS_OUTLINED
     selected_icon = ft.Icons.SETTINGS
 
+    @property
+    def usb_ok(self) -> bool:
+        """The USB (OTG) connection exists: in the Android app (APRS_KISS_USB=1 shows it for tests)."""
+        return android_usb.available() or os.environ.get("APRS_KISS_USB") == "1"
+
     def build(self) -> ft.Control:
         c = self.engine.config
         t = self.t
@@ -92,8 +98,10 @@ class SettingsView(View):
         # TNC
         self.connection = ft.Dropdown(label=t("connection"), value=c.connection, width=320,
                                       options=[ft.DropdownOption(key="tcp", text=t("conn_tcp"))]
-                                      # phones: no USB serial from Python yet, only KISS over the network
-                                      + ([] if self.app.mobile else [ft.DropdownOption(key="serial", text=t("conn_serial"))]),
+                                      # Android: a TNC on the phone's USB port (OTG); computers: a serial port
+                                      + ([ft.DropdownOption(key="usb", text=t("conn_usb"))] if self.usb_ok
+                                         else [] if self.app.mobile
+                                         else [ft.DropdownOption(key="serial", text=t("conn_serial"))]),
                                       on_select=lambda _e: self._connection_changed())
         self.host = ft.TextField(label=t("host"), value=c.host, width=240)
         self.port = ft.TextField(label=t("port"), value=str(c.port), width=110, input_filter=num)
@@ -232,7 +240,7 @@ class SettingsView(View):
         show_about(self.app)
 
     def _port_options(self, current: str = "") -> list[ft.DropdownOption]:
-        ports = serial_ports()
+        ports = [(d, d) for d in android_usb.list_devices()] if self.usb_ok else serial_ports()
         options = [ft.DropdownOption(key=d, text=desc) for d, desc in ports]
         if current and not any(d == current for d, _ in ports):
             options.insert(0, ft.DropdownOption(key=current, text=current))
@@ -244,7 +252,7 @@ class SettingsView(View):
             self.app.toast(self.t("no_ports"))
 
     def _connection_changed(self, update: bool = True) -> None:
-        serial = self.connection.value == "serial"
+        serial = self.connection.value in ("serial", "usb")
         self.tcp_row.visible = not serial
         self.serial_row.visible = serial
 

@@ -120,7 +120,7 @@ class BbsView(View):
     # ─── actions ──────────────────────────────────────────────────────────
 
     def _open(self, m: dict) -> None:
-        self.app.page.show_dialog(ft.AlertDialog(
+        self.app.show_dialog(ft.AlertDialog(
             title=ft.Text(f"#{m['number']} {m['subject']}"),
             content=ft.Column([
                 ft.Text(f"{m['from']} → {m['to']}" + (f" @ {m['at']}" if m["at"] else "") + f" · {clock(m['date'])}",
@@ -173,7 +173,7 @@ class BbsView(View):
             await self._apply(True)
 
         field.on_submit = enable
-        self.app.page.show_dialog(ft.AlertDialog(
+        self.app.show_dialog(ft.AlertDialog(
             modal=True,
             title=ft.Text(self.t("bbs_confirm_title")),
             content=ft.Column([

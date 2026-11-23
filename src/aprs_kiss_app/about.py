@@ -109,7 +109,7 @@ def show_about(app: App) -> None:
         width=480,
         scroll=ft.ScrollMode.AUTO,
     )
-    app.page.show_dialog(ft.AlertDialog(
+    app.show_dialog(ft.AlertDialog(
         content=content,
         actions=[ft.TextButton(t("close"), on_click=lambda _e: app.page.pop_dialog())],
     ))

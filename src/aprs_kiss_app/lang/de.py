@@ -24,7 +24,7 @@ TEXTS = {
     "pause": "Pause", "resume": "Weiter",
     "beacon_now": "Position jetzt senden", "position_sent": "Position gesendet",
     "tnc_section": "TNC-Verbindung", "connection": "Verbindung", "conn_tcp": "KISS über TCP (Netzwerk)",
-    "conn_serial": "Serielle Schnittstelle (USB)", "host": "Adresse", "port": "Port", "device": "Serielle Schnittstelle",
+    "conn_serial": "Serielle Schnittstelle (USB)", "conn_usb": "TNC über USB (OTG-Kabel)", "host": "Adresse", "port": "Port", "device": "Serielle Schnittstelle",
     "baudrate": "Geschwindigkeit (Baud)", "refresh_ports": "Serielle Schnittstellen suchen",
     "no_ports": "Keine seriellen Schnittstellen gefunden", "txdelay": "TX-Delay für den TNC (ms, 0 = nicht ändern)",
     "station": "Station", "callsign": "Rufzeichen", "ssid": "SSID", "symbol": "Symbol (APRS)",

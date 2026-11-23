@@ -24,7 +24,7 @@ TEXTS = {
     "pause": "Пауза", "resume": "Настави",
     "beacon_now": "Пошаљи позицију сада", "position_sent": "Позиција послата",
     "tnc_section": "Веза са TNC-ом", "connection": "Веза", "conn_tcp": "KISS преко TCP-а (мрежа)",
-    "conn_serial": "Серијски порт (USB)", "host": "Адреса", "port": "Порт", "device": "Серијски порт",
+    "conn_serial": "Серијски порт (USB)", "conn_usb": "TNC преко USB-а (OTG кабл)", "host": "Адреса", "port": "Порт", "device": "Серијски порт",
     "baudrate": "Брзина (бод)", "refresh_ports": "Тражи серијске портове",
     "no_ports": "Није пронађен ниједан серијски порт", "txdelay": "TX delay за TNC (ms, 0 = не мењај)",
     "station": "Станица", "callsign": "Позивни знак", "ssid": "SSID", "symbol": "Иконица (APRS симбол)",

@@ -52,3 +52,10 @@ module = "main"
 
 [tool.flet.android.permission]
 "android.permission.INTERNET" = true
+
+# Android: pyjnius reaches the USB host API for a TNC on the phone's USB port (aprs_kiss_core/android_usb.py)
+[tool.flet.android]
+dependencies = ["pyjnius"]
+
+[tool.flet.android.feature]
+"android.hardware.usb.host" = false  # used when present, not required

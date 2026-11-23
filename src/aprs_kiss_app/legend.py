@@ -79,7 +79,7 @@ def show_legend(app: App) -> None:
     if not counts and not unknown:
         rows.append(ft.Text(t("no_stations"), color=ft.Colors.ON_SURFACE_VARIANT))
 
-    app.page.show_dialog(ft.AlertDialog(
+    app.show_dialog(ft.AlertDialog(
         title=ft.Text(t("legend")),
         content=ft.Column(rows, tight=True, spacing=6, width=440, scroll=ft.ScrollMode.AUTO),
         actions=[ft.TextButton(t("close"), on_click=lambda _e: app.page.pop_dialog())],

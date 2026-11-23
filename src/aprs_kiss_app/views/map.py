@@ -67,7 +67,7 @@ class MapView(View):
             bar = ft.Column([
                 ft.Row([*buttons, ft.IconButton(ft.Icons.HELP_OUTLINE, tooltip=self.t("legend"), on_click=legend)],
                        tight=True, spacing=0),
-                ft.Row([self.internet, self.only_recent], tight=True, spacing=0),
+                ft.Row([self.internet, self.only_recent], tight=True, spacing=0, run_spacing=0, wrap=True),
             ], tight=True, spacing=0)
         else:
             bar = ft.Row([*buttons, self.internet, self.only_recent,
@@ -77,6 +77,7 @@ class MapView(View):
             bar,
             bgcolor=ft.Colors.with_opacity(0.85, ft.Colors.SURFACE),
             border_radius=8, padding=ft.Padding.symmetric(horizontal=4), left=8, top=8,
+            right=8 if self.app.compact else None,  # a phone: bounded, so the filters wrap
         )
         return ft.Stack([self.menu, overlay], expand=True)
 

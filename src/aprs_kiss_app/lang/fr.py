@@ -25,7 +25,7 @@ TEXTS = {
     "pause": "Pause", "resume": "Reprendre",
     "beacon_now": "Envoyer la position maintenant", "position_sent": "Position envoyée",
     "tnc_section": "Connexion au TNC", "connection": "Connexion", "conn_tcp": "KISS sur TCP (réseau)",
-    "conn_serial": "Port série (USB)", "host": "Adresse", "port": "Port", "device": "Port série",
+    "conn_serial": "Port série (USB)", "conn_usb": "TNC sur USB (câble OTG)", "host": "Adresse", "port": "Port", "device": "Port série",
     "baudrate": "Vitesse (bauds)", "refresh_ports": "Chercher les ports série",
     "no_ports": "Aucun port série trouvé", "txdelay": "TX delay envoyé au TNC (ms, 0 = ne pas changer)",
     "station": "Station", "callsign": "Indicatif", "ssid": "SSID", "symbol": "Icône (symbole APRS)",

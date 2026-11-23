@@ -12,6 +12,7 @@ from typing import Any
 
 import flet as ft
 
+from aprs_kiss_core import android_usb
 from aprs_kiss_core.config import VERSION, Config, data_dir, load_config, save_config
 
 from . import theme
@@ -21,7 +22,7 @@ from .about import show_about
 from . import updates
 from .i18n import Translator
 from .symbols import symbol_info
-from .views.base import View, clock
+from .views.base import View, adapt, clock
 from .views.bbs import BbsView
 from .views.tak import TakView
 from .views.chat import ChatView
@@ -66,8 +67,8 @@ class App:
         page = self.page
         page.title = "APRS & Packet"
         page.theme_mode = ft.ThemeMode.SYSTEM
-        page.theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
-        page.dark_theme = ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
+        page.theme = self._theme()
+        page.dark_theme = self._theme()
         page.padding = 0
         page.window.prevent_close = True
         page.window.on_event = self._on_window_event
@@ -76,10 +77,13 @@ class App:
         page.window.min_height = 480
         page.on_resize = self._on_resize
 
+        android_usb.register()  # Android: a TNC on the phone's USB port
         config = await asyncio.to_thread(load_config, self.folder)
         if self.mobile and (config.bbs_enabled or config.connection == "serial" or config.gps_source == "usb"):
-            # what a phone cannot do: BBS SERVER, a USB serial TNC, a USB GPS
-            config = Config.from_dict({**config.to_dict(), "bbs_enabled": False, "connection": "tcp",
+            # what a phone does not do: BBS SERVER, a USB GPS; a serial TNC is reached through USB instead
+            config = Config.from_dict({**config.to_dict(), "bbs_enabled": False,
+                                       "connection": ("usb" if android_usb.available() else "tcp")
+                                       if config.connection == "serial" else config.connection,
                                        "gps_source": "manual"}).validate()
         self.engine = Engine(config, self.folder)
         self.engine.add_listener(self._on_event)
@@ -119,7 +123,7 @@ class App:
             self.page.window.minimized = True
             self.page.update()
 
-        self.page.show_dialog(ft.AlertDialog(
+        self.show_dialog(ft.AlertDialog(
             modal=True,
             title=ft.Text(self.t("quit_title")),
             content=ft.Column([ft.Text(self.t("quit_text")), *[ft.Text(f"• {w}") for w in what]],
@@ -170,8 +174,48 @@ class App:
 
     @property
     def mobile(self) -> bool:
-        """A phone or tablet (Android, iOS): no BBS SERVER, no USB serial or USB GPS."""
-        return self.page.platform in (ft.PagePlatform.ANDROID, ft.PagePlatform.IOS)
+        """A phone or tablet (Android, iOS): no BBS SERVER, no USB GPS. APRS_KISS_PHONE=1 pretends one (tests)."""
+        return (self.page.platform in (ft.PagePlatform.ANDROID, ft.PagePlatform.IOS)
+                or os.environ.get("APRS_KISS_PHONE") == "1")
+
+    def _theme(self) -> ft.Theme:
+        """Phones get smaller type and denser fields: their screens are narrow and many have large fonts set."""
+        if not self.mobile:
+            return ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
+        size = lambda n: ft.TextStyle(size=n, color=ft.Colors.ON_SURFACE)  # noqa: E731 - a style without a color turns black
+        return ft.Theme(
+            color_scheme_seed=ft.Colors.INDIGO,
+            visual_density=ft.VisualDensity.COMPACT,
+            text_theme=ft.TextTheme(
+                body_large=size(14), body_medium=size(13), body_small=size(11),
+                title_large=size(18), title_medium=size(14), title_small=size(13),
+                label_large=size(13), label_medium=size(11), label_small=size(10),
+                headline_small=size(19), headline_medium=size(22),
+            ),
+            input_decoration_theme=ft.InputDecorationTheme(
+                dense=True, content_padding=ft.Padding.symmetric(horizontal=10, vertical=10)),
+        )
+
+    @property
+    def fit_width(self) -> float | None:
+        """On a phone: how wide a field or box on a screen may be (None: any width)."""
+        if not self.compact:
+            return None
+        return max(220.0, (self.page.width or 400) - 56)
+
+    def show_dialog(self, dialog: ft.DialogControl) -> None:
+        """A dialog or message bar that fits the screen."""
+        if self.compact:
+            limit = max(200.0, (self.page.width or 400) - 120)
+            if isinstance(dialog, ft.SnackBar):
+                dialog.width = None
+            else:
+                adapt(dialog, limit)
+                dialog.inset_padding = ft.Padding.symmetric(horizontal=16, vertical=24)
+                dialog.content_padding = ft.Padding.only(left=18, right=18, top=12, bottom=8)
+        else:
+            adapt(dialog)
+        self.page.show_dialog(dialog)
 
     def _is_compact(self, width: float | None = None) -> bool:
         page = self.page
@@ -459,7 +503,7 @@ class App:
         if st.available and st.notified != st.latest and not self._closing:
             st.notified = st.latest
             await asyncio.to_thread(updates.save, self.folder, st)
-            self.page.show_dialog(ft.SnackBar(
+            self.show_dialog(ft.SnackBar(
                 ft.Text(self.t("update_available", version=st.latest)),
                 action=ft.SnackBarAction(label=self.t("update_show"),
                                          on_click=lambda _e: self.page.run_task(self._open_release)),
@@ -499,7 +543,7 @@ class App:
                 if c.strip()}
 
     def toast(self, text: str, error: bool = False, seconds: float = 4) -> None:
-        self.page.show_dialog(ft.SnackBar(
+        self.show_dialog(ft.SnackBar(
             ft.Text(text, color=ft.Colors.ON_ERROR_CONTAINER if error else None),
             bgcolor=ft.Colors.ERROR_CONTAINER if error else None,
             behavior=ft.SnackBarBehavior.FLOATING, width=520, duration=int(seconds * 1000),
@@ -528,7 +572,7 @@ class App:
             self.view("messages").open_conversation(sender)
             self.select("messages")
 
-        self.page.show_dialog(ft.SnackBar(
+        self.show_dialog(ft.SnackBar(
             ft.Text(f"{self.t('message_from', call=sender)}: {message['text']}"),
             action=ft.SnackBarAction(label=self.t("messages"), on_click=open_it),
             duration=5000,
@@ -590,7 +634,7 @@ class App:
         if entry.get("latitude") is not None:
             actions.insert(0, ft.TextButton(self.t("show_on_map"), icon=ft.Icons.MAP, on_click=on_map))
         actions.append(ft.TextButton(self.t("close"), on_click=lambda _e: self.page.pop_dialog()))
-        self.page.show_dialog(ft.AlertDialog(
+        self.show_dialog(ft.AlertDialog(
             title=ft.Text(f"{pic}  {call}"),
             content=ft.Column(rows, tight=True, spacing=6, width=420),
             actions=actions,

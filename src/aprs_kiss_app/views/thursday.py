@@ -34,17 +34,20 @@ class ThursdayView(View):
 
     def build(self) -> ft.Control:
         self._signature = None
-        self.status = ft.Text(size=16, weight=ft.FontWeight.BOLD)
+        self.status = ft.Text(size=16, weight=ft.FontWeight.BOLD, expand=True)
         self.member = ft.Text(color=ft.Colors.ON_SURFACE_VARIANT)
         self.wait = ft.Text(size=12, color=ft.Colors.ON_SURFACE_VARIANT, visible=False)
         self.feed = ft.ListView(expand=True, spacing=8, auto_scroll=True, padding=ft.Padding.all(12))
         self.text = ft.TextField(hint_text=self.t("th_placeholder"), expand=True, dense=True,
                                  max_length=thursday.MAX_TEXT, on_submit=self._send)
+        compact = self.app.compact
         self.via = ft.Dropdown(
-            width=200, dense=True, value="internet",
+            width=130 if compact else 200, dense=True, value="internet",
             options=[ft.DropdownOption(key=k, text=self.t(f"via_{k}")) for k in ("radio", "internet", "both")],
         )
-        self.send_btn = ft.FilledButton(self.t("th_send"), icon=ft.Icons.SEND, on_click=self._send)
+        self.send_btn = (ft.IconButton(ft.Icons.SEND, tooltip=self.t("th_send"), on_click=self._send,
+                                       style=ft.ButtonStyle(bgcolor=ft.Colors.PRIMARY, color=ft.Colors.ON_PRIMARY))
+                         if compact else ft.FilledButton(self.t("th_send"), icon=ft.Icons.SEND, on_click=self._send))
         self.leave_btn = ft.TextButton(self.t("th_leave"), icon=ft.Icons.LOGOUT, on_click=self._leave)
         header = ft.Container(
             ft.Column([

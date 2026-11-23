@@ -24,7 +24,7 @@ TEXTS = {
     "pause": "Premor", "resume": "Nadaljuj",
     "beacon_now": "Pošlji položaj zdaj", "position_sent": "Položaj poslan",
     "tnc_section": "Povezava s TNC", "connection": "Povezava", "conn_tcp": "KISS prek TCP (omrežje)",
-    "conn_serial": "Serijska vrata (USB)", "host": "Naslov", "port": "Vrata", "device": "Serijska vrata",
+    "conn_serial": "Serijska vrata (USB)", "conn_usb": "TNC na USB (kabel OTG)", "host": "Naslov", "port": "Vrata", "device": "Serijska vrata",
     "baudrate": "Hitrost (baud)", "refresh_ports": "Poišči serijska vrata",
     "no_ports": "Ni najdenih serijskih vrat", "txdelay": "TX delay za TNC (ms, 0 = ne spreminjaj)",
     "station": "Postaja", "callsign": "Klicni znak", "ssid": "SSID", "symbol": "Ikona (simbol APRS)",

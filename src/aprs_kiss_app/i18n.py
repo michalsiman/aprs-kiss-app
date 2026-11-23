@@ -33,7 +33,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "beacon_now": "Send position now", "position_sent": "Position sent",
         # settings
         "tnc_section": "TNC connection", "connection": "Connection", "conn_tcp": "KISS over TCP (network)",
-        "conn_serial": "Serial port (USB)", "host": "Host", "port": "Port", "device": "Serial port",
+        "conn_serial": "Serial port (USB)", "conn_usb": "TNC on USB (OTG cable)", "host": "Host", "port": "Port", "device": "Serial port",
         "baudrate": "Speed (baud)", "refresh_ports": "Look for serial ports",
         "no_ports": "No serial ports found", "txdelay": "TX delay sent to the TNC (ms, 0 = leave)",
         "station": "Station", "callsign": "Callsign", "ssid": "SSID", "symbol": "Icon (APRS symbol)",
@@ -124,7 +124,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "pause": "Pozastavit", "resume": "Pokračovat",
         "beacon_now": "Poslat polohu teď", "position_sent": "Poloha odeslána",
         "tnc_section": "Připojení k TNC", "connection": "Připojení", "conn_tcp": "KISS přes TCP (síť)",
-        "conn_serial": "Sériový port (USB)", "host": "Adresa", "port": "Port", "device": "Sériový port",
+        "conn_serial": "Sériový port (USB)", "conn_usb": "TNC na USB (OTG kabel)", "host": "Adresa", "port": "Port", "device": "Sériový port",
         "baudrate": "Rychlost (baud)", "refresh_ports": "Hledat sériové porty",
         "no_ports": "Žádné sériové porty nenalezeny", "txdelay": "TX delay pro TNC (ms, 0 = neměnit)",
         "station": "Stanice", "callsign": "Značka", "ssid": "SSID", "symbol": "Ikona (APRS symbol)",

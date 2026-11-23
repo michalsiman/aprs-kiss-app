@@ -235,7 +235,7 @@ class TakView(View):
             await self._apply(True)
 
         field.on_submit = enable
-        self.app.page.show_dialog(ft.AlertDialog(
+        self.app.show_dialog(ft.AlertDialog(
             modal=True, title=ft.Text(self.t("tak_confirm_title")),
             content=ft.Column([ft.Text(self.t("tak_confirm_ask")),
                                ft.Text(self.t("tak_confirm_text"), weight=ft.FontWeight.BOLD, selectable=True),

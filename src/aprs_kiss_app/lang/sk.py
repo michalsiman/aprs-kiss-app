@@ -24,7 +24,7 @@ TEXTS = {
     "pause": "Pozastaviť", "resume": "Pokračovať",
     "beacon_now": "Poslať polohu teraz", "position_sent": "Poloha odoslaná",
     "tnc_section": "Pripojenie k TNC", "connection": "Pripojenie", "conn_tcp": "KISS cez TCP (sieť)",
-    "conn_serial": "Sériový port (USB)", "host": "Adresa", "port": "Port", "device": "Sériový port",
+    "conn_serial": "Sériový port (USB)", "conn_usb": "TNC na USB (OTG kábel)", "host": "Adresa", "port": "Port", "device": "Sériový port",
     "baudrate": "Rýchlosť (baud)", "refresh_ports": "Hľadať sériové porty",
     "no_ports": "Nenašiel sa žiadny sériový port", "txdelay": "TX delay pre TNC (ms, 0 = nemeniť)",
     "station": "Stanica", "callsign": "Značka", "ssid": "SSID", "symbol": "Ikona (APRS symbol)",
