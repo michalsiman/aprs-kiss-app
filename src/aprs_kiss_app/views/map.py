@@ -12,6 +12,7 @@ import flet_map as fm
 from ..legend import COLOR_ME, show_legend, station_color, visible
 from ..offline_map import MIN_ZOOM, BaseMap, Region, ScaleBar, gestures
 from ..symbols import emoji
+from ..declutter import spread
 from .map_source import MapSourceButton
 from .base import View, toggle
 
@@ -22,6 +23,7 @@ MAX_MARKERS_PHONE = 150
 CAMERA_SECONDS = 2.0  # while the map is shown, where it is looking is asked for no more often than this
 TRAIL_SECONDS = 1800  # the trails show the last half hour
 TRAIL_COLOR = "#E53935"  # one red, like aprs.fi
+LEADER_COLOR = "#757575"  # from a spread-out marker to where the station really is
 MUTED_OPACITY = 0.45  # muted map: tiles faded over a neutral background, so the colours recede
 
 
@@ -171,6 +173,11 @@ class MapView(View):
         self.base.moved(lat, lon, zoom, self.app.offline_map())
         self.scale.show(lat, zoom)
         changed = True  # at least the scale follows the zoom (the update sends only what changed)
+        self._zoom = zoom
+        if abs(zoom - getattr(self, "_layout_zoom", zoom)) >= 0.3:  # the markers' spread depends on the zoom
+            self._signature = None
+            self._last_build = 0
+            self.refresh()
         if not self._area.covers(lat, lon, zoom):
             self._area = Region.around(lat, lon, zoom)
             self._signature = None
@@ -259,19 +266,27 @@ class MapView(View):
         if here:
             wanted.append((self.engine.status()["callsign"] or self.t("my_position"), *here,
                            emoji(conf.symbol[:1], conf.symbol[1:]), COLOR_ME, True, "me"))
-        cache, markers = {}, []
-        for key in wanted:
-            marker = self._cache.get(key)
+        # stations whose markers would cover each other are spread in a circle, at this zoom
+        self._layout_zoom = self._zoom
+        me = len(wanted) - 1 if here else None  # our own station stays where it is
+        shown = spread([(k[1], k[2]) for k in wanted], self._zoom, fixed=me)
+        cache, markers, leaders = {}, [], []
+        for key, (slat, slon) in zip(wanted, shown):
+            moved = (slat, slon) != (key[1], key[2])
+            ckey = (key, round(slat, 7), round(slon, 7))
+            marker = self._cache.get(ckey)
             if marker is None:
-                call, lat, lon, icon, color, bold = key[:6]
+                call, _lat, _lon, icon, color, bold = key[:6]
                 click = None if len(key) > 6 else (lambda _e, c=call: self.app.show_station(c))
-                marker = self._marker(lat, lon, call, icon, color, on_click=click, bold=bold)
-            cache[key] = marker
+                marker = self._marker(slat, slon, call, icon, color, on_click=click, bold=bold)
+            cache[ckey] = marker
             markers.append(marker)
+            if moved:  # a thin line to where the station really is
+                leaders.append(("leader", ((round(slat, 7), round(slon, 7)), (key[1], key[2]))))
         self._cache = cache
         if [id(m) for m in markers] != [id(m) for m in self.markers.markers]:
             self.markers.markers = markers
-        self._draw_trails(trails)
+        self._draw_trails(trails + leaders)
 
     def _draw_trails(self, trails: list) -> None:
         """A thin red line joining where the station was (the marker shows where it is now); unchanged ones
@@ -280,9 +295,11 @@ class MapView(View):
         for key in sorted(trails):
             line = self._trail_cache.get(key)
             if line is None:
-                _call, points = key
+                kind, points = key
+                leader = kind == "leader"
                 line = fm.PolylineMarker(coordinates=[fm.MapLatitudeLongitude(lat, lon) for lat, lon in points],
-                                         color=TRAIL_COLOR, stroke_width=2)
+                                         color=LEADER_COLOR if leader else TRAIL_COLOR,
+                                         stroke_width=1.2 if leader else 2)
             cache[key] = line
             lines.append(line)
         self._trail_cache = cache
