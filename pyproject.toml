@@ -1,6 +1,6 @@
 [project]
 name = "aprs-kiss"
-version = "0.1.25"
+version = "0.1.26"
 description = "APRS station and packet radio terminal for a KISS TNC, for computers and phones"
 readme = "README.md"
 license = "MIT"
@@ -63,6 +63,9 @@ NSLocationWhenInUseUsageDescription = "Your position for the map and the APRS be
 # Android: pyjnius reaches the USB host API for a TNC on the phone's USB port (aprs_kiss_core/android_usb.py)
 [tool.flet.android]
 dependencies = ["pyjnius"]
+# The launcher icon: assets/icon_android.png is the icon blue to the edges (Android masks it to its own
+# shape), so no white margin around it; this colour is behind it, the blue of the icon's middle.
+adaptive_icon_background = "#3D46B2"
 
 [tool.flet.android.feature]
 "android.hardware.usb.host" = false  # used when present, not required

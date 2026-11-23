@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.26" date="2026-11-23">
+      <description>
+        <p>Android: the app icon is blue to the edges, without a white margin.</p>
+      </description>
+    </release>
     <release version="0.1.25" date="2026-11-23">
       <description>
         <p>On phones the screens are in a menu sliding in from the side (the menu button) instead of a bar along the bottom.</p>

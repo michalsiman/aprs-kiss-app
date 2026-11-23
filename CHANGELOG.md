@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.26 – 2026-11-23
+
+- **Android: the app icon is blue to the edges**, with no white margin around it; the launcher shapes
+  it (circle, rounded square…) like the other icons.
+
 ## 0.1.25 – 2026-11-23
 
 - **Phone: the screens are in a menu again**, sliding in from the left with the ☰ button in the top bar
