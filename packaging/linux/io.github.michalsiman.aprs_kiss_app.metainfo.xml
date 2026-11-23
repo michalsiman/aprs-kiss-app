@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.46" date="2026-11-23">
+      <description>
+        <p>The .flatpak file installs again (signed); settings fields aligned to the left in a wide window.</p>
+      </description>
+    </release>
     <release version="0.1.45" date="2026-11-23">
       <description>
         <p>The map is always redrawn after zooming with the fingers.</p>

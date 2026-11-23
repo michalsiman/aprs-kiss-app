@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.46 – 2026-11-23
+
+- **Fix: the .flatpak file from the release could not be installed** ("GPG verification enabled, but no
+  signatures found"): it carries our repository's key, so Flatpak wants a signed build, and the build was
+  not signed. It is now signed with the repository key when it is built, and installs both on its own and
+  over an installation from our repository.
+- **Settings in a wide window**: an open block's fields are on the left, no longer centred.
+
 ## 0.1.45 – 2026-11-23
 
 - **Fix: the map was not redrawn after zooming with the fingers**: the new zoom was asked for only once,
