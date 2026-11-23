@@ -239,10 +239,29 @@ class App:
     def _light(self, key: str, state: str | None) -> None:
         """A lamp: "on" green, "tx" red and filled, None grey; hidden when the thing is not in use."""
         lamp = self.lamps[key]
-        color = {"on": ft.Colors.GREEN, "tx": ft.Colors.RED}.get(state, ft.Colors.OUTLINE)
+        color = {"on": ft.Colors.GREEN, "tx": ft.Colors.RED, "armed": ft.Colors.RED}.get(state, ft.Colors.OUTLINE)
         lamp.border = ft.Border.all(1.5, color)
         lamp.bgcolor = ft.Colors.RED if state == "tx" else None
         lamp.content.color = ft.Colors.WHITE if state == "tx" else color
+
+    _on_air_until = 0.0
+
+    def _on_air(self, line: str) -> None:
+        """A frame went out by radio: the TX lamp is all red for about as long as it takes on air."""
+        if " >> " not in line[:12] or "[IS] " in line[12:18]:
+            return
+        conf = self.engine.config
+        seconds = max(1.0, (len(line) - 12) * 8 / 1200 + (conf.txdelay_ms or 300) / 1000)  # 1200 Bd packet
+        self._on_air_until = max(self._on_air_until, time.monotonic() + seconds)
+        try:
+            self.page.run_task(self._off_air, seconds)
+        except Exception:  # noqa: BLE001 - the page is gone
+            pass
+
+    async def _off_air(self, seconds: float) -> None:
+        await asyncio.sleep(seconds + 0.05)
+        if time.monotonic() >= self._on_air_until and not self._closing:
+            self.refresh_now()
 
     def _tx_tap(self, _e=None) -> None:
         if not self.engine.config.configured:
@@ -452,6 +471,8 @@ class App:
 
     def _on_event(self, kind: str, data: dict[str, Any]) -> None:
         self.sounds.on_event(kind, data)
+        if kind == "monitor":
+            self._on_air(data.get("line", ""))
         for v in self.views:
             if v.built:
                 v.on_event(kind, data)
@@ -534,13 +555,15 @@ class App:
         self.tx_switch.value = st["tx_enabled"]
         self.tx_switch.disabled = not self.engine.config.configured
         self.tx_switch.tooltip = self.t("tx_on") if st["tx_enabled"] else self.t("tx_off")
-        self.tx_box.bgcolor = ft.Colors.ERROR_CONTAINER if st["tx_enabled"] else None
+        on_air = time.monotonic() < self._on_air_until
+        self.tx_box.bgcolor = (ft.Colors.RED if on_air else ft.Colors.ERROR_CONTAINER) if st["tx_enabled"] else None
         self._light("tnc", "on" if st["tnc_connected"] else None)
         self.lamps["is"].visible = aprsis is not None
         self._light("is", "on" if aprsis and aprsis["verified"] else None)
         self.lamps["gps"].visible = gps is not None
         self._light("gps", "on" if gps and gps.get("fix") else None)
-        self._light("tx", "tx" if st["tx_enabled"] else None)
+        # TX: red frame and text while transmitting is allowed, all red only while the radio is on air
+        self._light("tx", ("tx" if on_air else "armed") if st["tx_enabled"] else None)
         if self.has_view("messages"):
             messages = self.view("messages")
             dest = self.rail.destinations[self.views.index(messages)]
