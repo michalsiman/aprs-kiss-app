@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.34 – 2026-11-23
+
+- **The callsign is required**: until one is saved, its field in Settings is framed red and has the
+  cursor, and the app stays in Settings (another screen brings you back to the field with a message).
+- **Offline map with more detail** (Europe): some 17,000 towns of 5,000 people and more and each
+  country's highest peaks (▲ with the height), from GeoNames (CC BY 4.0); more appear as you zoom in.
+  Names are drawn only around what is on screen, so phones stay quick. About 275 kB more in the packages.
+- **A scale bar** in the lower left corner of the maps ("5 km", "200 m").
+- **The map turns less easily**: two fingers either zoom or turn it, and turning needs a clear twist
+  (60° instead of 20°).
+- **TX lamp**: a red frame and red text while transmitting is on, all red only while a frame goes out
+  on air (estimated from its length at 1200 Bd).
+- Settings: the first field's label in each block is no longer cut off; shorter GPS choices on phones.
+- Android backs up the app's settings again (switched off in 0.1.33 for a clean first-start test).
+
 ## 0.1.33 – 2026-11-23
 
 - **Confirmation sentences only once**: the sentences typed to switch on TAK, BBS SERVER and APRS-IS

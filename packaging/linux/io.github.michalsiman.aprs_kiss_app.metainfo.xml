@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.34" date="2026-11-23">
+      <description>
+        <p>Required callsign, an offline map with towns and peaks, a scale bar, a map that turns less easily, a TX lamp that lights up while on air.</p>
+      </description>
+    </release>
     <release version="0.1.33" date="2026-11-23">
       <description>
         <p>Confirmation sentences asked only once; the phone's GPS by default and its position shown in Settings; a handheld radio symbol.</p>
