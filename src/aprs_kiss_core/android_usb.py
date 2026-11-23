@@ -2,8 +2,8 @@
 
 Android has no serial ports for apps: a USB serial adapter is driven through the USB host API
 (UsbManager), reached from Python with pyjnius. Supported are CDC-ACM devices (the Quansheng
-radios with the F4HWN KISS firmware, Arduino-style TNCs, most modern TNCs) and Silicon Labs
-CP210x adapters (Digirig and many cables). The first time, Android asks the user to allow
+radios with the F4HWN KISS firmware, Arduino-style TNCs, most modern TNCs), Silicon Labs
+CP210x (Digirig and many cables) and FTDI adapters. The first time, Android asks the user to allow
 the app to use the device.
 
 Registered as the "usb" transport, so the KISS logic in connection.py stays the same.
@@ -26,6 +26,7 @@ _LOGGER = logging.getLogger(__name__)
 
 CDC_CONTROL, CDC_DATA = 0x02, 0x0A
 VENDOR_CP210X = 0x10C4
+VENDOR_FTDI = 0x0403
 DIR_IN = 0x80  # UsbConstants.USB_DIR_IN
 XFER_BULK = 2  # UsbConstants.USB_ENDPOINT_XFER_BULK
 PERMISSION_ACTION = "io.github.michalsiman.aprs_kiss_app.USB_PERMISSION"
@@ -98,11 +99,24 @@ def _pick(device):
             data = itf
     if data is not None:
         return "cdc", control, data
-    if device.getVendorId() == VENDOR_CP210X and device.getInterfaceCount():
+    chips = {VENDOR_CP210X: "cp210x", VENDOR_FTDI: "ftdi"}
+    if device.getVendorId() in chips and device.getInterfaceCount():
         itf = device.getInterface(0)
         if all(_endpoints(itf)):
-            return "cp210x", itf, itf
+            return chips[device.getVendorId()], itf, itf
     return None
+
+
+def ftdi_divisor(baudrate: int) -> tuple[int, int]:
+    """(value, index) of FTDI's SET_BAUDRATE: 3 MHz / baud in eighths, the fraction coded oddly."""
+    eighths = round(3_000_000 * 8 / baudrate)
+    whole, frac = eighths >> 3, eighths & 7
+    if whole == 0:  # 3 Mbaud
+        return 0, 0
+    if whole == 1 and frac == 0:  # 2 Mbaud
+        return 1, 0
+    code = (0, 3, 2, 4, 1, 5, 6, 7)[frac]
+    return whole | (code & 3) << 14, code >> 2
 
 
 class UsbSerial:
@@ -123,15 +137,23 @@ class UsbSerial:
         self.ep_in, self.ep_out = _endpoints(data)
         self._setup(baudrate)
 
-    def _ctrl(self, request_type: int, request: int, value: int, payload: bytes | None = None) -> None:
+    def _ctrl(self, request_type: int, request: int, value: int, payload: bytes | None = None,
+              index: int | None = None) -> None:
         buf = bytearray(payload) if payload else None
-        self.conn.controlTransfer(request_type, request, value, self.control_index, buf, len(payload or b""), 1000)
+        self.conn.controlTransfer(request_type, request, value, self.control_index if index is None else index,
+                                  buf, len(payload or b""), 1000)
 
     def _setup(self, baudrate: int) -> None:
         if self.kind == "cdc":
             # SET_LINE_CODING (baud, 1 stop bit, no parity, 8 bits), then DTR and RTS on
             self._ctrl(0x21, 0x20, 0, struct.pack("<IBBB", baudrate, 0, 0, 8))
             self._ctrl(0x21, 0x22, 0x03)
+        elif self.kind == "ftdi":  # reset, baud rate, 8N1, DTR and RTS on
+            self._ctrl(0x40, 0x00, 0, index=0)
+            value, index = ftdi_divisor(baudrate)
+            self._ctrl(0x40, 0x03, value, index=index)
+            self._ctrl(0x40, 0x04, 0x0008, index=0)
+            self._ctrl(0x40, 0x01, 0x0303, index=0)
         else:  # CP210x: enable, 8N1, baud rate, DTR and RTS on
             self._ctrl(0x41, 0x00, 0x0001)
             self._ctrl(0x41, 0x03, 0x0800)
@@ -144,6 +166,9 @@ class UsbSerial:
         buf = bytearray(size)
         n = self.conn.bulkTransfer(self.ep_in, buf, size, READ_TIMEOUT_MS)
         if n and n > 0:
+            if self.kind == "ftdi":  # every packet starts with two modem status bytes
+                packet = self.ep_in.getMaxPacketSize() or 64
+                return b"".join(bytes(buf[i + 2:min(i + packet, n)]) for i in range(0, n, packet))
             return bytes(buf[:n])
         return b"" if self.attached() else None
 
