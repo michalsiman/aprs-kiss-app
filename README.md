@@ -23,7 +23,8 @@ Builds for **Linux**, **Windows**, **macOS**, **Android** and **iOS** (see [Plat
   so the stations stand out, stations from the internet on or off, *Last 2 hours* only, and a legend
   of the symbols. Right-click the map: *Set as my position*.
 - **Offline map** bundled with the app: country borders, coastlines and about 1,000 bigger cities
-  (Natural Earth), more of them as you zoom in. One button switches to it; **with no internet the map
+  (Natural Earth), in Europe also some 17,000 towns of 5,000 people and more and each country's highest
+  peaks (GeoNames), more of them as you zoom in. One button switches to it; **with no internet the map
   switches to it by itself** and tells you so, and goes back to OpenStreetMap when the internet returns.
 - **Messages** as conversations: retried until acknowledged, delivery state shown, incoming messages
   acknowledged automatically; a new message to any callsign; a notice when one arrives.
@@ -275,7 +276,8 @@ Privacy: the app collects nothing; see the [privacy policy](https://michalsiman.
   [Claude Code](https://claude.com/claude-code).
 - User interface by [Flet](https://flet.dev) (Flutter), maps by [flutter_map](https://github.com/fleaflet/flutter_map)
   through flet-map, map data © OpenStreetMap contributors.
-- Offline map from [Natural Earth](https://www.naturalearthdata.com/) (public domain).
+- Offline map from [Natural Earth](https://www.naturalearthdata.com/) (public domain) and
+  [GeoNames](https://www.geonames.org/) (CC BY 4.0).
 - APRS parsing by [aprslib](https://github.com/rossengeorgiev/aprs-python).
 - [F4HWN firmware](https://github.com/armel/uv-k1-k5v3-firmware-custom) for the Quansheng UV-K1/K5 V3 by **Armel F4HWN**,
   its [KISS TNC app](https://github.com/armel/uv-k1-k5v3-firmware-custom/wiki/App-KISS-TNC) by **F4WAT**.

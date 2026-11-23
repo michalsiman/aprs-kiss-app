@@ -23,7 +23,8 @@ Sestavení pro **Linux**, **Windows**, **macOS**, **Android** a **iOS** (viz [Pl
   aby stanice vynikly, stanice z internetu zapnout/vypnout, jen *Posledních 2 h* a legenda
   symbolů. Pravé tlačítko na mapě: *Nastavit jako moji polohu*.
 - **Offline mapa** přímo v aplikaci: hranice států, pobřeží a asi 1 000 větších měst (Natural Earth),
-  s přiblížením přibývají další. Přepíná se jedním tlačítkem; **když není internet, mapa se na ni
+  v Evropě i asi 17 000 obcí nad 5 000 obyvatel a nejvyšší hory každé země (GeoNames); s přiblížením
+  přibývají další. Přepíná se jedním tlačítkem; **když není internet, mapa se na ni
   přepne sama** a oznámí to, a jakmile se internet vrátí, vrátí se k OpenStreetMap.
 - **Zprávy** jako konverzace: opakované až do potvrzení, se stavem doručení, příchozí se potvrzují
   automaticky; nová zpráva na libovolnou značku; upozornění, když nějaká přijde.
@@ -274,7 +275,8 @@ Soukromí: aplikace nic nesbírá; viz [zásady ochrany osobních údajů](https
   s [Claude Code](https://claude.com/claude-code).
 - Uživatelské rozhraní [Flet](https://flet.dev) (Flutter), mapy [flutter_map](https://github.com/fleaflet/flutter_map)
   přes flet-map, mapová data © přispěvatelé OpenStreetMap.
-- Offline mapa z [Natural Earth](https://www.naturalearthdata.com/) (volné dílo).
+- Offline mapa z [Natural Earth](https://www.naturalearthdata.com/) (volné dílo) a
+  [GeoNames](https://www.geonames.org/) (CC BY 4.0).
 - Zpracování APRS [aprslib](https://github.com/rossengeorgiev/aprs-python).
 - [Firmware F4HWN](https://github.com/armel/uv-k1-k5v3-firmware-custom) pro Quansheng UV-K1/K5 V3 od **Armela F4HWN**,
   jeho [aplikace KISS TNC](https://github.com/armel/uv-k1-k5v3-firmware-custom/wiki/App-KISS-TNC) od **F4WAT**.

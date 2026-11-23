@@ -16,7 +16,7 @@ import flet as ft
 import flet_map as fm
 
 DATA = pathlib.Path(__file__).with_name("offline") / "world.json"
-ATTRIBUTION = "Natural Earth"
+ATTRIBUTION = "Natural Earth, GeoNames"
 BORDER = "#7B5EA7"
 COAST = "#4A7FB0"
 WATER_HINT = "#DCE9F5"
@@ -27,7 +27,7 @@ def data() -> dict:
     try:
         return json.loads(DATA.read_text(encoding="utf-8"))
     except (OSError, ValueError):
-        return {"borders": [], "coast": [], "cities": []}
+        return {"borders": [], "coast": [], "cities": [], "towns": [], "peaks": []}
 
 
 MIN_ZOOM = 3  # further out the world repeats side by side
@@ -45,6 +45,7 @@ def tier(zoom: float) -> int:
 
 
 MIN_HALF = 3.0  # degrees of latitude: at least ~330 km around the middle of the map is kept
+PLACE_SCREENS = 500  # pixels each way for the names
 SCREENS = 900  # pixels each way from the middle: a screen and a half, so a short pan needs nothing new
 
 
@@ -60,11 +61,12 @@ class Region:
     zoom_key: int
 
     @classmethod
-    def around(cls, lat: float, lon: float, zoom: float) -> Region:
+    def around(cls, lat: float, lon: float, zoom: float, screens: float = SCREENS,
+               min_half: float = MIN_HALF) -> Region:
         per_pixel = 360 / (256 * 2 ** zoom)
-        half = max(MIN_HALF, per_pixel * SCREENS)
+        half = max(min_half, per_pixel * screens)
         half_lon = min(180.0, half / max(math.cos(math.radians(min(abs(lat), 80))), 0.2))
-        if half >= 90:
+        if half >= 60:  # most of the world in view: all of it, no box to leave
             return cls(-90, 90, -180, 180, per_pixel * 2.5, round(zoom))
         return cls(max(-90.0, lat - half), min(90.0, lat + half), max(-180.0, lon - half_lon),
                    min(180.0, lon + half_lon), per_pixel * 2.5, round(zoom))
@@ -142,6 +144,45 @@ def city_markers(level: int, region: Region | None = None) -> list[fm.Marker]:
     return out
 
 
+TOWN_TIERS = ((8.5, None), (9.5, 20000), (10.5, 10000), (99, 0))  # (up to zoom, smallest town shown)
+PEAK_TIERS = ((7.0, None), (8.5, 1), (10.0, 5), (99, 99))  # (up to zoom, how many of each country's highest)
+PEAK_COLOR = "#8D6E63"
+
+
+def _limit(tiers, zoom):
+    return next(value for upto, value in tiers if zoom < upto)
+
+
+def town_markers(zoom: float, region: Region | None = None) -> list[fm.Marker]:
+    """Smaller towns (GeoNames, Europe): the bigger ones first as you zoom in, all of 5000+ people close up."""
+    least = _limit(TOWN_TIERS, zoom)
+    if least is None:
+        return []
+    return [fm.Marker(
+        coordinates=fm.MapLatitudeLongitude(lat, lon), width=120, height=26,
+        content=ft.Column([
+            ft.Container(width=4, height=4, border_radius=2, bgcolor=ft.Colors.ON_SURFACE_VARIANT),
+            ft.Text(name, size=9, color=ft.Colors.ON_SURFACE_VARIANT, no_wrap=True),
+        ], spacing=0, tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+    ) for name, lat, lon, pop in data().get("towns", [])
+        if pop >= least and (region is None or region.contains(lat, lon))]
+
+
+def peak_markers(zoom: float, region: Region | None = None) -> list[fm.Marker]:
+    """Each country's highest peaks: the very highest first, the others as you zoom in."""
+    ranks = _limit(PEAK_TIERS, zoom)
+    if ranks is None:
+        return []
+    return [fm.Marker(
+        coordinates=fm.MapLatitudeLongitude(lat, lon), width=130, height=30,
+        content=ft.Column([
+            ft.Text("▲", size=10, color=PEAK_COLOR),
+            ft.Text(f"{name} {metres} m", size=9, color=PEAK_COLOR, weight=ft.FontWeight.BOLD, no_wrap=True),
+        ], spacing=0, tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+    ) for name, lat, lon, metres, rank in data().get("peaks", [])
+        if rank < ranks and (region is None or region.contains(lat, lon))]
+
+
 class OfflineLayers:
     """The offline map around the middle of the screen, not the whole world.
 
@@ -154,6 +195,7 @@ class OfflineLayers:
         self.borders = fm.PolylineLayer(polylines=[])
         self.cities = fm.MarkerLayer(markers=[])
         self.region: Region | None = None
+        self.places: Region | None = None  # the names (cities, towns, peaks) cover a smaller box
         self.moved(lat, lon, zoom)
 
     @property
@@ -162,14 +204,21 @@ class OfflineLayers:
 
     def moved(self, lat: float, lon: float, zoom: float) -> bool:
         """The map moved: refill the layers when the box no longer covers it; True when they changed."""
-        if self.region and self.region.covers(lat, lon, zoom):
-            return False
-        d = data()
-        self.region = region = Region.around(lat, lon, zoom)
-        self.coast.polylines = _polylines(clip(d["coast"], region), COAST, 1.0)
-        self.borders.polylines = _polylines(clip(d["borders"], region), BORDER, 1.4)
-        self.cities.markers = city_markers(tier(zoom), region)
-        return True
+        changed = False
+        if not (self.region and self.region.covers(lat, lon, zoom)):
+            d = data()
+            self.region = region = Region.around(lat, lon, zoom)
+            self.coast.polylines = _polylines(clip(d["coast"], region), COAST, 1.0)
+            self.borders.polylines = _polylines(clip(d["borders"], region), BORDER, 1.4)
+            changed = True
+        if not (self.places and self.places.covers(lat, lon, zoom)):
+            # names only around what is on screen (about a screen and a half each way): close up there
+            # are thousands of towns within the lines' box, too many labels for a phone
+            self.places = places = Region.around(lat, lon, zoom, screens=PLACE_SCREENS, min_half=0.2)
+            self.cities.markers = (peak_markers(zoom, places) + town_markers(zoom, places)
+                                   + city_markers(tier(zoom), places))  # the big cities drawn on top
+            changed = True
+        return changed
 
 
 TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
