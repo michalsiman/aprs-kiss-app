@@ -1,10 +1,11 @@
-"""Markers that would cover each other on screen are spread out in a small circle ("spiderfy").
+"""Markers that would cover each other on screen are moved a little apart.
 
 Stations at the same place (a digipeater and an iGate on one mast, OK0BR-10 and OK0BR-1) or a few metres
-apart would otherwise be one unreadable heap. At the map's zoom each station gets a screen position
-(Web Mercator pixels); stations whose markers would overlap are grouped, and each group is laid out on a
-circle around its middle. A thin line on the map joins each moved marker to where the station really is.
-Zooming in, the group falls apart by itself: then the markers no longer overlap and stay where they are.
+apart would otherwise be one unreadable heap. At the map's zoom each station gets a screen position (Web
+Mercator pixels). The markers are placed one by one: each at its own place when that is free, otherwise at
+the nearest free spot on small rings around its own place (never further than MAX_SHIFT pixels, so a
+station never wanders off to somebody else's town). A thin line on the map joins a moved marker to where
+the station really is. Zooming in, the markers no longer overlap and all stay at their places.
 """
 
 from __future__ import annotations
@@ -12,12 +13,11 @@ from __future__ import annotations
 import math
 
 TILE = 256
-CLOSE_X = 56  # pixels: markers nearer than this side by side…
-CLOSE_Y = 30  # …and this one above the other cover each other's label
-SLOT = 70  # pixels of circle per marker, so the labels do not touch
-MIN_RADIUS = 44
-MIN_RADIUS_AROUND = 64  # around a marker that stays: clear of it whatever the angle (√(56² + 30²))
-MAX_GROUP = 14  # a bigger heap (a whole city zoomed out) stays as it is: zoom in to see it
+CLOSE_X = 60  # pixels: markers nearer than this side by side…
+CLOSE_Y = 40  # …and this one above the other cover each other's label
+RINGS = (48, 70, 96, 124)  # pixels: the circles tried around a station's own place
+DIRECTIONS = 8
+MAX_SHIFT = RINGS[-1]
 
 
 def to_px(lat: float, lon: float, zoom: float) -> tuple[float, float]:
@@ -35,50 +35,53 @@ def from_px(x: float, y: float, zoom: float) -> tuple[float, float]:
     return lat, lon
 
 
-def groups(points: list[tuple[float, float]], zoom: float) -> list[list[int]]:
-    """Indexes of the points whose markers overlap, grouped (each group sorted; single points left out)."""
-    px = [to_px(lat, lon, zoom) for lat, lon in points]
-    parent = list(range(len(px)))
+def _offsets() -> list[tuple[float, float]]:
+    out = [(0.0, 0.0)]
+    for ring, r in enumerate(RINGS):
+        turn = math.pi / DIRECTIONS * (ring % 2)  # every other ring turned by half a step
+        for k in range(DIRECTIONS):
+            a = -math.pi / 2 + 2 * math.pi * k / DIRECTIONS + turn  # the first one straight above
+            out.append((r * math.cos(a), r * math.sin(a)))
+    return out
 
-    def find(i: int) -> int:
-        while parent[i] != i:
-            parent[i] = parent[parent[i]]
-            i = parent[i]
-        return i
 
-    grid: dict[tuple[int, int], list[int]] = {}
-    for i, (x, y) in enumerate(px):
-        cx, cy = int(x // CLOSE_X), int(y // CLOSE_Y)
-        for dx in (-1, 0, 1):
-            for dy in (-1, 0, 1):
-                for j in grid.get((cx + dx, cy + dy), ()):
-                    if abs(px[j][0] - x) < CLOSE_X and abs(px[j][1] - y) < CLOSE_Y:
-                        parent[find(i)] = find(j)
-        grid.setdefault((cx, cy), []).append(i)
-    out: dict[int, list[int]] = {}
-    for i in range(len(px)):
-        out.setdefault(find(i), []).append(i)
-    return [sorted(g) for g in out.values() if len(g) > 1]
+OFFSETS = _offsets()
 
 
 def spread(points: list[tuple[float, float]], zoom: float, fixed: int | None = None) -> list[tuple[float, float]]:
-    """Where to draw each point: its own place, or a place on its group's circle.
+    """Where to draw each point: its own place, or a free spot close to it.
 
-    fixed: a point that stays where it is (our own station); the others of its group circle around it."""
+    fixed: a point placed first and never moved (our own station)."""
     shown = list(points)
-    for group in groups(points, zoom):
-        if len(group) > MAX_GROUP:
+    grid: dict[tuple[int, int], list[tuple[float, float]]] = {}
+
+    def free(x: float, y: float) -> bool:
+        cx, cy = int(x // CLOSE_X), int(y // CLOSE_Y)
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1):
+                for px, py in grid.get((cx + dx, cy + dy), ()):
+                    if abs(px - x) < CLOSE_X and abs(py - y) < CLOSE_Y:
+                        return False
+        return True
+
+    def take(x: float, y: float) -> None:
+        grid.setdefault((int(x // CLOSE_X), int(y // CLOSE_Y)), []).append((x, y))
+
+    order = list(range(len(points)))
+    if fixed is not None and 0 <= fixed < len(points):
+        order.remove(fixed)
+        order.insert(0, fixed)
+    for i in order:
+        x, y = to_px(*points[i], zoom)
+        if i == fixed:
+            take(x, y)
             continue
-        if fixed in group:
-            cx, cy = to_px(*points[fixed], zoom)
-            ring = [i for i in group if i != fixed]
+        for ox, oy in OFFSETS:
+            if free(x + ox, y + oy):
+                if ox or oy:
+                    shown[i] = from_px(x + ox, y + oy, zoom)
+                take(x + ox, y + oy)
+                break
         else:
-            px = [to_px(*points[i], zoom) for i in group]
-            cx = sum(p[0] for p in px) / len(px)
-            cy = sum(p[1] for p in px) / len(px)
-            ring = group
-        radius = max(MIN_RADIUS_AROUND if ring is not group else MIN_RADIUS, len(ring) * SLOT / (2 * math.pi))
-        for k, i in enumerate(ring):
-            angle = -math.pi / 2 + 2 * math.pi * k / len(ring)  # the first one straight above
-            shown[i] = from_px(cx + radius * math.cos(angle), cy + radius * math.sin(angle), zoom)
+            take(x, y)  # no room anywhere near: it stays on its place, under the others
     return shown

@@ -1,11 +1,17 @@
+import math
 import unittest
 
-from aprs_kiss_app.declutter import CLOSE_X, CLOSE_Y, from_px, groups, spread, to_px
+from aprs_kiss_app.declutter import CLOSE_X, CLOSE_Y, MAX_SHIFT, from_px, spread, to_px
 
 
 def overlap(a, b, zoom):
     (ax, ay), (bx, by) = to_px(*a, zoom), to_px(*b, zoom)
     return abs(ax - bx) < CLOSE_X and abs(ay - by) < CLOSE_Y
+
+
+def shift(a, b, zoom):
+    (ax, ay), (bx, by) = to_px(*a, zoom), to_px(*b, zoom)
+    return math.hypot(ax - bx, ay - by)
 
 
 class DeclutterTest(unittest.TestCase):
@@ -18,6 +24,7 @@ class DeclutterTest(unittest.TestCase):
         for n in range(2, 13):
             points = [(49.7, 13.4)] * n
             shown = spread(points, 14)
+            self.assertEqual(shown[0], points[0])  # the first one stays
             for i in range(n):
                 for j in range(i + 1, n):
                     self.assertFalse(overlap(shown[i], shown[j], 14), (n, i, j))
@@ -26,22 +33,19 @@ class DeclutterTest(unittest.TestCase):
         points = [(49.7, 13.4), (49.8, 13.6)]
         self.assertEqual(spread(points, 12), points)
 
-    def test_zooming_in_separates_the_group(self):
-        points = [(49.7000, 13.4000), (49.7005, 13.4005), (49.9, 14.0)]
-        self.assertEqual(groups(points, 10), [[0, 1]])
-        self.assertEqual(groups(points, 18), [])
+    def test_zoomed_in_nothing_moves(self):
+        points = [(49.7000, 13.4000), (49.7010, 13.4010)]
+        self.assertNotEqual(spread(points, 10), points)
+        self.assertEqual(spread(points, 18), points)
 
-    def test_chain_of_close_points_is_one_group(self):
-        points = [(49.7, 13.4), (49.7, 13.4002), (49.7, 13.4004)]
-        self.assertEqual(groups(points, 13), [[0, 1, 2]])
+    def test_never_far_from_its_own_place(self):
+        """A long chain of stations a little apart (a town zoomed out): nobody wanders off."""
+        points = [(49.70 + 0.004 * k, 13.30 + 0.006 * k) for k in range(40)] + [(49.75, 13.37)] * 6
+        for zoom in (8, 9, 10, 11, 12):
+            for a, b in zip(spread(points, zoom), points):
+                self.assertLessEqual(shift(a, b, zoom), MAX_SHIFT + 0.5)
 
-
-if __name__ == "__main__":
-    unittest.main()
-
-
-class FixedTest(unittest.TestCase):
-    def test_own_station_stays_and_others_circle_around(self):
+    def test_own_station_stays_and_others_go_around(self):
         for n in range(2, 10):
             points = [(49.7, 13.4)] * n
             shown = spread(points, 14, fixed=n - 1)
@@ -49,3 +53,7 @@ class FixedTest(unittest.TestCase):
             for i in range(n):
                 for j in range(i + 1, n):
                     self.assertFalse(overlap(shown[i], shown[j], 14), (n, i, j))
+
+
+if __name__ == "__main__":
+    unittest.main()

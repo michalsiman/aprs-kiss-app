@@ -23,7 +23,7 @@ MAX_MARKERS_PHONE = 150
 CAMERA_SECONDS = 2.0  # while the map is shown, where it is looking is asked for no more often than this
 TRAIL_SECONDS = 1800  # the trails show the last half hour
 TRAIL_COLOR = "#E53935"  # one red, like aprs.fi
-LEADER_COLOR = "#757575"  # from a spread-out marker to where the station really is
+LEADER_COLOR = "#8E8E8E"  # from a spread-out marker to where the station really is
 MUTED_OPACITY = 0.45  # muted map: tiles faded over a neutral background, so the colours recede
 
 
@@ -299,7 +299,7 @@ class MapView(View):
                 leader = kind == "leader"
                 line = fm.PolylineMarker(coordinates=[fm.MapLatitudeLongitude(lat, lon) for lat, lon in points],
                                          color=LEADER_COLOR if leader else TRAIL_COLOR,
-                                         stroke_width=1.2 if leader else 2)
+                                         stroke_width=1.6 if leader else 2)
             cache[key] = line
             lines.append(line)
         self._trail_cache = cache
