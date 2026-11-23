@@ -181,3 +181,14 @@ class ReconfigureTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(eng.aprsis.filter, "")
         eng.gps.push(49.7478, 13.3777)  # the same place again: still the area must be set
         self.assertEqual(eng.aprsis.filter, "r/49.748/13.378/50")
+
+
+class OwnTrailTest(unittest.TestCase):
+    def test_gps_fixes_make_our_own_track(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        eng = Engine(Config(callsign="OK1SIM-7", gps_source="phone").validate(), pathlib.Path(tmp.name))
+        eng.gps.push(49.7477, 13.3776)
+        eng.gps.push(49.7478, 13.3776)  # a few metres: the same point
+        eng.gps.push(49.7600, 13.3900)
+        self.assertEqual([(p[1], p[2]) for p in eng.my_track["track"]], [(49.7477, 13.3776), (49.76, 13.39)])

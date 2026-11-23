@@ -288,6 +288,10 @@ class MapView(View):
                 break
         wanted.sort()  # a steady order: the list changes only where stations come, go or move
         here = self.engine.my_position()
+        if conf.map_trails:  # our own trail too, from the GPS
+            points = tuple((p[1], p[2]) for p in self.engine.my_track.get("track", ()) if now - p[0] <= TRAIL_SECONDS)
+            if len(points) >= 2:
+                trails.append(("\x00me", points))
         if here:
             wanted.append((self.engine.status()["callsign"] or self.t("my_position"), *here,
                            emoji(conf.symbol[:1], conf.symbol[1:]), COLOR_ME, True, "me"))

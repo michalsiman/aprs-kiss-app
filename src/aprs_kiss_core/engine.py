@@ -34,6 +34,7 @@ from .ax25 import PF, U_DM, Address, Frame
 from .bbs import BbsConfigError, BbsServer
 from . import digipeater, tak
 from .tracker import Tracker, course_speed
+from .station import _track as station_track
 from . import vara as vara_mod
 from .gps import GpsFix, GpsReader, PushedGps
 from .config import MIN_BEACON_MINUTES, VERSION, Config, data_dir, load_state, save_state
@@ -124,6 +125,7 @@ class Engine:
         self._beacon_task: asyncio.Task | None = None
         self._tracker_task: asyncio.Task | None = None
         self.tracker = Tracker()
+        self.my_track: dict[str, Any] = {}  # where we went (GPS), the map's trail for our own station
         self.bbs: BbsServer | None = None
         self.bbs_call: Address | None = None
         self.bbs_error = ""
@@ -264,6 +266,8 @@ class Engine:
     def _on_gps_fix(self, fix: GpsFix) -> None:
         # Announce it only when something visible changes (about 1 m, the satellites, the fix).
         shown = (fix.usable(), round(fix.latitude or 0, 5), round(fix.longitude or 0, 5), fix.satellites)
+        if fix.usable():
+            station_track(self.my_track, time.time(), fix.latitude, fix.longitude)
         if shown != self._gps_shown:
             self._gps_shown = shown
             self._follow_is_area()
