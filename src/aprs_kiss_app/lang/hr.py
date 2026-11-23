@@ -27,6 +27,7 @@ TEXTS = {
     "conn_serial": "Serijski port (USB)", "conn_usb": "TNC na USB-u (OTG kabel)", "host": "Adresa", "port": "Port", "device": "Serijski port",
     "th_starts_in": "Sljedeći za {t}",
     "map_trails": "Tragovi (kuda su stanice išle u zadnjih pola sata)",
+    "map_tools_hide": "Sakrij gumbe karte", "map_tools_show": "Gumbi karte",
     "bt_device": "Bluetooth uređaj",
     "digi": "Digipeater", "digi_mode": "APRS digipeater", "digi_off": "Isključen", "digi_fillin": "Fill-in (WIDE1-1) – kućna stanica", "digi_wide": "Puni (WIDEn-N) – digipeater na koti", "digi_hops": "Najviše skokova (WIDEn-N)", "digi_aliases": "Prosljeđuj i za (aliasi, npr. RELAY)", "digi_hint": "Prosljeđuje APRS pakete stanica oko vas, samo kad je Odašiljanje uključeno. Fill-in pomaže ručnim stanicama i automobilima doći do najbližeg velikog digipeatera i pravi je izbor za kućnu stanicu. Puni digipeater samo u dogovoru s lokalnom APRS mrežom. Prosljeđuju se i okviri adresirani vašem znaku; isti paket samo jednom u 30 sekundi.",
     "conn_bt": "TNC preko Bluetootha (uparen)", "bt_none": "Nema uparenog Bluetooth uređaja: upari TNC u Bluetooth postavkama Androida, zatim dodirni osvježi.",

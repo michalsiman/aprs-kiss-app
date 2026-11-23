@@ -63,6 +63,7 @@ class Config:
     monitor_internet: bool = True  # the frame monitor also shows APRS-IS lines ([IS])
     map_muted: bool = False  # map tiles faded, so the station labels stand out
     map_trails: bool = False  # the map draws where each moving station went in the last half hour
+    map_tools_hidden: bool = False  # the map's button bar folded into one gear button
     map_offline: bool = False  # the bundled offline map (borders, cities) instead of OpenStreetMap tiles
     gps_source: str = "manual"  # "manual" (latitude/longitude above), "usb" (an NMEA GPS module), "phone"
     gps_device: str = ""  # its serial port

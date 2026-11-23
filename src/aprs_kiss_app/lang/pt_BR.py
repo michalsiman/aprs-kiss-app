@@ -27,6 +27,7 @@ TEXTS = {
     "conn_serial": "Porta serial (USB)", "conn_usb": "TNC via USB (cabo OTG)", "host": "Endereço", "port": "Porta", "device": "Porta serial",
     "th_starts_in": "O próximo em {t}",
     "map_trails": "Rastros (por onde as estações passaram na última meia hora)",
+    "map_tools_hide": "Ocultar os botões do mapa", "map_tools_show": "Botões do mapa",
     "bt_device": "Dispositivo Bluetooth",
     "digi": "Digipeater", "digi_mode": "Digipeater APRS", "digi_off": "Desligado", "digi_fillin": "Fill-in (WIDE1-1) – estação fixa", "digi_wide": "Completo (WIDEn-N) – digipeater em ponto alto", "digi_hops": "Saltos no máximo (WIDEn-N)", "digi_aliases": "Repetir também para (apelidos, ex. RELAY)", "digi_hint": "Repete pacotes APRS das estações próximas, só com Transmitir ligado. O fill-in ajuda portáteis e carros a alcançar o grande digipeater mais próximo e é o certo para uma estação fixa. Um digipeater completo só de acordo com a rede APRS local. Quadros endereçados ao seu indicativo também são repetidos; o mesmo pacote só uma vez a cada 30 segundos.",
     "conn_bt": "TNC por Bluetooth (pareado)", "bt_none": "Nenhum dispositivo Bluetooth pareado: pareie o TNC nas configurações de Bluetooth do Android e toque em atualizar.",

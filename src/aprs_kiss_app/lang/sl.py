@@ -27,6 +27,7 @@ TEXTS = {
     "conn_serial": "Serijska vrata (USB)", "conn_usb": "TNC na USB (kabel OTG)", "host": "Naslov", "port": "Vrata", "device": "Serijska vrata",
     "th_starts_in": "Naslednji čez {t}",
     "map_trails": "Sledi (kod so postaje šle v zadnje pol ure)",
+    "map_tools_hide": "Skrij gumbe zemljevida", "map_tools_show": "Gumbi zemljevida",
     "bt_device": "Naprava Bluetooth",
     "digi": "Digipeater", "digi_mode": "APRS digipeater", "digi_off": "Izklopljen", "digi_fillin": "Fill-in (WIDE1-1) – domača postaja", "digi_wide": "Polni (WIDEn-N) – digipeater na vzpetini", "digi_hops": "Največ skokov (WIDEn-N)", "digi_aliases": "Posreduj tudi za (vzdevki, npr. RELAY)", "digi_hint": "Posreduje pakete APRS postaj okoli vas, samo ko je Oddajanje vklopljeno. Fill-in pomaga ročnim postajam in avtomobilom doseči najbližji veliki digipeater in je prava izbira za domačo postajo. Polni digipeater samo v dogovoru z lokalnim omrežjem APRS. Posredujejo se tudi okvirji, naslovljeni na vaš klicni znak; isti paket samo enkrat v 30 sekundah.",
     "conn_bt": "TNC prek Bluetootha (seznanjen)", "bt_none": "Ni seznanjene naprave Bluetooth: seznani TNC v nastavitvah Bluetooth v Androidu, nato tapni osveži.",

@@ -27,6 +27,7 @@ TEXTS = {
     "conn_serial": "Serieport (USB)", "conn_usb": "TNC via USB (OTG-kabel)", "host": "Adress", "port": "Port", "device": "Serieport",
     "th_starts_in": "Nästa om {t}",
     "map_trails": "Spår (var stationerna åkte den senaste halvtimmen)",
+    "map_tools_hide": "Dölj kartknapparna", "map_tools_show": "Kartknappar",
     "bt_device": "Bluetooth-enhet",
     "digi": "Digipeater", "digi_mode": "APRS-digipeater", "digi_off": "Av", "digi_fillin": "Fill-in (WIDE1-1) – hemmastation", "digi_wide": "Full (WIDEn-N) – digipeater på en hög plats", "digi_hops": "Högst hopp (WIDEn-N)", "digi_aliases": "Repetera även för (alias, t.ex. RELAY)", "digi_hint": "Repeterar APRS-paket från stationer omkring dig, bara när Sändning är på. Fill-in hjälper handapparater och bilar att nå närmaste stora digipeater och passar en hemmastation. En full digipeater bara efter överenskommelse med det lokala APRS-nätet. Ramar adresserade till din anropssignal repeteras också; samma paket bara en gång per 30 sekunder.",
     "conn_bt": "TNC via Bluetooth (parkopplad)", "bt_none": "Ingen parkopplad Bluetooth-enhet: parkoppla TNC:n i Androids Bluetooth-inställningar och tryck sedan på uppdatera.",

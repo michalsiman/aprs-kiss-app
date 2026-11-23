@@ -27,6 +27,7 @@ TEXTS = {
     "conn_serial": "Sériový port (USB)", "conn_usb": "TNC na USB (OTG kábel)", "host": "Adresa", "port": "Port", "device": "Sériový port",
     "th_starts_in": "Ďalší začína o {t}",
     "map_trails": "Chvosty (kadiaľ stanice išli za poslednú polhodinu)",
+    "map_tools_hide": "Skryť tlačidlá mapy", "map_tools_show": "Tlačidlá mapy",
     "bt_device": "Bluetooth zariadenie",
     "digi": "Digipeater", "digi_mode": "APRS digipeater", "digi_off": "Vypnutý", "digi_fillin": "Fill-in (WIDE1-1) – domáca stanica", "digi_wide": "Plný (WIDEn-N) – digipeater na kóte", "digi_hops": "Najviac hopov (WIDEn-N)", "digi_aliases": "Preposielať aj pre (aliasy, napr. RELAY)", "digi_hint": "Preposiela APRS pakety staníc okolo vás, len keď je zapnuté Vysielanie. Fill-in pomáha ručkám a autám dosiahnuť na najbližší veľký digipeater a je to správna voľba pre domácu stanicu. Plný digipeater len po dohode s miestnou APRS sieťou. Preposielajú sa aj rámce adresované vašej značke; rovnaký paket len raz za 30 sekúnd.",
     "conn_bt": "TNC cez Bluetooth (spárované)", "bt_none": "Žiadne spárované Bluetooth zariadenie: spáruj TNC v nastaveniach Bluetooth v Androide a potom ťukni na obnoviť.",

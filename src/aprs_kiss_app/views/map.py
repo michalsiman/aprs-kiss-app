@@ -74,11 +74,15 @@ class MapView(View):
                                   self._toggle_recent)
         self.internet = toggle(ft.Icons.PUBLIC_OFF, ft.Icons.PUBLIC, conf.show_internet, self.t("show_internet"),
                                lambda _e: self.app.set_show_internet(not self.engine.config.show_internet))
-        bar = ft.Row([
+        self.tools = [
             ft.IconButton(ft.Icons.MY_LOCATION, tooltip=self.t("centre_me"), on_click=self._centre_me),
             self.internet, self.only_recent, self.trails_btn, self._muted_btn(), self._offline_btn(),
             ft.IconButton(ft.Icons.HELP_OUTLINE, tooltip=self.t("legend"), on_click=lambda _e: show_legend(self.app)),
-        ], tight=True, spacing=0, wrap=True, run_spacing=0)
+        ]
+        # The bar folds into one gear button (and stays folded next time) for those who want the whole map.
+        self.fold_btn = ft.IconButton(on_click=self._toggle_tools)
+        bar = ft.Row([self.fold_btn, *self.tools], tight=True, spacing=0, wrap=True, run_spacing=0)
+        self._show_tools(not conf.map_tools_hidden)
         overlay = ft.Container(
             bar,
             bgcolor=ft.Colors.with_opacity(0.85, ft.Colors.SURFACE),
@@ -88,6 +92,19 @@ class MapView(View):
         self.scale = ScaleBar()
         self.scale.show(center[0], self._zoom)
         return ft.Stack([self.menu, overlay, self.controls.control, self.scale.control, self.base.credit], expand=True)
+
+    def _show_tools(self, shown: bool) -> None:
+        for button in self.tools:
+            button.visible = shown
+        self.fold_btn.icon = ft.Icons.CHEVRON_LEFT if shown else ft.Icons.SETTINGS
+        self.fold_btn.tooltip = self.t("map_tools_hide" if shown else "map_tools_show")
+
+    def _toggle_tools(self, _e) -> None:
+        conf = self.engine.config
+        conf.map_tools_hidden = not conf.map_tools_hidden
+        self._show_tools(not conf.map_tools_hidden)
+        self.app.save_config_soon()
+        self.app.page.update()
 
     def _toggle_trails(self, _e) -> None:
         conf = self.engine.config
