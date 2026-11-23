@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.1.40 – 2026-11-23
+
+- **Tracker**: the position button in the top bar now opens a menu: send the position now, or start the
+  tracker (▶) – the GPS position then goes out by itself, by radio while TX is on (and over the internet
+  when chosen). Green ▶ while it sends, amber while it waits for the GPS or for TX; ⏸ stops it. Kept
+  across restarts.
+- **Settings › Tracker**: a fixed interval (1–30 min), or **smart (SmartBeaconing)** like the APRS and LoRa
+  APRS trackers: standing still once in 10–60 min (60 by default), moving more often the faster you go,
+  at once on a turn; profiles on foot, bike and car. Positions carry course and speed.
+- **Fix: APRS-IS could not be switched on**: the field for the licence sentence never appeared, so the
+  sentence could not be typed. The sentence is now also written out above the field (and can be copied).
+- **Fix: "no internet" after the background**: phones that cut an app off the network for a while in the
+  background (Xiaomi) made the map flip to the offline map and back. The app no longer checks while in
+  the background or just after it returns, and goes offline only after three failed checks in a row.
+- **Map bar fits on a phone**: the muted map and the legend moved into the map menu.
+
 ## 0.1.39 – 2026-11-23
 
 - **Your own offline maps** (Settings › Offline maps): import a better map, e.g. a topographic one, from

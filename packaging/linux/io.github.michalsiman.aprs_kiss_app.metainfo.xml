@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.40" date="2026-11-23">
+      <description>
+        <p>A tracker with SmartBeaconing; APRS-IS can be switched on again (the licence sentence showed no field); no false "no internet" after the background.</p>
+      </description>
+    </release>
     <release version="0.1.39" date="2026-11-23">
       <description>
         <p>Import your own offline maps (MBTiles, PMTiles, SQLiteDB, ZIP/7z); station trails; a foldable map toolbar.</p>
