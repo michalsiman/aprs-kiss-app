@@ -14,6 +14,7 @@ import flet_map as fm
 from aprs_kiss_core.config import Config
 
 from ..i18n import TEXTS
+from .map_source import MapSourceButton
 from .base import View, clock, distance_km
 from .bbs import _plain
 from ..offline_map import MIN_ZOOM, BaseMap, ScaleBar, gestures
@@ -89,11 +90,11 @@ class TakView(View):
         self.map = fm.Map(
             expand=True, bgcolor=ft.Colors.SURFACE,
             initial_center=fm.MapLatitudeLongitude(*(here or (49.8, 15.5))), initial_zoom=self._zoom, min_zoom=MIN_ZOOM,
-            layers=self.base.layers(self.app.offline_map()), on_pointer_up=self._gesture_end,
+            layers=self.base.layers(self.app.offline_map(), self.app.imported_shown()), on_pointer_up=self._gesture_end,
             interaction_configuration=gestures(),
         )
-        self.offline_btn = toggle(ft.Icons.CLOUD_OFF_OUTLINED, ft.Icons.CLOUD_OFF, self.app.offline_map(),
-                                  self.t("map_offline"), self._toggle_offline)
+        self.source_btn = MapSourceButton(self.app)
+        self.offline_btn = self.source_btn.control
         self.controls = MapControls(self.map, self.t, lambda: self.app.page.run_task(self._ask_camera, 0.7))
         map_tools = ft.Container(self.offline_btn, left=8, top=8, border_radius=8,
                                  bgcolor=ft.Colors.with_opacity(0.85, ft.Colors.SURFACE))
@@ -149,15 +150,8 @@ class TakView(View):
     def base_map_changed(self) -> None:
         """Called by the app when the internet goes away or returns."""
         if hasattr(self, "map"):
-            self.map.layers = self.base.layers(self.app.offline_map())
-            self.offline_btn.selected = self.app.offline_map()
-
-    def _toggle_offline(self, _e) -> None:
-        conf = self.engine.config
-        conf.map_offline = not conf.map_offline
-        self.base_map_changed()
-        self.app.save_config_soon()
-        self.app.page.update()
+            self.map.layers = self.base.layers(self.app.offline_map(), self.app.imported_shown())
+            self.source_btn.refresh()
 
     def _gesture_end(self, _e=None) -> None:
         self.app.page.run_task(self._ask_camera, 0.8)

@@ -12,6 +12,7 @@ import flet_map as fm
 from ..legend import COLOR_ME, show_legend, station_color, visible
 from ..offline_map import MIN_ZOOM, BaseMap, Region, ScaleBar, gestures
 from ..symbols import emoji
+from .map_source import MapSourceButton
 from .base import View, toggle
 
 DEFAULT_CENTER = (49.8, 15.5)  # Czechia
@@ -54,7 +55,7 @@ class MapView(View):
             initial_zoom=self._zoom,
             min_zoom=MIN_ZOOM,
             interaction_configuration=gestures(),
-            layers=self.base.layers(self.app.offline_map()),
+            layers=self.base.layers(self.app.offline_map(), self.app.imported_shown()),
             # Right click (long press on touch screens): "set as my position".
             on_secondary_tap=self._menu,
             on_long_press=self._menu,
@@ -139,20 +140,13 @@ class MapView(View):
     def base_map_changed(self) -> None:
         """Called by the app when the internet goes away or returns."""
         if hasattr(self, "map"):
-            self.map.layers = self.base.layers(self.app.offline_map())
-            self.offline_btn.selected = self.muted.disabled = self.app.offline_map()
+            self.map.layers = self.base.layers(self.app.offline_map(), self.app.imported_shown())
+            self.muted.disabled = self.app.offline_map()
+            self.source_btn.refresh()
 
-    def _offline_btn(self) -> ft.IconButton:
-        self.offline_btn = toggle(ft.Icons.CLOUD_OFF_OUTLINED, ft.Icons.CLOUD_OFF, self.app.offline_map(),
-                                  self.t("map_offline"), self._toggle_offline)
-        return self.offline_btn
-
-    def _toggle_offline(self, _e) -> None:
-        conf = self.engine.config
-        conf.map_offline = not conf.map_offline
-        self.base_map_changed()
-        self.app.save_config_soon()
-        self.app.page.update()
+    def _offline_btn(self) -> ft.Control:
+        self.source_btn = MapSourceButton(self.app)
+        return self.source_btn.control
 
     def _gesture_end(self, _e=None) -> None:
         self.app.page.run_task(self._ask_camera, 0.8)  # after the fling has (mostly) stopped

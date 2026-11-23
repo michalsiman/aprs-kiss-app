@@ -19,7 +19,7 @@ from . import theme
 from aprs_kiss_core.engine import Engine, TransmitRefused
 
 from .about import show_about
-from . import disclaimer, distribution, language, updates
+from . import disclaimer, distribution, language, offline_map, updates
 from .sounds import Sounds
 from .i18n import Translator
 from .phone_gps import PhoneGps
@@ -97,6 +97,10 @@ class App:
                                        if config.connection == "serial" else config.connection,
                                        "gps_source": "manual"}).validate()
         self.engine = Engine(config, self.folder)
+        if config.map_paths:  # imported offline maps: opened before the map is drawn
+            failed = await asyncio.to_thread(offline_map.set_custom_maps, config.map_paths)
+            for path, err in failed:
+                _LOGGER.warning("Offline map %s cannot be used: %s", path, err)
         self.sounds = Sounds(self)
         self.engine.add_listener(self._on_event)
         await self.engine.start()
@@ -607,13 +611,54 @@ class App:
             up = await asyncio.to_thread(self._internet_up)
             if up == self.no_internet:  # changed
                 self.no_internet = not up
-                for v in self.views:
-                    if v.built and hasattr(v, "base_map_changed"):
-                        v.base_map_changed()
+                self.base_maps_changed()
                 if not self.engine.config.map_offline:
                     self.toast(self.t("net_offline") if self.no_internet else self.t("net_online"), seconds=10)
                 self.page.update()
             await asyncio.sleep(60)
+
+    async def set_map_files(self, paths: list[str]) -> list:
+        """The imported offline maps changed (settings): reopen them and redraw the maps."""
+        self.engine.config.map_files = "\n".join(paths)
+        failed = await asyncio.to_thread(offline_map.set_custom_maps, paths)
+        self.base_maps_changed()
+        self.save_config_soon()
+        return failed
+
+    def has_imported_maps(self) -> bool:
+        return bool(offline_map.custom_maps())
+
+    def wanted_map_mode(self) -> str:
+        """What the user chose in the map menu."""
+        conf = self.engine.config
+        if not conf.map_offline:
+            return "online"
+        return "imported" if conf.map_imported and self.has_imported_maps() else "basic"
+
+    def map_mode(self) -> str:
+        """What is shown: without internet an offline map even when online was chosen."""
+        if not self.offline_map():
+            return "online"
+        return "imported" if self.engine.config.map_imported and self.has_imported_maps() else "basic"
+
+    def imported_shown(self) -> bool:
+        return self.map_mode() == "imported"
+
+    def set_map_mode(self, mode: str) -> None:
+        conf = self.engine.config
+        conf.map_offline = mode != "online"
+        if mode != "online":
+            conf.map_imported = mode == "imported"
+        self.base_maps_changed()
+        self.save_config_soon()
+        if mode == "online" and self.no_internet:
+            self.toast(self.t("net_offline"), seconds=6)
+        self.page.update()
+
+    def base_maps_changed(self) -> None:
+        for v in self.views:
+            if v.built and hasattr(v, "base_map_changed"):
+                v.base_map_changed()
 
     def offline_map(self) -> bool:
         """The offline base map: chosen by the user, or because there is no internet."""

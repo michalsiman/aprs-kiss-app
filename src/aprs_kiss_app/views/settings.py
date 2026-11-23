@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import asyncio
 import glob
+import logging
 import os
+from pathlib import Path
 
 import flet as ft
 
-from aprs_kiss_core import android_bt, android_usb
+from aprs_kiss_core import android_bt, android_usb, tilemaps
 from aprs_kiss_core.aprsis import licence_confirmed
 from aprs_kiss_core.bbs import BbsConfigError
 from aprs_kiss_core.bbs.storage import (
@@ -21,10 +23,12 @@ from aprs_kiss_core.bbs.storage import (
 )
 from aprs_kiss_core.config import Config
 
-from .. import distribution
+from .. import distribution, offline_map
 from ..i18n import LANGUAGES, TEXTS, ssid_labels
 from ..symbols import SYMBOLS
 from .base import View, short_path
+
+_LOGGER = logging.getLogger(__name__)
 
 BAUDRATES = ["1200", "4800", "9600", "19200", "38400", "57600", "115200"]
 
@@ -254,6 +258,7 @@ class SettingsView(View):
                          ft.Text(t("bbs_welcome"), size=12), ft.Row([self.bbs_welcome]),
                          ft.Text(t("bbs_more"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
                          ft.Text(short_path(self.engine.bbs_folder()), size=12, font_family="monospace", selectable=True))]),
+                self._maps_section(),
                 _section(t("bg_section"), ft.Icons.PHONELINK_LOCK,
                          *([self.run_bg, ft.Text(t("bg_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT)]
                            if self.app.mobile else []),
@@ -377,6 +382,80 @@ class SettingsView(View):
         else:
             state = self.t("disconnected") + (f" – {s['error']}" if s.get("error") else "")
         self.is_state.value = f"{self.t('aprsis_state')}: {state}"
+
+    # ─── imported offline maps: take effect at once, no Save needed ─────
+
+    def _maps_section(self) -> ft.Control:
+        t = self.t
+        self.maps_list = ft.Column(spacing=0)
+        self.maps_busy = ft.Row([ft.ProgressRing(width=16, height=16, stroke_width=2), ft.Text(t("maps_importing"))],
+                                visible=False)
+        self._list_maps()
+        return _section(t("maps_section"), ft.Icons.TERRAIN,
+                        ft.Text(t("maps_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
+                        self.maps_list, self.maps_busy,
+                        ft.Row([ft.OutlinedButton(t("maps_import"), icon=ft.Icons.FILE_OPEN, on_click=self._import_maps)],
+                               wrap=True))
+
+    def _list_maps(self) -> None:
+        opened = {str(source.path): source for _, source in offline_map.custom_maps()}
+        rows = []
+        for path in self.engine.config.map_paths:
+            source = opened.get(path)
+            text = source.describe() if source else f"{Path(path).name} – {self.t('maps_broken')}"
+            rows.append(ft.Row([
+                ft.Icon(ft.Icons.TERRAIN if source else ft.Icons.ERROR_OUTLINE, size=18,
+                        color=ft.Colors.PRIMARY if source else ft.Colors.ERROR),
+                ft.Text(text, size=13, expand=True, tooltip=path),
+                ft.IconButton(ft.Icons.DELETE_OUTLINE, tooltip=self.t("maps_remove"),
+                              on_click=lambda _e, p=path: self.app.page.run_task(self._remove_map, p)),
+            ], vertical_alignment=ft.CrossAxisAlignment.CENTER))
+        self.maps_list.controls = rows or [ft.Text(self.t("maps_none"), size=13, italic=True)]
+
+    async def _import_maps(self, _e) -> None:
+        try:
+            files = await ft.FilePicker().pick_files(dialog_title=self.t("maps_import"), allow_multiple=True)
+        except Exception as err:  # noqa: BLE001 - the picker is not there (some web setups)
+            _LOGGER.warning("File picker failed: %s", err)
+            files = None
+        if not files:
+            return
+        if not any(f.path for f in files):
+            self.app.toast(self.t("maps_web"))
+            return
+        self.maps_busy.visible = True
+        self.app.page.update()
+        added, errors = [], []
+        folder = self.app.folder / "maps"
+        for f in files:
+            if not f.path:
+                continue
+            try:
+                found = await asyncio.to_thread(tilemaps.import_file, f.path, folder, not self.app.mobile)
+                added += [str(p) for p in found]
+            except tilemaps.MapError as err:
+                _LOGGER.warning("Map %s not imported: %s", f.name, err)
+                errors.append(f"{f.name}: {self.t('map_err_' + err.code)}")
+            except OSError as err:
+                errors.append(f"{f.name}: {err}")
+        paths = self.engine.config.map_paths
+        paths += [p for p in added if p not in paths]
+        if added:
+            await self.app.set_map_files(paths)
+        self.maps_busy.visible = False
+        self._list_maps()
+        if errors:
+            self.app.toast("\n".join(errors), seconds=12)
+        elif added:
+            self.app.toast(self.t("maps_added"), seconds=8)
+        self.app.page.update()
+
+    async def _remove_map(self, path: str) -> None:
+        paths = [p for p in self.engine.config.map_paths if p != path]
+        await self.app.set_map_files(paths)
+        await asyncio.to_thread(tilemaps.remove_map, path, self.app.folder / "maps")
+        self._list_maps()
+        self.app.page.update()
 
     def _gps_changed(self, update: bool = True) -> None:
         usb = self.gps_source.value == "usb"

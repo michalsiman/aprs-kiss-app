@@ -15,6 +15,8 @@ from dataclasses import dataclass
 import flet as ft
 import flet_map as fm
 
+from aprs_kiss_core import tilemaps
+
 DATA = pathlib.Path(__file__).with_name("offline") / "world.json"
 ATTRIBUTION = "Natural Earth, GeoNames"
 BORDER = "#7B5EA7"
@@ -229,6 +231,39 @@ class OfflineLayers:
         return changed
 
 
+# ─── maps the user imported (MBTiles, PMTiles, …), shown over the bundled map when offline ───
+
+_server: tilemaps.TileServer | None = None
+_custom: list[tuple[str, tilemaps.TileSource]] = []
+
+
+def set_custom_maps(paths: list[str]) -> list[tuple[str, tilemaps.MapError]]:
+    """Open the imported maps (slow for big folders: call from a thread); the ones that failed."""
+    global _server
+    if _server is None:
+        if not paths:
+            return []
+        _server = tilemaps.TileServer()
+    opened, failed = _server.set_maps(paths)
+    _custom[:] = opened
+    return failed
+
+
+def custom_maps() -> list[tuple[str, tilemaps.TileSource]]:
+    return list(_custom)
+
+
+def _custom_layer(url: str, source: tilemaps.TileSource) -> fm.TileLayer:
+    bounds = None
+    if source.bounds:
+        w, s, e, n = source.bounds
+        bounds = fm.MapLatitudeLongitudeBounds(fm.MapLatitudeLongitude(n, w), fm.MapLatitudeLongitude(s, e))
+    # past its most detailed zoom the map's own tiles are enlarged; where it has none the bundled map shows
+    return fm.TileLayer(url_template=url, user_agent_package_name="aprs_kiss_app", tile_bounds=bounds,
+                        min_native_zoom=source.min_zoom, max_native_zoom=source.max_zoom, max_zoom=20,
+                        min_zoom=max(0, source.min_zoom - 1), keep_buffer=1, pan_buffer=0)
+
+
 TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
 # OpenStreetMap's tile usage policy asks for an identifying User-Agent.
 USER_AGENT = "io.github.michalsiman.aprs_kiss_app"
@@ -255,20 +290,24 @@ class BaseMap:
         self.tiles = fm.TileLayer(url_template=TILES, user_agent_package_name=USER_AGENT, max_zoom=19,
                                   opacity=tile_opacity)
         self.offline: OfflineLayers | None = None
+        self._custom: dict[str, fm.TileLayer] = {}
         self.credit_text = ft.Text(size=8, color=ft.Colors.ON_SURFACE_VARIANT)
         # Small and see-through, in the corner: the credit OpenStreetMap asks for, without covering the map.
         self.credit = ft.Container(self.credit_text, right=0, bottom=0, padding=ft.Padding.symmetric(horizontal=3),
                                    bgcolor=ft.Colors.with_opacity(0.55, ft.Colors.SURFACE),
                                    border_radius=ft.BorderRadius.only(top_left=4))
 
-    def layers(self, offline: bool) -> list:
+    def layers(self, offline: bool, imported: bool = False) -> list:
         if offline and self.offline is None:
             self.offline = OfflineLayers(*self.center, self.zoom)
         self.tiles.visible = not offline
-        extra = self.offline.layers if self.offline else []
+        custom = custom_maps() if offline and imported else []
+        self._custom = {url: self._custom.get(url) or _custom_layer(url, source) for url, source in custom}
+        extra = (self.offline.layers if self.offline else []) + list(self._custom.values())
         for layer in extra:
             layer.visible = offline
-        self.credit_text.value = f"{ATTRIBUTION} (offline)" if offline else OSM_CREDIT
+        credits = [source.attribution or source.name for _, source in custom]
+        self.credit_text.value = (" · ".join([*credits, ATTRIBUTION]) + " (offline)") if offline else OSM_CREDIT
         return [self.tiles, *extra, *([self.trails] if self.trails else []), self.markers]
 
     def moved(self, lat: float, lon: float, zoom: float, offline: bool) -> bool:
