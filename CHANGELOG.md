@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.30 – 2026-11-23
+
+- **Phone top bar as a dashboard**: TNC, IS, GPS and TX are small lamps – green when working, grey when
+  not, TX red while transmitting is on; a tap on TX switches transmitting, a tap on TNC or GPS tells
+  their state. A long callsign is shortened instead of pushing the switch off the screen.
+- **The same on/off icons on every screen**: Monitor (stations from the internet, pause, clear) and
+  Stations now use the lit / crossed-out icons of the map.
+- **Terminal**: just the list of saved BBSes and the connect / disconnect icons; "New station…" in the
+  list opens the fields for a callsign and path (and saving it).
+- **TAK on a phone**: while typing a GeoChat message the map and the station list step aside, so the
+  keyboard does not cover the text.
+- The Android .apk is now signed with the project's permanent key (uninstall the old app once; from
+  now on new versions install over it), and the release has the .aab for Google Play.
+
 ## 0.1.29 – 2026-11-23
 
 - **A warning at the first start**, to be accepted before the app can be used: the app makes a radio

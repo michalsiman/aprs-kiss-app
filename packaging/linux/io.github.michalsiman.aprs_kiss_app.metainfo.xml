@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.30" date="2026-11-23">
+      <description>
+        <p>Phone top bar as a dashboard (TNC, GPS, TX lamps), the same on/off icons on every screen, a simpler terminal.</p>
+      </description>
+    </release>
     <release version="0.1.29" date="2026-11-23">
       <description>
         <p>A warning at the first start: transmitting needs an amateur radio licence. Preparations for Google Play.</p>

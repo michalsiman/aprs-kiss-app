@@ -6,9 +6,9 @@ import time
 
 import flet as ft
 
-from ..legend import internet_checkbox, show_legend, station_color, visible
+from ..legend import show_legend, station_color, visible
 from ..symbols import symbol_info
-from .base import View, bearing, distance_km
+from .base import View, bearing, distance_km, toggle
 
 
 def describe(app, entry: dict) -> str:
@@ -38,17 +38,19 @@ class StationsView(View):
 
     def build(self) -> ft.Control:
         self._signature = None
-        self.filter = ft.TextField(hint_text=self.t("filter"), prefix_icon=ft.Icons.SEARCH, dense=True, width=240,
+        self.filter = ft.TextField(hint_text=self.t("filter"), prefix_icon=ft.Icons.SEARCH, dense=True, expand=True,
                                    on_change=lambda _e: self.force())
-        self.internet = internet_checkbox(self.app)
+        self.internet = toggle(ft.Icons.PUBLIC_OFF, ft.Icons.PUBLIC, self.engine.config.show_internet,
+                               self.t("show_internet"),
+                               lambda _e: self.app.set_show_internet(not self.engine.config.show_internet))
         self.count = ft.Text(color=ft.Colors.ON_SURFACE_VARIANT)
         self.list = ft.ListView(expand=True, spacing=0)
         return ft.Column(
             [
-                ft.Row([self.filter, self.internet, self.count,
-                        ft.TextButton(self.t("legend"), icon=ft.Icons.HELP_OUTLINE,
+                ft.Row([self.filter, self.count, self.internet,
+                        ft.IconButton(ft.Icons.HELP_OUTLINE, tooltip=self.t("legend"),
                                       on_click=lambda _e: show_legend(self.app))],
-                       vertical_alignment=ft.CrossAxisAlignment.CENTER, wrap=self.app.compact, run_spacing=0),
+                       vertical_alignment=ft.CrossAxisAlignment.CENTER, spacing=4),
                 self.list,
             ],
             expand=True,
@@ -56,7 +58,7 @@ class StationsView(View):
 
     def force(self) -> None:
         self._signature = None
-        self.internet.value = self.engine.config.show_internet
+        self.internet.selected = self.engine.config.show_internet
         self.refresh()
 
     def refresh(self) -> None:

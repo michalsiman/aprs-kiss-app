@@ -176,3 +176,11 @@ def adapt(control: ft.Control, fit_width: float | None = None) -> ft.Control:
                 parent.controls[parent.controls.index(c)] = _wrapping(c)  # a long label wraps
         stack.extend((child, c) for child in _children(c))
     return control
+
+
+def toggle(icon: str, selected_icon: str, selected: bool, tooltip: str, on_click) -> ft.IconButton:
+    """An on/off icon, the same on every screen: the plain (or crossed-out) icon when off, the filled one on a tinted background when on."""
+    return ft.IconButton(icon, selected_icon=selected_icon, selected=selected, tooltip=tooltip, on_click=on_click,
+                         style=ft.ButtonStyle(bgcolor={ft.ControlState.SELECTED:
+                                                       ft.Colors.with_opacity(0.18, ft.Colors.PRIMARY)}))
+

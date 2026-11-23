@@ -12,7 +12,7 @@ import flet_map as fm
 from ..legend import COLOR_ME, show_legend, station_color, visible
 from ..offline_map import MIN_ZOOM, BaseMap, Region
 from ..symbols import emoji
-from .base import View
+from .base import View, toggle
 
 DEFAULT_CENTER = (49.8, 15.5)  # Czechia
 REBUILD_SECONDS = 2.0
@@ -271,13 +271,6 @@ class MapView(View):
             await self.centre(*here, max(self.base.zoom, 11))
         else:
             self.app.toast(self.t("no_position"))
-
-
-def toggle(icon: str, selected_icon: str, selected: bool, tooltip: str, on_click) -> ft.IconButton:
-    """An on/off icon: the plain (or crossed-out) icon when off, the filled one on a tinted background when on."""
-    return ft.IconButton(icon, selected_icon=selected_icon, selected=selected, tooltip=tooltip, on_click=on_click,
-                         style=ft.ButtonStyle(bgcolor={ft.ControlState.SELECTED:
-                                                       ft.Colors.with_opacity(0.18, ft.Colors.PRIMARY)}))
 
 
 class MapControls:

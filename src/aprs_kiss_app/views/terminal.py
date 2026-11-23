@@ -11,6 +11,7 @@ from aprs_kiss_core.engine import TransmitRefused
 from .base import MONO, View, capped_append
 
 LIMIT = 2000
+NEW = "\x00new"  # the "New station…" item of the saved list
 
 
 class TerminalView(View):
@@ -19,22 +20,26 @@ class TerminalView(View):
     selected_icon = ft.Icons.TERMINAL
 
     def build(self) -> ft.Control:
-        self.remote = ft.TextField(label=self.t("remote"), hint_text="OK0BBS", width=200, dense=True,
+        self.remote = ft.TextField(label=self.t("remote"), hint_text="OK0BBS", width=160, dense=True,
                                    capitalization=ft.TextCapitalization.CHARACTERS, on_submit=self._connect)
-        self.path = ft.TextField(label=self.t("path"), width=200, dense=True,
+        self.path = ft.TextField(label=self.t("path"), width=160, dense=True,
                                  capitalization=ft.TextCapitalization.CHARACTERS)
-        self.saved = ft.Dropdown(label=self.t("bbs_saved"), width=220, dense=True, on_select=self._pick)
+        # Mostly a saved station is picked; a new one opens the fields for its callsign and path.
+        self.saved = ft.Dropdown(label=self.t("bbs_saved"), dense=True, on_select=self._pick,
+                                 expand=self.app.compact, width=None if self.app.compact else 340)
         self.save_btn = ft.IconButton(ft.Icons.BOOKMARK_ADD_OUTLINED, tooltip=self.t("bbs_save"), on_click=self._save)
         self.remove_btn = ft.IconButton(ft.Icons.BOOKMARK_REMOVE_OUTLINED, tooltip=self.t("bbs_remove"),
                                         on_click=self._remove)
-        self._fill_saved()
         # Over AX.25 packet (the TNC) or VARA FM; the choice appears once VARA is set up in Settings.
         self.via = ft.Dropdown(label=self.t("connection"), width=210, dense=True, value="ax25",
                                visible=self.engine.vara is not None,
                                options=[ft.DropdownOption(key="ax25", text=self.t("via_packet")),
                                         ft.DropdownOption(key="vara", text="VARA FM")])
-        self.connect_btn = ft.FilledButton(self.t("connect"), icon=ft.Icons.LINK, on_click=self._connect)
-        self.disconnect_btn = ft.OutlinedButton(self.t("disconnect"), icon=ft.Icons.LINK_OFF, on_click=self._disconnect)
+        self.connect_btn = ft.IconButton(ft.Icons.LINK, tooltip=self.t("connect"), on_click=self._connect,
+                                         style=ft.ButtonStyle(bgcolor=ft.Colors.with_opacity(0.18, ft.Colors.PRIMARY)))
+        self.disconnect_btn = ft.IconButton(ft.Icons.LINK_OFF, tooltip=self.t("disconnect"), on_click=self._disconnect)
+        self.new_row = ft.Row([self.remote, self.path, self.save_btn], wrap=True, run_spacing=4)
+        self._fill_saved()
         self.state = ft.Text(self.t("not_connected_session"), color=ft.Colors.ON_SURFACE_VARIANT)
         self.lines = ft.ListView(expand=True, spacing=0, auto_scroll=True, padding=ft.Padding.all(8))
         self._open: ft.Text | None = None  # the received line still waiting for its end
@@ -42,8 +47,9 @@ class TerminalView(View):
                                   text_style=ft.TextStyle(font_family=MONO))
         return ft.Column(
             [
-                ft.Row([self.saved, self.remote, self.path, self.via, self.save_btn, self.remove_btn,
-                        self.connect_btn, self.disconnect_btn], wrap=True),
+                ft.Row([self.saved, self.remove_btn, self.connect_btn, self.disconnect_btn], spacing=2),
+                self.new_row,
+                self.via,
                 self.state,
                 ft.Container(ft.SelectionArea(self.lines), expand=True, border_radius=8,
                              bgcolor=ft.Colors.SURFACE_CONTAINER_LOWEST),
@@ -58,19 +64,26 @@ class TerminalView(View):
         items = self.engine.config.saved_bbs()
         self.saved.options = [ft.DropdownOption(key=i["call"], text=f"{i['call']} via {i['path']}" if i["path"]
                                                 else i["call"]) for i in items]
-        if self.saved.value not in {i["call"] for i in items}:
-            self.saved.value = None
-        self.saved.disabled = not items
-        self.remove_btn.disabled = self.saved.value is None
+        self.saved.options.append(ft.DropdownOption(key=NEW, text=self.t("term_new"), leading_icon=ft.Icons.ADD))
+        if self.saved.value not in {i["call"] for i in items} | {NEW}:
+            self.saved.value = NEW if not items else None  # nothing saved yet: straight to a new station
+        self._show_new()
+
+    def _show_new(self) -> None:
+        """The callsign and path fields only for a new station; a saved one has them already."""
+        self.new_row.visible = self.saved.value == NEW
+        self.remove_btn.visible = self.saved.value not in (None, NEW)
 
     def _pick(self, e) -> None:
         """Choosing a saved station fills in its callsign and path, ready to connect."""
         item = next((i for i in self.engine.config.saved_bbs() if i["call"] == e.control.value), None)
         if item:
             self.remote.value, self.path.value = item["call"], item["path"]
-            self._reload_lines()
-            self.refresh()
-        self.remove_btn.disabled = item is None
+        elif e.control.value == NEW:
+            self.remote.value = self.path.value = ""
+        self._reload_lines()
+        self.refresh()
+        self._show_new()
         self.app.page.update()
 
     def _save(self, _e) -> None:
@@ -140,9 +153,9 @@ class TerminalView(View):
                             else ft.Colors.ON_SURFACE_VARIANT)
         # While it keeps trying, the Disconnect button becomes a clear "Stop connecting".
         self.disconnect_btn.disabled = not state
-        self.disconnect_btn.content = self.t("term_stop") if connecting else self.t("disconnect")
+        self.disconnect_btn.tooltip = self.t("term_stop") if connecting else self.t("disconnect")
         self.disconnect_btn.icon = ft.Icons.STOP_CIRCLE if connecting else ft.Icons.LINK_OFF
-        self.disconnect_btn.style = ft.ButtonStyle(color=ft.Colors.ERROR) if connecting else None
+        self.disconnect_btn.icon_color = ft.Colors.ERROR if connecting or state == "connected" else None
         self.connect_btn.disabled = bool(state)
         self.input.disabled = state != "connected"
 

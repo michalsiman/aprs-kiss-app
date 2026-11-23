@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import flet as ft
 
-from .base import MONO, View, capped_append
+from .base import MONO, View, capped_append, toggle
 
 LIMIT = 500
 
@@ -19,24 +19,20 @@ class MonitorView(View):
     icon = ft.Icons.LIST_ALT_OUTLINED
     selected_icon = ft.Icons.LIST_ALT
 
-    def _header(self) -> list[ft.Control]:
-        hint = ft.Text(self.t("monitor_hint"), color=ft.Colors.ON_SURFACE_VARIANT, expand=not self.app.compact)
-        buttons = [self.internet, self.pause_btn,
-                   ft.TextButton(self.t("clear"), icon=ft.Icons.DELETE_SWEEP, on_click=self._clear)]
-        if self.app.compact:  # a phone: the hint above, the buttons below
-            return [hint, ft.Row(buttons, wrap=True, spacing=0)]
-        return [ft.Row([hint, *buttons])]
-
     def build(self) -> ft.Control:
         self.paused = False
         self.lines = ft.ListView(expand=True, spacing=0, auto_scroll=True, padding=ft.Padding.all(8))
         self.lines.controls = self._all_lines()
-        self.internet = ft.Switch(label=self.t("show_internet"), value=self.engine.config.monitor_internet,
-                                  on_change=self._internet_changed)
-        self.pause_btn = ft.TextButton(self.t("pause"), icon=ft.Icons.PAUSE, on_click=self._toggle)
+        # The same lit / crossed-out icons as on the map: little room taken, the state seen at a glance.
+        self.internet = toggle(ft.Icons.PUBLIC_OFF, ft.Icons.PUBLIC, self.engine.config.monitor_internet,
+                               self.t("show_internet"), self._internet_changed)
+        self.pause_btn = toggle(ft.Icons.PAUSE, ft.Icons.PLAY_ARROW, False, self.t("pause"), self._toggle)
+        clear = ft.IconButton(ft.Icons.DELETE_SWEEP_OUTLINED, tooltip=self.t("clear"), on_click=self._clear)
+        hint = ft.Text(self.t("monitor_hint"), color=ft.Colors.ON_SURFACE_VARIANT, expand=True,
+                       size=12 if self.app.compact else None)
         return ft.Column(
             [
-                *self._header(),
+                ft.Row([hint, self.internet, self.pause_btn, clear], spacing=0),
                 ft.Container(ft.SelectionArea(self.lines), expand=True, border_radius=8,
                              bgcolor=ft.Colors.SURFACE_CONTAINER_LOWEST),
             ],
@@ -55,8 +51,8 @@ class MonitorView(View):
 
     def _toggle(self, _e) -> None:
         self.paused = not self.paused
-        self.pause_btn.text = self.t("resume") if self.paused else self.t("pause")
-        self.pause_btn.icon = ft.Icons.PLAY_ARROW if self.paused else ft.Icons.PAUSE
+        self.pause_btn.selected = self.paused  # lit while paused; a tap goes on
+        self.pause_btn.tooltip = self.t("resume") if self.paused else self.t("pause")
         if not self.paused:
             self.lines.controls = self._all_lines()
 
@@ -69,7 +65,8 @@ class MonitorView(View):
 
     def _internet_changed(self, e) -> None:
         """Saved like the map's choice; the lines already received are filtered again at once."""
-        self.engine.config.monitor_internet = bool(e.control.value)
+        self.engine.config.monitor_internet = not self.engine.config.monitor_internet
+        self.internet.selected = self.engine.config.monitor_internet
         self.app.save_config_soon()
         if not self.paused:
             self.lines.controls = self._all_lines()

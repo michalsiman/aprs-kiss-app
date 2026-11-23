@@ -217,6 +217,29 @@ class App:
         self.toast(self.tnc_text.value if st["tnc_connected"] else (st.get("tnc_error") or self.tnc_text.value or ""),
                    error=not st["tnc_connected"])
 
+    @staticmethod
+    def _lamp(text: str, on_click) -> ft.Container:
+        return ft.Container(ft.Text(text, size=12, weight=ft.FontWeight.BOLD), on_click=on_click,
+                            padding=ft.Padding.symmetric(horizontal=5, vertical=1), border_radius=5,
+                            border=ft.Border.all(1.5, ft.Colors.OUTLINE))
+
+    def _light(self, key: str, state: str | None) -> None:
+        """A lamp: "on" green, "tx" red and filled, None grey; hidden when the thing is not in use."""
+        lamp = self.lamps[key]
+        color = {"on": ft.Colors.GREEN, "tx": ft.Colors.RED}.get(state, ft.Colors.OUTLINE)
+        lamp.border = ft.Border.all(1.5, color)
+        lamp.bgcolor = ft.Colors.RED if state == "tx" else None
+        lamp.content.color = ft.Colors.WHITE if state == "tx" else color
+
+    def _tx_tap(self, _e=None) -> None:
+        if not self.engine.config.configured:
+            self.toast(self.t("tx_off"))
+            return
+        self.engine.set_tx(not self.engine.station.tx_enabled)
+        self.toast(self.t("tx_on") if self.engine.station.tx_enabled else self.t("tx_off"),
+                   error=self.engine.station.tx_enabled)
+        self.refresh_now()
+
     def _gps_info(self, _e=None) -> None:
         """A tap on "GPS": its state, or why there is no position."""
         gps = self.engine.status().get("gps") or {}
@@ -323,9 +346,23 @@ class App:
             self.tx_switch.label = None
         self.callsign.size = 16 if self.compact else 18
         self.tnc_text.visible = self.gps_text.visible = not self.compact
+        # a phone: TNC, IS, GPS and TX as lamps on a dashboard - green when working, grey when not,
+        # TX red while transmitting is on; a tap tells the state (TX: switches it)
+        self.lamps = {key: self._lamp(text, on_click) for key, text, on_click in (
+            ("tnc", "TNC", self._tnc_info), ("is", "IS", None), ("gps", "GPS", self._gps_info),
+            ("tx", "TX", self._tx_tap))}
+        if self.compact:
+            self.callsign.expand = True
+            self.callsign.no_wrap = True
+            self.callsign.overflow = ft.TextOverflow.ELLIPSIS
+            row = [self.menu_btn, self.callsign, self.lamps["tnc"], self.lamps["is"], self.lamps["gps"],
+                   self.update_btn,
+                   ft.IconButton(ft.Icons.SHARE_LOCATION, tooltip=self.t("beacon_now"), on_click=self._beacon_now,
+                                 visible=not self.engine.exclusive_mode),
+                   self.lamps["tx"]]
         status = ft.Container(
             ft.Row(
-                [
+                row if self.compact else [
                     self.menu_btn,
                     self.callsign,
                     ft.Container(ft.Row([self.tnc_dot, ft.Text(self.t("tnc"), size=13), self.tnc_text], spacing=4,
@@ -341,7 +378,7 @@ class App:
                     ft.IconButton(ft.Icons.INFO_OUTLINE, tooltip=self.t("about"),
                                   on_click=lambda _e: show_about(self), visible=not self.compact),
                 ],
-                spacing=6 if self.compact else 16,
+                spacing=4 if self.compact else 16,
                 vertical_alignment=ft.CrossAxisAlignment.CENTER,
             ),
             padding=ft.Padding.symmetric(horizontal=2 if self.compact else 16, vertical=2 if self.compact else 6),
@@ -472,6 +509,12 @@ class App:
         self.tx_switch.disabled = not self.engine.config.configured
         self.tx_switch.tooltip = self.t("tx_on") if st["tx_enabled"] else self.t("tx_off")
         self.tx_box.bgcolor = ft.Colors.ERROR_CONTAINER if st["tx_enabled"] else None
+        self._light("tnc", "on" if st["tnc_connected"] else None)
+        self.lamps["is"].visible = aprsis is not None
+        self._light("is", "on" if aprsis and aprsis["verified"] else None)
+        self.lamps["gps"].visible = gps is not None
+        self._light("gps", "on" if gps and gps.get("fix") else None)
+        self._light("tx", "tx" if st["tx_enabled"] else None)
         if self.has_view("messages"):
             messages = self.view("messages")
             dest = self.rail.destinations[self.views.index(messages)]

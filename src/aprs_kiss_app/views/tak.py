@@ -17,7 +17,8 @@ from ..i18n import TEXTS
 from .base import View, clock
 from .bbs import _plain
 from ..offline_map import MIN_ZOOM, BaseMap
-from .map import MapControls, toggle
+from .base import toggle
+from .map import MapControls
 
 TEAM_COLORS = {
     "White": "#9E9E9E", "Yellow": "#F9A825", "Orange": "#EF6C00", "Magenta": "#D81B60", "Red": "#E53935",
@@ -72,11 +73,19 @@ class TakView(View):
         self.chat = ft.ListView(expand=True, spacing=6, auto_scroll=True, padding=ft.Padding.all(6))
         self.to = ft.Dropdown(dense=True, width=150, value="", options=[ft.DropdownOption(key="", text=self.t("tak_everybody"))])
         self.text = ft.TextField(hint_text=self.t("type_here"), expand=True, dense=True, on_submit=self._send)
+        position_row = ft.Row([ft.FilledTonalButton(self.t("tak_send_position"), icon=ft.Icons.MY_LOCATION,
+                                                    on_click=self._position), self.offline_btn])
+        stations_title = ft.Text(self.t("tak_stations"), weight=ft.FontWeight.BOLD)
+        if compact:
+            # a phone: while typing, the keyboard takes half the screen - the map and the station list
+            # step aside so GeoChat and the text stay in sight
+            self._typing_hides = [header, map_box, position_row, stations_title, self.stations]
+            self.text.on_focus = lambda _e: self._typing(True)
+            self.text.on_blur = lambda _e: self._typing(False)
         panel = ft.Container(
             ft.Column([
-                ft.Row([ft.FilledTonalButton(self.t("tak_send_position"), icon=ft.Icons.MY_LOCATION,
-                                             on_click=self._position), self.offline_btn]),
-                ft.Text(self.t("tak_stations"), weight=ft.FontWeight.BOLD), self.stations,
+                position_row,
+                stations_title, self.stations,
                 ft.Text(self.t("tak_chat"), weight=ft.FontWeight.BOLD),
                 ft.Container(self.chat, expand=True, border_radius=8, bgcolor=ft.Colors.SURFACE_CONTAINER_LOWEST),
                 ft.Row([self.to, self.text, ft.IconButton(ft.Icons.SEND, tooltip=self.t("send"), on_click=self._send)]),
@@ -88,6 +97,11 @@ class TakView(View):
             return ft.Column([header, map_box, panel], expand=True)
         return ft.Column([header, ft.Row([map_box, panel], expand=True,
                                          vertical_alignment=ft.CrossAxisAlignment.STRETCH)], expand=True)
+
+    def _typing(self, on: bool) -> None:
+        for control in self._typing_hides:
+            control.visible = not on
+        self.app.page.update()
 
     def base_map_changed(self) -> None:
         """Called by the app when the internet goes away or returns."""
