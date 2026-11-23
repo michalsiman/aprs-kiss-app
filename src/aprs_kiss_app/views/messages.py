@@ -27,11 +27,15 @@ class MessagesView(View):
         self.conversations = ft.ListView(expand=True, spacing=2)
         self.thread = ft.ListView(expand=True, spacing=8, auto_scroll=True, padding=ft.Padding.all(12))
         self.title = ft.Text(self.t("pick_conversation"), size=16, weight=ft.FontWeight.BOLD)
-        self.to = ft.TextField(label=self.t("to"), width=150, dense=True, visible=False,
-                               capitalization=ft.TextCapitalization.CHARACTERS)
-        self.text = ft.TextField(hint_text=self.t("text"), expand=True, dense=True, max_length=MAX_TEXT,
-                                 on_submit=self._send)
         compact = self.app.compact
+        # Writing: who to (a new message only), the text, then the way, the characters left and Send -
+        # each on its own line, wide enough to read on a phone.
+        self.to = ft.TextField(label=self.t("to"), dense=not compact, visible=False,
+                               capitalization=ft.TextCapitalization.CHARACTERS)
+        self.text = ft.TextField(hint_text=self.t("text"), dense=not compact, on_submit=self._send,
+                                 multiline=True, min_lines=1, max_lines=3, shift_enter=True,
+                                 on_change=self._count)
+        self.count = ft.Text(f"0/{MAX_TEXT}", size=12, color=ft.Colors.ON_SURFACE_VARIANT)
         self.via = ft.Dropdown(
             width=120 if compact else 200, dense=True, value="both",
             options=[ft.DropdownOption(key=k, text=self.t(f"via_{k}")) for k in ("radio", "internet", "both")],
@@ -51,16 +55,29 @@ class MessagesView(View):
                 ft.Row([self.back, self.title], spacing=4),
                 ft.Container(ft.SelectionArea(self.thread), expand=True, border_radius=8,
                              bgcolor=ft.Colors.SURFACE_CONTAINER_LOWEST),
-                ft.Row([self.to, self.text, self.via,
-                        ft.IconButton(ft.Icons.SEND, tooltip=self.t("send"), on_click=self._send)],
-                       vertical_alignment=ft.CrossAxisAlignment.START),
+                self.to,
+                self.text,
+                ft.Row([self.via, ft.Container(expand=True), self.count,
+                        ft.IconButton(ft.Icons.SEND, tooltip=self.t("send"), on_click=self._send,
+                                      style=ft.ButtonStyle(bgcolor=ft.Colors.PRIMARY, color=ft.Colors.ON_PRIMARY))],
+                       vertical_alignment=ft.CrossAxisAlignment.CENTER),
             ],
             expand=True,
+            horizontal_alignment=ft.CrossAxisAlignment.STRETCH,  # "to" and the text as wide as the screen
         )
         if compact:
             return ft.Row([left, right], expand=True, vertical_alignment=ft.CrossAxisAlignment.STRETCH)
         return ft.Row([left, ft.VerticalDivider(width=1), right], expand=True,
                       vertical_alignment=ft.CrossAxisAlignment.STRETCH)
+
+    def _count(self, _e=None) -> None:
+        """Characters used of the APRS limit; longer text is cut to it."""
+        text = self.text.value or ""
+        if len(text) > MAX_TEXT:
+            self.text.value = text = text[:MAX_TEXT]
+        self.count.value = f"{len(text)}/{MAX_TEXT}"
+        self.count.color = ft.Colors.ERROR if len(text) >= MAX_TEXT else ft.Colors.ON_SURFACE_VARIANT
+        self.app.page.update()
 
     # ─── data ─────────────────────────────────────────────────────────────
 
@@ -188,5 +205,6 @@ class MessagesView(View):
         via = self.via.value if self.via.visible else "radio"
         if await self.app.guard(self.engine.send_aprs_message(to, text, via)):
             self.text.value = ""
+            self.count.value, self.count.color = f"0/{MAX_TEXT}", ft.Colors.ON_SURFACE_VARIANT
             self.open_conversation(to)
         await self.text.focus()
