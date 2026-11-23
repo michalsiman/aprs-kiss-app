@@ -329,13 +329,14 @@ class SettingsView(View):
     def _refresh_ports(self, _e) -> None:
         self.device.options = self._port_options(self.device.value or "")
         if not self.device.options:
-            self.app.toast(self.t("no_ports"))
+            self.app.toast(self.t("bt_none" if self.connection.value == "bt" else "no_ports"))
 
     def _connection_changed(self, update: bool = True) -> None:
         serial = self.connection.value in ("serial", "usb", "bt")
         self.tcp_row.visible = not serial
         self.serial_row.visible = serial
         self.baudrate.visible = self.connection.value != "bt"  # a Bluetooth link has no line speed
+        self.device.label = self.t("bt_device") if self.connection.value == "bt" else self.t("device")
         if update:
             self.device.options = self._port_options(self.device.value or "")
             if self.connection.value == "bt" and not self.device.options:

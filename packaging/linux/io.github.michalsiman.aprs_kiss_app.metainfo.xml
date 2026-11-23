@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.37" date="2026-11-23">
+      <description>
+        <p>APRS digipeater (fill-in or full); on Android a TNC over Bluetooth.</p>
+      </description>
+    </release>
     <release version="0.1.36" date="2026-11-23">
       <description>
         <p>Offline map with motorways, main roads, smaller places and more peaks.</p>

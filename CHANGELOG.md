@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.37 – 2026-11-23
+
+- **APRS digipeater** (Settings › Digipeater): fill-in (WIDE1-1, for a home station) or full (WIDEn-N
+  with a hop limit, 2 by default), frames addressed to your callsign or aliases (e.g. RELAY) too; the
+  same packet only once in 30 seconds, never your own; only while transmitting is on.
+- **Android: a TNC over Bluetooth** (Settings › Connection › TNC over Bluetooth): a paired TNC or radio
+  with the serial port profile (SPP), e.g. Mobilinkd TNC3 or a handheld with a Bluetooth KISS TNC.
+  Android asks once for "Nearby devices". Bluetooth Low Energy-only TNCs are not supported.
+- README: verified also with the VGC VR-N76 and AnyTone UV890 handhelds.
+
 ## 0.1.36 – 2026-11-23
 
 - **Offline map with roads and more places** (Europe): motorways (from the whole country's view) and main
