@@ -342,7 +342,7 @@ class MapView(View):
                 if dkey not in cache:  # two stations at one place share one dot: never one marker twice
                     cache[dkey] = self._cache.get(dkey) or self._dot(key[1], key[2])
                     dots.append(cache[dkey])
-        markers = dots + markers  # the dots under the markers
+        markers = markers + dots  # the dots on top: where a group really is must always show
         self._cache = cache
         if [id(m) for m in markers] != [id(m) for m in self.markers.markers]:
             self.markers.markers = markers

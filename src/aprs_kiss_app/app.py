@@ -261,9 +261,20 @@ class App:
 
     _on_air_until = 0.0
 
+    _is_sent_until = 0.0
+    IS_FLASH_SECONDS = 1.0
+
     def _on_air(self, line: str) -> None:
-        """A frame went out by radio: the TX lamp is all red for about as long as it takes on air."""
-        if " >> " not in line[:12] or "[IS] " in line[12:18]:
+        """A frame went out by radio: the TX lamp is all red for about as long as it takes on air.
+        Sent to APRS-IS: the IS lamp is all red for a second."""
+        if " >> " not in line[:12]:
+            return
+        if "[IS] " in line[12:18]:
+            self._is_sent_until = time.monotonic() + self.IS_FLASH_SECONDS
+            try:
+                self.page.run_task(self._off_air, self.IS_FLASH_SECONDS)
+            except Exception:  # noqa: BLE001 - the page is gone
+                pass
             return
         conf = self.engine.config
         seconds = max(1.0, (len(line) - 12) * 8 / 1200 + (conf.txdelay_ms or 300) / 1000)  # 1200 Bd packet
@@ -275,7 +286,8 @@ class App:
 
     async def _off_air(self, seconds: float) -> None:
         await asyncio.sleep(seconds + 0.05)
-        if time.monotonic() >= self._on_air_until and not self._closing:
+        now = time.monotonic()
+        if now >= self._on_air_until and now >= self._is_sent_until and not self._closing:
             self.refresh_now()
 
     def _tx_tap(self, _e=None) -> None:
@@ -645,7 +657,8 @@ class App:
         aprsis = st.get("aprsis")
         self.is_box.visible = aprsis is not None
         if aprsis:
-            self.is_dot.color = (ft.Colors.GREEN if aprsis["verified"] else
+            self.is_dot.color = (ft.Colors.RED if time.monotonic() < self._is_sent_until else  # just sent
+                                 ft.Colors.GREEN if aprsis["verified"] else
                                  ft.Colors.AMBER if aprsis["connected"] else ft.Colors.RED)
         gps = st.get("gps")
         self.gps_box.visible = gps is not None
@@ -665,7 +678,8 @@ class App:
         self.tx_box.bgcolor = (ft.Colors.RED if on_air else ft.Colors.ERROR_CONTAINER) if st["tx_enabled"] else None
         self._light("tnc", "on" if st["tnc_connected"] else None)
         self.lamps["is"].visible = aprsis is not None
-        self._light("is", "on" if aprsis and aprsis["verified"] else None)
+        sent_is = time.monotonic() < self._is_sent_until  # red for a second while something went to APRS-IS
+        self._light("is", "tx" if aprsis and sent_is else "on" if aprsis and aprsis["verified"] else None)
         self.lamps["gps"].visible = gps is not None
         self._light("gps", "on" if gps and gps.get("fix") else None)
         # TX: red frame and text while transmitting is allowed, all red only while the radio is on air

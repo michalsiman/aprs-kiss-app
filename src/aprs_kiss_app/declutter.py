@@ -18,6 +18,7 @@ CLOSE_Y = 48  # …and this one above the other cover each other's label
 RINGS = (54, 78, 104, 132, 160)  # pixels: the circles tried around a station's own place
 DIRECTIONS = 12
 MAX_SHIFT = RINGS[-1]
+SAME_PX = 10  # closer than this on screen: one place (a digi and an iGate on one mast)
 MIN_ZOOM = 9.0  # further out (a whole region) the markers stay where they are: spreading would be a web of lines
 
 
@@ -70,6 +71,25 @@ def spread(points: list[tuple[float, float]], zoom: float, fixed: int | None = N
     def take(x: float, y: float) -> None:
         grid.setdefault((int(x // CLOSE_X), int(y // CLOSE_Y)), []).append((x, y))
 
+    px = [to_px(*pt, zoom) for pt in points]
+    # Several stations at one place: none of them stays on it. The place itself is kept free for the dot
+    # the lines point to, otherwise the first station's marker covered it and nobody could tell where
+    # the group really is.
+    shared = set()
+    cells: dict[tuple[int, int], list[int]] = {}
+    for i, (x, y) in enumerate(px):
+        cx, cy = int(x // SAME_PX), int(y // SAME_PX)
+        for dx in (-1, 0, 1):
+            for dy in (-1, 0, 1):
+                for j in cells.get((cx + dx, cy + dy), ()):
+                    if abs(px[j][0] - x) < SAME_PX and abs(px[j][1] - y) < SAME_PX:
+                        shared.update((i, j))
+        cells.setdefault((cx, cy), []).append(i)
+    if fixed in shared:
+        shared.discard(fixed)  # our own station stays; the others go round it
+    for i in shared:
+        take(*px[i])  # the place is taken (by its dot)
+
     order = list(range(len(points)))
     if fixed is not None and 0 <= fixed < len(points):
         order.remove(fixed)
@@ -79,7 +99,7 @@ def spread(points: list[tuple[float, float]], zoom: float, fixed: int | None = N
         if i == fixed:
             take(x, y)
             continue
-        for ox, oy in OFFSETS:
+        for ox, oy in OFFSETS[1:] if i in shared else OFFSETS:  # sharing a place: never on it
             if free(x + ox, y + oy):
                 if ox or oy:
                     shown[i] = from_px(x + ox, y + oy, zoom)

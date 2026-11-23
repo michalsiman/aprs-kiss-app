@@ -24,7 +24,7 @@ class DeclutterTest(unittest.TestCase):
         for n in range(2, 13):
             points = [(49.7, 13.4)] * n
             shown = spread(points, 14)
-            self.assertEqual(shown[0], points[0])  # the first one stays
+            self.assertTrue(all(p != points[0] for p in shown))  # the place is left for its dot
             for i in range(n):
                 for j in range(i + 1, n):
                     self.assertFalse(overlap(shown[i], shown[j], 14), (n, i, j))
@@ -58,3 +58,21 @@ class DeclutterTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SharedPlaceTest(unittest.TestCase):
+    def test_a_shared_place_is_left_free_for_the_dot(self):
+        for n in (2, 3, 5):
+            points = [(49.03, 14.0)] * n
+            shown = spread(points, 13)
+            for p in shown:
+                self.assertNotEqual(p, points[0])  # nobody stays on the place
+                self.assertFalse(overlap(p, points[0], 13))  # and nobody covers it
+            for i in range(n):
+                for j in range(i + 1, n):
+                    self.assertFalse(overlap(shown[i], shown[j], 13))
+
+    def test_own_station_still_stays(self):
+        points = [(49.03, 14.0)] * 3
+        shown = spread(points, 13, fixed=2)
+        self.assertEqual(shown[2], points[2])
