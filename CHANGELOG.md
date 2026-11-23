@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.44 – 2026-11-23
+
+- **Your own trail**: with trails on, your station gets one too, from the GPS (the last half hour, in
+  memory only).
+- **Trails** red and a pixel thicker than the grey lines to moved markers.
+- **Fix: long lines across the map**: APRS objects (repeaters, events…) are now places of their own under
+  their names ("object of DB0YC" in the details); before, they moved the sending station between all its
+  objects and the trail joined them across the country. A killed object goes away; a jump no vehicle can
+  make starts a trail again.
+- **Fix: stray lines and lost markers**: two moved stations at one place shared one dot, which confused the
+  map (old lines stayed, markers – even your own – disappeared).
+- Zoomed far out (a whole region on screen) the markers are no longer spread: it made a web of lines.
+
 ## 0.1.43 – 2026-11-23
 
 - **Measure a distance on the map**: long press › *Measure distance from here* and tap the other point (or

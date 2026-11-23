@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.44" date="2026-11-23">
+      <description>
+        <p>Your own trail; APRS objects as their own places; fixes for stray lines and lost markers on the map.</p>
+      </description>
+    </release>
     <release version="0.1.43" date="2026-11-23">
       <description>
         <p>Measure distances on the map; station symbols on a light disc; a dot where a moved marker's station is.</p>
