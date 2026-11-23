@@ -10,7 +10,7 @@ from pathlib import Path
 
 import flet as ft
 
-from aprs_kiss_core import android_bt, android_usb, tilemaps
+from aprs_kiss_core import android_bt, android_usb, tilemaps, tracker
 from aprs_kiss_core.aprsis import licence_confirmed
 from aprs_kiss_core.bbs import BbsConfigError
 from aprs_kiss_core.bbs.storage import (
@@ -202,6 +202,19 @@ class SettingsView(View):
 
         # App
         # APRS digipeater
+        mins = lambda values: [ft.DropdownOption(key=str(n), text=f"{n} min") for n in values]  # noqa: E731
+        self.trk_mode = ft.Dropdown(label=t("trk_mode"), value=c.tracker_mode, width=420,
+                                    on_select=lambda _e: self._trk_changed(),
+                                    options=[ft.DropdownOption(key="fixed", text=t("trk_fixed")),
+                                             ft.DropdownOption(key="smart", text=t("trk_smart"))])
+        self.trk_minutes = ft.Dropdown(label=t("trk_minutes"), value=str(c.tracker_minutes), width=200,
+                                       options=mins(sorted({*tracker.FIXED_MINUTES, c.tracker_minutes})))
+        self.trk_profile = ft.Dropdown(label=t("trk_profile"), value=c.tracker_profile, width=200,
+                                       options=[ft.DropdownOption(key=k, text=t(f"trk_{k}")) for k in ("walk", "bike", "car")])
+        self.trk_still = ft.Dropdown(label=t("trk_still"), value=str(c.tracker_still_minutes), width=200,
+                                     options=mins(sorted({*tracker.STILL_MINUTES, c.tracker_still_minutes})))
+        self.trk_hint = ft.Text(size=12, color=ft.Colors.ON_SURFACE_VARIANT)
+        self._trk_changed(update=False)
         self.digi_mode = ft.Dropdown(label=t("digi_mode"), value=c.digi_mode if c.digi_mode in ("off", "fillin", "wide")
                                      else "off", width=340, on_select=lambda _e: self._digi_changed(),
                                      options=[ft.DropdownOption(key=k, text=t(f"digi_{k}")) for k in ("off", "fillin", "wide")])
@@ -247,6 +260,8 @@ class SettingsView(View):
                          self.beacon, self.beacon_is, self.tracked, self.incoming, expanded=first),
                 _section("GPS", ft.Icons.GPS_FIXED, self.gps_source, self.gps_phone_hint) if self.app.mobile else
                 _section("GPS", ft.Icons.GPS_FIXED, self.gps_source, self.gps_row, self.gps_hint),
+                _section(t("trk_section"), ft.Icons.ROUTE, self.trk_mode,
+                         ft.Row([self.trk_minutes, self.trk_profile, self.trk_still], wrap=True), self.trk_hint),
                 _section(t("digi"), ft.Icons.REPEAT, self.digi_mode, self.digi_hops, self.digi_aliases, self.digi_hint),
                 _section(t("aprsis"), ft.Icons.PUBLIC, self.aprsis, self.licence, self.is_fields, self.is_state),
                 _section("VARA FM", ft.Icons.SETTINGS_INPUT_ANTENNA, ft.Row([self.vara_host, self.vara_port], wrap=True),
@@ -382,6 +397,14 @@ class SettingsView(View):
         else:
             state = self.t("disconnected") + (f" – {s['error']}" if s.get("error") else "")
         self.is_state.value = f"{self.t('aprsis_state')}: {state}"
+
+    def _trk_changed(self, update: bool = True) -> None:
+        smart = self.trk_mode.value == "smart"
+        self.trk_minutes.visible = not smart
+        self.trk_profile.visible = self.trk_still.visible = smart
+        self.trk_hint.value = self.t("trk_hint_smart" if smart else "trk_hint_fixed")
+        if update:
+            self.app.page.update()
 
     # ─── imported offline maps: take effect at once, no Save needed ─────
 
@@ -539,6 +562,8 @@ class SettingsView(View):
             "language": self.language.value or "",
             "check_updates": self.check_updates.value,
             **{key: box.value for key, box in self.sound_boxes.items()},
+            "tracker_mode": self.trk_mode.value or "fixed", "tracker_minutes": self.trk_minutes.value or "2",
+            "tracker_profile": self.trk_profile.value or "car", "tracker_still_minutes": self.trk_still.value or "60",
             "digi_mode": self.digi_mode.value or "off", "digi_max_hops": self.digi_hops.value or "2",
             "digi_aliases": (self.digi_aliases.value or "").strip().upper(),
             "run_background": bool(self.run_bg.value), "keep_screen_on": self.keep_screen.value or "never",

@@ -43,6 +43,11 @@ class Config:
     longitude: float | None = None
     beacon_minutes: int = 0
     beacon_is: bool = False
+    tracker_on: bool = False  # the tracker runs: our GPS position goes out again and again
+    tracker_mode: str = "fixed"  # "fixed" every tracker_minutes, or "smart" (SmartBeaconing)
+    tracker_minutes: int = 2
+    tracker_profile: str = "car"  # smart: walk, bike or car
+    tracker_still_minutes: int = 60  # smart: standing still, once in this many minutes
     tracked_callsigns: str = ""
     accept_incoming: bool = False
     # APRS-IS
@@ -130,6 +135,12 @@ class Config:
             setattr(self, name, value)
         if self.beacon_minutes and self.beacon_minutes < MIN_BEACON_MINUTES:
             self.beacon_minutes = MIN_BEACON_MINUTES
+        if self.tracker_mode not in ("fixed", "smart"):
+            self.tracker_mode = "fixed"
+        if self.tracker_profile not in ("walk", "bike", "car"):
+            self.tracker_profile = "car"
+        self.tracker_minutes = min(60, max(1, int(self.tracker_minutes or 2)))
+        self.tracker_still_minutes = min(120, max(5, int(self.tracker_still_minutes or 60)))
         if self.connection == "tcp" and not (0 < int(self.port) < 65536):
             raise ValueError("Invalid TCP port")
         return self  # licence_confirmed stays when APRS-IS is switched off: the sentence is typed once

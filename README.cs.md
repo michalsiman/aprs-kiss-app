@@ -31,6 +31,10 @@ skutečném Macu, iPhonu ani iPadu je zatím nikdo nevyzkoušel – **hledáme t
   v Evropě i dálnice a hlavní silnice (Natural Earth), asi 67 000 obcí nad 1 000 obyvatel a 30 nejvyšších
   hor každé země (GeoNames) – s přiblížením přibývají další. Přepíná se jedním tlačítkem; **když není internet, mapa se na ni
   přepne sama** a oznámí to, a jakmile se internet vrátí, vrátí se k OpenStreetMap.
+- **Tracker**: tlačítko polohy v horní liště pošle polohu jednou, nebo spustí tracker (▶) – poloha z GPS
+  se pak posílá sama, v pevném intervalu nebo **chytře (SmartBeaconing)** jako APRS a LoRa APRS trackery:
+  když stojíte zřídka, čím rychleji jedete tím častěji, hned v zatáčce; s kurzem a rychlostí. Rádiem jde,
+  když je zapnuté TX (a přes internet, pokud je to zvolené).
 - **Vlastní offline mapa** (Nastavení › Offline mapy): nahrajte si lepší mapu, třeba turistickou,
   odkudkoli – rastrové dlaždicové mapy **MBTiles, PMTiles, SQLiteDB** (OsmAnd, Locus), **ZIP** s dlaždicemi
   z/x/y nebo ZIP/7z, ve kterém jsou takové soubory (7z na počítači se 7-Zipem). I víc map naráz; tlačítkem

@@ -77,9 +77,8 @@ class MapView(View):
                                lambda _e: self.app.set_show_internet(not self.engine.config.show_internet))
         self.tools = [
             ft.IconButton(ft.Icons.MY_LOCATION, tooltip=self.t("centre_me"), on_click=self._centre_me),
-            self.internet, self.only_recent, self.trails_btn, self._muted_btn(), self._offline_btn(),
-            ft.IconButton(ft.Icons.HELP_OUTLINE, tooltip=self.t("legend"), on_click=lambda _e: show_legend(self.app)),
-        ]
+            self.internet, self.only_recent, self.trails_btn, self._offline_btn(),
+        ]  # the muted map and the legend are in the map menu: the bar fits on a phone
         # The bar folds into one gear button (and stays folded next time) for those who want the whole map.
         self.fold_btn = ft.IconButton(on_click=self._toggle_tools)
         bar = ft.Row([self.fold_btn, *self.tools], tight=True, spacing=0, wrap=True, run_spacing=0)
@@ -120,17 +119,11 @@ class MapView(View):
         self.force()
         self.app.page.update()
 
-    def _muted_btn(self) -> ft.IconButton:
-        self.muted = toggle(ft.Icons.FILTER_B_AND_W_OUTLINED, ft.Icons.FILTER_B_AND_W, self.engine.config.map_muted,
-                            self.t("map_muted"), self._toggle_muted)
-        self.muted.disabled = self.app.offline_map()
-        return self.muted
-
     def _toggle_muted(self, _e) -> None:
         """Saved like the other view choices; only the tiles change, the markers keep their colours."""
         conf = self.engine.config
         conf.map_muted = not conf.map_muted
-        self.muted.selected = conf.map_muted
+        self.muted.checked = conf.map_muted
         self.tiles.opacity = MUTED_OPACITY if conf.map_muted else 1.0
         self.app.save_config_soon()
         self.app.page.update()
@@ -145,7 +138,12 @@ class MapView(View):
             self.source_btn.refresh()
 
     def _offline_btn(self) -> ft.Control:
-        self.source_btn = MapSourceButton(self.app)
+        self.muted = ft.PopupMenuItem(self.t("map_muted"), icon=ft.Icons.FILTER_B_AND_W,
+                                      checked=self.engine.config.map_muted, on_click=self._toggle_muted)
+        self.muted.disabled = self.app.offline_map()
+        legend = ft.PopupMenuItem(self.t("legend"), icon=ft.Icons.HELP_OUTLINE,
+                                  on_click=lambda _e: show_legend(self.app))
+        self.source_btn = MapSourceButton(self.app, [self.muted, legend])
         return self.source_btn.control
 
     def _gesture_end(self, _e=None) -> None:

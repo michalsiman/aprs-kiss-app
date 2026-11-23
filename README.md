@@ -31,6 +31,10 @@ them on a real Mac, iPhone or iPad yet – **testers wanted** (see [Platforms](#
   (Natural Earth); in Europe also motorways and main roads (Natural Earth), some 67,000 places of 1,000
   people and more and each country's 30 highest peaks (GeoNames) – more of them as you zoom in. One button switches to it; **with no internet the map
   switches to it by itself** and tells you so, and goes back to OpenStreetMap when the internet returns.
+- **Tracker**: the position button in the top bar sends your position once, or starts the tracker (▶) –
+  your GPS position then goes out by itself, at a fixed interval or **smart (SmartBeaconing)** like the APRS
+  and LoRa APRS trackers: rarely when standing, more often the faster you go, at once on a turn; course and
+  speed included. It sends by radio while TX is on (and over the internet when chosen).
 - **Your own offline map** (Settings › Offline maps): import a better map, e.g. a topographic one, from
   wherever you get it – raster tile maps in **MBTiles, PMTiles, SQLiteDB** (OsmAnd, Locus), a **ZIP** of z/x/y
   tiles, or a ZIP/7z with such files inside (7z on a computer with 7-Zip). Several maps at once; the map

@@ -23,6 +23,7 @@ from . import disclaimer, distribution, language, offline_map, updates
 from .sounds import Sounds
 from .i18n import Translator
 from .phone_gps import PhoneGps
+from .tracker_ui import PositionButton
 from .symbols import symbol_info
 from .views.base import View, adapt, clock
 from .views.bbs import BbsView
@@ -134,7 +135,7 @@ class App:
             return
         st = self.engine.status()
         what = [self.t("quit_rx")]
-        if self.engine.config.beacon_minutes and st["tx_enabled"]:
+        if (self.engine.config.beacon_minutes or self.engine.config.tracker_on) and st["tx_enabled"]:
             what.append(self.t("quit_beacon"))
         if self.engine.aprsis and (self.engine.config.igate_rx or self.engine.config.igate_tx):
             what.append(self.t("quit_igate"))
@@ -396,15 +397,14 @@ class App:
             ("tnc", "TNC", self._tnc_info), ("is", "IS", None),
             ("gps", ft.Icon(ft.Icons.SATELLITE_ALT, size=16), self._gps_info),  # a satellite instead of a word
             ("tx", "TX", self._tx_tap))}
+        # "send my position" (once, or again and again: the tracker), a lamp in the same frame on a phone
+        self.position_btn = PositionButton(self, self.compact)
         if self.compact:
             self.callsign.expand = True
             self.callsign.no_wrap = True
             self.callsign.overflow = ft.TextOverflow.ELLIPSIS
-            beacon = self._lamp(ft.Icon(ft.Icons.SHARE_LOCATION, size=16, color=ft.Colors.ON_SURFACE),
-                                self._beacon_now, self.t("beacon_now"))  # "send my position" in the same frame
-            beacon.visible = not self.engine.exclusive_mode
             row = [self.menu_btn, self.callsign, self.lamps["tnc"], self.lamps["is"], self.lamps["gps"],
-                   self.update_btn, beacon, self.lamps["tx"]]
+                   self.update_btn, self.position_btn.control, self.lamps["tx"]]
         status = ft.Container(
             ft.Row(
                 row if self.compact else [
@@ -417,8 +417,7 @@ class App:
                     ft.Container(self.gps_box, on_click=self._gps_info if self.compact else None),
                     ft.Container(expand=True),
                     self.update_btn,
-                    ft.IconButton(ft.Icons.SHARE_LOCATION, tooltip=self.t("beacon_now"), on_click=self._beacon_now,
-                                  visible=not self.engine.exclusive_mode),
+                    self.position_btn.control,
                     self.tx_box,
                     ft.IconButton(ft.Icons.INFO_OUTLINE, tooltip=self.t("about"),
                                   on_click=lambda _e: show_about(self), visible=not self.compact),
@@ -579,6 +578,8 @@ class App:
         self._light("gps", "on" if gps and gps.get("fix") else None)
         # TX: red frame and text while transmitting is allowed, all red only while the radio is on air
         self._light("tx", ("tx" if on_air else "armed") if st["tx_enabled"] else None)
+        if hasattr(self, "position_btn"):
+            self.position_btn.refresh()
         if self.has_view("messages"):
             messages = self.view("messages")
             dest = self.rail.destinations[self.views.index(messages)]

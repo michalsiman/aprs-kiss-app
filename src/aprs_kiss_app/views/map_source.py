@@ -13,7 +13,7 @@ ICONS = {"online": ft.Icons.CLOUD_OUTLINED, "imported": ft.Icons.TERRAIN, "basic
 
 
 class MapSourceButton:
-    def __init__(self, app) -> None:
+    def __init__(self, app, extra: list | None = None) -> None:
         self.app = app
         t = app.t
         self.items = {
@@ -29,7 +29,7 @@ class MapSourceButton:
         self.icon = ft.Icon(ICONS["online"])
         self.face = ft.Container(self.icon, padding=8, shape=ft.BoxShape.CIRCLE)
         self.control = ft.PopupMenuButton(content=self.face, tooltip=t("map_source"),
-                                          items=[*self.items.values(), ft.PopupMenuItem(), manage])
+                                          items=[*self.items.values(), ft.PopupMenuItem(), *(extra or []), manage])
         self.refresh()
 
     def refresh(self) -> None:

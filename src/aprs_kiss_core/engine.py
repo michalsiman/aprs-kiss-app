@@ -33,6 +33,7 @@ from .aprsis import AprsIsClient, gate_to_is, passcode, third_party
 from .ax25 import PF, U_DM, Address, Frame
 from .bbs import BbsConfigError, BbsServer
 from . import digipeater, tak
+from .tracker import Tracker, course_speed
 from . import vara as vara_mod
 from .gps import GpsFix, GpsReader, PushedGps
 from .config import MIN_BEACON_MINUTES, VERSION, Config, data_dir, load_state, save_state
@@ -121,6 +122,8 @@ class Engine:
         self.digipeated = 0
         self._tasks: set[asyncio.Task] = set()
         self._beacon_task: asyncio.Task | None = None
+        self._tracker_task: asyncio.Task | None = None
+        self.tracker = Tracker()
         self.bbs: BbsServer | None = None
         self.bbs_call: Address | None = None
         self.bbs_error = ""
@@ -278,9 +281,12 @@ class Engine:
     def _position_comment(self, comment: str) -> str:
         """APRS altitude extension (/A=feet) when the GPS knows it."""
         fix = self.gps_fix()
-        if fix and fix.altitude_m is not None:
-            return f"/A={max(0, round(fix.altitude_m / 0.3048)):06d} {comment}".rstrip()
-        return comment
+        if not fix:
+            return comment
+        moving = course_speed(fix.course, fix.speed_kmh)  # "088/036": where we head and how fast
+        if fix.altitude_m is not None:
+            comment = f"/A={max(0, round(fix.altitude_m / 0.3048)):06d} {comment}".rstrip()
+        return moving + comment
 
     # ─── TAK ──────────────────────────────────────────────────────────────
 
@@ -475,6 +481,8 @@ class Engine:
             await self.aprsis.start()
         if self.config.beacon_minutes and not self.exclusive_mode:
             self._beacon_task = asyncio.create_task(self._beacon_loop(), name="aprs_kiss_beacon")
+        if not self.exclusive_mode:
+            self._tracker_task = asyncio.create_task(self._tracker_loop(), name="aprs_kiss_tracker")
         if self.bbs:
             self._bbs_task = asyncio.create_task(self._bbs_loop(), name="aprs_kiss_bbs")
         if self.gps:
@@ -514,6 +522,11 @@ class Engine:
             with contextlib.suppress(asyncio.CancelledError):
                 await self._beacon_task
             self._beacon_task = None
+        if self._tracker_task:
+            self._tracker_task.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await self._tracker_task
+            self._tracker_task = None
         for task in list(self._tasks):
             task.cancel()
         await self.station.close()
@@ -739,21 +752,75 @@ class Engine:
         interval = max(MIN_BEACON_MINUTES, int(self.config.beacon_minutes)) * 60
         while True:
             await asyncio.sleep(interval)
-            await self.beacon()
+            if not self.config.tracker_on:  # the tracker sends on its own while it runs
+                await self.beacon()
 
-    async def beacon(self) -> None:
+    async def beacon(self) -> bool:
         """Our position: by radio while transmitting is on; over the internet only when chosen."""
         if self.exclusive_mode:
-            return
+            return False
         position = self.my_position()
         if not position:
             _LOGGER.debug("Beacon not sent: no position set")
-            return
+            return False
         try:
             await self.station.send_position(*position, self._position_comment(self.config.comment),
                                              to_is=self.config.beacon_is)
         except (TransmitRefused, ConnectionError) as err:
             _LOGGER.debug("Beacon not sent: %s", err)
+            return False
+        return True
+
+    # ─── tracker: the GPS position sent by itself, at a fixed rate or "smart" ─────
+
+    TRACKER_TICK = 2.0
+
+    def _tracker_settings(self) -> None:
+        c, t = self.config, self.tracker
+        t.mode, t.fixed_minutes, t.profile, t.still_minutes = (c.tracker_mode, c.tracker_minutes,
+                                                               c.tracker_profile, c.tracker_still_minutes)
+
+    def set_tracking(self, on: bool) -> None:
+        """Start (the first position goes out at once) or stop the tracker."""
+        self.config.tracker_on = bool(on)
+        self.tracker.last_time = None
+        self._emit("tracker")
+        self._on_update()
+
+    def _can_send_position(self) -> bool:
+        return self.station.tx_enabled or bool(self.config.beacon_is and self.aprsis and self.aprsis.connected)
+
+    async def tracker_tick(self, now: float | None = None) -> str | None:
+        """One look: send our position when it is time; why it was sent, or None."""
+        if not self.config.tracker_on or self.exclusive_mode:
+            return None
+        fix = self.gps_fix()
+        if not fix or not self._can_send_position():
+            return None  # waits for the GPS, or for transmitting to be switched on
+        self._tracker_settings()
+        now = time.time() if now is None else now
+        position = (fix.latitude, fix.longitude)
+        why = self.tracker.why(now, fix.speed_kmh, fix.course, position)
+        if why and await self.beacon():
+            self.tracker.sent(now, fix.course, position)
+            self._emit("tracker")
+            return why
+        return None
+
+    async def _tracker_loop(self) -> None:
+        while True:
+            await asyncio.sleep(self.TRACKER_TICK)
+            try:
+                await self.tracker_tick()
+            except Exception:  # noqa: BLE001 - the tracker keeps going
+                _LOGGER.exception("Tracker")
+
+    def tracker_status(self) -> dict[str, Any]:
+        fix = self.gps_fix()
+        now = time.time()
+        return {"on": self.config.tracker_on, "gps": bool(fix), "can_send": self._can_send_position(),
+                "last": self.tracker.last_time,
+                "next_in": self.tracker.next_in(now, fix.speed_kmh if fix else None) if fix else None}
 
     async def send_position(self, lat: float | None = None, lon: float | None = None,
                             comment: str | None = None) -> None:
