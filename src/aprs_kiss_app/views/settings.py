@@ -107,7 +107,8 @@ class SettingsView(View):
         self.port = ft.TextField(label=t("port"), value=str(c.port), width=110, input_filter=num)
         self.device = ft.Dropdown(label=t("device"), value=c.device or None, editable=True, expand=True,
                                   options=self._port_options(c.device))
-        self.baudrate = ft.Dropdown(label=t("baudrate"), value=str(c.baudrate), width=150, editable=True,
+        self.baudrate = ft.Dropdown(label=t("baudrate"), value=str(c.baudrate), width=120 if self.app.compact else 150,
+                                    editable=True,
                                     options=[ft.DropdownOption(key=b, text=b) for b in BAUDRATES])
         self.tcp_row = ft.Row([self.host, self.port], wrap=True)
         self.serial_row = ft.Row([self.device, ft.IconButton(ft.Icons.REFRESH, tooltip=t("refresh_ports"),

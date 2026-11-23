@@ -134,10 +134,11 @@ dejte vědět, když něco nefunguje.
 Stáhněte v telefonu **`aprs-kiss-…-android.apk`** z
 [posledního vydání](https://github.com/michalsiman/aprs-kiss-app/releases/latest) a otevřete ho; Android
 se jednou zeptá, jestli smí prohlížeč nebo správce souborů instalovat aplikace. V telefonu se aplikace
-připojuje k TNC **po síti (KISS přes TCP)**: Direwolf na počítači, rádio sdílené přes
-[`kiss_tcp_bridge.py`](https://github.com/michalsiman/aprs-kiss-ha/tree/main/bridge) nebo Wi-Fi TNC;
-TNC na USB portu telefonu zatím podporované není. Obrazovky jsou upravené pro telefon a přepínají
-se v liště dole. BBS SERVER, USB GPS a sériový port jsou jen pro počítače.
+připojuje k TNC **přes USB port telefonu** (Nastavení › Připojení: TNC na USB, přes OTG kabel nebo
+redukci; Quansheng s KISS firmwarem F4HWN a další CDC-ACM TNC, kabely CP210x a FTDI; Android se jednou
+zeptá, jestli to aplikaci povolí) nebo **po síti (KISS přes TCP)**: Direwolf na počítači, rádio sdílené
+přes [`kiss_tcp_bridge.py`](https://github.com/michalsiman/aprs-kiss-ha/tree/main/bridge) nebo Wi-Fi TNC.
+Obrazovky jsou upravené pro telefon a přepínají se v liště dole. BBS SERVER a USB GPS jsou jen pro počítače.
 
 ## Instalace (iPhone, iPad)
 
@@ -250,9 +251,9 @@ tests/              testy jednotek, testy enginu proti fake_tnc.py a fake_vara.p
 | | Linux | Windows | macOS | Android | iOS |
 |---|---|---|---|---|---|
 | KISS přes TCP | ✅ | ✅ | ✅ | ✅ | ✅ (sideloading) |
-| USB sériový port | ✅ | ✅ (COM porty) | ✅ | potřebuje USB host | ❌ (iOS) |
+| USB sériový port | ✅ | ✅ (COM porty) | ✅ | ✅ (OTG: CDC-ACM, CP210x, FTDI) | ❌ (iOS) |
 | Bluetooth TNC | – | – | – | v plánu | jen BLE |
-| USB GPS modul | ✅ | ✅ (COM porty) | ✅ | potřebuje USB host | ❌ |
+| USB GPS modul | ✅ | ✅ (COM porty) | ✅ | – | ❌ |
 | VARA FM | ✅ (VARA ve Wine) | ✅ | VARA na jiném počítači | VARA na jiném počítači | VARA na jiném počítači |
 | BBS SERVER | ✅ | ✅ | ✅ | – (jen počítače) | – (jen počítače) |
 | Běh na pozadí | ✅ | ✅ | ✅ | potřebuje službu na popředí | omezeno iOS |

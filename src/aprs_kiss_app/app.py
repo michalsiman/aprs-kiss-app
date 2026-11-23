@@ -203,6 +203,12 @@ class App:
             return None
         return max(220.0, (self.page.width or 400) - 56)
 
+    def _tnc_info(self, _e=None) -> None:
+        """A phone has no hover: a tap on "TNC" tells what is going on with it."""
+        st = self.engine.status()
+        self.toast(self.tnc_text.value if st["tnc_connected"] else (st.get("tnc_error") or self.tnc_text.value or ""),
+                   error=not st["tnc_connected"])
+
     def show_dialog(self, dialog: ft.DialogControl) -> None:
         """A dialog or message bar that fits the screen."""
         if self.compact:
@@ -302,7 +308,9 @@ class App:
             ft.Row(
                 [
                     self.callsign,
-                    ft.Row([self.tnc_dot, ft.Text(self.t("tnc"), size=13), self.tnc_text], spacing=4, tight=True),
+                    ft.Container(ft.Row([self.tnc_dot, ft.Text(self.t("tnc"), size=13), self.tnc_text], spacing=4,
+                                        tight=True),
+                                 on_click=self._tnc_info if self.compact else None),
                     self.is_box,
                     self.gps_box,
                     ft.Container(expand=True),

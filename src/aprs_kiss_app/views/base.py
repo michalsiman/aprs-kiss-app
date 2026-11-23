@@ -12,6 +12,7 @@ if TYPE_CHECKING:
     from ..app import App
 
 MONO = "monospace"
+LONG_LABEL = 28  # characters: longer field labels go above the field on a phone
 
 
 class View:
@@ -162,6 +163,13 @@ def adapt(control: ft.Control, fit_width: float | None = None) -> ft.Control:
             width = getattr(c, "width", None)
             if isinstance(width, (int, float)) and width > fit_width:
                 c.width = fit_width if isinstance(c, (ft.TextField, ft.Dropdown)) else None
+            label = getattr(c, "label", None)
+            if (isinstance(c, (ft.TextField, ft.Dropdown)) and isinstance(label, str) and len(label) > LONG_LABEL
+                    and isinstance(parent, (ft.Column, ft.Row)) and c in parent.controls and not c.expand):
+                # a long label would wrap inside the border, over the value: above the field instead
+                c.label = None
+                parent.controls[parent.controls.index(c)] = ft.Column(
+                    [ft.Text(label, size=12, color=ft.Colors.ON_SURFACE_VARIANT), c], spacing=2, visible=c.visible)
             if (isinstance(c, ft.Checkbox) and isinstance(c.label, str) and isinstance(parent, ft.Column)
                     and c in parent.controls):
                 parent.controls[parent.controls.index(c)] = _wrapping(c)  # a long label wraps

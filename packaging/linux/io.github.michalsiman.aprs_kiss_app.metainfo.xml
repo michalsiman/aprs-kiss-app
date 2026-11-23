@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.22" date="2026-11-23">
+      <description>
+        <p>Android: a TNC on the phone's USB port. Phone layout fixes and callsigns always in capitals.</p>
+      </description>
+    </release>
     <release version="0.1.21" date="2026-11-23">
       <description>
         <p>On phones the screens are in a bar along the bottom instead of a side menu.</p>

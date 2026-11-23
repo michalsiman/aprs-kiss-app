@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.22 – 2026-11-23
+
+- **Android: a TNC on the phone's USB port** (Settings › Connection: TNC on USB, through an OTG cable):
+  CDC-ACM devices such as the Quansheng with the F4HWN KISS firmware, CP210x and FTDI cables. Android
+  asks to allow the app to use the device.
+- **Phone layout fixed**: smaller type and denser fields (fit also with a large system font), dialogs and
+  fields no wider than the screen, long checkbox and field labels wrap instead of running off the screen,
+  the APRS Thursday, Stations and map bars fit. A tap on "TNC" in the top bar tells its state or error.
+- **Callsigns are always capitals**, whatever the phone keyboard types.
+
 ## 0.1.21 – 2026-11-23
 
 - **Phone: the screens are in a bar along the bottom** instead of a side menu that covered half of the
