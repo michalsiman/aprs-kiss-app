@@ -103,7 +103,7 @@ TEXTS = {
 }
 
 SSIDS = [
-    "0 – kućna stanica, glavna", "1 – dodatna stanica, digi, mobilna, meteo", "2 – dodatna stanica",
+    "0 – bez SSID-a, kućna stanica, glavna", "1 – dodatna stanica, digi, mobilna, meteo", "2 – dodatna stanica",
     "3 – dodatna stanica", "4 – dodatna stanica", "5 – druge mreže (D-STAR, iPhone, Android…)",
     "6 – posebna aktivnost, satelit, kampiranje", "7 – ručna radiostanica", "8 – brod, kamper, drugo vozilo",
     "9 – glavna mobilna (automobil)", "10 – internet, iGate, EchoLink, Winlink", "11 – balon, zrakoplov, svemirska letjelica",

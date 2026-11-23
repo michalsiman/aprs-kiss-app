@@ -103,7 +103,7 @@ TEXTS = {
 }
 
 SSIDS = [
-    "0 – hjemmestasjon, primær", "1 – ekstra stasjon, digi, mobil, vær", "2 – ekstra stasjon",
+    "0 – uten SSID, hjemmestasjon, primær", "1 – ekstra stasjon, digi, mobil, vær", "2 – ekstra stasjon",
     "3 – ekstra stasjon", "4 – ekstra stasjon", "5 – andre nett (D-STAR, iPhone, Android…)",
     "6 – spesiell aktivitet, satellitt, camping", "7 – håndholdt", "8 – båt, bobil, ekstra kjøretøy",
     "9 – primær mobil (bil)", "10 – internett, iGate, EchoLink, Winlink", "11 – ballong, fly, romfartøy",

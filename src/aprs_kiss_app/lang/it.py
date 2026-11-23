@@ -104,7 +104,7 @@ TEXTS = {
 }
 
 SSIDS = [
-    "0 – stazione fissa principale", "1 – stazione aggiuntiva, digi, mobile, meteo", "2 – stazione aggiuntiva",
+    "0 – senza SSID, stazione fissa principale", "1 – stazione aggiuntiva, digi, mobile, meteo", "2 – stazione aggiuntiva",
     "3 – stazione aggiuntiva", "4 – stazione aggiuntiva", "5 – altre reti (D-STAR, iPhone, Android…)",
     "6 – attività speciale, satellite, campeggio", "7 – portatile", "8 – barca, camper, secondo veicolo",
     "9 – mobile principale (auto)", "10 – internet, iGate, EchoLink, Winlink", "11 – pallone, aereo, veicolo spaziale",
