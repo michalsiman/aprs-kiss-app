@@ -262,7 +262,7 @@ Privacy: the app collects nothing; see the [privacy policy](https://michalsiman.
 | Phone's own GPS | – | – | – | ✅ | ✅ |
 | VARA FM | ✅ (VARA in Wine) | ✅ | VARA on another computer | VARA on another computer | VARA on another computer |
 | BBS SERVER | ✅ | ✅ | ✅ | – (computers only) | – (computers only) |
-| Running in the background | ✅ | ✅ | ✅ | needs a foreground service | limited by iOS |
+| Running in the background | ✅ | ✅ | ✅ | ✅ (Settings, with a notification) | limited by iOS |
 
 ## Tests
 

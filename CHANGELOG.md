@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.35 – 2026-11-23
+
+- **Android: keeps running in the background** (Settings › Background and screen): receiving, beacons,
+  messages and TAK go on when the app is not on screen or the phone is locked, with a notification
+  ("Running: receiving and transmitting go on") and a wake lock. Needs the location permission (Android
+  allows this kind of service only so). Uses more battery; off by default.
+- **Keep the screen on**: never, while TAK runs, or always while the app is open; on phones and computers.
+
 ## 0.1.34 – 2026-11-23
 
 - **The callsign is required**: until one is saved, its field in Settings is framed red and has the

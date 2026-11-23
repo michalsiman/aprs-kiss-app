@@ -261,7 +261,7 @@ Soukromí: aplikace nic nesbírá; viz [zásady ochrany osobních údajů](https
 | GPS telefonu | – | – | – | ✅ | ✅ |
 | VARA FM | ✅ (VARA ve Wine) | ✅ | VARA na jiném počítači | VARA na jiném počítači | VARA na jiném počítači |
 | BBS SERVER | ✅ | ✅ | ✅ | – (jen počítače) | – (jen počítače) |
-| Běh na pozadí | ✅ | ✅ | ✅ | potřebuje službu na popředí | omezeno iOS |
+| Běh na pozadí | ✅ | ✅ | ✅ | ✅ (v Nastavení, s notifikací) | omezeno iOS |
 
 ## Testy
 
