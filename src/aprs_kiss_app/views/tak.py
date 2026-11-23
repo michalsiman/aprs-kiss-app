@@ -16,7 +16,7 @@ from aprs_kiss_core.config import Config
 from ..i18n import TEXTS
 from .base import View, clock, distance_km
 from .bbs import _plain
-from ..offline_map import MIN_ZOOM, BaseMap
+from ..offline_map import MIN_ZOOM, BaseMap, gestures
 from .base import toggle
 from .map import MapControls
 
@@ -90,6 +90,7 @@ class TakView(View):
             expand=True, bgcolor=ft.Colors.SURFACE,
             initial_center=fm.MapLatitudeLongitude(*(here or (49.8, 15.5))), initial_zoom=self._zoom, min_zoom=MIN_ZOOM,
             layers=self.base.layers(self.app.offline_map()), on_pointer_up=self._gesture_end,
+            interaction_configuration=gestures(),
         )
         self.offline_btn = toggle(ft.Icons.CLOUD_OFF_OUTLINED, ft.Icons.CLOUD_OFF, self.app.offline_map(),
                                   self.t("map_offline"), self._toggle_offline)

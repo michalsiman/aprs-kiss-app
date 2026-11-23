@@ -10,7 +10,7 @@ import flet as ft
 import flet_map as fm
 
 from ..legend import COLOR_ME, show_legend, station_color, visible
-from ..offline_map import MIN_ZOOM, BaseMap, Region
+from ..offline_map import MIN_ZOOM, BaseMap, Region, gestures
 from ..symbols import emoji
 from .base import View, toggle
 
@@ -49,6 +49,7 @@ class MapView(View):
             initial_center=fm.MapLatitudeLongitude(*center),
             initial_zoom=self._zoom,
             min_zoom=MIN_ZOOM,
+            interaction_configuration=gestures(),
             layers=self.base.layers(self.app.offline_map()),
             # Right click (long press on touch screens): "set as my position".
             on_secondary_tap=self._menu,

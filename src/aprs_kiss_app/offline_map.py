@@ -178,6 +178,12 @@ USER_AGENT = "io.github.michalsiman.aprs_kiss_app"
 OSM_CREDIT = "© OpenStreetMap"
 
 
+def gestures() -> fm.InteractionConfiguration:
+    """Two fingers either zoom or turn the map, not both at once, and turning needs a clear twist
+    (60° instead of 20°): zooming and panning no longer turn the map by accident."""
+    return fm.InteractionConfiguration(enable_multi_finger_gesture_race=True, rotation_threshold=60)
+
+
 class BaseMap:
     """What lies under the markers: OpenStreetMap tiles or the offline map, and a small credit line.
 
