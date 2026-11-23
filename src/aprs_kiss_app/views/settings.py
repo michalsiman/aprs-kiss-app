@@ -58,7 +58,8 @@ def _section(title: str, icon: str, *controls: ft.Control, expanded: bool = Fals
             title=ft.Text(title, size=15, weight=ft.FontWeight.BOLD),
             leading=ft.Icon(icon, color=ft.Colors.PRIMARY),
             controls=[ft.Container(ft.Column(list(controls), spacing=8),
-                                   padding=ft.Padding.only(left=14, right=14, bottom=12))],
+                                   # top: room for the first field's label, which sits on the field's edge
+                                   padding=ft.Padding.only(left=14, right=14, top=8, bottom=12))],
             expanded=expanded, maintain_state=True, shape=shape, collapsed_shape=shape,
             expanded_cross_axis_alignment=ft.CrossAxisAlignment.START,
         ),
@@ -136,7 +137,8 @@ class SettingsView(View):
         sources = ("manual", "phone") if self.app.mobile else ("manual", "usb")
         self.gps_source = ft.Dropdown(label=t("gps_source"), value=c.gps_source if c.gps_source in sources
                                       else "manual", width=320, on_select=lambda _e: self._gps_changed(),
-                                      options=[ft.DropdownOption(key=k, text=t(f"gps_{k}")) for k in sources])
+                                      options=[ft.DropdownOption(key=k, text=t(f"gps_{k}").split(" (")[0] if self.app.compact
+                                                                   else t(f"gps_{k}")) for k in sources])
         self.gps_device = ft.Dropdown(label=t("gps_device"), value=c.gps_device or None, editable=True, expand=True,
                                       options=self._port_options(c.gps_device))
         self.gps_baud = ft.Dropdown(label=t("baudrate"), value=str(c.gps_baudrate or 0), width=170,
