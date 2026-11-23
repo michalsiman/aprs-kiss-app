@@ -26,6 +26,7 @@ TEXTS = {
     "beacon_now": "Wyślij pozycję teraz", "position_sent": "Pozycja wysłana",
     "tnc_section": "Połączenie z TNC", "connection": "Połączenie", "conn_tcp": "KISS przez TCP (sieć)",
     "conn_serial": "Port szeregowy (USB)", "conn_usb": "TNC przez USB (kabel OTG)", "host": "Adres", "port": "Port", "device": "Port szeregowy",
+    "th_starts_in": "Następny za {t}",
     "map_trails": "Ślady (którędy stacje jechały w ostatnim półgodzinie)",
     "bt_device": "Urządzenie Bluetooth",
     "digi": "Digipeater", "digi_mode": "Digipeater APRS", "digi_off": "Wyłączony", "digi_fillin": "Fill-in (WIDE1-1) – stacja domowa", "digi_wide": "Pełny (WIDEn-N) – digipeater na wzniesieniu", "digi_hops": "Najwyżej skoków (WIDEn-N)", "digi_aliases": "Powtarzaj też dla (aliasy, np. RELAY)", "digi_hint": "Powtarza pakiety APRS stacji w okolicy, tylko gdy Nadawanie jest włączone. Fill-in pomaga ręczniakom i samochodom dotrzeć do najbliższego dużego digipeatera i jest właściwy dla stacji domowej. Pełny digipeater tylko w porozumieniu z lokalną siecią APRS. Powtarzane są też ramki adresowane do Twojego znaku; ten sam pakiet tylko raz na 30 sekund.",

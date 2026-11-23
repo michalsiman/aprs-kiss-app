@@ -25,6 +25,7 @@ TEXTS = {
     "beacon_now": "Poslať polohu teraz", "position_sent": "Poloha odoslaná",
     "tnc_section": "Pripojenie k TNC", "connection": "Pripojenie", "conn_tcp": "KISS cez TCP (sieť)",
     "conn_serial": "Sériový port (USB)", "conn_usb": "TNC na USB (OTG kábel)", "host": "Adresa", "port": "Port", "device": "Sériový port",
+    "th_starts_in": "Ďalší začína o {t}",
     "map_trails": "Chvosty (kadiaľ stanice išli za poslednú polhodinu)",
     "bt_device": "Bluetooth zariadenie",
     "digi": "Digipeater", "digi_mode": "APRS digipeater", "digi_off": "Vypnutý", "digi_fillin": "Fill-in (WIDE1-1) – domáca stanica", "digi_wide": "Plný (WIDEn-N) – digipeater na kóte", "digi_hops": "Najviac hopov (WIDEn-N)", "digi_aliases": "Preposielať aj pre (aliasy, napr. RELAY)", "digi_hint": "Preposiela APRS pakety staníc okolo vás, len keď je zapnuté Vysielanie. Fill-in pomáha ručkám a autám dosiahnuť na najbližší veľký digipeater a je to správna voľba pre domácu stanicu. Plný digipeater len po dohode s miestnou APRS sieťou. Preposielajú sa aj rámce adresované vašej značke; rovnaký paket len raz za 30 sekúnd.",

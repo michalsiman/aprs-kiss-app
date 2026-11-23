@@ -34,7 +34,7 @@ class ThursdayView(View):
 
     def build(self) -> ft.Control:
         self._signature = None
-        self.status = ft.Text(size=16, weight=ft.FontWeight.BOLD, expand=True)
+        self.status = ft.Text(size=15, weight=ft.FontWeight.BOLD, expand=True)
         self.member = ft.Text(color=ft.Colors.ON_SURFACE_VARIANT)
         self.wait = ft.Text(size=12, color=ft.Colors.ON_SURFACE_VARIANT, visible=False)
         self.feed = ft.ListView(expand=True, spacing=8, auto_scroll=True, padding=ft.Padding.all(12))
@@ -49,19 +49,13 @@ class ThursdayView(View):
                                        style=ft.ButtonStyle(bgcolor=ft.Colors.PRIMARY, color=ft.Colors.ON_PRIMARY))
                          if compact else ft.FilledButton(self.t("th_send"), icon=ft.Icons.SEND, on_click=self._send))
         self.leave_btn = ft.TextButton(self.t("th_leave"), icon=ft.Icons.LOGOUT, on_click=self._leave)
+        # one short line: when it starts (or ends); what it is, the group and the map are behind the "i"
         header = ft.Container(
-            ft.Column([
-                ft.Row([ft.Icon(ft.Icons.EVENT, color=ft.Colors.PRIMARY), self.status], spacing=8),
-                self.member,
-                ft.Text(self.t("th_about"), size=12),
-                ft.Text(self.t("th_rf_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
-                ft.Row([
-                    ft.TextButton(self.t("th_map"), icon=ft.Icons.MAP_OUTLINED,
-                                  url=thursday.MAP_URL),
-                    self.leave_btn,
-                ], wrap=True),
-            ], spacing=4, tight=True),
-            padding=12, border_radius=8, bgcolor=ft.Colors.SURFACE_CONTAINER,
+            ft.Row([ft.Icon(ft.Icons.EVENT, color=ft.Colors.PRIMARY), self.status,
+                    ft.IconButton(ft.Icons.INFO_OUTLINE, tooltip=self.t("about"), on_click=self._info)],
+                   spacing=8, vertical_alignment=ft.CrossAxisAlignment.CENTER),
+            padding=ft.Padding.only(left=12, right=4, top=4, bottom=4), border_radius=8,
+            bgcolor=ft.Colors.SURFACE_CONTAINER,
         )
         return ft.Column(
             [
@@ -93,7 +87,8 @@ class ThursdayView(View):
         if thursday.is_active(now):
             self.status.value = self.t("th_running", t=duration(end - now))
         else:
-            self.status.value = self.t("th_next", when=local_time(start), t=duration(start - now))
+            self.status.value = self.t("th_starts_in", t=duration(start - now))
+            self.status.tooltip = self.t("th_next", when=local_time(start), t=duration(start - now))
         self.member.value = (self.t("th_member", when=local_time(until)) if until
                              else self.t("th_not_member"))
         self.leave_btn.visible = bool(until)
@@ -140,6 +135,29 @@ class ThursdayView(View):
             self._signature = None
             self.refresh()
             self.app.page.update()
+
+    def _info(self, _e=None) -> None:
+        """What APRS Thursday is, whether we are in the group, the map; leaving the group."""
+        now = time.time()
+        start, _end = thursday.window(now)
+        self.leave_btn.on_click = self._leave_from_dialog
+        self.app.show_dialog(ft.AlertDialog(
+            title=ft.Text("#APRSThursday"),
+            content=ft.Column([
+                ft.Text(self.t("th_next", when=local_time(start), t=duration(start - now)), weight=ft.FontWeight.BOLD)
+                if not thursday.is_active(now) else ft.Text(self.status.value, weight=ft.FontWeight.BOLD),
+                self.member,
+                ft.Text(self.t("th_about"), size=13),
+                ft.Text(self.t("th_rf_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
+                ft.Row([ft.TextButton(self.t("th_map"), icon=ft.Icons.MAP_OUTLINED, url=thursday.MAP_URL),
+                        self.leave_btn], wrap=True),
+            ], tight=True, spacing=8, width=520),
+            actions=[ft.TextButton(self.t("close"), on_click=lambda _e: self.app.page.pop_dialog())],
+        ))
+
+    async def _leave_from_dialog(self, e) -> None:
+        self.app.page.pop_dialog()
+        await self._leave(e)
 
     async def _leave(self, _e) -> None:
         if await self.app.guard(self.engine.leave_thursday(self._via())):

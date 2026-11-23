@@ -26,6 +26,7 @@ TEXTS = {
     "beacon_now": "Envoyer la position maintenant", "position_sent": "Position envoyée",
     "tnc_section": "Connexion au TNC", "connection": "Connexion", "conn_tcp": "KISS sur TCP (réseau)",
     "conn_serial": "Port série (USB)", "conn_usb": "TNC sur USB (câble OTG)", "host": "Adresse", "port": "Port", "device": "Port série",
+    "th_starts_in": "Le prochain dans {t}",
     "map_trails": "Traces (le trajet des stations dans la dernière demi-heure)",
     "bt_device": "Appareil Bluetooth",
     "digi": "Digipeater", "digi_mode": "Digipeater APRS", "digi_off": "Arrêté", "digi_fillin": "Fill-in (WIDE1-1) – station fixe", "digi_wide": "Complet (WIDEn-N) – digipeater de site", "digi_hops": "Sauts au maximum (WIDEn-N)", "digi_aliases": "Relayer aussi pour (alias, p. ex. RELAY)", "digi_hint": "Relaie les paquets APRS des stations proches, seulement si l'émission est activée. Le fill-in aide les portatifs et les mobiles à atteindre le grand digipeater le plus proche, c'est le bon choix pour une station fixe. Un digipeater complet seulement en accord avec le réseau APRS local. Les trames adressées à votre indicatif sont aussi relayées ; un même paquet une seule fois en 30 secondes.",
