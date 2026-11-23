@@ -188,9 +188,13 @@ class SettingsView(View):
 
         # APRS-IS
         self.aprsis = ft.Checkbox(label=t("aprsis_on"), value=c.aprsis_enabled, on_change=lambda _e: self._aprsis_changed())
-        self.licence = ft.TextField(hint_text=t("licence_text"), helper=t("licence_text"), width=420)
-        self.licence_box = ft.Column([ft.Text(t("licence_ask"), size=13, color=ft.Colors.PRIMARY), self.licence],
-                                     spacing=4)
+        self.licence = ft.TextField(hint_text=t("licence_text"), width=420)
+        self.licence_box = ft.Column([
+            ft.Text(t("licence_ask"), size=13, color=ft.Colors.PRIMARY),
+            # the sentence itself, to read while typing it (or to copy)
+            ft.Text(t("licence_text"), size=15, weight=ft.FontWeight.BOLD, selectable=True),
+            self.licence,
+        ], spacing=4)
         self.is_host = ft.TextField(label=t("server"), value=c.aprsis_host, width=240)
         self.is_port = ft.TextField(label=t("port"), value=str(c.aprsis_port), width=110, input_filter=num)
         self.passcode = ft.TextField(label=t("passcode"), value=c.aprsis_passcode, width=240, password=True,
