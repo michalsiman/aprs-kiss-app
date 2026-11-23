@@ -14,7 +14,7 @@ from ..offline_map import MIN_ZOOM, BaseMap, Region, ScaleBar, gestures
 from ..symbols import emoji
 from ..declutter import spread
 from .map_source import MapSourceButton
-from .base import View, toggle
+from .base import View, bearing_deg, distance_km, distance_text, toggle
 
 DEFAULT_CENTER = (49.8, 15.5)  # Czechia
 REBUILD_SECONDS = 2.0
@@ -23,6 +23,7 @@ MAX_MARKERS_PHONE = 150
 CAMERA_SECONDS = 2.0  # while the map is shown, where it is looking is asked for no more often than this
 TRAIL_SECONDS = 1800  # the trails show the last half hour
 TRAIL_COLOR = "#E53935"  # one red, like aprs.fi
+MEASURE_COLOR = "#6A1B9A"  # the measured line: a colour no station label uses
 LEADER_COLOR = "#8E8E8E"  # from a spread-out marker to where the station really is
 MUTED_OPACITY = 0.45  # muted map: tiles faded over a neutral background, so the colours recede
 
@@ -48,7 +49,12 @@ class MapView(View):
         self._camera_busy = False
         self.trails = fm.PolylineLayer(polylines=[])  # where moving stations went in the last hour
         self._trail_cache: dict[tuple, fm.PolylineMarker] = {}
-        self.base = BaseMap(self.markers, center, self._zoom, MUTED_OPACITY if conf.map_muted else 1.0, self.trails)
+        # measuring a distance: a dashed line between two points, a pin at each end
+        self.measure_line = fm.PolylineLayer(polylines=[])
+        self.measure_pins = fm.MarkerLayer(markers=[])
+        self._measure: list[tuple[float, float]] = []
+        self.base = BaseMap(self.markers, center, self._zoom, MUTED_OPACITY if conf.map_muted else 1.0, self.trails,
+                            overlays=(self.measure_line, self.measure_pins))
         self.tiles = self.base.tiles
         self.map = fm.Map(
             expand=True,
@@ -64,6 +70,7 @@ class MapView(View):
             # Not on_position_change: that sends an event for every frame of a pan or zoom, which on a
             # phone floods the app. Where the map looks is asked for after a gesture and now and then.
             on_pointer_up=self._gesture_end,
+            on_tap=self._tap,
         )
         self._picked: tuple[float, float] | None = None
         self.menu = ft.ContextMenu(
@@ -93,7 +100,20 @@ class MapView(View):
         self.controls = MapControls(self.map, self.t, lambda: self.app.page.run_task(self._ask_camera, 0.7))
         self.scale = ScaleBar()
         self.scale.show(center[0], self._zoom)
-        return ft.Stack([self.menu, overlay, self.controls.control, self.scale.control, self.base.credit], expand=True)
+        self.measure_text = ft.Text(size=14, weight=ft.FontWeight.BOLD)
+        self.measure_box = ft.Container(
+            ft.Row([ft.Container(
+                ft.Row([ft.Icon(ft.Icons.STRAIGHTEN, size=18, color=ft.Colors.PRIMARY), self.measure_text,
+                        ft.IconButton(ft.Icons.CLOSE, icon_size=18, tooltip=self.t("measure_close"),
+                                      on_click=self._measure_clear)],
+                       tight=True, spacing=6, vertical_alignment=ft.CrossAxisAlignment.CENTER),
+                bgcolor=ft.Colors.with_opacity(0.95, ft.Colors.SURFACE), border_radius=20,
+                padding=ft.Padding.only(left=12, right=2), shadow=ft.BoxShadow(blur_radius=4, color=ft.Colors.with_opacity(0.3, ft.Colors.BLACK)),
+            )], alignment=ft.MainAxisAlignment.CENTER),
+            left=70, right=70, bottom=36, visible=False,
+        )
+        return ft.Stack([self.menu, overlay, self.controls.control, self.scale.control, self.base.credit,
+                         self.measure_box], expand=True)
 
     def _show_tools(self, shown: bool) -> None:
         for button in self.tools:
@@ -303,7 +323,11 @@ class MapView(View):
         lon = (e.coordinates.longitude + 180) % 360 - 180  # the map wraps around the world
         lat, lon = round(e.coordinates.latitude, 5), round(lon, 5)
         self._picked = (lat, lon)
+        here = self.engine.my_position()
         self.menu.items = [
+            ft.PopupMenuItem(content=self.t("measure_from"), icon=ft.Icons.STRAIGHTEN, data="measure"),
+            *([ft.PopupMenuItem(content=self.t("measure_from_me"), icon=ft.Icons.NEAR_ME, data="measure_me")]
+              if here else []),
             ft.PopupMenuItem(content=self.t("set_my_position"), icon=ft.Icons.MY_LOCATION, data="me"),
             ft.PopupMenuItem(content=self.t("copy_coordinates", lat=f"{lat:.5f}", lon=f"{lon:.5f}"),
                              icon=ft.Icons.CONTENT_COPY, data="copy"),
@@ -315,11 +339,57 @@ class MapView(View):
         if not self._picked or e.item is None:
             return
         lat, lon = self._picked
-        if e.item.data == "me":
+        if e.item.data == "measure":
+            self._measure = [(lat, lon)]  # the next tap on the map is the other end
+            self._draw_measure()
+        elif e.item.data == "measure_me":
+            here = self.engine.my_position()
+            if here:
+                self._measure = [here, (lat, lon)]
+                self._draw_measure()
+        elif e.item.data == "me":
             await self.app.set_position(lat, lon)
         elif e.item.data == "copy":
             await ft.Clipboard().set(f"{lat:.5f}, {lon:.5f}")
             self.app.toast(self.t("copied"))
+
+    # ─── measuring a distance ─────────────────────────────────────────────
+
+    def _tap(self, e) -> None:
+        """While measuring: a tap puts (or moves) the far end there."""
+        if not self._measure or getattr(e, "coordinates", None) is None:
+            return
+        lon = (e.coordinates.longitude + 180) % 360 - 180
+        self._measure = [self._measure[0], (e.coordinates.latitude, lon)]
+        self._draw_measure()
+
+    def _measure_clear(self, _e=None) -> None:
+        self._measure = []
+        self._draw_measure()
+
+    @staticmethod
+    def _pin(lat: float, lon: float, color) -> fm.Marker:
+        return fm.Marker(coordinates=fm.MapLatitudeLongitude(lat, lon), width=14, height=14,
+                         content=ft.Container(width=14, height=14, border_radius=7, bgcolor=color,
+                                              border=ft.Border.all(2, ft.Colors.WHITE)))
+
+    def _draw_measure(self) -> None:
+        points = self._measure
+        self.measure_pins.markers = [self._pin(*points[0], MEASURE_COLOR)] if points else []
+        self.measure_line.polylines = []
+        if len(points) == 2:
+            (lat1, lon1), (lat2, lon2) = points
+            self.measure_pins.markers.append(self._pin(lat2, lon2, MEASURE_COLOR))
+            self.measure_line.polylines = [fm.PolylineMarker(
+                coordinates=[fm.MapLatitudeLongitude(lat1, lon1), fm.MapLatitudeLongitude(lat2, lon2)],
+                color=MEASURE_COLOR, stroke_width=3,
+                stroke_pattern=fm.DashedStrokePattern(segments=[12, 8]))]
+            km = distance_km(lat1, lon1, lat2, lon2)
+            self.measure_text.value = f"{distance_text(km)} · {bearing_deg(lat1, lon1, lat2, lon2):.0f}°"
+        elif points:
+            self.measure_text.value = self.t("measure_hint")
+        self.measure_box.visible = bool(points)
+        self.app.page.update()
 
     async def centre(self, lat: float, lon: float, zoom: float = 12) -> None:
         self._look(lat, lon, zoom)  # the offline map and the stations there first, then the move

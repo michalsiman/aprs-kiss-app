@@ -88,12 +88,22 @@ def distance_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     return 2 * r * math.asin(math.sqrt(a))
 
 
-def bearing(lat1: float, lon1: float, lat2: float, lon2: float) -> str:
+def bearing_deg(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """The initial direction from the first point to the second, degrees from north (0–360)."""
     p1, p2 = math.radians(lat1), math.radians(lat2)
     dl = math.radians(lon2 - lon1)
-    deg = math.degrees(math.atan2(math.sin(dl) * math.cos(p2),
-                                  math.cos(p1) * math.sin(p2) - math.sin(p1) * math.cos(p2) * math.cos(dl))) % 360
-    return ["N", "NE", "E", "SE", "S", "SW", "W", "NW"][round(deg / 45) % 8]
+    return math.degrees(math.atan2(math.sin(dl) * math.cos(p2),
+                                   math.cos(p1) * math.sin(p2) - math.sin(p1) * math.cos(p2) * math.cos(dl))) % 360
+
+
+def bearing(lat1: float, lon1: float, lat2: float, lon2: float) -> str:
+    return ["N", "NE", "E", "SE", "S", "SW", "W", "NW"][round(bearing_deg(lat1, lon1, lat2, lon2) / 45) % 8]
+
+
+def distance_text(km: float) -> str:
+    if km < 1:
+        return f"{km * 1000:.0f} m"
+    return f"{km:.2f} km" if km < 10 else f"{km:.1f} km" if km < 100 else f"{km:.0f} km"
 
 
 def capped_append(lv: ft.ListView, control: ft.Control, limit: int) -> None:
