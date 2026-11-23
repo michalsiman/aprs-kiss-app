@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.31" date="2026-11-23">
+      <description>
+        <p>TAK: a slim header, map and GeoChat as two screens on phones, the team's moves shown in GeoChat.</p>
+      </description>
+    </release>
     <release version="0.1.30" date="2026-11-23">
       <description>
         <p>Phone top bar as a dashboard (TNC, GPS, TX lamps), the same on/off icons on every screen, a simpler terminal.</p>

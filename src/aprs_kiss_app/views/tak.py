@@ -14,7 +14,7 @@ import flet_map as fm
 from aprs_kiss_core.config import Config
 
 from ..i18n import TEXTS
-from .base import View, clock
+from .base import View, clock, distance_km
 from .bbs import _plain
 from ..offline_map import MIN_ZOOM, BaseMap
 from .base import toggle
@@ -43,16 +43,36 @@ class TakView(View):
         self._signature = None
         self._centred = False
         on = self.engine.tak_mode
-        self.switch = ft.Switch(label=self.t("tak"), value=on, on_change=self._toggle)
-        self.state = ft.Text(size=15, weight=ft.FontWeight.BOLD)
+        self.switch = ft.Switch(label=None if on else self.t("tak"), value=on, on_change=self._toggle,
+                                scale=0.75 if on else None)
+        self.state = ft.Text(size=12 if on else 15, weight=ft.FontWeight.BOLD, no_wrap=True,
+                             overflow=ft.TextOverflow.ELLIPSIS, expand=on)
         self.hint = ft.Text(size=12, color=ft.Colors.ON_SURFACE_VARIANT)
-        header = ft.Container(
-            ft.Column([ft.Row([ft.Icon(ft.Icons.RADAR, color=ft.Colors.PRIMARY), self.switch]), self.state, self.hint],
-                      spacing=4, tight=True),
-            padding=12, border_radius=8, bgcolor=ft.Colors.SURFACE_CONTAINER,
-        )
         if not on:
+            header = ft.Container(
+                ft.Column([ft.Row([ft.Icon(ft.Icons.RADAR, color=ft.Colors.PRIMARY), self.switch]), self.state,
+                           self.hint], spacing=4, tight=True),
+                padding=12, border_radius=8, bgcolor=ft.Colors.SURFACE_CONTAINER,
+            )
             return ft.Column([header], expand=True)
+        compact = self.app.compact
+        # Running: one slim line - the two screens (map, GeoChat), who we are, the warnings, "send my position"
+        # and the switch, small; the long texts went to tooltips and to the top bar's TX lamp.
+        self.tx_warn = ft.IconButton(ft.Icons.WARNING_AMBER, icon_color=ft.Colors.ERROR, icon_size=20,
+                                     tooltip=self.t("tak_tx_needed"),
+                                     on_click=lambda _e: self.app.toast(self.t("tak_tx_needed"), error=True))
+        self.tab = "map"
+        self.unread = 0
+        self.map_tab = toggle(ft.Icons.MAP_OUTLINED, ft.Icons.MAP, True, self.t("map"), lambda _e: self._show("map"))
+        self.chat_tab = toggle(ft.Icons.CHAT_OUTLINED, ft.Icons.CHAT, False, self.t("tak_chat"),
+                               lambda _e: self._show("chat"))
+        position = ft.IconButton(ft.Icons.MY_LOCATION, tooltip=self.t("tak_send_position"), on_click=self._position)
+        header = ft.Container(
+            ft.Row([*([self.map_tab, self.chat_tab] if compact else [ft.Icon(ft.Icons.RADAR, color=ft.Colors.PRIMARY)]),
+                    self.state, self.tx_warn, position, self.switch], spacing=2,
+                   vertical_alignment=ft.CrossAxisAlignment.CENTER),
+            padding=ft.Padding.symmetric(horizontal=4), border_radius=8, bgcolor=ft.Colors.SURFACE_CONTAINER,
+        )
         here = self.engine.my_position()
         self.markers = fm.MarkerLayer(markers=[])
         self._zoom = 12 if here else 7
@@ -66,37 +86,48 @@ class TakView(View):
         self.offline_btn = toggle(ft.Icons.CLOUD_OFF_OUTLINED, ft.Icons.CLOUD_OFF, self.app.offline_map(),
                                   self.t("map_offline"), self._toggle_offline)
         self.controls = MapControls(self.map, self.t, lambda: self.app.page.run_task(self._ask_camera, 0.7))
-        map_box = ft.Container(ft.Stack([self.map, self.controls.control, self.base.credit], expand=True),
+        map_tools = ft.Container(self.offline_btn, left=8, top=8, border_radius=8,
+                                 bgcolor=ft.Colors.with_opacity(0.85, ft.Colors.SURFACE))
+        map_box = ft.Container(ft.Stack([self.map, map_tools, self.controls.control, self.base.credit], expand=True),
                                expand=True, border_radius=8)
-        compact = self.app.compact
-        self.stations = ft.ListView(spacing=0, height=90 if compact else 170)
+        self.stations = ft.ListView(spacing=0, height=170)
         self.chat = ft.ListView(expand=True, spacing=6, auto_scroll=True, padding=ft.Padding.all(6))
-        self.to = ft.Dropdown(dense=True, width=150, value="", options=[ft.DropdownOption(key="", text=self.t("tak_everybody"))])
+        self.to = ft.Dropdown(dense=True, width=130 if compact else 150, value="",
+                              options=[ft.DropdownOption(key="", text=self.t("tak_everybody"))])
         self.text = ft.TextField(hint_text=self.t("type_here"), expand=True, dense=True, on_submit=self._send)
-        position_row = ft.Row([ft.FilledTonalButton(self.t("tak_send_position"), icon=ft.Icons.MY_LOCATION,
-                                                    on_click=self._position), self.offline_btn])
-        stations_title = ft.Text(self.t("tak_stations"), weight=ft.FontWeight.BOLD)
+        # the team's moves shown in GeoChat: who appeared, who moved how far
+        self.moves: list[dict] = []
+        self._placed = {uid: (st["lat"], st["lon"], time.time()) for uid, st in self.engine.tak_stations.items()}
+        self._seen_time = max((c["time"] for c in self.engine.tak_chat), default=0)
+        chat_box = ft.Container(self.chat, expand=True, border_radius=8, bgcolor=ft.Colors.SURFACE_CONTAINER_LOWEST)
+        send_row = ft.Row([self.to, self.text, ft.IconButton(ft.Icons.SEND, tooltip=self.t("send"), on_click=self._send)])
         if compact:
-            # a phone: while typing, the keyboard takes half the screen - the map and the station list
-            # step aside so GeoChat and the text stay in sight
-            self._typing_hides = [header, map_box, position_row, stations_title, self.stations]
+            # a phone: map and GeoChat are two screens; the map stays loaded under the chat (no rebuild)
+            self.chat_layer = ft.Container(ft.Column([chat_box, send_row], expand=True, spacing=6),
+                                           bgcolor=ft.Colors.SURFACE, visible=False, left=0, top=0, right=0, bottom=0)
+            self._typing_hides = [header]
             self.text.on_focus = lambda _e: self._typing(True)
             self.text.on_blur = lambda _e: self._typing(False)
+            return ft.Column([header, ft.Stack([map_box, self.chat_layer], expand=True)], expand=True, spacing=6)
         panel = ft.Container(
             ft.Column([
-                position_row,
-                stations_title, self.stations,
-                ft.Text(self.t("tak_chat"), weight=ft.FontWeight.BOLD),
-                ft.Container(self.chat, expand=True, border_radius=8, bgcolor=ft.Colors.SURFACE_CONTAINER_LOWEST),
-                ft.Row([self.to, self.text, ft.IconButton(ft.Icons.SEND, tooltip=self.t("send"), on_click=self._send)]),
+                ft.Text(self.t("tak_stations"), weight=ft.FontWeight.BOLD), self.stations,
+                ft.Text(self.t("tak_chat"), weight=ft.FontWeight.BOLD), chat_box, send_row,
             ], expand=True, spacing=6),
-            width=None if compact else 380,
-            expand=compact,
+            width=380,
         )
-        if compact:  # a phone: the map above, stations and GeoChat below
-            return ft.Column([header, map_box, panel], expand=True)
         return ft.Column([header, ft.Row([map_box, panel], expand=True,
                                          vertical_alignment=ft.CrossAxisAlignment.STRETCH)], expand=True)
+
+    def _show(self, tab: str) -> None:
+        """A phone: the map or GeoChat; opening GeoChat reads the new messages."""
+        self.tab = tab
+        self.map_tab.selected, self.chat_tab.selected = tab == "map", tab == "chat"
+        self.chat_layer.visible = tab == "chat"
+        if tab == "chat":
+            self.unread = 0
+        self.chat_tab.badge = str(self.unread) if self.unread else None
+        self.app.page.update()
 
     def _typing(self, on: bool) -> None:
         for control in self._typing_hides:
@@ -135,6 +166,8 @@ class TakView(View):
     def on_event(self, kind, data) -> None:
         if kind in ("tak", "gps", "update"):
             self._signature = None
+        if kind == "tak" and hasattr(self, "_seen_time"):
+            self._count_unread()  # also while another screen is open
 
     # ─── drawing ──────────────────────────────────────────────────────────
 
@@ -153,9 +186,12 @@ class TakView(View):
         self._signature = signature
         conf = eng.config
         if eng.tak_mode:
-            self.state.value = self.t("tak_running", call=eng.tak_callsign, team=conf.tak_team, n=len(stations))
+            self.state.value = (f"{eng.tak_callsign} · {conf.tak_team} · {len(stations)}" if self.app.compact else
+                                self.t("tak_running", call=eng.tak_callsign, team=conf.tak_team, n=len(stations)))
+            self.state.tooltip = self.t("tak_running", call=eng.tak_callsign, team=conf.tak_team, n=len(stations))
             self.state.color = ft.Colors.GREEN
             self.hint.value = "" if eng.station.tx_enabled else self.t("tak_tx_needed")
+            self.tx_warn.visible = not eng.station.tx_enabled
         else:
             self.state.value, self.state.color, self.hint.value = self.t("tak_off"), None, ""
         self.hint.visible = bool(self.hint.value)
@@ -184,8 +220,48 @@ class TakView(View):
         self.to.options = [ft.DropdownOption(key="", text=self.t("tak_everybody"))] + [
             ft.DropdownOption(key=s["uid"], text=s["callsign"]) for s in rows]
         self.to.value = current if any(o.key == current for o in self.to.options) else ""
-        self.chat.controls = [self._bubble(c) for c in eng.tak_chat] or [
+        self._watch_team(stations, now)
+        self._count_unread()
+        items = sorted([*eng.tak_chat, *self.moves], key=lambda c: c["time"])
+        self.chat.controls = [self._move_line(c) if "move" in c else self._bubble(c) for c in items] or [
             ft.Text(self.t("tak_no_chat"), color=ft.Colors.ON_SURFACE_VARIANT)]
+
+    MOVE_M = 200  # a station has to move this far before GeoChat says so…
+    MOVE_EVERY = 120  # …and at most once in this many seconds per station
+
+    def _watch_team(self, stations: dict, now: float) -> None:
+        """Who appeared on the map, who moved how far: lines in GeoChat between the messages."""
+        for uid, st in stations.items():
+            where = (st["lat"], st["lon"])
+            before = self._placed.get(uid)
+            if before is None:
+                self.moves.append({"time": now, "move": self.t("tak_appeared", call=st["callsign"])})
+            elif (now - before[2] >= self.MOVE_EVERY
+                  and distance_km(*before[:2], *where) * 1000 >= self.MOVE_M):
+                metres = distance_km(*before[:2], *where) * 1000
+                far = f"{metres / 1000:.1f} km" if metres >= 1000 else f"{metres:.0f} m"
+                self.moves.append({"time": now, "move": self.t("tak_moved", call=st["callsign"], far=far)})
+            else:
+                continue
+            self._placed[uid] = (*where, now)
+        del self.moves[:-100]
+
+    def _count_unread(self) -> None:
+        """New GeoChat messages while the map is shown: a number on the GeoChat icon and a message."""
+        new = [c for c in self.engine.tak_chat if c["time"] > self._seen_time and not c.get("out")]
+        if not new:
+            return
+        self._seen_time = max(c["time"] for c in new)
+        if self.app.compact and self.tab != "chat" or self.app.current_key != self.key:
+            self.unread += len(new)
+            if self.app.compact:
+                self.chat_tab.badge = str(self.unread)
+            last = new[-1]
+            self.app.toast(f"{self.t('tak_chat')} · {last['from']}: {last['text']}")
+
+    def _move_line(self, c: dict) -> ft.Control:
+        return ft.Row([ft.Text(f"{clock(c['time'])}  {c['move']}", size=11, italic=True,
+                               color=ft.Colors.ON_SURFACE_VARIANT)], alignment=ft.MainAxisAlignment.CENTER)
 
     def _color(self, s: dict) -> str:
         return TEAM_COLORS.get(s.get("team") or "", AFFILIATION_COLORS.get(s["type"].split("-")[1] if

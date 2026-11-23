@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.31 – 2026-11-23
+
+- **TAK takes less room**: while TAK runs, its header is one slim line – who you are, the team and the
+  number of stations, a warning icon when transmitting is off, "send my position" and a small switch.
+- **TAK on a phone: the map and GeoChat are two screens**, switched by two icons in that line. On the map
+  a number on the GeoChat icon and a short message tell about new messages.
+- **The team's moves in GeoChat**: who appeared on the map and who moved how far (at least 200 m, at
+  most every 2 minutes per station), between the messages.
+- TAK frames are at most 220 bytes, so they also fit LoRa KISS modems (MeshCore's "KISS Radio Modem").
+
 ## 0.1.30 – 2026-11-23
 
 - **Phone top bar as a dashboard**: TNC, IS, GPS and TX are small lamps – green when working, grey when

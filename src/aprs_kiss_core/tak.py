@@ -19,7 +19,7 @@ from xml.sax.saxutils import escape, quoteattr
 
 MESH_HEADER = b"\xbf\x01\xbf"
 DESTINATION = "TAK"  # AX.25 destination of TAK frames
-MAX_PAYLOAD = 256  # AX.25 N1: one event per frame
+MAX_PAYLOAD = 220  # one event per frame: AX.25 N1 is 256, but LoRa KISS modems (MeshCore) carry 255 bytes with the header
 UNKNOWN = 9999999.0  # TAK's "unknown" for hae, ce and le
 
 TEAMS = ["White", "Yellow", "Orange", "Magenta", "Red", "Maroon", "Purple", "Dark Blue", "Blue",
