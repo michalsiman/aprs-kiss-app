@@ -28,6 +28,7 @@ TEXTS = {
     "th_starts_in": "Следећи за {t}",
     "map_trails": "Трагови (куда су станице ишле у последњих пола сата)",
     "map_tools_hide": "Сакриј дугмад мапе", "map_tools_show": "Дугмад мапе",
+    "filter": "Филтер станица", "filter_on": "Приказано само: {what}", "filter_all": "Прикажи све станице", "filter_weather": "Само метео станице", "filter_moving": "Само у покрету (помериле су се у последњих 10 мин)", "filter_road": "Само проблеми на путу (незгоде, радови, поплаве…)", "filter_weather_short": "метео", "filter_moving_short": "у покрету", "filter_road_short": "проблеми на путу",
     "object_of": "објекат од {call}",
     "measure_from": "Измери удаљеност одавде",
     "measure_from_me": "Удаљеност од мог положаја",

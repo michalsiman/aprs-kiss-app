@@ -14,6 +14,7 @@ from typing import Any
 
 from .aprsis import DEFAULT_PORT as DEFAULT_APRSIS_PORT
 from .aprsis import DEFAULT_SERVER as DEFAULT_APRSIS_HOST
+from . import mapfilter
 from .ax25 import Address
 
 _LOGGER = logging.getLogger(__name__)
@@ -70,6 +71,7 @@ class Config:
     map_trails: bool = False  # the map draws where each moving station went in the last half hour
     map_files: str = ""  # imported offline maps (MBTiles, PMTiles, …), one path per line
     map_imported: bool = True  # offline: the imported map (when there is one) over the bundled one
+    map_filters: str = ""  # the map shows only these kinds of stations ("weather,moving,road"); empty = all
     map_tools_hidden: bool = False  # the map's button bar folded into one gear button
     map_offline: bool = False  # the bundled offline map (borders, cities) instead of OpenStreetMap tiles
     gps_source: str = "manual"  # "manual" (latitude/longitude above), "usb" (an NMEA GPS module), "phone"
@@ -137,6 +139,7 @@ class Config:
             self.beacon_minutes = MIN_BEACON_MINUTES
         if self.tracker_mode not in ("fixed", "smart"):
             self.tracker_mode = "fixed"
+        self.map_filters = mapfilter.join(mapfilter.parse(self.map_filters))
         if self.tracker_profile not in ("walk", "bike", "car"):
             self.tracker_profile = "car"
         self.tracker_minutes = min(60, max(1, int(self.tracker_minutes or 2)))

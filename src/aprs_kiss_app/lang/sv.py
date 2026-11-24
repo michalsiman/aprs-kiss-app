@@ -28,6 +28,7 @@ TEXTS = {
     "th_starts_in": "Nästa om {t}",
     "map_trails": "Spår (var stationerna åkte den senaste halvtimmen)",
     "map_tools_hide": "Dölj kartknapparna", "map_tools_show": "Kartknappar",
+    "filter": "Filtrera stationer", "filter_on": "Visas bara: {what}", "filter_all": "Visa alla stationer", "filter_weather": "Bara väderstationer", "filter_moving": "Bara i rörelse (flyttat sig de senaste 10 min)", "filter_road": "Bara trafikstörningar (olyckor, vägarbeten, översvämningar…)", "filter_weather_short": "väder", "filter_moving_short": "i rörelse", "filter_road_short": "trafikstörningar",
     "object_of": "objekt från {call}",
     "measure_from": "Mät avstånd härifrån",
     "measure_from_me": "Avstånd från min position",

@@ -28,6 +28,7 @@ TEXTS = {
     "th_starts_in": "Наступний через {t}",
     "map_trails": "Сліди (куди рухалися станції за останні пів години)",
     "map_tools_hide": "Сховати кнопки мапи", "map_tools_show": "Кнопки мапи",
+    "filter": "Фільтр станцій", "filter_on": "Показано лише: {what}", "filter_all": "Показати всі станції", "filter_weather": "Лише метеостанції", "filter_moving": "Лише ті, що рухаються (рухались за останні 10 хв)", "filter_road": "Лише дорожні проблеми (аварії, ремонти, повені…)", "filter_weather_short": "метео", "filter_moving_short": "в русі", "filter_road_short": "дорожні проблеми",
     "object_of": "об'єкт від {call}",
     "measure_from": "Виміряти відстань звідси",
     "measure_from_me": "Відстань від моєї позиції",

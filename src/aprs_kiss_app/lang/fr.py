@@ -29,6 +29,7 @@ TEXTS = {
     "th_starts_in": "Le prochain dans {t}",
     "map_trails": "Traces (le trajet des stations dans la dernière demi-heure)",
     "map_tools_hide": "Masquer les boutons de la carte", "map_tools_show": "Boutons de la carte",
+    "filter": "Filtrer les stations", "filter_on": "Affichées seulement : {what}", "filter_all": "Afficher toutes les stations", "filter_weather": "Stations météo seulement", "filter_moving": "En mouvement seulement (déplacées ces 10 dernières min)", "filter_road": "Incidents routiers seulement (accidents, travaux, inondations…)", "filter_weather_short": "météo", "filter_moving_short": "en mouvement", "filter_road_short": "incidents routiers",
     "object_of": "objet de {call}",
     "measure_from": "Mesurer la distance d'ici",
     "measure_from_me": "Distance depuis ma position",

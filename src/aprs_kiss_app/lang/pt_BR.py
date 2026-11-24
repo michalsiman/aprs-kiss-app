@@ -28,6 +28,7 @@ TEXTS = {
     "th_starts_in": "O próximo em {t}",
     "map_trails": "Rastros (por onde as estações passaram na última meia hora)",
     "map_tools_hide": "Ocultar os botões do mapa", "map_tools_show": "Botões do mapa",
+    "filter": "Filtrar estações", "filter_on": "Mostradas só: {what}", "filter_all": "Mostrar todas as estações", "filter_weather": "Só estações meteorológicas", "filter_moving": "Só em movimento (moveram-se nos últimos 10 min)", "filter_road": "Só ocorrências nas vias (acidentes, obras, enchentes…)", "filter_weather_short": "meteorologia", "filter_moving_short": "em movimento", "filter_road_short": "ocorrências nas vias",
     "object_of": "objeto de {call}",
     "measure_from": "Medir distância daqui",
     "measure_from_me": "Distância da minha posição",

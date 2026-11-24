@@ -8,12 +8,13 @@ import time
 
 import flet as ft
 import flet_map as fm
+from aprs_kiss_core import mapfilter
 
 from ..legend import COLOR_ME, map_label, show_legend, station_color, visible
 from ..offline_map import MIN_ZOOM, BaseMap, Region, ScaleBar, gestures
 from ..symbols import emoji
 from ..declutter import spread
-from .map_source import MapSourceButton
+from .map_source import MapSourceButton, _label
 from .base import View, bearing_deg, distance_km, distance_text, toggle
 
 DEFAULT_CENTER = (49.8, 15.5)  # Czechia
@@ -90,7 +91,7 @@ class MapView(View):
                                lambda _e: self.app.set_show_internet(not self.engine.config.show_internet))
         self.tools = [
             ft.IconButton(ft.Icons.MY_LOCATION, tooltip=self.t("centre_me"), on_click=self._centre_me),
-            self.internet, self.only_recent, self.trails_btn, self._offline_btn(),
+            self.internet, self.only_recent, self._filter_btn(), self.trails_btn, self._offline_btn(),
         ]  # the muted map and the legend are in the map menu: the bar fits on a phone
         # The bar folds into one gear button (and stays folded next time) for those who want the whole map.
         self.fold_btn = ft.IconButton(on_click=self._toggle_tools)
@@ -142,6 +143,47 @@ class MapView(View):
 
     def _toggle_recent(self, _e) -> None:
         self.only_recent.selected = not self.only_recent.selected
+        self.force()
+        self.app.page.update()
+
+    # ─── filters: only weather stations, moving stations, road incidents (any mix) ─────
+
+    FILTER_ICONS = {"weather": ft.Icons.THUNDERSTORM_OUTLINED, "moving": ft.Icons.DIRECTIONS_CAR_OUTLINED,
+                    "road": ft.Icons.CAR_CRASH_OUTLINED}
+
+    def _filter_btn(self) -> ft.Control:
+        self.filter_items = {
+            kind: ft.PopupMenuItem(_label(self.t(f"filter_{kind}")), icon=icon,
+                                   on_click=lambda _e, k=kind: self._toggle_filter(k))
+            for kind, icon in self.FILTER_ICONS.items()
+        }
+        self.filter_all = ft.PopupMenuItem(self.t("filter_all"), icon=ft.Icons.FILTER_ALT_OFF_OUTLINED,
+                                           on_click=lambda _e: self._set_filters(set()))
+        self.filter_icon = ft.Icon(ft.Icons.FILTER_ALT_OUTLINED)
+        self.filter_face = ft.Container(self.filter_icon, padding=8, shape=ft.BoxShape.CIRCLE)
+        self.filter_btn = ft.PopupMenuButton(content=self.filter_face, tooltip=self.t("filter"),
+                                             items=[*self.filter_items.values(), ft.PopupMenuItem(), self.filter_all])
+        self._show_filters()
+        return self.filter_btn
+
+    def _show_filters(self) -> None:
+        kinds = mapfilter.parse(self.engine.config.map_filters)
+        for kind, item in self.filter_items.items():
+            item.checked = kind in kinds
+        self.filter_all.disabled = not kinds
+        self.filter_icon.icon = ft.Icons.FILTER_ALT if kinds else ft.Icons.FILTER_ALT_OUTLINED
+        self.filter_icon.color = ft.Colors.PRIMARY if kinds else None
+        self.filter_face.bgcolor = ft.Colors.with_opacity(0.18, ft.Colors.PRIMARY) if kinds else None
+        names = ", ".join(self.t(f"filter_{k}_short") for k in mapfilter.KINDS if k in kinds)
+        self.filter_btn.tooltip = self.t("filter_on", what=names) if kinds else self.t("filter")
+
+    def _toggle_filter(self, kind: str) -> None:
+        self._set_filters(mapfilter.parse(self.engine.config.map_filters) ^ {kind})
+
+    def _set_filters(self, kinds: set[str]) -> None:
+        self.engine.config.map_filters = mapfilter.join(kinds)
+        self._show_filters()
+        self.app.save_config_soon()
         self.force()
         self.app.page.update()
 
@@ -282,8 +324,10 @@ class MapView(View):
             self.app.page.run_task(self._ask_camera)
         now = time.time()
         heard = self.engine.station.heard
+        kinds = mapfilter.parse(self.engine.config.map_filters)
         signature = (len(heard), next(reversed(heard), None),
-                     heard[next(reversed(heard))]["count"] if heard else 0, self.engine.my_position())
+                     heard[next(reversed(heard))]["count"] if heard else 0, self.engine.my_position(),
+                     int(now // 60) if "moving" in kinds else 0)  # standing stations drop out as time goes
         if signature == self._signature or now - self._last_build < REBUILD_SECONDS:
             return
         self._signature = signature
@@ -300,7 +344,7 @@ class MapView(View):
                 continue
             if recent and now - e["last_heard"] > recent:
                 continue
-            if not visible(self.app, e):
+            if not visible(self.app, e) or not mapfilter.shown(e, kinds, now):
                 continue
             wanted.append((e["call"], lat, lon, emoji(e.get("symbol_table"), e.get("symbol")),
                            station_color(self.app, e), bool(e.get("last_rf"))))

@@ -180,7 +180,7 @@ class Station:
             if packet.get("alive") is False:
                 self.heard.pop(call, None)
                 return
-        entry = self.heard.pop(call, {"call": call, "count": 0})
+        entry = self.heard.pop(call, None) or {"call": call, "count": 0, "first_heard": now}
         if owner:
             entry["object_of"] = owner
         entry["count"] += 1
