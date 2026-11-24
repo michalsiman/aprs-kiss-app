@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.51 – 2026-11-24
+
+- **Computer top bar** (Linux, Windows, macOS): the same lamps as on a phone – TNC, IS, GPS, the position /
+  tracker button and TX – larger, side by side on the right; the callsign stays on the left. Hovering a
+  lamp tells its state (TNC error, APRS-IS server, GPS satellites); a click on TX switches transmitting.
+- **"Back to me"** (the map follows you while the tracker runs): the button with its countdown is now in
+  the bottom left corner, above the scale.
+
 ## 0.1.50 – 2026-11-24
 
 - **Phone top bar**: TNC, IS and GPS share one small block (IS and GPS above, TNC below), so the whole

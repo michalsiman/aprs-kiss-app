@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.51" date="2026-11-24">
+      <description>
+        <p>Computer top bar with the same lamps as on a phone (TNC, IS, GPS, position, TX); the back-to-me button moved above the scale.</p>
+      </description>
+    </release>
     <release version="0.1.50" date="2026-11-24">
       <description>
         <p>The whole callsign fits in the phone's top bar again; one-line map filter menu; TNC errors translated.</p>
