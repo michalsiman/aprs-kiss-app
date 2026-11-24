@@ -369,9 +369,8 @@ class MessagesView(View):
                 error.value, error.visible = t(err.code, example=err.example), True
                 self.app.page.update()
                 return
-            via = self.via.value or "both"
-            if via == "radio":
-                via = "both"  # the gateways are on APRS-IS: by radio it needs an iGate anyway
+            # by radio over APRS (an iGate in range takes it to the gateway); internet too only when chosen
+            via = (self.via.value if self.via.visible else "radio") or "radio"
             if not await self.app.guard(self.engine.send_aprs_message(to, text, via)):
                 return
             self.engine.config.spot_last = json.dumps({

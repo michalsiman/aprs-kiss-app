@@ -1,6 +1,7 @@
 """Self-spotting an outdoor activation (SOTA, POTA, WWFF, SIOTA) with an APRS message to a gateway.
 
-Two gateways, both reached over APRS-IS (by radio through an iGate, or straight over the internet):
+Sent by radio over APRS: any iGate in range passes the message to the gateway on APRS-IS (straight over
+the internet too, when the station has it and it is chosen). Two gateways:
 
 - APRS2SOTA (sotaspots.co.uk, G0LGS) - SOTA only, posts to SOTAwatch. Message to "APRS2SOTA" (or "SOTA"):
   "<summit> <freq> <mode> [callsign] [comment]", e.g. "OK/PL-001 145.500 FM OK1SIM CQ SOTA". The callsign
