@@ -29,6 +29,18 @@ class CorridorTest(unittest.TestCase):
         self.assertAlmostEqual(a[0], 3, places=1)
         self.assertAlmostEqual(a[1], -0.5, places=1)  # north of an eastward road: on the left
 
+    def test_lobe_wide_in_town_narrow_fast(self):
+        diagonal = _pos(2, 2)  # 45° off, 2.8 km away
+        beside = _pos(0.05, 1.5)  # straight to the right, 1.5 km
+        self.assertIsNotNone(ahead(LAT, LON, 0.0, *diagonal, 5, 25))
+        self.assertIsNone(ahead(LAT, LON, 0.0, *diagonal, 5, 110))
+        self.assertIsNotNone(ahead(LAT, LON, 0.0, *beside, 5, 25))
+        self.assertIsNone(ahead(LAT, LON, 0.0, *beside, 5, 110))
+        self.assertIsNotNone(ahead(LAT, LON, 0.0, *_pos(4.8, 0.3), 5, 110))  # straight ahead: the whole way
+        for speed in (10, 50, 130):
+            self.assertIsNone(ahead(LAT, LON, 0.0, *_pos(-0.3, 0.1), 5, speed))  # behind: never
+        self.assertIsNotNone(ahead(LAT, LON, 0.0, *_pos(0.1, 0.4), 5, 130))  # right next to us, in front
+
     def test_heading_from_gps_or_track(self):
         self.assertEqual(heading(270.0, 50.0, None), 270.0)
         self.assertIsNone(heading(270.0, 2.0, None))  # standing: the GPS course is noise

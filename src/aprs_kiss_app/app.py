@@ -910,7 +910,7 @@ class App:
             self.road_alerts = roadalert.RoadAlerts()
         course = roadalert.heading(fix.course, fix.speed_kmh, engine.my_track.get("track"))
         found = self.road_alerts.check(time.time(), fix.latitude, fix.longitude, course,
-                                       list(engine.station.heard.values()), conf.road_alert_km)
+                                       list(engine.station.heard.values()), conf.road_alert_km, fix.speed_kmh)
         if found:
             self._road_warn(found)
 

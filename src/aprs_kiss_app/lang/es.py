@@ -32,7 +32,7 @@ TEXTS = {
     "filter_repeater": "Solo repetidores (con su frecuencia)", "filter_repeater_short": "repetidores",
     "map_following": "El mapa me sigue (tracker); toca para volver enseguida tras mover el mapa",
     "follow_back": "Volver a mí · {s} s", "follow_back_tip": "Volver ya a mi posición (al acabar la cuenta vuelve sola)",
-    "road_alerts": "Avisar de incidencias de tráfico delante (con el tracker en marcha)", "road_alert_km": "Mirar adelante", "road_alerts_hint": "Accidentes, obras y otros avisos en el mapa hasta la distancia elegida en el sentido de la marcha (un corredor a lo largo de tu rumbo, más ancho a lo lejos): un globo y un sonido, una vez por cada uno.", "road_ahead": "Incidencia de tráfico a {d} delante", "road_left": "a la izquierda", "road_right": "a la derecha", "road_more": "y {n} más delante", "road_show": "Mostrar", "sound_road": "Incidencia de tráfico delante (tracker)",
+    "road_alerts": "Avisar de incidencias de tráfico delante (con el tracker en marcha)", "road_alert_km": "Mirar adelante", "road_alerts_hint": "Accidentes, obras y otros avisos en el mapa en un lóbulo delante de ti: recto hasta la distancia elegida, menos a los lados, nunca detrás. Despacio (en ciudad) el lóbulo es ancho, rápido (vías principales) largo y estrecho. Un globo y un sonido, una vez por cada uno.", "road_ahead": "Incidencia de tráfico a {d} delante", "road_left": "a la izquierda", "road_right": "a la derecha", "road_more": "y {n} más delante", "road_show": "Mostrar", "sound_road": "Incidencia de tráfico delante (tracker)",
     "object_of": "objeto de {call}",
     "measure_from": "Medir distancia desde aquí",
     "measure_from_me": "Distancia desde mi posición",
