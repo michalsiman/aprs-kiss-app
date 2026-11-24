@@ -243,15 +243,18 @@ class App:
                    error=not st["tnc_connected"])
 
     @staticmethod
-    def _lamp(content: str | ft.Control, on_click, tooltip: str | None = None, small: bool = False) -> ft.Container:
+    def _lamp(content: str | ft.Control, on_click, tooltip: str | None = None, small: bool = False,
+              large: bool = False) -> ft.Container:
         """One dashboard lamp: all the same height and frame, a word or an icon inside.
-        small: half height, for the TNC / IS / GPS block (two rows in the height of one lamp)."""
+        small: half height, for the phone's TNC / IS / GPS block (two rows in the height of one lamp);
+        large: a computer's top bar, which has the room."""
         if isinstance(content, str):
-            content = ft.Text(content, size=8 if small else 12, weight=ft.FontWeight.BOLD)
-        return ft.Container(content, on_click=on_click, tooltip=tooltip, height=12 if small else 26,
-                            alignment=ft.Alignment.CENTER, data=1.0 if small else 1.5,
-                            padding=ft.Padding.symmetric(horizontal=3 if small else 6), border_radius=3 if small else 5,
-                            border=ft.Border.all(1.0 if small else 1.5, ft.Colors.OUTLINE))
+            content = ft.Text(content, size=8 if small else 15 if large else 12, weight=ft.FontWeight.BOLD)
+        return ft.Container(content, on_click=on_click, tooltip=tooltip, height=12 if small else 36 if large else 26,
+                            alignment=ft.Alignment.CENTER, data=1.0 if small else 2.0 if large else 1.5,
+                            padding=ft.Padding.symmetric(horizontal=3 if small else 12 if large else 6),
+                            border_radius=3 if small else 7 if large else 5,
+                            border=ft.Border.all(1.0 if small else 2.0 if large else 1.5, ft.Colors.OUTLINE))
 
     def _light(self, key: str, state: str | None) -> None:
         """A lamp: "on" green, "tx" red and filled, None grey; hidden when the thing is not in use."""
@@ -494,10 +497,12 @@ class App:
         # TX red while transmitting is on; a tap tells the state (TX: switches it)
         # On a phone TNC, IS and GPS share one block the height of a lamp (IS and GPS above, TNC below),
         # so the callsign with its SSID has room.
-        small = self.compact
-        self.lamps = {key: self._lamp(text, on_click, small=small and key != "tx") for key, text, on_click in (
+        # A computer: the same lamps, larger and side by side.
+        small, large = self.compact, not self.compact
+        self.lamps = {key: self._lamp(text, on_click, small=small and key != "tx", large=large)
+                      for key, text, on_click in (
             ("tnc", "TNC", self._tnc_info), ("is", "IS", None),
-            ("gps", ft.Icon(ft.Icons.SATELLITE_ALT, size=9 if small else 16), self._gps_info),  # a satellite, not a word
+            ("gps", ft.Icon(ft.Icons.SATELLITE_ALT, size=9 if small else 20), self._gps_info),  # a satellite, not a word
             ("tx", "TX", self._tx_tap))}
         # "send my position" (once, or again and again: the tracker), a lamp in the same frame on a phone
         self.position_btn = PositionButton(self, self.compact)
@@ -515,19 +520,15 @@ class App:
                 row if self.compact else [
                     self.menu_btn,
                     self.callsign_btn,
-                    ft.Container(ft.Row([self.tnc_dot, ft.Text(self.t("tnc"), size=13), self.tnc_text], spacing=4,
-                                        tight=True),
-                                 on_click=self._tnc_info if self.compact else None),
-                    self.is_box,
-                    ft.Container(self.gps_box, on_click=self._gps_info if self.compact else None),
+                    self.lamps["tnc"], self.lamps["is"], self.lamps["gps"],
                     ft.Container(expand=True),
                     self.update_btn,
                     self.position_btn.control,
-                    self.tx_box,
+                    self.lamps["tx"],
                     ft.IconButton(ft.Icons.INFO_OUTLINE, tooltip=self.t("about"),
                                   on_click=lambda _e: show_about(self), visible=not self.compact),
                 ],
-                spacing=6 if self.compact else 16,
+                spacing=6 if self.compact else 10,
                 vertical_alignment=ft.CrossAxisAlignment.CENTER,
             ),
             # a phone: the menu button close to the left edge, the TX lamp a little away from the right one
@@ -700,6 +701,12 @@ class App:
         self._light("gps", "on" if gps and gps.get("fix") else None)
         # TX: red frame and text while transmitting is allowed, all red only while the radio is on air
         self._light("tx", ("tx" if on_air else "armed") if st["tx_enabled"] else None)
+        # what a lamp means, on a computer when the mouse is over it (a phone tells it on a tap)
+        self.lamps["tnc"].tooltip = f"TNC: {self.tnc_text.tooltip or self.tnc_text.value}"
+        self.lamps["is"].tooltip = (f"APRS-IS: {aprsis.get('server') or ''} {aprsis.get('error') or ''}".strip()
+                                    if aprsis else None)
+        self.lamps["gps"].tooltip = f"GPS: {self.gps_box.tooltip or self.gps_text.value}" if gps else None
+        self.lamps["tx"].tooltip = self.t("tx_on") if st["tx_enabled"] else self.t("tx_off")
         if hasattr(self, "position_btn"):
             self.position_btn.refresh()
         if self.has_view("messages"):

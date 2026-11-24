@@ -18,16 +18,15 @@ class PositionButton:
     def __init__(self, app, compact: bool) -> None:
         self.app = app
         t = app.t
-        self.pin = ft.Icon(ft.Icons.SHARE_LOCATION, size=16 if compact else 24, color=ft.Colors.ON_SURFACE)
+        self.pin = ft.Icon(ft.Icons.SHARE_LOCATION, size=16 if compact else 22, color=ft.Colors.ON_SURFACE)
         self.play = ft.Icon(ft.Icons.PLAY_ARROW, size=14 if compact else 18, visible=False)
         face = ft.Row([self.pin, self.play], spacing=0, tight=True,
                       vertical_alignment=ft.CrossAxisAlignment.CENTER)
-        if compact:  # a lamp like the others in the phone's top bar
-            self.face = ft.Container(face, height=26, alignment=ft.Alignment.CENTER,
-                                     padding=ft.Padding.symmetric(horizontal=6), border_radius=5,
-                                     border=ft.Border.all(1.5, ft.Colors.OUTLINE))
-        else:
-            self.face = ft.Container(face, padding=8, border_radius=20)
+        # a lamp like the others in the top bar (larger on a computer)
+        self.face = ft.Container(face, height=26 if compact else 36, alignment=ft.Alignment.CENTER,
+                                 padding=ft.Padding.symmetric(horizontal=6 if compact else 10),
+                                 border_radius=5 if compact else 7,
+                                 border=ft.Border.all(1.5 if compact else 2.0, ft.Colors.OUTLINE))
         self.send_item = ft.PopupMenuItem(t("pos_send_now"), icon=ft.Icons.SEND, on_click=self._send_now)
         self.toggle_item = ft.PopupMenuItem(t("trk_start"), icon=ft.Icons.PLAY_ARROW, on_click=self._toggle)
         self.state_item = ft.PopupMenuItem(t("trk_off"), disabled=True)
@@ -60,7 +59,7 @@ class PositionButton:
         self.play.visible = on
         self.pin.color = self.play.color = color or ft.Colors.ON_SURFACE
         if isinstance(self.face.border, ft.Border):
-            self.face.border = ft.Border.all(1.5, color or ft.Colors.OUTLINE)
+            self.face.border = ft.Border.all(self.face.border.top.width, color or ft.Colors.OUTLINE)
         self.toggle_item.content = self.app.t("trk_stop" if on else "trk_start")
         self.toggle_item.icon = ft.Icons.PAUSE if on else ft.Icons.PLAY_ARROW
         self.state_item.content = text
