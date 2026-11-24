@@ -3,6 +3,7 @@
 - weather: weather stations (a weather report, or the weather symbol);
 - moving: stations that moved in the last MOVING_SECONDS. A station not seen long enough to know
   (heard for the first time a moment ago) is shown until it is clear it stands still;
+- repeater: repeaters (the repeater symbol, or a frequency with offset or tone; see repeater.py);
 - road: traffic incidents and road trouble (crash, emergency, work zone, flooding, fog, snow and ice),
   mostly objects put on APRS-IS by traffic-info gateways.
 
@@ -13,7 +14,9 @@ from __future__ import annotations
 
 from typing import Any
 
-KINDS = ("weather", "moving", "road")
+from .repeater import is_repeater
+
+KINDS = ("weather", "moving", "repeater", "road")
 MOVING_SECONDS = 10 * 60
 MOVING_KMH = 3.0  # a reported speed above this, lately: it moves
 
@@ -63,4 +66,5 @@ def shown(entry: dict[str, Any], kinds: set[str], now: float) -> bool:
         return True
     return (("weather" in kinds and is_weather(entry))
             or ("road" in kinds and is_road(entry))
+            or ("repeater" in kinds and is_repeater(entry))
             or ("moving" in kinds and is_moving(entry, now)))

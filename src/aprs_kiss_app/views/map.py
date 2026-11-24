@@ -8,7 +8,7 @@ import time
 
 import flet as ft
 import flet_map as fm
-from aprs_kiss_core import mapfilter
+from aprs_kiss_core import mapfilter, repeater
 
 from ..legend import COLOR_ME, map_label, show_legend, station_color, visible
 from ..offline_map import MIN_ZOOM, BaseMap, Region, ScaleBar, gestures
@@ -165,7 +165,7 @@ class MapView(View):
     # ─── filters: only weather stations, moving stations, road incidents (any mix) ─────
 
     FILTER_ICONS = {"weather": ft.Icons.THUNDERSTORM_OUTLINED, "moving": ft.Icons.DIRECTIONS_CAR_OUTLINED,
-                    "road": ft.Icons.CAR_CRASH_OUTLINED}
+                    "repeater": ft.Icons.CELL_TOWER, "road": ft.Icons.CAR_CRASH_OUTLINED}
 
     def _filter_btn(self) -> ft.Control:
         self.filter_items = {
@@ -308,12 +308,15 @@ class MapView(View):
         self._last_build = 0
         self.refresh()
 
-    def _marker(self, lat: float, lon: float, label: str, icon: str, color, on_click=None, bold=False) -> fm.Marker:
+    def _marker(self, lat: float, lon: float, label: str, icon: str, color, on_click=None, bold=False,
+                freq: str | None = None) -> fm.Marker:
+        extra = 14 if freq else 0  # a repeater's frequency line: the box grows both ways, the symbol stays put
         return fm.Marker(
             coordinates=fm.MapLatitudeLongitude(lat, lon),
-            width=110, height=56,
+            width=110 if not freq else 130, height=56 + 2 * extra,
             content=ft.Container(
-                ft.Column(
+                padding=ft.Padding.only(top=extra),
+                content=ft.Column(
                     [
                         # the symbol on a small light disc: it no longer melts into a green or brown map
                         ft.Container(ft.Text(icon, size=18), width=30, height=30, alignment=ft.Alignment.CENTER,
@@ -321,7 +324,8 @@ class MapView(View):
                                      border=ft.Border.all(0.8, ft.Colors.with_opacity(0.18, ft.Colors.BLACK)),
                                      shadow=ft.BoxShadow(blur_radius=3, offset=ft.Offset(0, 1),
                                                          color=ft.Colors.with_opacity(0.25, ft.Colors.BLACK))),
-                        map_label(label, color, bold),
+                        map_label(label, color, bold, sub=freq,
+                                  band=freq.split(" · ")[1] if freq and " · " in freq else None),
                     ],
                     spacing=1, tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 ),
@@ -367,7 +371,7 @@ class MapView(View):
             if not visible(self.app, e) or not mapfilter.shown(e, kinds, now):
                 continue
             wanted.append((e["call"], lat, lon, emoji(e.get("symbol_table"), e.get("symbol")),
-                           station_color(self.app, e), bool(e.get("last_rf"))))
+                           station_color(self.app, e), bool(e.get("last_rf")), repeater.label(e)))
             if conf.map_trails:
                 points = tuple((p[1], p[2]) for p in e.get("track", ()) if now - p[0] <= TRAIL_SECONDS)
                 if len(points) >= 2:
@@ -382,7 +386,7 @@ class MapView(View):
                 trails.append(("\x00me", points))
         if here:
             wanted.append((self.engine.status()["callsign"] or self.t("my_position"), *here,
-                           emoji(conf.symbol[:1], conf.symbol[1:]), COLOR_ME, True, "me"))
+                           emoji(conf.symbol[:1], conf.symbol[1:]), COLOR_ME, True, None, "me"))
         # stations whose markers would cover each other are spread in a circle, at this zoom
         self._layout_zoom = self._zoom
         me = len(wanted) - 1 if here else None  # our own station stays where it is
@@ -393,9 +397,9 @@ class MapView(View):
             ckey = (key, round(slat, 7), round(slon, 7))
             marker = self._cache.get(ckey)
             if marker is None:
-                call, _lat, _lon, icon, color, bold = key[:6]
-                click = None if len(key) > 6 else (lambda _e, c=call: self.app.show_station(c))
-                marker = self._marker(slat, slon, call, icon, color, on_click=click, bold=bold)
+                call, _lat, _lon, icon, color, bold, freq = key[:7]
+                click = None if len(key) > 7 else (lambda _e, c=call: self.app.show_station(c))
+                marker = self._marker(slat, slon, call, icon, color, on_click=click, bold=bold, freq=freq)
             if ckey in cache:
                 continue  # the same station twice (cannot happen, but one marker twice breaks the map)
             cache[ckey] = marker

@@ -24,11 +24,23 @@ MAP_TEXT = {COLOR_RF: "#1565C0", COLOR_IS: "#546E7A", COLOR_TRACKED: "#E65100", 
 MAP_TEXT_OTHER = "#263238"
 
 
-def map_label(text: str, color=None, bold: bool = False, opacity: float = 1.0) -> ft.Control:
-    """A station's name on the map: dark text on a light, slightly see-through tag with a soft shadow."""
+BAND_TEXT = {"2 m": "#2E7D32", "70 cm": "#C2185B"}  # a repeater's band at a glance: 2 m green, 70 cm magenta
+BAND_TEXT_OTHER = "#5D4037"
+
+
+def map_label(text: str, color=None, bold: bool = False, opacity: float = 1.0, sub: str | None = None,
+              band: str | None = None) -> ft.Control:
+    """A station's name on the map: dark text on a light, slightly see-through tag with a soft shadow.
+
+    sub: a second, smaller line (a repeater's frequency), coloured by its band."""
+    name = ft.Text(text, size=11, no_wrap=True, color=MAP_TEXT.get(color, MAP_TEXT_OTHER),
+                   weight=ft.FontWeight.BOLD if bold else ft.FontWeight.W_600)
+    if sub:
+        name = ft.Column([name, ft.Text(sub, size=10, no_wrap=True, weight=ft.FontWeight.BOLD,
+                                        color=BAND_TEXT.get(band, BAND_TEXT_OTHER))],
+                         spacing=0, tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER)
     return ft.Container(
-        ft.Text(text, size=11, no_wrap=True, color=MAP_TEXT.get(color, MAP_TEXT_OTHER),
-                weight=ft.FontWeight.BOLD if bold else ft.FontWeight.W_600),
+        name,
         bgcolor=ft.Colors.with_opacity(0.92, ft.Colors.WHITE),
         border=ft.Border.all(0.8, ft.Colors.with_opacity(0.18, ft.Colors.BLACK)),
         shadow=ft.BoxShadow(blur_radius=3, spread_radius=0, color=ft.Colors.with_opacity(0.25, ft.Colors.BLACK),

@@ -30,6 +30,7 @@ TEXTS = {
     "map_trails": "Ślady (którędy stacje jechały w ostatnim półgodzinie)",
     "map_tools_hide": "Ukryj przyciski mapy", "map_tools_show": "Przyciski mapy",
     "filter": "Filtr stacji", "filter_on": "Pokazane tylko: {what}", "filter_all": "Pokaż wszystkie stacje", "filter_weather": "Tylko stacje pogodowe", "filter_moving": "Tylko w ruchu (ruszyły się w ostatnich 10 min)", "filter_road": "Tylko utrudnienia drogowe (wypadki, roboty, powodzie…)", "filter_weather_short": "pogoda", "filter_moving_short": "w ruchu", "filter_road_short": "utrudnienia drogowe",
+    "filter_repeater": "Tylko przemienniki (z ich częstotliwością)", "filter_repeater_short": "przemienniki",
     "map_following": "Mapa podąża za mną (tracker); dotknij, by po przesunięciu mapy od razu wrócić",
     "follow_back": "Wróć do mnie · {s} s", "follow_back_tip": "Od razu wróć do mojej pozycji (po odliczaniu mapa wróci sama)",
     "object_of": "obiekt od {call}",

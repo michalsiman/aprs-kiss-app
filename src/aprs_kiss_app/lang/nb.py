@@ -29,6 +29,7 @@ TEXTS = {
     "map_trails": "Spor (hvor stasjonene kjørte den siste halvtimen)",
     "map_tools_hide": "Skjul kartknappene", "map_tools_show": "Kartknapper",
     "filter": "Filtrer stasjoner", "filter_on": "Bare vist: {what}", "filter_all": "Vis alle stasjoner", "filter_weather": "Bare værstasjoner", "filter_moving": "Bare i bevegelse (flyttet seg de siste 10 min)", "filter_road": "Bare trafikkproblemer (ulykker, veiarbeid, flom…)", "filter_weather_short": "vær", "filter_moving_short": "i bevegelse", "filter_road_short": "trafikkproblemer",
+    "filter_repeater": "Bare repeatere (med frekvensen)", "filter_repeater_short": "repeatere",
     "map_following": "Kartet følger meg (tracker); trykk for å komme tilbake med en gang etter at kartet er flyttet",
     "follow_back": "Tilbake til meg · {s} s", "follow_back_tip": "Tilbake til min posisjon nå (etter nedtellingen skjer det av seg selv)",
     "object_of": "objekt fra {call}",
