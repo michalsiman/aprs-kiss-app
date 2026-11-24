@@ -13,7 +13,7 @@ from aprs_kiss_core import mapfilter, repeater
 from ..legend import COLOR_ME, map_label, show_legend, station_color, visible
 from ..offline_map import MIN_ZOOM, BaseMap, Region, ScaleBar, gestures
 from ..symbols import emoji
-from ..declutter import spread, to_px
+from ..declutter import from_px, spread, to_px
 from .map_source import MapSourceButton, _label
 from .base import View, bearing_deg, distance_km, distance_text, toggle
 
@@ -31,6 +31,7 @@ FOLLOW_ZOOM = 13.0  # while the tracker runs the map follows us at this zoom…
 FOLLOW_IDLE_SECONDS = 15.0  # …and comes back to it this long after the map was last moved by hand
 FOLLOW_OWN_MOVE_SECONDS = 2.0  # camera changes this soon after the map followed us are ours, not the user's
 FOLLOW_SLACK_PX = 12  # closer than this to the middle: no need to move
+DISC_ABOVE_PX = 13  # the symbol's disc is this far above the middle of its marker (56 px box, disc 30 px at its top)
 MUTED_OPACITY = 0.45  # muted map: tiles faded over a neutral background, so the colours recede
 
 
@@ -405,7 +406,10 @@ class MapView(View):
             cache[ckey] = marker
             markers.append(marker)
             if moved:  # a thin line to where the station really is, and a dot there
-                leaders.append(("leader", ((round(slat, 7), round(slon, 7)), (key[1], key[2]))))
+                # from the middle of the symbol's disc, not of the whole marker (disc and tag)
+                x, y = to_px(slat, slon, self._zoom)
+                dlat, dlon = from_px(x, y - DISC_ABOVE_PX, self._zoom)
+                leaders.append(("leader", ((round(dlat, 7), round(dlon, 7)), (key[1], key[2]))))
                 dkey = ("dot", key[1], key[2])
                 if dkey not in cache:  # two stations at one place share one dot: never one marker twice
                     cache[dkey] = self._cache.get(dkey) or self._dot(key[1], key[2])
