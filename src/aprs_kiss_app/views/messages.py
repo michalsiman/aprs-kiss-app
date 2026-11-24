@@ -6,6 +6,8 @@ import flet as ft
 
 import time
 
+from aprs_kiss_core.aprs import MAX_MESSAGE_PARTS, message_parts
+
 from .base import View, bearing, clock, distance_km
 
 MAX_TEXT = 67  # APRS message text limit
@@ -79,13 +81,21 @@ class MessagesView(View):
         return ft.Row([left, ft.VerticalDivider(width=1), right], expand=True,
                       vertical_alignment=ft.CrossAxisAlignment.STRETCH)
 
+    MAX_LONG = MAX_MESSAGE_PARTS * (MAX_TEXT - 4)  # up to five messages, each with its " 2/5"
+
     def _count(self, _e=None) -> None:
-        """Characters used of the APRS limit; longer text is cut to it."""
+        """Characters used of one APRS message; longer text goes as several, the count says how many."""
         text = self.text.value or ""
-        if len(text) > MAX_TEXT:
-            self.text.value = text = text[:MAX_TEXT]
-        self.count.value = f"{len(text)}/{MAX_TEXT}"
-        self.count.color = ft.Colors.ERROR if len(text) >= MAX_TEXT else ft.Colors.ON_SURFACE_VARIANT
+        if len(text) > self.MAX_LONG:
+            self.text.value = text = text[:self.MAX_LONG]
+        n = len(message_parts(text))
+        if n <= 1:
+            self.count.value = f"{len(text)}/{MAX_TEXT}"
+            self.count.color = ft.Colors.ON_SURFACE_VARIANT
+        else:  # several messages, numbered 1/n … n/n
+            self.count.value = self.t("msg_parts", n=n, chars=len(text))
+            self.count.color = ft.Colors.PRIMARY
+        self.count.weight = ft.FontWeight.BOLD if n > 1 else None
         self.app.page.update()
 
     # ─── data ─────────────────────────────────────────────────────────────
@@ -274,7 +284,12 @@ class MessagesView(View):
         if not to or not text:
             return
         via = self.via.value if self.via.visible else "radio"
-        if await self.app.guard(self.engine.send_aprs_message(to, text, via)):
+        sent = True
+        for part in message_parts(text):  # one, or several numbered "1/3", "2/3", "3/3"
+            if not await self.app.guard(self.engine.send_aprs_message(to, part, via)):
+                sent = False
+                break
+        if sent:
             self.text.value = ""
             self.count.value, self.count.color = f"0/{MAX_TEXT}", ft.Colors.ON_SURFACE_VARIANT
             self.open_conversation(to)

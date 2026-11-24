@@ -25,5 +25,19 @@ class ConversationTest(unittest.IsolatedAsyncioTestCase):
                 eng._save_handle.cancel()
 
 
+class PartsTest(unittest.TestCase):
+    def test_split_numbered_within_the_limit(self):
+        from aprs_kiss_core.aprs import message_parts
+        self.assertEqual(message_parts("short one"), ["short one"])
+        self.assertEqual(message_parts("   "), [])
+        text = " ".join(f"word{i}" for i in range(40))
+        parts = message_parts(text)
+        self.assertGreater(len(parts), 1)
+        self.assertTrue(all(len(p) <= 67 for p in parts))
+        self.assertTrue(parts[0].endswith(f" 1/{len(parts)}") and parts[-1].endswith(f" {len(parts)}/{len(parts)}"))
+        self.assertEqual(" ".join(p.rsplit(" ", 1)[0] for p in parts), text)
+        self.assertLessEqual(len(message_parts("x" * 1000)), 5)
+
+
 if __name__ == "__main__":
     unittest.main()
