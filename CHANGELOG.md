@@ -4,6 +4,14 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## Unreleased
+
+- **Spotting an activation (SOTA, POTA, WWFF, SIOTA)**: Messages › Spot sends a self-spot as an APRS
+  message to a gateway – APRS2SOTA (SOTAwatch; the callsign is registered with its operator first) or
+  APSPOT (pota.app, SOTAwatch, ParksnPeaks; an account there). The reference is checked, kHz is turned
+  into MHz, the comment is shortened to fit one message, a test spot can be sent; the dialog shows the
+  message before it goes and the gateway's answer comes in its conversation. The last spot is remembered.
+
 ## 1.0.1 beta – 2026-11-24
 
 - **Android: a radio plugged in opens the app.** When a TNC is plugged into the phone (the Quansheng with

@@ -82,6 +82,7 @@ class Config:
     map_trails: bool = False  # the map draws where each moving station went in the last half hour
     map_files: str = ""  # imported offline maps (MBTiles, PMTiles, …), one path per line
     map_imported: bool = True  # offline: the imported map (when there is one) over the bundled one
+    spot_last: str = ""  # Messages › Spot: the last spot (JSON: program, reference, frequency, mode, gateway)
     map_filters: str = ""  # the map shows only these kinds of stations ("weather,moving,road"); empty = all
     map_tools_hidden: bool = False  # the map's button bar folded into one gear button
     map_offline: bool = False  # the bundled offline map (borders, cities) instead of OpenStreetMap tiles

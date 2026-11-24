@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
-import flet as ft
-
+import json
 import time
+
+import flet as ft
 
 from aprs_kiss_core.aprs import MAX_MESSAGE_PARTS, message_parts
 from aprs_kiss_core.geotext import find_positions, write_position
+from aprs_kiss_core.spotting import MODES, PROGRAMS, Spot, SpotError, build as build_spot, default_gateway, gateways_for
 
 from .base import View, bearing, clock, distance_km
 
@@ -55,7 +57,9 @@ class MessagesView(View):
                                     visible=False)
         self.left = left = ft.Column(
             [
-                ft.FilledTonalButton(self.t("new_message"), icon=ft.Icons.EDIT, on_click=self._new),
+                ft.Row([ft.FilledTonalButton(self.t("new_message"), icon=ft.Icons.EDIT, on_click=self._new),
+                        ft.OutlinedButton(self.t("spot_button"), icon=ft.Icons.TERRAIN, on_click=self._spot,
+                                          tooltip=self.t("spot_title"))], wrap=True, spacing=6),
                 self.conversations,
             ],
             width=None if compact else 250,
@@ -295,6 +299,99 @@ class MessagesView(View):
         self._signature = None
         self.refresh()
         await self.to.focus()
+
+    # ─── self-spotting an activation (SOTA, POTA, WWFF, SIOTA) ─────────────
+
+    def _spot(self, _e=None) -> None:
+        """A dialog for a self-spot; it goes as an APRS message to the gateway, whose answer then shows in
+        that conversation."""
+        t = self.t
+        try:
+            last = json.loads(self.engine.config.spot_last or "{}")
+        except ValueError:
+            last = {}
+        program = ft.Dropdown(label=t("spot_program"), value=last.get("program", "SOTA"), dense=True, width=130,
+                              options=[ft.DropdownOption(key=p, text=p) for p in PROGRAMS])
+        gateway = ft.Dropdown(label=t("spot_gateway"), dense=True, width=160)
+        ref = ft.TextField(label=t("spot_ref"), value=last.get("reference", ""), dense=True, width=150,
+                           capitalization=ft.TextCapitalization.CHARACTERS)
+        freq = ft.TextField(label=t("spot_freq"), value=last.get("frequency", ""), dense=True, width=170,
+                            keyboard_type=ft.KeyboardType.NUMBER)
+        mode = ft.Dropdown(label=t("spot_mode"), dense=True, width=120)
+        comment = ft.TextField(label=t("spot_comment"), value="", dense=True)
+        test = ft.Checkbox(label=t("spot_test"), value=False)
+        hint = ft.Text(size=12, color=ft.Colors.ON_SURFACE_VARIANT)
+        error = ft.Text(size=12, color=ft.Colors.ERROR, visible=False)
+        preview = ft.Text(size=12, font_family="monospace", selectable=True)
+
+        def current() -> Spot:
+            return Spot(program.value or "SOTA", ref.value or "", freq.value or "", mode.value or "",
+                        comment.value or "", gateway.value or "", bool(test.value))
+
+        def update_preview() -> None:
+            try:
+                to, text = build_spot(current(), str(self.engine.me))
+                preview.value, error.visible = f"→ {to}: {text}", False
+            except SpotError as err:
+                preview.value = ""
+                error.value, error.visible = t(err.code, example=err.example), bool(ref.value or freq.value)
+
+        def program_changed(_e=None, keep_gateway: str = "") -> None:
+            p = program.value or "SOTA"
+            choices = gateways_for(p)
+            gateway.options = [ft.DropdownOption(key=g, text=g) for g in choices]
+            gateway.value = keep_gateway if keep_gateway in choices else default_gateway(p)
+            gateway_changed(keep_mode=mode.value or last.get("mode", "SSB"))
+
+        def gateway_changed(_e=None, keep_mode: str = "") -> None:
+            g = gateway.value or "APRS2SOTA"
+            mode.options = [ft.DropdownOption(key=m, text=m) for m in MODES[g]]
+            wanted = keep_mode or mode.value
+            mode.value = wanted if wanted in MODES[g] else "SSB"
+            hint.value = t("spot_hint_aprs2sota" if g == "APRS2SOTA" else "spot_hint_apspot")
+            update_preview()
+            if _e is not None:
+                self.app.page.update()
+
+        program.on_select = lambda e: (program_changed(), self.app.page.update())
+        gateway.on_select = gateway_changed
+        mode.on_select = lambda _e: (update_preview(), self.app.page.update())
+        for field in (ref, freq, comment):
+            field.on_change = lambda _e: (update_preview(), self.app.page.update())
+        test.on_change = lambda _e: (update_preview(), self.app.page.update())
+        program_changed(keep_gateway=last.get("gateway", ""))
+
+        async def send(_e) -> None:
+            spot = current()
+            try:
+                to, text = build_spot(spot, str(self.engine.me))
+            except SpotError as err:
+                error.value, error.visible = t(err.code, example=err.example), True
+                self.app.page.update()
+                return
+            via = self.via.value or "both"
+            if via == "radio":
+                via = "both"  # the gateways are on APRS-IS: by radio it needs an iGate anyway
+            if not await self.app.guard(self.engine.send_aprs_message(to, text, via)):
+                return
+            self.engine.config.spot_last = json.dumps({
+                "program": spot.program, "reference": ref.value or "", "frequency": freq.value or "",
+                "mode": mode.value or "", "gateway": gateway.value or ""})
+            self.app.save_config_soon()
+            self.app.page.pop_dialog()
+            self.open_conversation(to)
+
+        self.app.show_dialog(ft.AlertDialog(
+            title=ft.Text(t("spot_title")),
+            content=ft.Container(ft.Column([
+                ft.Row([program, gateway], wrap=True, spacing=8),
+                ft.Row([ref, freq, mode], wrap=True, spacing=8),
+                comment, test, hint, preview, error,
+            ], tight=True, spacing=10, horizontal_alignment=ft.CrossAxisAlignment.STRETCH), width=480),
+            scrollable=True,
+            actions=[ft.TextButton(t("cancel"), on_click=lambda _e: self.app.page.pop_dialog()),
+                     ft.FilledButton(t("spot_send"), icon=ft.Icons.SEND, on_click=send)],
+        ))
 
     def compose_to(self, call: str) -> None:
         if any(self._party(m) == call.upper() for m in self.engine.messages):
