@@ -29,6 +29,7 @@ TEXTS = {
     "map_trails": "Sledi (kod so postaje šle v zadnje pol ure)",
     "map_tools_hide": "Skrij gumbe zemljevida", "map_tools_show": "Gumbi zemljevida",
     "filter": "Filter postaj", "filter_on": "Prikazano samo: {what}", "filter_all": "Prikaži vse postaje", "filter_weather": "Samo vremenske postaje", "filter_moving": "Samo v gibanju (premaknile so se v zadnjih 10 min)", "filter_road": "Samo težave na cesti (nesreče, dela, poplave…)", "filter_weather_short": "vreme", "filter_moving_short": "v gibanju", "filter_road_short": "težave na cesti",
+    "map_following": "Zemljevid mi sledi (tracker); dotakni se za takojšnjo vrnitev po premiku zemljevida",
     "object_of": "objekt od {call}",
     "measure_from": "Izmeri razdaljo od tu",
     "measure_from_me": "Razdalja od mojega položaja",

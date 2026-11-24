@@ -13,7 +13,7 @@ from aprs_kiss_core import mapfilter
 from ..legend import COLOR_ME, map_label, show_legend, station_color, visible
 from ..offline_map import MIN_ZOOM, BaseMap, Region, ScaleBar, gestures
 from ..symbols import emoji
-from ..declutter import spread
+from ..declutter import spread, to_px
 from .map_source import MapSourceButton, _label
 from .base import View, bearing_deg, distance_km, distance_text, toggle
 
@@ -27,6 +27,10 @@ TRAIL_SECONDS = 1800  # the trails show the last half hour
 TRAIL_COLOR = "#E53935"  # one red, like aprs.fi
 MEASURE_COLOR = "#6A1B9A"  # the measured line: a colour no station label uses
 LEADER_COLOR = "#8E8E8E"  # from a spread-out marker to where the station really is
+FOLLOW_ZOOM = 13.0  # while the tracker runs the map follows us at this zoom…
+FOLLOW_IDLE_SECONDS = 15.0  # …and comes back to it this long after the map was last moved by hand
+FOLLOW_OWN_MOVE_SECONDS = 2.0  # camera changes this soon after the map followed us are ours, not the user's
+FOLLOW_SLACK_PX = 12  # closer than this to the middle: no need to move
 MUTED_OPACITY = 0.45  # muted map: tiles faded over a neutral background, so the colours recede
 
 
@@ -51,6 +55,8 @@ class MapView(View):
         self._camera_busy = False
         self._camera_again = False
         self._camera_seen: tuple | None = None
+        self._touched = 0.0  # when the user last moved or zoomed the map (monotonic)
+        self._followed = 0.0  # when the map last moved itself to follow us
         self.app.page.run_task(self._watch_camera)
         self.trails = fm.PolylineLayer(polylines=[])  # where moving stations went in the last hour
         self._trail_cache: dict[tuple, fm.PolylineMarker] = {}
@@ -89,8 +95,9 @@ class MapView(View):
                                   self._toggle_recent)
         self.internet = toggle(ft.Icons.PUBLIC_OFF, ft.Icons.PUBLIC, conf.show_internet, self.t("show_internet"),
                                lambda _e: self.app.set_show_internet(not self.engine.config.show_internet))
+        self.me_btn = ft.IconButton(ft.Icons.MY_LOCATION, tooltip=self.t("centre_me"), on_click=self._centre_me)
         self.tools = [
-            ft.IconButton(ft.Icons.MY_LOCATION, tooltip=self.t("centre_me"), on_click=self._centre_me),
+            self.me_btn,
             self.internet, self.only_recent, self._filter_btn(), self.trails_btn, self._offline_btn(),
         ]  # the muted map and the legend are in the map menu: the bar fits on a phone
         # The bar folds into one gear button (and stays folded next time) for those who want the whole map.
@@ -215,6 +222,7 @@ class MapView(View):
         return self.source_btn.control
 
     def _gesture_end(self, _e=None) -> None:
+        self._touched = time.monotonic()
         self.app.page.run_task(self._ask_camera, 0.4)  # soon, and the watch below catches the end of a fling
 
     async def _watch_camera(self) -> None:
@@ -225,6 +233,7 @@ class MapView(View):
             await asyncio.sleep(CAMERA_WATCH_SECONDS)
             if self.app.current_key == self.key:
                 await self._ask_camera()
+                await self._follow()
 
     async def _ask_camera(self, delay: float = 0) -> None:
         """Where the map looks now: the offline map and the markers follow it."""
@@ -246,6 +255,9 @@ class MapView(View):
                 seen = (round(camera.center.latitude, 6), round(lon, 6), round(camera.zoom, 3),
                         round(camera.rotation or 0, 1))
                 if seen != self._camera_seen:  # nothing to redraw when the map has not moved
+                    if (self._camera_seen is not None
+                            and time.monotonic() - self._followed > FOLLOW_OWN_MOVE_SECONDS):
+                        self._touched = time.monotonic()  # moved, not by us: the wheel, a fling, the buttons
                     self._camera_seen = seen
                     if self.controls.rotated(camera.rotation) and self.app.current_key == self.key:
                         self.controls.needle.update()
@@ -486,9 +498,40 @@ class MapView(View):
         self._look(lat, lon, zoom)  # the offline map and the stations there first, then the move
         await self.map.center_on(fm.MapLatitudeLongitude(lat, lon), zoom)
 
+    # ─── following us while the tracker runs, as in a navigation ─────
+
+    def following(self) -> bool:
+        return bool(self.engine.config.tracker_on and self.engine.gps_fix())
+
+    async def _follow(self) -> None:
+        """While the tracker runs, we stay in the middle of the map at FOLLOW_ZOOM. Moved or zoomed by
+        hand, the map stays so for FOLLOW_IDLE_SECONDS after the last touch, then comes back."""
+        following = self.following()
+        if self.me_btn.icon_color != (ft.Colors.PRIMARY if following else None):
+            self.me_btn.icon_color = ft.Colors.PRIMARY if following else None
+            self.me_btn.tooltip = self.t("map_following" if following else "centre_me")
+            self.me_btn.update()
+        if not following or self._camera_seen is None:
+            return
+        now = time.monotonic()
+        if now - self._touched < FOLLOW_IDLE_SECONDS or now - self._followed < FOLLOW_OWN_MOVE_SECONDS:
+            return
+        fix = self.engine.gps_fix()
+        lat, lon, zoom, _rot = self._camera_seen
+        mx, my = to_px(fix.latitude, fix.longitude, FOLLOW_ZOOM)
+        cx, cy = to_px(lat, lon, FOLLOW_ZOOM)
+        if abs(zoom - FOLLOW_ZOOM) < 0.05 and math.hypot(mx - cx, my - cy) < FOLLOW_SLACK_PX:
+            return  # already there
+        self._followed = time.monotonic()
+        await self.centre(fix.latitude, fix.longitude, FOLLOW_ZOOM)
+
     async def _centre_me(self, _e) -> None:
         here = self.engine.my_position()
-        if here:
+        if here and self.following():
+            self._touched = 0.0  # following again at once, at the usual zoom
+            self._followed = 0.0
+            await self._follow()
+        elif here:
             await self.centre(*here, max(self.base.zoom, 11))
         else:
             self.app.toast(self.t("no_position"))
