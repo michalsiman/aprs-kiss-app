@@ -1,0 +1,54 @@
+# Daily repository statistics, kept on the `stats` branch (see its README.md).
+#
+# Release downloads work with the workflow's own token. Traffic (views, clones,
+# referrers, popular content) needs a secret TRAFFIC_TOKEN: a fine-grained
+# personal access token limited to this repository with the single permission
+# "Administration: Read-only". GitHub keeps traffic for 14 days only, so this
+# daily run is what keeps the history.
+name: Stats
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency: stats
+
+jobs:
+  collect:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: main
+          sparse-checkout: tools/collect_stats.py
+          sparse-checkout-cone-mode: false
+
+      - name: Check out the stats branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          url="https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if ! git clone -q --depth 1 --branch stats "$url" stats; then
+            mkdir stats && cd stats && git init -q -b stats && git remote add origin "$url"
+          fi
+
+      - name: Collect
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          TRAFFIC_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
+        run: python3 main/tools/collect_stats.py stats
+
+      - name: Save
+        working-directory: stats
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if ! git diff --cached --quiet; then
+            git commit -q -m "Stats $(date -u +%F)"
+            git push -q origin stats
+          fi
