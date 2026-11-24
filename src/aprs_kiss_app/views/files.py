@@ -107,11 +107,13 @@ class FilesView(View):
         if state in ("sending", "receiving") and r.get("data_started"):
             moved = done - r.get("offset", 0)
             elapsed = max(1.0, now - r["data_started"])
-            speed = moved / elapsed
-            parts.append(f"{size_text(done)} / {size_text(size)}")
-            if speed > 0:
-                parts.append(f"{speed:.0f} B/s")
-                parts.append(t("files_left", t=duration((size - done) / speed)))
+            measured = moved / elapsed if moved > 0 and elapsed >= 5 else 0
+            # the measured speed once there is one, before that the estimate in excellent conditions
+            speed = measured or SPEED_DIRECT[1]
+            parts.append(f"{size_text(done)} / {size_text(size)} ({round(100 * done / size) if size else 0} %)")
+            if measured:
+                parts.append(f"{measured:.0f} B/s")
+            parts.append(t("files_left", left=size_text(max(0, size - done)), t=duration((size - done) / speed)))
         elif state == "done" and r.get("ended"):
             took = max(1.0, r["ended"] - r.get("data_started", r["started"]))
             parts.append(t("files_took", t=duration(took), speed=f"{(size - r.get('offset', 0)) / took:.0f}"))
