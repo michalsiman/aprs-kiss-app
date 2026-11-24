@@ -37,7 +37,7 @@ class MessagesView(View):
                                  on_change=self._count)
         self.count = ft.Text(f"0/{MAX_TEXT}", size=12, color=ft.Colors.ON_SURFACE_VARIANT)
         self.via = ft.Dropdown(
-            width=120 if compact else 200, dense=True,
+            width=170 if compact else 220, dense=True,  # "Internetem" fits on a phone
             value="both" if self.engine.config.beacon_is else "radio",  # the APRS-IS switch in Settings
             options=[ft.DropdownOption(key=k, text=self.t(f"via_{k}")) for k in ("radio", "internet", "both")],
         )
@@ -180,8 +180,12 @@ class MessagesView(View):
             padding=ft.Padding.symmetric(horizontal=12, vertical=8),
             border_radius=12,
             bgcolor=ft.Colors.PRIMARY_CONTAINER if out else ft.Colors.SURFACE_CONTAINER_HIGH,
+            # as wide as the text, at most the row: a long message wraps instead of running off the screen
+            expand=True, expand_loose=True,
         )
-        return ft.Row([bubble], alignment=ft.MainAxisAlignment.END if out else ft.MainAxisAlignment.START)
+        gap = ft.Container(width=40)  # the other side stays a little free, like in any messenger
+        return ft.Row([gap, bubble] if out else [bubble, gap],
+                      alignment=ft.MainAxisAlignment.END if out else ft.MainAxisAlignment.START)
 
     # ─── actions ──────────────────────────────────────────────────────────
 
