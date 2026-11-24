@@ -51,7 +51,21 @@ async def _open_tcp(s: TncSettings) -> Streams:
 async def _open_serial(s: TncSettings) -> Streams:
     import serial_asyncio_fast  # noqa: PLC0415 - optional, only for serial TNCs
 
-    return await serial_asyncio_fast.open_serial_connection(url=s.device, baudrate=s.baudrate)
+    if not s.device:
+        raise OSError("No serial port chosen")
+    try:
+        return await serial_asyncio_fast.open_serial_connection(url=s.device, baudrate=s.baudrate)
+    except Exception as err:  # noqa: BLE001 - serial.SerialException and OSError: said plainly, then retried
+        text = str(err)
+        if isinstance(err, FileNotFoundError) or "No such file" in text or "Errno 2" in text \
+                or "FileNotFoundError" in text or "cannot find the file" in text:
+            raise OSError(f"The serial port {s.device} is not there") from err
+        if "Errno 5" in text or "(5," in text or "Input/output" in text or "configure port" in text:
+            # e.g. /dev/ttyS0: a port the computer names but has no hardware behind
+            raise OSError(f"The serial port {s.device} does not answer") from err
+        if "Permission denied" in text or "Errno 13" in text or "PermissionError" in text or "Access is denied" in text:
+            raise OSError(f"Not allowed to open {s.device}") from err
+        raise OSError(text or type(err).__name__) from err
 
 
 TRANSPORTS: dict[str, Transport] = {"tcp": _open_tcp, "serial": _open_serial}

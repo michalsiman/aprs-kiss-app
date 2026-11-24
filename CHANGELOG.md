@@ -4,6 +4,13 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## Unreleased
+
+- **A serial TNC that is not there is said plainly**: instead of "Could not configure port: (5, …)" the app
+  says the port does not answer (probably not the radio's), is not there, is not allowed (the dialout group)
+  or is not chosen – in the app's language, with what to do. The Linux ports ttyS0…ttyS31 with nothing
+  behind them are no longer offered.
+
 ## 1.1.0 – 2026-11-24
 
 The betas 1.0.1–1.0.3 as a stable version:

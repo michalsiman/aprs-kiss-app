@@ -6,6 +6,7 @@ import asyncio
 import glob
 import logging
 import os
+import sys
 from pathlib import Path
 
 import flet as ft
@@ -42,6 +43,8 @@ def serial_ports() -> list[tuple[str, str]]:
         from serial.tools import list_ports  # noqa: PLC0415
 
         for p in list_ports.comports():
+            if sys.platform.startswith("linux") and p.device.startswith("/dev/ttyS") and p.hwid in ("n/a", "", None):
+                continue  # ttyS0…ttyS31: names the kernel keeps, with no port behind (the radio is ttyUSB/ttyACM)
             if not any(os.path.realpath(d) == p.device for d, _ in ports):
                 # Windows repeats the port in the description: "USB-SERIAL CH340 (COM5)"
                 desc = (p.description or "").replace(f"({p.device})", "").strip()
