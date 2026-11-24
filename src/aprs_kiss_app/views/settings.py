@@ -10,7 +10,7 @@ from pathlib import Path
 
 import flet as ft
 
-from aprs_kiss_core import android_bt, android_usb, roadalert, tilemaps, tracker
+from aprs_kiss_core import android_bt, android_usb, profiles, roadalert, tilemaps, tracker
 from aprs_kiss_core.aprsis import licence_confirmed
 from aprs_kiss_core.bbs import BbsConfigError
 from aprs_kiss_core.bbs.storage import (
@@ -107,7 +107,7 @@ class SettingsView(View):
         c = self.engine.config
         t = self.t
         num = ft.NumbersOnlyInputFilter()
-        call, _, ssid = c.callsign.partition("-")
+        call = profiles.split_call(c.callsign)[0]
 
         # TNC
         self.connection = ft.Dropdown(label=t("connection"), value=c.connection, width=320,
@@ -134,9 +134,6 @@ class SettingsView(View):
         self.call = ft.TextField(label=t("callsign"), value=call, width=160,
                                  capitalization=ft.TextCapitalization.CHARACTERS,
                                  autofocus=not c.configured, on_change=lambda _e: self._mark_call())
-        self.ssid = ft.Dropdown(label=t("ssid"), value=ssid or "0", width=330,
-                                options=[ft.DropdownOption(key=str(i), text=label)
-                                         for i, label in enumerate(ssid_labels(t.language))])
         self.bbs_ssid = ft.Dropdown(label=t("bbs_ssid"), value=str(c.bbs_ssid), width=200,
                                     options=[ft.DropdownOption(key=str(i), text=str(i)) for i in range(1, 16)])
         self._build_bbs_fields(t)
@@ -170,10 +167,32 @@ class SettingsView(View):
         self.tak_interval = ft.TextField(label=t("tak_interval"), value=str(c.tak_interval_min), width=440,
                                          keyboard_type=ft.KeyboardType.NUMBER, input_filter=ft.NumbersOnlyInputFilter())
         lang_index = 3 if t.language == "cs" else 2
-        symbols = [ft.DropdownOption(key=s[0], text=f"{s[1]}  {s[lang_index]} ({s[0]})") for s in SYMBOLS]
-        if not any(s[0] == c.symbol for s in SYMBOLS):
-            symbols.insert(0, ft.DropdownOption(key=c.symbol, text=c.symbol))
-        self.symbol = ft.Dropdown(label=t("symbol"), value=c.symbol, width=330, options=symbols)
+        # profiles: up to three SSIDs, each with its own symbol; the active one is picked in the top bar
+        items = profiles.load(c)
+        self.prof_ssid, self.prof_symbol = [], []
+        rows = []
+        for i in range(profiles.MAX):
+            p = items[i] if i < len(items) else None
+            ssid_opts = [ft.DropdownOption(key=str(n), text=label) for n, label in enumerate(ssid_labels(t.language))]
+            if i:
+                ssid_opts.insert(0, ft.DropdownOption(key="", text=t("profile_unused")))
+            sym = p["symbol"] if p else c.symbol
+            sym_opts = [ft.DropdownOption(key=s[0], text=f"{s[1]}  {s[lang_index]} ({s[0]})") for s in SYMBOLS]
+            if not any(s[0] == sym for s in SYMBOLS):
+                sym_opts.insert(0, ft.DropdownOption(key=sym, text=sym))
+            self.prof_ssid.append(ft.Dropdown(label=t("ssid"), value=str(p["ssid"]) if p else "", width=330,
+                                              options=ssid_opts))
+            self.prof_symbol.append(ft.Dropdown(label=t("symbol"), value=sym, width=330, options=sym_opts))
+            active = p is not None and i == c.profile
+            mark = ft.Container(ft.Text(str(i + 1), weight=ft.FontWeight.BOLD,
+                                        color=ft.Colors.ON_PRIMARY if active else None),
+                                width=28, height=28, border_radius=14, alignment=ft.Alignment.CENTER,
+                                bgcolor=ft.Colors.PRIMARY if active else ft.Colors.SURFACE_CONTAINER_HIGHEST,
+                                tooltip=t("profile_active") if active else None)
+            rows.append(ft.Row([mark, self.prof_ssid[i], self.prof_symbol[i]], wrap=True,
+                               vertical_alignment=ft.CrossAxisAlignment.CENTER))
+        self.profile_rows = ft.Column([ft.Text(t("profiles_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
+                                       *rows], spacing=8, tight=True)
         self.comment = ft.TextField(label=t("comment"), value=c.comment, expand=True, max_length=43)
         self.path = ft.TextField(label=t("digipath"), value=c.path, width=240,
                                  capitalization=ft.TextCapitalization.CHARACTERS)
@@ -265,7 +284,7 @@ class SettingsView(View):
             [
                 self.intro,
                 _section(t("tnc_section"), ft.Icons.CABLE, self.connection, self.tcp_row, self.serial_row, self.txdelay, expanded=first),
-                station := _section(t("station"), ft.Icons.PERSON_PIN_CIRCLE, ft.Row([self.call, self.ssid], wrap=True), self.symbol,
+                station := _section(t("station"), ft.Icons.PERSON_PIN_CIRCLE, ft.Row([self.call]), self.profile_rows,
                          ft.Row([self.comment]), self.path,
                          ft.Row([self.lat, self.lon], wrap=True), self.gps_now,
                          ft.Text(t("position_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
@@ -555,14 +574,26 @@ class SettingsView(View):
         """(the callsign typed, the settings as the form shows them)."""
         old = self.engine.config
         call = (self.call.value or "").strip().upper()
-        ssid = self.ssid.value or "0"
+        items, active, self._dup_ssid = [], 0, False
+        for i, (ssid_box, sym_box) in enumerate(zip(self.prof_ssid, self.prof_symbol)):
+            value = ssid_box.value if i else (ssid_box.value or "0")
+            if value in (None, ""):
+                continue
+            if any(p["ssid"] == int(value) for p in items):
+                self._dup_ssid = True
+                continue
+            if i == old.profile:
+                active = len(items)
+            items.append({"ssid": int(value), "symbol": sym_box.value or "/-"})
+        one = len(items) == 1 and not old.profiles  # never had profiles: stays so
         data = {
             **old.to_dict(),
             "connection": self.connection.value, "host": (self.host.value or "").strip(), "port": self.port.value,
             "device": (self.device.value or "").strip(), "baudrate": self.baudrate.value,
             "txdelay_ms": self.txdelay.value,
-            "callsign": f"{call}-{ssid}" if call and ssid != "0" else call,
-            "symbol": self.symbol.value, "comment": self.comment.value, "path": self.path.value,
+            "callsign": profiles.full_call(call, items[active]["ssid"]),
+            "symbol": items[active]["symbol"], "profiles": "" if one else profiles.dump(items),
+            "profile": 0 if one else active, "comment": self.comment.value, "path": self.path.value,
             "latitude": (self.lat.value or "").replace(",", ".").strip(),
             "longitude": (self.lon.value or "").replace(",", ".").strip(),
             "beacon_minutes": self.beacon.value, "beacon_is": self.beacon_is.value,
@@ -626,6 +657,9 @@ class SettingsView(View):
             self.error.value = f"{self.t('invalid')}: {err}"
             return False
         self.error.value = ""
+        if self._dup_ssid:
+            self.error.value = self.t("profile_dup")
+            return False
         if not call:  # the one thing that is needed
             self.error.value = self.t("call_required")
             await self.require_call()

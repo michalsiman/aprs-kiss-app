@@ -14,7 +14,7 @@ from typing import Any
 
 from .aprsis import DEFAULT_PORT as DEFAULT_APRSIS_PORT
 from .aprsis import DEFAULT_SERVER as DEFAULT_APRSIS_HOST
-from . import mapfilter, roadalert
+from . import mapfilter, profiles, roadalert
 from .ax25 import Address
 
 _LOGGER = logging.getLogger(__name__)
@@ -39,6 +39,8 @@ class Config:
     callsign: str = ""
     path: str = "WIDE1-1,WIDE2-1"
     symbol: str = "/-"
+    profiles: str = ""  # up to three SSIDs with their own symbol, JSON (see profiles.py); empty = just the one above
+    profile: int = 0  # the active one
     comment: str = ""
     latitude: float | None = None  # our position (Home Assistant's home in the integration)
     longitude: float | None = None
@@ -145,6 +147,7 @@ class Config:
         if self.tracker_mode not in ("fixed", "smart"):
             self.tracker_mode = "fixed"
         self.map_filters = mapfilter.join(mapfilter.parse(self.map_filters))
+        profiles.normalize(self)
         if self.tracker_profile not in ("walk", "bike", "car"):
             self.tracker_profile = "car"
         self.tracker_minutes = min(60, max(1, int(self.tracker_minutes or 2)))

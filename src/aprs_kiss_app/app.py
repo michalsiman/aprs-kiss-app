@@ -12,7 +12,7 @@ from typing import Any
 
 import flet as ft
 
-from aprs_kiss_core import android_bt, android_usb, roadalert
+from aprs_kiss_core import android_bt, android_usb, profiles, roadalert
 from aprs_kiss_core.config import VERSION, Config, data_dir, load_config, save_config
 
 from . import theme
@@ -464,6 +464,10 @@ class App:
         stacked = sorted(range(len(self.views)), key=lambda i: not self.views[i].keep_alive)  # the map at the bottom
 
         self.callsign = ft.Text(weight=ft.FontWeight.BOLD, size=18)
+        # a tap on the callsign: pick another profile (SSID and symbol)
+        self.callsign_btn = ft.Container(self.callsign, on_click=self._pick_profile, border_radius=6,
+                                         padding=ft.Padding.symmetric(horizontal=4, vertical=2),
+                                         tooltip=self.t("profile_pick"))
         self.tnc_dot = ft.Icon(ft.Icons.CIRCLE, size=12)
         self.tnc_text = ft.Text(size=13)
         self.is_dot = ft.Icon(ft.Icons.CIRCLE, size=12)
@@ -493,16 +497,16 @@ class App:
         # "send my position" (once, or again and again: the tracker), a lamp in the same frame on a phone
         self.position_btn = PositionButton(self, self.compact)
         if self.compact:
-            self.callsign.expand = True
+            self.callsign_btn.expand = True
             self.callsign.no_wrap = True
             self.callsign.overflow = ft.TextOverflow.ELLIPSIS
-            row = [self.menu_btn, self.callsign, self.lamps["tnc"], self.lamps["is"], self.lamps["gps"],
+            row = [self.menu_btn, self.callsign_btn, self.lamps["tnc"], self.lamps["is"], self.lamps["gps"],
                    self.update_btn, self.position_btn.control, self.lamps["tx"]]
         status = ft.Container(
             ft.Row(
                 row if self.compact else [
                     self.menu_btn,
-                    self.callsign,
+                    self.callsign_btn,
                     ft.Container(ft.Row([self.tnc_dot, ft.Text(self.t("tnc"), size=13), self.tnc_text], spacing=4,
                                         tight=True),
                                  on_click=self._tnc_info if self.compact else None),
@@ -896,6 +900,55 @@ class App:
     def tracked(self) -> set[str]:
         return {c.strip().upper() for c in self.engine.config.tracked_callsigns.replace(" ", ",").split(",")
                 if c.strip()}
+
+    # ─── profiles: one callsign, up to three SSIDs with their own symbol ─────
+
+    def _pick_profile(self, _e=None) -> None:
+        conf = self.engine.config
+        if not conf.configured or self.engine.exclusive_mode:
+            return
+        base = profiles.split_call(conf.callsign)[0]
+        items = profiles.load(conf)
+
+        def tile(i: int, p: dict) -> ft.Control:
+            pic, name, _known = symbol_info(p["symbol"][:1], p["symbol"][1:], self.t.language)
+            active = i == conf.profile
+            return ft.ListTile(
+                leading=ft.Text(pic, size=26), title=ft.Text(profiles.full_call(base, p["ssid"]),
+                                                             weight=ft.FontWeight.BOLD if active else None),
+                subtitle=ft.Text(name or p["symbol"]),
+                trailing=ft.Icon(ft.Icons.CHECK_CIRCLE, color=ft.Colors.PRIMARY) if active else None,
+                selected=active, on_click=lambda _e, i=i: self.page.run_task(self._use_profile, i),
+            )
+
+        def edit(_e) -> None:
+            self.page.pop_dialog()
+            self.select("settings")
+
+        rows: list[ft.Control] = [tile(i, p) for i, p in enumerate(items)]
+        if len(items) < profiles.MAX:
+            rows.append(ft.Text(self.t("profile_add_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT))
+        self.show_dialog(ft.AlertDialog(
+            title=ft.Text(self.t("profile_title")),
+            content=ft.Column(rows, tight=True, width=360, spacing=4),
+            actions=[ft.TextButton(self.t("profile_edit"), on_click=edit),
+                     ft.TextButton(self.t("cancel"), on_click=lambda _e: self.page.pop_dialog())],
+        ))
+
+    async def _use_profile(self, index: int) -> None:
+        """From now on everything goes out under this profile: saved, and the radio side set up again."""
+        self.page.pop_dialog()
+        conf = self.engine.config
+        if index == conf.profile:
+            return
+        new = profiles.switch(conf, index)
+        settings = self.view("settings") if self.has_view("settings") else None
+        if settings:
+            settings.discard()  # the form shows the new profile next time
+        await self.apply_config(new)
+        if settings and self.current_key == "settings":
+            self.select("settings", force=True)
+        self.toast(self.t("profile_now", call=new.callsign))
 
     # ─── road incidents and moving stations ahead (while the tracker runs; both off by default) ─────
 
