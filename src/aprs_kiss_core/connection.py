@@ -22,6 +22,9 @@ _LOGGER = logging.getLogger(__name__)
 
 RECONNECT_MIN = 2.0
 RECONNECT_MAX = 60.0
+# A TNC on a cable or Bluetooth: looking for it is cheap, and a radio plugged in should be found at once.
+LOCAL_KINDS = {"usb", "serial", "bt", "ble"}
+RECONNECT_LOCAL = 3.0
 
 
 @dataclass
@@ -116,7 +119,7 @@ class KissConnection:
                 self.last_error = str(err) or type(err).__name__
                 _LOGGER.debug("KISS TNC not reachable (%s), retrying in %.0f s", self.last_error, delay)
                 await self._sleep(delay)
-                delay = min(delay * 2, RECONNECT_MAX)
+                delay = RECONNECT_LOCAL if self._settings.kind in LOCAL_KINDS else min(delay * 2, RECONNECT_MAX)
                 continue
             self._writer = writer
             self.last_error = None
@@ -148,8 +151,21 @@ class KissConnection:
                 await self._sleep(RECONNECT_MIN)
 
     async def _sleep(self, seconds: float) -> None:
-        with contextlib.suppress(asyncio.TimeoutError):
-            await asyncio.wait_for(self._stop.wait(), timeout=seconds)
+        """Wait before trying again; stop() or retry_now() end the wait early."""
+        self._wake = asyncio.Event()
+        stop, wake = asyncio.ensure_future(self._stop.wait()), asyncio.ensure_future(self._wake.wait())
+        try:
+            await asyncio.wait({stop, wake}, timeout=seconds, return_when=asyncio.FIRST_COMPLETED)
+        finally:
+            stop.cancel()
+            wake.cancel()
+
+    _wake: asyncio.Event | None = None
+
+    def retry_now(self) -> None:
+        """Not connected: try again at once (the app came back to the screen, a radio may be plugged in)."""
+        if self._wake is not None and not self.connected:
+            self._wake.set()
 
     async def _send_parameters(self) -> None:
         s = self._settings

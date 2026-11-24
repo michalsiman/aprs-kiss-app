@@ -7,6 +7,9 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 ## 1.0.0 – 2026-11-24
 
 - **The first stable version** – the same as 0.1.55, plus:
+- **A radio plugged in is connected by itself**: a TNC on USB, Bluetooth or a serial port is looked for every
+  3 seconds (it was up to a minute), and at once when the app comes back to the screen – no need to
+  save the settings again.
 - **Beta versions for testers**: Settings › App › *Also offer beta versions*. From now on new features come
   as betas first and now and then as a new stable version.
 

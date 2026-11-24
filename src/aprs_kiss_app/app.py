@@ -795,6 +795,8 @@ class App:
             if not self._foreground:
                 self._resumed_at = time.monotonic()
             self._foreground = True
+            with contextlib.suppress(Exception):  # a radio plugged in meanwhile: connect it now
+                self.engine.connection.retry_now()
             if getattr(self, "_drive_pending", False):  # the notification was tapped (or the app opened): ask now
                 self._drive_pending = False
                 android_notify.cancel()
