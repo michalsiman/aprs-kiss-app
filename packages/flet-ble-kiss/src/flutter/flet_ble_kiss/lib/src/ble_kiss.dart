@@ -109,7 +109,7 @@ class BleKissService extends FletService {
     return list;
   }
 
-  bool _offersKiss(BleDevice d) => d.services.any((s) => BleUuidParser.compare(s, kissService));
+  bool _offersKiss(BleDevice d) => d.services.any((s) => BleUuidParser.compareStrings(s, kissService));
 
   /// Finds the device by a short scan when this run has not seen it yet (iOS knows a device only so).
   Future<void> _find(String id) async {
@@ -135,14 +135,14 @@ class BleKissService extends FletService {
     await UniversalBle.connect(id, timeout: const Duration(seconds: 20));
     try {
       final services = await UniversalBle.discoverServices(id);
-      final service = services.firstWhere((s) => BleUuidParser.compare(s.uuid, kissService),
+      final service = services.firstWhere((s) => BleUuidParser.compareStrings(s.uuid, kissService),
           orElse: () => throw Exception("The device offers no KISS over Bluetooth LE: "
               "switch KISS on in its Bluetooth settings"));
       BleCharacteristic? out;
       BleCharacteristic? inp;
       for (final c in service.characteristics) {
-        if (BleUuidParser.compare(c.uuid, kissWrite)) out = c;
-        if (BleUuidParser.compare(c.uuid, kissNotify)) inp = c;
+        if (BleUuidParser.compareStrings(c.uuid, kissWrite)) out = c;
+        if (BleUuidParser.compareStrings(c.uuid, kissNotify)) inp = c;
       }
       if (out == null || inp == null) {
         throw Exception("The device's KISS service is incomplete");
