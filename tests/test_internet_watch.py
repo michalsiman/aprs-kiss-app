@@ -3,6 +3,11 @@ import time
 import types
 import unittest
 
+try:
+    import flet  # noqa: F401
+except ImportError:  # the CI tests the core without the UI
+    raise unittest.SkipTest("flet is not installed")
+
 from aprs_kiss_app.app import App
 
 

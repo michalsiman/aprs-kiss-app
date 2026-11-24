@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.48 – 2026-11-24
+
+- **Map filters** (funnel button): only weather stations, only moving stations (moved in the last 10
+  minutes; a station just heard stays until it is clear it stands still), only repeaters, only road
+  incidents (crash, emergency, work zone, flooding, fog, snow) – any mix; remembered.
+- **Repeaters show their frequency** in their map tag, with the band (2 m green, 70 cm magenta) and the
+  digital mode when the comment says it (DMR, D-Star, C4FM, NXDN, TETRA).
+- **The map follows you while the tracker runs**, at zoom 13, like a navigation. Moved or zoomed by hand,
+  a **"Back to me"** button counts down 15 s and the map then comes back by itself (or at once on a tap).
+- **Warnings ahead while the tracker runs** (off until switched on in the position menu or Settings ›
+  Tracker): road incidents, and other moving stations (going your way, coming towards you or crossing)
+  in a lobe ahead of you – long and narrow when fast, wide in town, never behind; a bubble and a sound
+  (each sound can be switched off).
+
 ## 0.1.47 – 2026-11-23
 
 - **One switch for the internet** (Settings › APRS-IS): "Send over the internet too: my position (now,

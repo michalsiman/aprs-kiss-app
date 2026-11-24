@@ -1,5 +1,10 @@
 import unittest
 
+try:
+    import flet  # noqa: F401
+except ImportError:  # the CI tests the core without the UI
+    raise unittest.SkipTest("flet is not installed")
+
 from aprs_kiss_app.views.base import bearing_deg, distance_km, distance_text
 
 

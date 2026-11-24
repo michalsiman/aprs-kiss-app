@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.48" date="2026-11-24">
+      <description>
+        <p>Map filters (weather, moving, repeaters, road incidents); repeaters show their frequency and band; the map follows you while the tracker runs, with a back-to-me countdown; optional warnings of road incidents and moving stations ahead.</p>
+      </description>
+    </release>
     <release version="0.1.47" date="2026-11-23">
       <description>
         <p>One switch to send position and messages over the internet too; the IS lamp flashes red on sending; stations sharing a place spread around a visible dot.</p>
