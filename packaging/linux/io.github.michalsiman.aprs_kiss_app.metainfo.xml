@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="1.0.3" date="2026-11-24" type="development">
+      <description>
+        <p>Beta: a TNC over Bluetooth LE (KISS over BLE), such as a LoRa APRS tracker, Mobilinkd TNC4 or PicoAPRS.</p>
+      </description>
+    </release>
     <release version="1.0.2" date="2026-11-24" type="development">
       <description>
         <p>Beta: self-spotting an activation (SOTA, POTA, WWFF, GMA and more) and services on APRS (FIND, REPEAT, WXNOW, UTC, satellites, e-mail) in Messages; Android fixes.</p>
