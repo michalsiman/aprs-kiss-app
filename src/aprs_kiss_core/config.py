@@ -49,7 +49,8 @@ class Config:
     tracker_minutes: int = 2
     tracker_profile: str = "car"  # smart: walk, bike or car
     tracker_still_minutes: int = 60  # smart: standing still, once in this many minutes
-    road_alerts: bool = True  # while the tracker runs: warn about road incidents ahead…
+    road_alerts: bool = False  # while the tracker runs: warn about road incidents ahead…
+    meet_alerts: bool = False  # …and about other moving stations ahead…
     road_alert_km: int = 5  # …this far
     tracked_callsigns: str = ""
     accept_incoming: bool = False
@@ -101,6 +102,7 @@ class Config:
     sound_chat: bool = True  # … for a new packet chat line
     sound_tak: bool = True  # … for a new TAK GeoChat message
     sound_road: bool = True  # … for a road incident ahead (tracker)
+    sound_meet: bool = True  # … for a moving station ahead (tracker)
     theme: str = "auto"  # auto (as the desktop), light, dark
 
     @property

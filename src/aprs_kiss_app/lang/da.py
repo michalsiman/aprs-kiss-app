@@ -33,6 +33,8 @@ TEXTS = {
     "map_following": "Kortet følger mig (tracker); tryk for straks at vende tilbage efter at have flyttet kortet",
     "follow_back": "Tilbage til mig · {s} s", "follow_back_tip": "Tilbage til min position nu (efter nedtællingen sker det af sig selv)",
     "road_alerts": "Advar om trafikproblemer forude (når trackeren kører)", "road_alert_km": "Se fremad", "road_alerts_hint": "Ulykker, vejarbejde og andre trafikmeldinger på kortet i en lap foran dig: lige ud til den valgte afstand, mindre til siderne, aldrig bagved. Langsomt (i byen) er lappen bred, hurtigt (hovedveje) lang og smal. En boble og en lyd, én gang for hver.", "road_ahead": "Trafikmelding {d} forude", "road_left": "til venstre", "road_right": "til højre", "road_more": "og {n} mere forude", "road_show": "Vis", "sound_road": "Trafikproblem forude (tracker)",
+    "trk_menu_road": "Advar: trafikproblemer forude", "trk_menu_meet": "Advar: kørende stationer forude",
+    "meet_alerts": "Advar om andre kørende stationer forude (du indhenter dem, eller de kommer imod dig)", "meet_ahead": "Kørende station {d} forude", "meet_same": "Kørende station {d} forude, samme vej", "meet_towards": "Kørende station {d} forude, kommer imod dig", "meet_across": "Kørende station {d} forude, krydser din vej", "sound_meet": "Kørende station forude (tracker)",
     "object_of": "objekt fra {call}",
     "measure_from": "Mål afstand herfra",
     "measure_from_me": "Afstand fra min position",

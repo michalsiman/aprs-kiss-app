@@ -33,6 +33,8 @@ TEXTS = {
     "map_following": "Mapa ma sleduje (tracker); ťuknutím sa po posunutí mapy hneď vráti na mňa",
     "follow_back": "Späť na mňa · {s} s", "follow_back_tip": "Hneď späť na moju polohu (po odpočte sa mapa vráti sama)",
     "road_alerts": "Upozorňovať na dopravné problémy predo mnou (keď beží tracker)", "road_alert_km": "Pozerať dopredu", "road_alerts_hint": "Nehody, práce na ceste a ďalšie dopravné hlásenia na mape v laloku pred tebou: rovno do zvolenej vzdialenosti, do strán menej, za teba nikdy. Pomaly (v meste) je lalok široký, rýchlo (hlavné cesty) dlhý a úzky. Bublina a zvuk, pri každom raz.", "road_ahead": "Dopravné hlásenie {d} pred tebou", "road_left": "vľavo", "road_right": "vpravo", "road_more": "a ďalšie pred tebou: {n}", "road_show": "Ukázať", "sound_road": "Dopravný problém pred tebou (tracker)",
+    "trk_menu_road": "Hlásiť dopravné problémy predo mnou", "trk_menu_meet": "Hlásiť idúce stanice predo mnou",
+    "meet_alerts": "Upozorňovať na iné idúce stanice predo mnou (dobiehaš ich, alebo idú oproti)", "meet_ahead": "Idúca stanica {d} pred tebou", "meet_same": "Idúca stanica {d} pred tebou, ide rovnakým smerom", "meet_towards": "Idúca stanica {d} pred tebou, ide oproti tebe", "meet_across": "Idúca stanica {d} pred tebou, križuje tvoj smer", "sound_meet": "Idúca stanica pred tebou (tracker)",
     "object_of": "objekt od {call}",
     "measure_from": "Merať vzdialenosť odtiaľto",
     "measure_from_me": "Vzdialenosť od mojej polohy",

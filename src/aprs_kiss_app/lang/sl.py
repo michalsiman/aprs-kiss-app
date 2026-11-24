@@ -33,6 +33,8 @@ TEXTS = {
     "map_following": "Zemljevid mi sledi (tracker); dotakni se za takojšnjo vrnitev po premiku zemljevida",
     "follow_back": "Nazaj name · {s} s", "follow_back_tip": "Takoj nazaj na moj položaj (po odštevanju se vrne sam)",
     "road_alerts": "Opozori na težave na cesti pred mano (ko teče tracker)", "road_alert_km": "Glej naprej", "road_alerts_hint": "Nesreče, dela na cesti in druga prometna obvestila na zemljevidu v krpi pred tabo: naravnost do izbrane razdalje, v stran manj, za tabo nikoli. Počasi (v mestu) je široka, hitro (glavne ceste) dolga in ozka. Oblaček in zvok, za vsako enkrat.", "road_ahead": "Prometno obvestilo {d} pred tabo", "road_left": "levo", "road_right": "desno", "road_more": "in še {n} pred tabo", "road_show": "Pokaži", "sound_road": "Težava na cesti pred tabo (tracker)",
+    "trk_menu_road": "Javi težave na cesti pred mano", "trk_menu_meet": "Javi postaje v vožnji pred mano",
+    "meet_alerts": "Opozori na druge postaje v vožnji pred mano (jih dohitevaš ali prihajajo nasproti)", "meet_ahead": "Postaja v vožnji {d} pred tabo", "meet_same": "Postaja v vožnji {d} pred tabo, v tvoji smeri", "meet_towards": "Postaja v vožnji {d} pred tabo, prihaja nasproti", "meet_across": "Postaja v vožnji {d} pred tabo, prečka tvojo smer", "sound_meet": "Postaja v vožnji pred tabo (tracker)",
     "object_of": "objekt od {call}",
     "measure_from": "Izmeri razdaljo od tu",
     "measure_from_me": "Razdalja od mojega položaja",

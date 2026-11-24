@@ -33,6 +33,8 @@ TEXTS = {
     "map_following": "El mapa me sigue (tracker); toca para volver enseguida tras mover el mapa",
     "follow_back": "Volver a mí · {s} s", "follow_back_tip": "Volver ya a mi posición (al acabar la cuenta vuelve sola)",
     "road_alerts": "Avisar de incidencias de tráfico delante (con el tracker en marcha)", "road_alert_km": "Mirar adelante", "road_alerts_hint": "Accidentes, obras y otros avisos en el mapa en un lóbulo delante de ti: recto hasta la distancia elegida, menos a los lados, nunca detrás. Despacio (en ciudad) el lóbulo es ancho, rápido (vías principales) largo y estrecho. Un globo y un sonido, una vez por cada uno.", "road_ahead": "Incidencia de tráfico a {d} delante", "road_left": "a la izquierda", "road_right": "a la derecha", "road_more": "y {n} más delante", "road_show": "Mostrar", "sound_road": "Incidencia de tráfico delante (tracker)",
+    "trk_menu_road": "Avisar: incidencias de tráfico delante", "trk_menu_meet": "Avisar: estaciones en movimiento delante",
+    "meet_alerts": "Avisar de otras estaciones en movimiento delante (las alcanzas, o vienen de frente)", "meet_ahead": "Estación en movimiento a {d} delante", "meet_same": "Estación en movimiento a {d} delante, en tu sentido", "meet_towards": "Estación en movimiento a {d} delante, viene de frente", "meet_across": "Estación en movimiento a {d} delante, cruza tu camino", "sound_meet": "Estación en movimiento delante (tracker)",
     "object_of": "objeto de {call}",
     "measure_from": "Medir distancia desde aquí",
     "measure_from_me": "Distancia desde mi posición",

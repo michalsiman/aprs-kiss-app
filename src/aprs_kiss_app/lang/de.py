@@ -33,6 +33,8 @@ TEXTS = {
     "map_following": "Die Karte folgt mir (Tracker); antippen, um nach dem Verschieben sofort zurückzukehren",
     "follow_back": "Zurück zu mir · {s} s", "follow_back_tip": "Sofort zurück zu meiner Position (nach dem Countdown von selbst)",
     "road_alerts": "Vor Verkehrsstörungen voraus warnen (wenn der Tracker läuft)", "road_alert_km": "Vorausschauen", "road_alerts_hint": "Unfälle, Baustellen und andere Verkehrsmeldungen auf der Karte in einer Keule vor dir: geradeaus bis zur gewählten Entfernung, seitlich weniger, nie hinter dir. Langsam (in der Stadt) ist sie breit, schnell (Hauptstraßen) lang und schmal. Eine Blase und ein Ton, für jede einmal.", "road_ahead": "Verkehrsmeldung {d} voraus", "road_left": "links", "road_right": "rechts", "road_more": "und {n} weitere voraus", "road_show": "Zeigen", "sound_road": "Verkehrsstörung voraus (Tracker)",
+    "trk_menu_road": "Melden: Verkehrsstörungen voraus", "trk_menu_meet": "Melden: fahrende Stationen voraus",
+    "meet_alerts": "Vor anderen fahrenden Stationen voraus hinweisen (du holst sie ein, oder sie kommen entgegen)", "meet_ahead": "Fahrende Station {d} voraus", "meet_same": "Fahrende Station {d} voraus, in deiner Richtung", "meet_towards": "Fahrende Station {d} voraus, kommt dir entgegen", "meet_across": "Fahrende Station {d} voraus, kreuzt deinen Weg", "sound_meet": "Fahrende Station voraus (Tracker)",
     "object_of": "Objekt von {call}",
     "measure_from": "Entfernung von hier messen",
     "measure_from_me": "Entfernung von meiner Position",

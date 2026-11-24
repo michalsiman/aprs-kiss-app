@@ -34,6 +34,8 @@ TEXTS = {
     "map_following": "La mappa mi segue (tracker); tocca per tornare subito dopo aver spostato la mappa",
     "follow_back": "Torna a me · {s} s", "follow_back_tip": "Torna subito alla mia posizione (allo scadere torna da sola)",
     "road_alerts": "Avvisa dei problemi stradali davanti (con il tracker attivo)", "road_alert_km": "Guarda avanti", "road_alerts_hint": "Incidenti, cantieri e altre segnalazioni sulla mappa in un lobo davanti a te: dritto fino alla distanza scelta, meno ai lati, mai dietro. Piano (in città) il lobo è largo, veloce (strade principali) lungo e stretto. Un fumetto e un suono, una volta per ciascuno.", "road_ahead": "Segnalazione stradale a {d} davanti", "road_left": "a sinistra", "road_right": "a destra", "road_more": "e altre {n} davanti", "road_show": "Mostra", "sound_road": "Problema stradale davanti (tracker)",
+    "trk_menu_road": "Avvisa: problemi stradali davanti", "trk_menu_meet": "Avvisa: stazioni in movimento davanti",
+    "meet_alerts": "Avvisa di altre stazioni in movimento davanti (le raggiungi, o ti vengono incontro)", "meet_ahead": "Stazione in movimento a {d} davanti", "meet_same": "Stazione in movimento a {d} davanti, nella tua direzione", "meet_towards": "Stazione in movimento a {d} davanti, ti viene incontro", "meet_across": "Stazione in movimento a {d} davanti, incrocia la tua strada", "sound_meet": "Stazione in movimento davanti (tracker)",
     "object_of": "oggetto di {call}",
     "measure_from": "Misura la distanza da qui",
     "measure_from_me": "Distanza dalla mia posizione",

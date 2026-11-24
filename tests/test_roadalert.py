@@ -1,7 +1,8 @@
 import unittest
 
 from aprs_kiss_core.config import Config
-from aprs_kiss_core.roadalert import REPEAT_SECONDS, RoadAlerts, ahead, heading
+from aprs_kiss_core.roadalert import (REPEAT_SECONDS, STATION_MAX_AGE, RoadAlerts, ahead, heading,
+                                      moving_station, relation)
 
 NOW = 1_000_000.0
 LAT, LON = 50.0, 14.0
@@ -72,6 +73,28 @@ class AlertsTest(unittest.TestCase):
 
     def test_no_heading_no_alert(self):
         self.assertEqual(RoadAlerts().check(NOW, LAT, LON, None, [incident("A", 1, 0)], 5), [])
+
+    def test_moving_stations_ahead(self):
+        car = incident("OK1CAR-9", 2, 0, symbol=">", table="/")
+        car.update(track=[[NOW - 200, car["latitude"] - 0.01, car["longitude"]], [NOW - 60, car["latitude"], car["longitude"]]],
+                   course=180.0, speed=80.0)
+        house = incident("OK1HOU", 1, 0, symbol="-", table="/")
+        house.update(track=[[NOW - 60, house["latitude"], house["longitude"]]])
+        mine = incident("OK1SIM-7", 1, 0, symbol=">", table="/")
+        mine.update(speed=50.0)
+        crash = incident("CRASH", 1, 0)
+        found = RoadAlerts().check(NOW, LAT, LON, 0.0, [car, house, mine, crash], 5, 60,
+                                   want=moving_station("OK1SIM-9"), max_age=STATION_MAX_AGE)
+        self.assertEqual([f[0]["call"] for f in found], ["OK1CAR-9"])
+        self.assertEqual(relation(0.0, car), "towards")
+        self.assertEqual(relation(10.0, {"course": 350.0, "speed": 40.0}), "same")
+        self.assertEqual(relation(0.0, {"course": 90.0, "speed": 40.0}), "across")
+        self.assertIsNone(relation(0.0, {"course": 90.0}))
+
+    def test_off_by_default(self):
+        conf = Config()
+        self.assertFalse(conf.road_alerts)
+        self.assertFalse(conf.meet_alerts)
 
     def test_config_distance(self):
         conf = Config(callsign="OK1ABC", road_alert_km=7)

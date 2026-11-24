@@ -33,6 +33,8 @@ TEXTS = {
     "map_following": "Kartan följer mig (tracker); tryck för att genast komma tillbaka efter att ha flyttat kartan",
     "follow_back": "Tillbaka till mig · {s} s", "follow_back_tip": "Tillbaka till min position nu (efter nedräkningen sker det av sig självt)",
     "road_alerts": "Varna för trafikstörningar framåt (när trackern är igång)", "road_alert_km": "Titta framåt", "road_alerts_hint": "Olyckor, vägarbeten och andra trafikmeddelanden på kartan i en lob framför dig: rakt fram till vald sträcka, mindre åt sidorna, aldrig bakom. Långsamt (i stan) är loben bred, fort (huvudvägar) lång och smal. En bubbla och ett ljud, en gång för varje.", "road_ahead": "Trafikmeddelande {d} framåt", "road_left": "till vänster", "road_right": "till höger", "road_more": "och {n} till framåt", "road_show": "Visa", "sound_road": "Trafikstörning framåt (tracker)",
+    "trk_menu_road": "Varna: trafikstörningar framåt", "trk_menu_meet": "Varna: rörliga stationer framåt",
+    "meet_alerts": "Varna för andra rörliga stationer framåt (du kör ikapp dem, eller de möter dig)", "meet_ahead": "Rörlig station {d} framåt", "meet_same": "Rörlig station {d} framåt, åt ditt håll", "meet_towards": "Rörlig station {d} framåt, möter dig", "meet_across": "Rörlig station {d} framåt, korsar din väg", "sound_meet": "Rörlig station framåt (tracker)",
     "object_of": "objekt från {call}",
     "measure_from": "Mät avstånd härifrån",
     "measure_from_me": "Avstånd från min position",

@@ -223,6 +223,7 @@ class SettingsView(View):
                                      options=mins(sorted({*tracker.STILL_MINUTES, c.tracker_still_minutes})))
         self.trk_hint = ft.Text(size=12, color=ft.Colors.ON_SURFACE_VARIANT)
         self.road_alerts = ft.Checkbox(label=t("road_alerts"), value=c.road_alerts)
+        self.meet_alerts = ft.Checkbox(label=t("meet_alerts"), value=c.meet_alerts)
         self.road_km = ft.Dropdown(label=t("road_alert_km"), value=str(c.road_alert_km), width=200,
                                    options=[ft.DropdownOption(key=str(n), text=f"{n} km") for n in roadalert.DISTANCES_KM])
         self._trk_changed(update=False)
@@ -241,7 +242,7 @@ class SettingsView(View):
             "never", "tak", "always") else "never", width=320,
             options=[ft.DropdownOption(key=k, text=t(f"keep_{k}")) for k in ("never", "tak", "always")])
         self.sound_boxes = {key: ft.Checkbox(label=t(key), value=getattr(c, key))
-                            for key in ("sound_tx", "sound_messages", "sound_chat", "sound_tak", "sound_road")}
+                            for key in ("sound_tx", "sound_messages", "sound_chat", "sound_tak", "sound_road", "sound_meet")}
         self.check_updates = ft.Checkbox(label=t("check_updates"), value=c.check_updates,
                                          visible=not distribution.store_updates())  # Google Play updates it
         self.theme = ft.Dropdown(label=t("theme"), value=c.theme if c.theme in ("auto", "light", "dark") else "auto",
@@ -273,7 +274,7 @@ class SettingsView(View):
                 _section("GPS", ft.Icons.GPS_FIXED, self.gps_source, self.gps_row, self.gps_hint),
                 _section(t("trk_section"), ft.Icons.ROUTE, self.trk_mode,
                          ft.Row([self.trk_minutes, self.trk_profile, self.trk_still], wrap=True), self.trk_hint,
-                         self.road_alerts, self.road_km,
+                         self.road_alerts, self.meet_alerts, self.road_km,
                          ft.Text(t("road_alerts_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT)),
                 _section(t("digi"), ft.Icons.REPEAT, self.digi_mode, self.digi_hops, self.digi_aliases, self.digi_hint),
                 _section(t("aprsis"), ft.Icons.PUBLIC, self.aprsis, self.licence_box, self.is_fields, self.is_state),
@@ -336,7 +337,7 @@ class SettingsView(View):
 
     async def _test_sounds(self, _e) -> None:
         """Each sound once, so they can be heard before choosing."""
-        for kind in ("tx", "message", "chat", "tak", "road"):
+        for kind in ("tx", "message", "chat", "tak", "road", "meet"):
             self.app.sounds.play(kind, force=True)
             await asyncio.sleep(0.8)
 
@@ -580,7 +581,8 @@ class SettingsView(View):
             **{key: box.value for key, box in self.sound_boxes.items()},
             "tracker_mode": self.trk_mode.value or "fixed", "tracker_minutes": self.trk_minutes.value or "2",
             "tracker_profile": self.trk_profile.value or "car", "tracker_still_minutes": self.trk_still.value or "60",
-            "road_alerts": bool(self.road_alerts.value), "road_alert_km": self.road_km.value or "5",
+            "road_alerts": bool(self.road_alerts.value), "meet_alerts": bool(self.meet_alerts.value),
+            "road_alert_km": self.road_km.value or "5",
             "digi_mode": self.digi_mode.value or "off", "digi_max_hops": self.digi_hops.value or "2",
             "digi_aliases": (self.digi_aliases.value or "").strip().upper(),
             "run_background": bool(self.run_bg.value), "keep_screen_on": self.keep_screen.value or "never",

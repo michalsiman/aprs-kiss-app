@@ -34,6 +34,8 @@ TEXTS = {
     "map_following": "La carte me suit (tracker) ; touchez pour revenir tout de suite après avoir déplacé la carte",
     "follow_back": "Revenir à moi · {s} s", "follow_back_tip": "Revenir tout de suite à ma position (à la fin du décompte, la carte revient seule)",
     "road_alerts": "Prévenir des incidents routiers devant (quand le tracker tourne)", "road_alert_km": "Regarder devant", "road_alerts_hint": "Accidents, travaux et autres infos trafic sur la carte dans un lobe devant toi : tout droit jusqu'à la distance choisie, moins sur les côtés, jamais derrière. Lentement (en ville) le lobe est large, vite (grands axes) long et étroit. Une bulle et un son, une fois pour chacun.", "road_ahead": "Incident routier à {d} devant", "road_left": "à gauche", "road_right": "à droite", "road_more": "et {n} autres devant", "road_show": "Afficher", "sound_road": "Incident routier devant (tracker)",
+    "trk_menu_road": "Prévenir : incidents routiers devant", "trk_menu_meet": "Prévenir : stations en mouvement devant",
+    "meet_alerts": "Prévenir des autres stations en mouvement devant (tu les rattrapes, ou elles arrivent en face)", "meet_ahead": "Station en mouvement à {d} devant", "meet_same": "Station en mouvement à {d} devant, dans ton sens", "meet_towards": "Station en mouvement à {d} devant, vient en face", "meet_across": "Station en mouvement à {d} devant, croise ta route", "sound_meet": "Station en mouvement devant (tracker)",
     "object_of": "objet de {call}",
     "measure_from": "Mesurer la distance d'ici",
     "measure_from_me": "Distance depuis ma position",

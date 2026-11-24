@@ -1,4 +1,5 @@
 """Road incidents ahead: while the tracker runs, a warning for an incident on the way we are going.
+The same for other moving stations: one ahead of us on our way (we catch it up, or it comes towards us).
 
 Where we will drive is not known (no route), so "ahead" is a lobe in front of us: as far as the chosen
 distance straight ahead, shorter the more an incident is off to the side (we may turn), and never
@@ -10,9 +11,9 @@ counts. Each incident is announced once; again only after REPEAT_SECONDS, if it 
 from __future__ import annotations
 
 import math
-from typing import Any, Iterable
+from typing import Any, Callable, Iterable
 
-from .mapfilter import is_road
+from .mapfilter import MOVING_SECONDS, is_moving, is_road, is_weather
 
 DISTANCES_KM = (2, 5, 10, 20)
 MIN_SPEED_KMH = 5.0  # slower than this the heading from the GPS means nothing
@@ -22,6 +23,8 @@ WIDE, NARROW = 1.0, 4.0  # the lobe's exponent (see reach)
 NEAR_KM = 0.5  # closer than this and in front of us: always
 REPEAT_SECONDS = 30 * 60
 INCIDENT_MAX_AGE = 3 * 3600  # older reports are not news any more
+STATION_MAX_AGE = MOVING_SECONDS  # a moving station's position older than this: it is elsewhere by now
+SAME_WAY_DEG = 45  # its course this close to ours: it goes our way; this close to the opposite: towards us
 HEADING_MIN_M = 60  # from our own track: the last two points at least this far apart
 
 
@@ -77,21 +80,53 @@ def heading(fix_course: float | None, fix_speed: float | None, track: list | Non
     return None
 
 
+def _base(call: str) -> str:
+    return call.split("-")[0].upper()
+
+
+def moving_station(mine: str) -> Callable[[dict[str, Any], float], bool]:
+    """Which stations count for the "moving station ahead" warning: moving lately, not our own
+    (any SSID of our callsign), not an incident or a weather station."""
+    me = _base(mine) if mine else ""
+
+    def want(entry: dict[str, Any], now: float) -> bool:
+        if (me and _base(entry.get("call", "")) == me) or entry.get("object_of") or is_road(entry) or is_weather(entry):
+            return False
+        return is_moving(entry, now, new_counts=False)
+    return want
+
+
+def incident(entry: dict[str, Any], _now: float) -> bool:
+    return is_road(entry)
+
+
+def relation(our_course: float, entry: dict[str, Any]) -> str | None:
+    """"same" (it goes our way: we catch it up), "towards" (it comes towards us), "across", or None
+    when its course is not known."""
+    course, speed = entry.get("course"), entry.get("speed")
+    if course is None or not speed or speed < 3:
+        return None
+    d = abs(course - our_course) % 360
+    d = 360 - d if d > 180 else d
+    return "same" if d <= SAME_WAY_DEG else "towards" if d >= 180 - SAME_WAY_DEG else "across"
+
+
 class RoadAlerts:
     def __init__(self) -> None:
         self.told: dict[str, float] = {}  # incident -> when we warned about it
 
     def check(self, now: float, lat: float, lon: float, course: float | None,
               stations: Iterable[dict[str, Any]], radius_km: float,
-              speed_kmh: float | None = None) -> list[tuple[dict[str, Any], float, float]]:
-        """New incidents ahead: [(station, km away, km to the side)], nearest first."""
+              speed_kmh: float | None = None, want: Callable[[dict[str, Any], float], bool] = incident,
+              max_age: float = INCIDENT_MAX_AGE) -> list[tuple[dict[str, Any], float, float]]:
+        """New incidents (or what `want` picks) ahead: [(station, km away, km to the side)], nearest first."""
         if course is None:
             return []
         found = []
         for e in stations:
-            if e.get("latitude") is None or e.get("longitude") is None or not is_road(e):
+            if e.get("latitude") is None or e.get("longitude") is None or not want(e, now):
                 continue
-            if now - (e.get("last_heard") or 0) > INCIDENT_MAX_AGE:
+            if now - (e.get("last_heard") or 0) > max_age:
                 continue
             if now - self.told.get(e["call"], -REPEAT_SECONDS) < REPEAT_SECONDS:
                 continue

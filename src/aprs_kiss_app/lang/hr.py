@@ -33,6 +33,8 @@ TEXTS = {
     "map_following": "Karta me prati (tracker); dodirni za odmah natrag nakon pomicanja karte",
     "follow_back": "Natrag na mene · {s} s", "follow_back_tip": "Odmah natrag na moj položaj (nakon odbrojavanja vraća se sama)",
     "road_alerts": "Upozori na probleme na cesti ispred (dok radi tracker)", "road_alert_km": "Gledaj naprijed", "road_alerts_hint": "Nesreće, radovi i druge prometne obavijesti na karti u režnju ispred tebe: ravno do odabrane udaljenosti, u stranu manje, iza nikad. Polako (u gradu) režanj je širok, brzo (glavne ceste) dug i uzak. Oblačić i zvuk, za svaku jednom.", "road_ahead": "Prometna obavijest {d} ispred", "road_left": "lijevo", "road_right": "desno", "road_more": "i još {n} ispred", "road_show": "Prikaži", "sound_road": "Problem na cesti ispred (tracker)",
+    "trk_menu_road": "Javi probleme na cesti ispred", "trk_menu_meet": "Javi stanice u vožnji ispred",
+    "meet_alerts": "Upozori na druge stanice u vožnji ispred (sustižeš ih ili dolaze iz suprotnog smjera)", "meet_ahead": "Stanica u vožnji {d} ispred", "meet_same": "Stanica u vožnji {d} ispred, istim smjerom", "meet_towards": "Stanica u vožnji {d} ispred, dolazi prema tebi", "meet_across": "Stanica u vožnji {d} ispred, presijeca tvoj smjer", "sound_meet": "Stanica u vožnji ispred (tracker)",
     "object_of": "objekt od {call}",
     "measure_from": "Izmjeri udaljenost odavde",
     "measure_from_me": "Udaljenost od mog položaja",

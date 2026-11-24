@@ -34,6 +34,8 @@ TEXTS = {
     "map_following": "Mapa podąża za mną (tracker); dotknij, by po przesunięciu mapy od razu wrócić",
     "follow_back": "Wróć do mnie · {s} s", "follow_back_tip": "Od razu wróć do mojej pozycji (po odliczaniu mapa wróci sama)",
     "road_alerts": "Ostrzegaj o utrudnieniach przed mną (gdy działa tracker)", "road_alert_km": "Patrz do przodu", "road_alerts_hint": "Wypadki, roboty drogowe i inne komunikaty na mapie w płacie przed tobą: prosto do wybranej odległości, na boki mniej, nigdy za tobą. Wolno (w mieście) płat jest szeroki, szybko (główne drogi) długi i wąski. Dymek i dźwięk, dla każdego raz.", "road_ahead": "Utrudnienie {d} przed tobą", "road_left": "po lewej", "road_right": "po prawej", "road_more": "i jeszcze {n} przed tobą", "road_show": "Pokaż", "sound_road": "Utrudnienie przed tobą (tracker)",
+    "trk_menu_road": "Zgłaszaj utrudnienia przed sobą", "trk_menu_meet": "Zgłaszaj jadące stacje przed sobą",
+    "meet_alerts": "Ostrzegaj o innych jadących stacjach przed mną (doganiasz je albo jadą z naprzeciwka)", "meet_ahead": "Jadąca stacja {d} przed tobą", "meet_same": "Jadąca stacja {d} przed tobą, w twoim kierunku", "meet_towards": "Jadąca stacja {d} przed tobą, jedzie z naprzeciwka", "meet_across": "Jadąca stacja {d} przed tobą, przecina twój kierunek", "sound_meet": "Jadąca stacja przed tobą (tracker)",
     "object_of": "obiekt od {call}",
     "measure_from": "Zmierz odległość stąd",
     "measure_from_me": "Odległość od mojej pozycji",

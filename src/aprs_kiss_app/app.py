@@ -897,43 +897,54 @@ class App:
         return {c.strip().upper() for c in self.engine.config.tracked_callsigns.replace(" ", ",").split(",")
                 if c.strip()}
 
-    # ─── road incidents ahead (while the tracker runs) ─────
+    # ─── road incidents and moving stations ahead (while the tracker runs; both off by default) ─────
 
     def _road_check(self) -> None:
         engine, conf = self.engine, self.engine.config
-        if not (conf.tracker_on and conf.road_alerts) or engine.exclusive_mode:
+        if not (conf.tracker_on and (conf.road_alerts or conf.meet_alerts)) or engine.exclusive_mode:
             return
         fix = engine.gps_fix()
         if not fix:
             return
         if not hasattr(self, "road_alerts"):
-            self.road_alerts = roadalert.RoadAlerts()
+            self.road_alerts, self.meet_alerts = roadalert.RoadAlerts(), roadalert.RoadAlerts()
         course = roadalert.heading(fix.course, fix.speed_kmh, engine.my_track.get("track"))
-        found = self.road_alerts.check(time.time(), fix.latitude, fix.longitude, course,
-                                       list(engine.station.heard.values()), conf.road_alert_km, fix.speed_kmh)
-        if found:
-            self._road_warn(found)
+        now, stations = time.time(), list(engine.station.heard.values())
+        args = (now, fix.latitude, fix.longitude, course, stations, conf.road_alert_km, fix.speed_kmh)
+        if conf.road_alerts and (found := self.road_alerts.check(*args)):
+            self._warn_ahead(found, "road")  # one bubble at a time: stations wait for the next look
+        elif conf.meet_alerts and (found := self.meet_alerts.check(
+                *args, want=roadalert.moving_station(str(engine.me)), max_age=roadalert.STATION_MAX_AGE)):
+            self._warn_ahead(found, "meet", course)
 
-    def _road_warn(self, found: list) -> None:
-        """A bubble with the nearest incident ahead (and how many more), and a sound."""
+    def _warn_ahead(self, found: list, kind: str, course: float | None = None) -> None:
+        """A bubble with the nearest one ahead (and how many more), and a sound."""
         entry, along, side = found[0]
         t = self.t
-        where = t("road_ahead", d=distance_text(along))
+        if kind == "meet":
+            how = roadalert.relation(course, entry) if course is not None else None
+            where = t(f"meet_{how}" if how else "meet_ahead", d=distance_text(along))
+        else:
+            where = t("road_ahead", d=distance_text(along))
         if abs(side) >= 0.5:
             where += f" ({t('road_right' if side > 0 else 'road_left')})"
         pic, name, _known = symbol_info(entry.get("symbol_table"), entry.get("symbol"), t.language)
-        what = " · ".join(x for x in (entry["call"], name, (entry.get("comment") or "").strip()) if x)
+        speed = entry.get("speed")
+        extra = f"{speed:.0f} km/h" if kind == "meet" and speed else (entry.get("comment") or "").strip()
+        what = " · ".join(x for x in (entry["call"], name, extra) if x)
         lines = [ft.Text(where, weight=ft.FontWeight.BOLD, color=ft.Colors.BLACK_87),
                  ft.Text(what, max_lines=3, overflow=ft.TextOverflow.ELLIPSIS, color=ft.Colors.BLACK_87)]
         if len(found) > 1:
             lines.append(ft.Text(t("road_more", n=len(found) - 1), size=12, color=ft.Colors.BLACK_87))
-        self.sounds.play("road")
+        self.sounds.play(kind)
         self.show_dialog(ft.SnackBar(
             ft.Row([ft.Text(pic or "⚠️", size=28), ft.Column(lines, spacing=2, tight=True, expand=True)],
                    spacing=12, vertical_alignment=ft.CrossAxisAlignment.CENTER),
-            bgcolor=ft.Colors.AMBER_200, behavior=ft.SnackBarBehavior.FLOATING, width=520,
-            duration=20000, show_close_icon=True, close_icon_color=ft.Colors.BLACK_87,
-            action=ft.SnackBarAction(t("road_show"), text_color=ft.Colors.BROWN_900, on_click=lambda _e, c=entry["call"]: self.show_station(c)),
+            bgcolor=ft.Colors.AMBER_200 if kind == "road" else ft.Colors.LIGHT_BLUE_100,
+            behavior=ft.SnackBarBehavior.FLOATING, width=520,
+            duration=20000 if kind == "road" else 10000, show_close_icon=True, close_icon_color=ft.Colors.BLACK_87,
+            action=ft.SnackBarAction(t("road_show"), text_color=ft.Colors.BROWN_900 if kind == "road" else ft.Colors.BLUE_900,
+                                     on_click=lambda _e, c=entry["call"]: self.show_station(c)),
         ))
 
     def toast(self, text: str, error: bool = False, seconds: float = 4) -> None:

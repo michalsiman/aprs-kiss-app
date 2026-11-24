@@ -32,9 +32,13 @@ class PositionButton:
         self.toggle_item = ft.PopupMenuItem(t("trk_start"), icon=ft.Icons.PLAY_ARROW, on_click=self._toggle)
         self.state_item = ft.PopupMenuItem(t("trk_off"), disabled=True)
         settings = ft.PopupMenuItem(t("trk_settings"), icon=ft.Icons.TUNE, on_click=lambda _e: app.select("settings"))
+        # warnings while the tracker runs (both off until switched on here or in Settings › Tracker)
+        self.road_item = ft.PopupMenuItem(t("trk_menu_road"), on_click=lambda _e: self._flip("road_alerts"))
+        self.meet_item = ft.PopupMenuItem(t("trk_menu_meet"), on_click=lambda _e: self._flip("meet_alerts"))
         self.control = ft.PopupMenuButton(content=self.face, tooltip=t("beacon_now"),
                                           items=[self.send_item, self.toggle_item, ft.PopupMenuItem(),
-                                                 self.state_item, settings], on_open=self._opened)
+                                                 self.state_item, self.road_item, self.meet_item, settings],
+                                          on_open=self._opened)
         self.control.visible = not app.engine.exclusive_mode
         self.refresh()
 
@@ -60,6 +64,8 @@ class PositionButton:
         self.toggle_item.content = self.app.t("trk_stop" if on else "trk_start")
         self.toggle_item.icon = ft.Icons.PAUSE if on else ft.Icons.PLAY_ARROW
         self.state_item.content = text
+        self.road_item.checked = self.app.engine.config.road_alerts
+        self.meet_item.checked = self.app.engine.config.meet_alerts
         self.control.tooltip = text if on else self.app.t("beacon_now")
 
     async def _send_now(self, e) -> None:
@@ -85,6 +91,13 @@ class PositionButton:
         app.save_config_soon()
         self.refresh()
         app.page.update()
+
+    def _flip(self, name: str) -> None:
+        conf = self.app.engine.config
+        setattr(conf, name, not getattr(conf, name))
+        self.app.save_config_soon()
+        self.refresh()
+        self.app.page.update()
 
     def _opened(self, _e) -> None:
         self.refresh()  # the countdown as it is now

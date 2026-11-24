@@ -49,7 +49,7 @@ def is_road(entry: dict[str, Any]) -> bool:
     return _alternate(entry.get("symbol_table")) and (entry.get("symbol") or "") in ROAD_ALTERNATE
 
 
-def is_moving(entry: dict[str, Any], now: float) -> bool:
+def is_moving(entry: dict[str, Any], now: float, new_counts: bool = True) -> bool:
     """Moved lately (the track has a new place), or says it drives; or too new to know yet."""
     track = entry.get("track") or ()
     if len(track) >= 2 and now - track[-2][0] <= MOVING_SECONDS:
@@ -58,7 +58,7 @@ def is_moving(entry: dict[str, Any], now: float) -> bool:
     if recent and (entry.get("speed") or 0) > MOVING_KMH and not entry.get("weather"):
         return True
     first = entry.get("first_heard")
-    return first is not None and now - first < MOVING_SECONDS  # not known yet: shown until it stays put
+    return new_counts and first is not None and now - first < MOVING_SECONDS  # not known yet: shown until it stays put
 
 
 def shown(entry: dict[str, Any], kinds: set[str], now: float) -> bool:
