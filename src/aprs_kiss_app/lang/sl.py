@@ -33,6 +33,7 @@ TEXTS = {
     "map_following": "Zemljevid mi sledi (tracker); dotakni se za takojšnjo vrnitev po premiku zemljevida",
     "follow_back": "Nazaj name · {s} s", "follow_back_tip": "Takoj nazaj na moj položaj (po odštevanju se vrne sam)",
     "road_alerts": "Opozori na težave na cesti pred mano (ko teče tracker)", "road_alert_km": "Glej naprej", "road_alerts_hint": "Nesreče, dela na cesti in druga prometna obvestila na zemljevidu v krpi pred tabo: naravnost do izbrane razdalje, v stran manj, za tabo nikoli. Počasi (v mestu) je široka, hitro (glavne ceste) dolga in ozka. Oblaček in zvok, za vsako enkrat.", "road_ahead": "Prometno obvestilo {d} pred tabo", "road_left": "levo", "road_right": "desno", "road_more": "in še {n} pred tabo", "road_show": "Pokaži", "sound_road": "Težava na cesti pred tabo (tracker)",
+    "about_thanks": "Hvala radioklubu OK1OMG in Martinu OK1MDX za pomoč in podporo.",
     "update_beta": "Ponujaj tudi beta različice (za preizkuševalce: novejše, manj preizkušene)",
     "locator_is": "Lokator {loc} (kopiraj)", "loc_to_chat": "Pošlji lokator {loc} v klepet", "loc_to_message": "Pošlji lokator {loc} v sporočilu…",
     "pos_to_chat": "Pošlji ta položaj v klepet", "pos_to_message": "Pošlji ta položaj v sporočilu…", "pos_send_mine": "Pošlji moj položaj v klepet", "pos_insert_mine": "Vstavi moj položaj v sporočilo", "pos_on_map": "Pokaži na zemljevidu", "pos_sent_chat": "Položaj je šel v klepet",

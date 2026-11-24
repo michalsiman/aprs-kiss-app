@@ -33,6 +33,7 @@ TEXTS = {
     "map_following": "Kartan följer mig (tracker); tryck för att genast komma tillbaka efter att ha flyttat kartan",
     "follow_back": "Tillbaka till mig · {s} s", "follow_back_tip": "Tillbaka till min position nu (efter nedräkningen sker det av sig självt)",
     "road_alerts": "Varna för trafikstörningar framåt (när trackern är igång)", "road_alert_km": "Titta framåt", "road_alerts_hint": "Olyckor, vägarbeten och andra trafikmeddelanden på kartan i en lob framför dig: rakt fram till vald sträcka, mindre åt sidorna, aldrig bakom. Långsamt (i stan) är loben bred, fort (huvudvägar) lång och smal. En bubbla och ett ljud, en gång för varje.", "road_ahead": "Trafikmeddelande {d} framåt", "road_left": "till vänster", "road_right": "till höger", "road_more": "och {n} till framåt", "road_show": "Visa", "sound_road": "Trafikstörning framåt (tracker)",
+    "about_thanks": "Tack till radioklubben OK1OMG och till Martin OK1MDX för hjälp och stöd.",
     "update_beta": "Erbjud även betaversioner (för testare: nyare, mindre beprövade)",
     "locator_is": "Lokator {loc} (kopiera)", "loc_to_chat": "Skicka lokatorn {loc} till chatten", "loc_to_message": "Skicka lokatorn {loc} i ett meddelande…",
     "pos_to_chat": "Skicka den här positionen till chatten", "pos_to_message": "Skicka den här positionen i ett meddelande…", "pos_send_mine": "Skicka min position till chatten", "pos_insert_mine": "Infoga min position i meddelandet", "pos_on_map": "Visa på kartan", "pos_sent_chat": "Positionen gick till chatten",

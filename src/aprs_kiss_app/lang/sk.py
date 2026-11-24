@@ -33,6 +33,7 @@ TEXTS = {
     "map_following": "Mapa ma sleduje (tracker); ťuknutím sa po posunutí mapy hneď vráti na mňa",
     "follow_back": "Späť na mňa · {s} s", "follow_back_tip": "Hneď späť na moju polohu (po odpočte sa mapa vráti sama)",
     "road_alerts": "Upozorňovať na dopravné problémy predo mnou (keď beží tracker)", "road_alert_km": "Pozerať dopredu", "road_alerts_hint": "Nehody, práce na ceste a ďalšie dopravné hlásenia na mape v laloku pred tebou: rovno do zvolenej vzdialenosti, do strán menej, za teba nikdy. Pomaly (v meste) je lalok široký, rýchlo (hlavné cesty) dlhý a úzky. Bublina a zvuk, pri každom raz.", "road_ahead": "Dopravné hlásenie {d} pred tebou", "road_left": "vľavo", "road_right": "vpravo", "road_more": "a ďalšie pred tebou: {n}", "road_show": "Ukázať", "sound_road": "Dopravný problém pred tebou (tracker)",
+    "about_thanks": "Ďakujem rádioklubu OK1OMG a Martinovi OK1MDX za pomoc a podporu.",
     "update_beta": "Ponúkať aj beta verzie (pre testerov: novšie, menej vyskúšané)",
     "locator_is": "Lokátor {loc} (kopírovať)", "loc_to_chat": "Poslať lokátor {loc} do chatu", "loc_to_message": "Poslať lokátor {loc} v správe…",
     "pos_to_chat": "Poslať túto polohu do chatu", "pos_to_message": "Poslať túto polohu v správe…", "pos_send_mine": "Poslať moju polohu do chatu", "pos_insert_mine": "Vložiť moju polohu do správy", "pos_on_map": "Ukázať na mape", "pos_sent_chat": "Poloha odišla do chatu",

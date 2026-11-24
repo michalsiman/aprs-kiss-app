@@ -33,6 +33,7 @@ TEXTS = {
     "map_following": "Karta me prati (tracker); dodirni za odmah natrag nakon pomicanja karte",
     "follow_back": "Natrag na mene · {s} s", "follow_back_tip": "Odmah natrag na moj položaj (nakon odbrojavanja vraća se sama)",
     "road_alerts": "Upozori na probleme na cesti ispred (dok radi tracker)", "road_alert_km": "Gledaj naprijed", "road_alerts_hint": "Nesreće, radovi i druge prometne obavijesti na karti u režnju ispred tebe: ravno do odabrane udaljenosti, u stranu manje, iza nikad. Polako (u gradu) režanj je širok, brzo (glavne ceste) dug i uzak. Oblačić i zvuk, za svaku jednom.", "road_ahead": "Prometna obavijest {d} ispred", "road_left": "lijevo", "road_right": "desno", "road_more": "i još {n} ispred", "road_show": "Prikaži", "sound_road": "Problem na cesti ispred (tracker)",
+    "about_thanks": "Hvala radioklubu OK1OMG i Martinu OK1MDX na pomoći i podršci.",
     "update_beta": "Nudi i beta verzije (za testere: novije, manje isprobane)",
     "locator_is": "Lokator {loc} (kopiraj)", "loc_to_chat": "Pošalji lokator {loc} u chat", "loc_to_message": "Pošalji lokator {loc} u poruci…",
     "pos_to_chat": "Pošalji ovaj položaj u chat", "pos_to_message": "Pošalji ovaj položaj u poruci…", "pos_send_mine": "Pošalji moj položaj u chat", "pos_insert_mine": "Umetni moj položaj u poruku", "pos_on_map": "Prikaži na karti", "pos_sent_chat": "Položaj je otišao u chat",

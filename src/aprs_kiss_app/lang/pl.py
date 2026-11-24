@@ -34,6 +34,7 @@ TEXTS = {
     "map_following": "Mapa podąża za mną (tracker); dotknij, by po przesunięciu mapy od razu wrócić",
     "follow_back": "Wróć do mnie · {s} s", "follow_back_tip": "Od razu wróć do mojej pozycji (po odliczaniu mapa wróci sama)",
     "road_alerts": "Ostrzegaj o utrudnieniach przed mną (gdy działa tracker)", "road_alert_km": "Patrz do przodu", "road_alerts_hint": "Wypadki, roboty drogowe i inne komunikaty na mapie w płacie przed tobą: prosto do wybranej odległości, na boki mniej, nigdy za tobą. Wolno (w mieście) płat jest szeroki, szybko (główne drogi) długi i wąski. Dymek i dźwięk, dla każdego raz.", "road_ahead": "Utrudnienie {d} przed tobą", "road_left": "po lewej", "road_right": "po prawej", "road_more": "i jeszcze {n} przed tobą", "road_show": "Pokaż", "sound_road": "Utrudnienie przed tobą (tracker)",
+    "about_thanks": "Dziękuję klubowi krótkofalowców OK1OMG i Martinowi OK1MDX za pomoc i wsparcie.",
     "update_beta": "Proponuj też wersje beta (dla testerów: nowsze, mniej sprawdzone)",
     "locator_is": "Lokator {loc} (kopiuj)", "loc_to_chat": "Wyślij lokator {loc} na czat", "loc_to_message": "Wyślij lokator {loc} w wiadomości…",
     "pos_to_chat": "Wyślij tę pozycję na czat", "pos_to_message": "Wyślij tę pozycję w wiadomości…", "pos_send_mine": "Wyślij moją pozycję na czat", "pos_insert_mine": "Wstaw moją pozycję do wiadomości", "pos_on_map": "Pokaż na mapie", "pos_sent_chat": "Pozycja poszła na czat",

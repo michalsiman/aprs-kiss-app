@@ -102,6 +102,7 @@ def show_about(app: App) -> None:
             ], wrap=True, spacing=4),
             ft.Text(t("about_contact"), size=13, color=small),
             ft.Text(t("about_together"), size=13, color=small),
+            ft.Text(t("about_thanks"), size=13),
             ft.Divider(height=8),
             ft.Text(t("about_licence"), size=12, color=small),
             ft.Text(f"{t('about_data')}: {app.folder}", size=12, color=small, selectable=True),

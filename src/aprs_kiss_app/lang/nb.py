@@ -33,6 +33,7 @@ TEXTS = {
     "map_following": "Kartet følger meg (tracker); trykk for å komme tilbake med en gang etter at kartet er flyttet",
     "follow_back": "Tilbake til meg · {s} s", "follow_back_tip": "Tilbake til min posisjon nå (etter nedtellingen skjer det av seg selv)",
     "road_alerts": "Varsle om trafikkproblemer foran (når trackeren går)", "road_alert_km": "Se framover", "road_alerts_hint": "Ulykker, veiarbeid og andre trafikkmeldinger på kartet i en lapp foran deg: rett fram til valgt avstand, mindre til sidene, aldri bak. Sakte (i byen) er lappen bred, fort (hovedveier) lang og smal. En boble og en lyd, én gang for hver.", "road_ahead": "Trafikkmelding {d} foran", "road_left": "til venstre", "road_right": "til høyre", "road_more": "og {n} til foran", "road_show": "Vis", "sound_road": "Trafikkproblem foran (tracker)",
+    "about_thanks": "Takk til radioklubben OK1OMG og til Martin OK1MDX for hjelp og støtte.",
     "update_beta": "Tilby også betaversjoner (for testere: nyere, mindre utprøvd)",
     "locator_is": "Lokator {loc} (kopier)", "loc_to_chat": "Send lokatoren {loc} til chatten", "loc_to_message": "Send lokatoren {loc} i en melding…",
     "pos_to_chat": "Send denne posisjonen til chatten", "pos_to_message": "Send denne posisjonen i en melding…", "pos_send_mine": "Send min posisjon til chatten", "pos_insert_mine": "Sett inn min posisjon i meldingen", "pos_on_map": "Vis på kartet", "pos_sent_chat": "Posisjonen gikk til chatten",

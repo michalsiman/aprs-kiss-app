@@ -33,6 +33,7 @@ TEXTS = {
     "map_following": "Die Karte folgt mir (Tracker); antippen, um nach dem Verschieben sofort zurückzukehren",
     "follow_back": "Zurück zu mir · {s} s", "follow_back_tip": "Sofort zurück zu meiner Position (nach dem Countdown von selbst)",
     "road_alerts": "Vor Verkehrsstörungen voraus warnen (wenn der Tracker läuft)", "road_alert_km": "Vorausschauen", "road_alerts_hint": "Unfälle, Baustellen und andere Verkehrsmeldungen auf der Karte in einer Keule vor dir: geradeaus bis zur gewählten Entfernung, seitlich weniger, nie hinter dir. Langsam (in der Stadt) ist sie breit, schnell (Hauptstraßen) lang und schmal. Eine Blase und ein Ton, für jede einmal.", "road_ahead": "Verkehrsmeldung {d} voraus", "road_left": "links", "road_right": "rechts", "road_more": "und {n} weitere voraus", "road_show": "Zeigen", "sound_road": "Verkehrsstörung voraus (Tracker)",
+    "about_thanks": "Danke an den Funkclub OK1OMG und an Martin OK1MDX für Hilfe und Unterstützung.",
     "update_beta": "Auch Beta-Versionen anbieten (für Tester: neuer, weniger erprobt)",
     "locator_is": "Locator {loc} (kopieren)", "loc_to_chat": "Locator {loc} in den Chat senden", "loc_to_message": "Locator {loc} in einer Nachricht senden…",
     "pos_to_chat": "Diese Position in den Chat senden", "pos_to_message": "Diese Position in einer Nachricht senden…", "pos_send_mine": "Meine Position in den Chat senden", "pos_insert_mine": "Meine Position in die Nachricht einfügen", "pos_on_map": "Auf der Karte zeigen", "pos_sent_chat": "Die Position ging in den Chat",

@@ -33,6 +33,7 @@ TEXTS = {
     "map_following": "El mapa me sigue (tracker); toca para volver enseguida tras mover el mapa",
     "follow_back": "Volver a mí · {s} s", "follow_back_tip": "Volver ya a mi posición (al acabar la cuenta vuelve sola)",
     "road_alerts": "Avisar de incidencias de tráfico delante (con el tracker en marcha)", "road_alert_km": "Mirar adelante", "road_alerts_hint": "Accidentes, obras y otros avisos en el mapa en un lóbulo delante de ti: recto hasta la distancia elegida, menos a los lados, nunca detrás. Despacio (en ciudad) el lóbulo es ancho, rápido (vías principales) largo y estrecho. Un globo y un sonido, una vez por cada uno.", "road_ahead": "Incidencia de tráfico a {d} delante", "road_left": "a la izquierda", "road_right": "a la derecha", "road_more": "y {n} más delante", "road_show": "Mostrar", "sound_road": "Incidencia de tráfico delante (tracker)",
+    "about_thanks": "Gracias al radioclub OK1OMG y a Martin OK1MDX por su ayuda y apoyo.",
     "update_beta": "Ofrecer también las versiones beta (para probadores: más nuevas, menos probadas)",
     "locator_is": "Localizador {loc} (copiar)", "loc_to_chat": "Enviar el localizador {loc} al chat", "loc_to_message": "Enviar el localizador {loc} en un mensaje…",
     "pos_to_chat": "Enviar esta posición al chat", "pos_to_message": "Enviar esta posición en un mensaje…", "pos_send_mine": "Enviar mi posición al chat", "pos_insert_mine": "Poner mi posición en el mensaje", "pos_on_map": "Mostrar en el mapa", "pos_sent_chat": "La posición se envió al chat",
