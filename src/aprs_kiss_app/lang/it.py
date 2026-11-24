@@ -31,6 +31,7 @@ TEXTS = {
     "map_tools_hide": "Nascondi i pulsanti della mappa", "map_tools_show": "Pulsanti della mappa",
     "filter": "Filtra le stazioni", "filter_on": "Mostrate solo: {what}", "filter_all": "Mostra tutte le stazioni", "filter_weather": "Solo stazioni meteo", "filter_moving": "Solo in movimento (mosse negli ultimi 10 min)", "filter_road": "Solo problemi stradali (incidenti, cantieri, allagamenti…)", "filter_weather_short": "meteo", "filter_moving_short": "in movimento", "filter_road_short": "problemi stradali",
     "map_following": "La mappa mi segue (tracker); tocca per tornare subito dopo aver spostato la mappa",
+    "follow_back": "Torna a me · {s} s", "follow_back_tip": "Torna subito alla mia posizione (allo scadere torna da sola)",
     "object_of": "oggetto di {call}",
     "measure_from": "Misura la distanza da qui",
     "measure_from_me": "Distanza dalla mia posizione",

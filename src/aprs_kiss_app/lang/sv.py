@@ -30,6 +30,7 @@ TEXTS = {
     "map_tools_hide": "Dölj kartknapparna", "map_tools_show": "Kartknappar",
     "filter": "Filtrera stationer", "filter_on": "Visas bara: {what}", "filter_all": "Visa alla stationer", "filter_weather": "Bara väderstationer", "filter_moving": "Bara i rörelse (flyttat sig de senaste 10 min)", "filter_road": "Bara trafikstörningar (olyckor, vägarbeten, översvämningar…)", "filter_weather_short": "väder", "filter_moving_short": "i rörelse", "filter_road_short": "trafikstörningar",
     "map_following": "Kartan följer mig (tracker); tryck för att genast komma tillbaka efter att ha flyttat kartan",
+    "follow_back": "Tillbaka till mig · {s} s", "follow_back_tip": "Tillbaka till min position nu (efter nedräkningen sker det av sig självt)",
     "object_of": "objekt från {call}",
     "measure_from": "Mät avstånd härifrån",
     "measure_from_me": "Avstånd från min position",

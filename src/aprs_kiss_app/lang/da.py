@@ -30,6 +30,7 @@ TEXTS = {
     "map_tools_hide": "Skjul kortknapperne", "map_tools_show": "Kortknapper",
     "filter": "Filtrer stationer", "filter_on": "Kun vist: {what}", "filter_all": "Vis alle stationer", "filter_weather": "Kun vejrstationer", "filter_moving": "Kun i bevægelse (flyttet de sidste 10 min)", "filter_road": "Kun trafikproblemer (ulykker, vejarbejde, oversvømmelser…)", "filter_weather_short": "vejr", "filter_moving_short": "i bevægelse", "filter_road_short": "trafikproblemer",
     "map_following": "Kortet følger mig (tracker); tryk for straks at vende tilbage efter at have flyttet kortet",
+    "follow_back": "Tilbage til mig · {s} s", "follow_back_tip": "Tilbage til min position nu (efter nedtællingen sker det af sig selv)",
     "object_of": "objekt fra {call}",
     "measure_from": "Mål afstand herfra",
     "measure_from_me": "Afstand fra min position",

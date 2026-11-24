@@ -30,6 +30,7 @@ TEXTS = {
     "map_tools_hide": "Ocultar los botones del mapa", "map_tools_show": "Botones del mapa",
     "filter": "Filtrar estaciones", "filter_on": "Solo se muestran: {what}", "filter_all": "Mostrar todas las estaciones", "filter_weather": "Solo estaciones meteorológicas", "filter_moving": "Solo en movimiento (se movieron en los últimos 10 min)", "filter_road": "Solo incidencias de tráfico (accidentes, obras, inundaciones…)", "filter_weather_short": "meteo", "filter_moving_short": "en movimiento", "filter_road_short": "incidencias de tráfico",
     "map_following": "El mapa me sigue (tracker); toca para volver enseguida tras mover el mapa",
+    "follow_back": "Volver a mí · {s} s", "follow_back_tip": "Volver ya a mi posición (al acabar la cuenta vuelve sola)",
     "object_of": "objeto de {call}",
     "measure_from": "Medir distancia desde aquí",
     "measure_from_me": "Distancia desde mi posición",

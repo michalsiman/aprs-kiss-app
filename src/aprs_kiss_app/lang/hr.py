@@ -30,6 +30,7 @@ TEXTS = {
     "map_tools_hide": "Sakrij gumbe karte", "map_tools_show": "Gumbi karte",
     "filter": "Filtar stanica", "filter_on": "Prikazano samo: {what}", "filter_all": "Prikaži sve stanice", "filter_weather": "Samo meteorološke stanice", "filter_moving": "Samo u pokretu (pomaknule se u zadnjih 10 min)", "filter_road": "Samo problemi na cesti (nesreće, radovi, poplave…)", "filter_weather_short": "meteo", "filter_moving_short": "u pokretu", "filter_road_short": "problemi na cesti",
     "map_following": "Karta me prati (tracker); dodirni za odmah natrag nakon pomicanja karte",
+    "follow_back": "Natrag na mene · {s} s", "follow_back_tip": "Odmah natrag na moj položaj (nakon odbrojavanja vraća se sama)",
     "object_of": "objekt od {call}",
     "measure_from": "Izmjeri udaljenost odavde",
     "measure_from_me": "Udaljenost od mog položaja",

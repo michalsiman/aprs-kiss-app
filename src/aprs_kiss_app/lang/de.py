@@ -30,6 +30,7 @@ TEXTS = {
     "map_tools_hide": "Kartenknöpfe ausblenden", "map_tools_show": "Kartenknöpfe",
     "filter": "Stationen filtern", "filter_on": "Nur angezeigt: {what}", "filter_all": "Alle Stationen zeigen", "filter_weather": "Nur Wetterstationen", "filter_moving": "Nur bewegte (in den letzten 10 Min. bewegt)", "filter_road": "Nur Verkehrsstörungen (Unfälle, Baustellen, Hochwasser…)", "filter_weather_short": "Wetter", "filter_moving_short": "bewegte", "filter_road_short": "Verkehrsstörungen",
     "map_following": "Die Karte folgt mir (Tracker); antippen, um nach dem Verschieben sofort zurückzukehren",
+    "follow_back": "Zurück zu mir · {s} s", "follow_back_tip": "Sofort zurück zu meiner Position (nach dem Countdown von selbst)",
     "object_of": "Objekt von {call}",
     "measure_from": "Entfernung von hier messen",
     "measure_from_me": "Entfernung von meiner Position",

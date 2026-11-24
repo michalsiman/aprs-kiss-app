@@ -30,6 +30,7 @@ TEXTS = {
     "map_tools_hide": "Skryť tlačidlá mapy", "map_tools_show": "Tlačidlá mapy",
     "filter": "Filter staníc", "filter_on": "Zobrazené len: {what}", "filter_all": "Zobraziť všetky stanice", "filter_weather": "Len meteostanice", "filter_moving": "Len pohybujúce sa (pohli sa za posledných 10 min)", "filter_road": "Len dopravné problémy (nehody, práce na ceste, povodne…)", "filter_weather_short": "meteostanice", "filter_moving_short": "pohybujúce sa", "filter_road_short": "dopravné problémy",
     "map_following": "Mapa ma sleduje (tracker); ťuknutím sa po posunutí mapy hneď vráti na mňa",
+    "follow_back": "Späť na mňa · {s} s", "follow_back_tip": "Hneď späť na moju polohu (po odpočte sa mapa vráti sama)",
     "object_of": "objekt od {call}",
     "measure_from": "Merať vzdialenosť odtiaľto",
     "measure_from_me": "Vzdialenosť od mojej polohy",

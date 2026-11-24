@@ -124,8 +124,17 @@ class MapView(View):
             )], alignment=ft.MainAxisAlignment.CENTER),
             left=70, right=70, bottom=36, visible=False,
         )
+        # Following us, the map moved by hand: a button back to us, counting down to when it goes back by itself.
+        self.back_text = ft.Text(size=14, weight=ft.FontWeight.BOLD, color=ft.Colors.ON_PRIMARY)
+        self.back_btn = ft.Container(
+            ft.Row([ft.Icon(ft.Icons.MY_LOCATION, size=20, color=ft.Colors.ON_PRIMARY), self.back_text],
+                   tight=True, spacing=6, vertical_alignment=ft.CrossAxisAlignment.CENTER),
+            bgcolor=ft.Colors.PRIMARY, border_radius=22, padding=ft.Padding.symmetric(horizontal=14, vertical=10),
+            shadow=ft.BoxShadow(blur_radius=6, color=ft.Colors.with_opacity(0.35, ft.Colors.BLACK)),
+            right=8, bottom=150, visible=False, tooltip=self.t("follow_back_tip"), on_click=self._centre_me,
+        )
         return ft.Stack([self.menu, overlay, self.controls.control, self.scale.control, self.base.credit,
-                         self.measure_box], expand=True)
+                         self.measure_box, self.back_btn], expand=True)
 
     def _show_tools(self, shown: bool) -> None:
         for button in self.tools:
@@ -222,7 +231,6 @@ class MapView(View):
         return self.source_btn.control
 
     def _gesture_end(self, _e=None) -> None:
-        self._touched = time.monotonic()
         self.app.page.run_task(self._ask_camera, 0.4)  # soon, and the watch below catches the end of a fling
 
     async def _watch_camera(self) -> None:
@@ -511,10 +519,16 @@ class MapView(View):
             self.me_btn.icon_color = ft.Colors.PRIMARY if following else None
             self.me_btn.tooltip = self.t("map_following" if following else "centre_me")
             self.me_btn.update()
+        now = time.monotonic()
+        left = FOLLOW_IDLE_SECONDS - (now - self._touched)
+        back = following and left >= 0.5 and self._camera_seen is not None
+        text = self.t("follow_back", s=math.ceil(left)) if back else self.back_text.value
+        if back != self.back_btn.visible or text != self.back_text.value:
+            self.back_btn.visible, self.back_text.value = back, text
+            self.back_btn.update()
         if not following or self._camera_seen is None:
             return
-        now = time.monotonic()
-        if now - self._touched < FOLLOW_IDLE_SECONDS or now - self._followed < FOLLOW_OWN_MOVE_SECONDS:
+        if left > 0 or now - self._followed < FOLLOW_OWN_MOVE_SECONDS:
             return
         fix = self.engine.gps_fix()
         lat, lon, zoom, _rot = self._camera_seen
@@ -530,6 +544,7 @@ class MapView(View):
         if here and self.following():
             self._touched = 0.0  # following again at once, at the usual zoom
             self._followed = 0.0
+            self._camera_seen = self._camera_seen or (*here, -1.0, 0.0)  # not asked yet: move anyway
             await self._follow()
         elif here:
             await self.centre(*here, max(self.base.zoom, 11))
