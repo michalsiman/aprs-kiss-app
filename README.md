@@ -1,0 +1,109 @@
+# Statistics of michalsiman/aprs-kiss-app
+
+Updated 2026-11-24 by `.github/workflows/stats.yml`. Raw data: the CSV files on this branch.
+
+## Release downloads (457 in total)
+
+| Release | Downloads |
+|---|---:|
+| v1.0.2-beta | 11 |
+| v1.0.1-beta | 0 |
+| v1.0.0 | 12 |
+| v0.1.55 | 11 |
+| v0.1.54 | 3 |
+| v0.1.53 | 2 |
+| v0.1.52 | 11 |
+| v0.1.51 | 12 |
+| v0.1.50 | 11 |
+| v0.1.49 | 13 |
+| v0.1.48 | 3 |
+| v0.1.47 | 19 |
+| v0.1.46 | 13 |
+| v0.1.45 | 13 |
+| v0.1.44 | 10 |
+| v0.1.43 | 12 |
+| v0.1.42 | 12 |
+| v0.1.41 | 11 |
+| v0.1.40 | 3 |
+| v0.1.39 | 11 |
+| v0.1.38 | 11 |
+| v0.1.37 | 11 |
+| v0.1.36 | 12 |
+| v0.1.35 | 8 |
+| v0.1.34 | 13 |
+| v0.1.33 | 10 |
+| v0.1.32 | 11 |
+| v0.1.31 | 12 |
+| v0.1.30 | 10 |
+| v0.1.29 | 9 |
+| v0.1.28 | 9 |
+| v0.1.27 | 9 |
+| v0.1.25 | 10 |
+| v0.1.24 | 9 |
+| v0.1.23 | 9 |
+| v0.1.22 | 10 |
+| v0.1.21 | 9 |
+| v0.1.20 | 9 |
+| v0.1.19 | 5 |
+| v0.1.18 | 5 |
+| v0.1.17 | 6 |
+| v0.1.16 | 6 |
+| v0.1.15 | 8 |
+| v0.1.14 | 5 |
+| v0.1.13 | 5 |
+| v0.1.12 | 5 |
+| v0.1.11 | 5 |
+| v0.1.9 | 5 |
+| v0.1.8 | 5 |
+| v0.1.7 | 3 |
+| v0.1.6 | 3 |
+| v0.1.5 | 3 |
+| v0.1.4 | 4 |
+| v0.1.3 | 3 |
+| v0.1.2 | 3 |
+| v0.1.1 | 3 |
+| v0.1.0 | 1 |
+
+## Views, last 30 days
+
+| Day | Views | Unique visitors | Clones |
+|---|---:|---:|---:|
+| 2026-11-23 | 55 | 20 | 663 |
+| 2026-11-22 | 41 | 15 | 251 |
+| 2026-11-21 | 2 | 1 | 4 |
+| 2026-11-20 | 0 | 0 | 6 |
+| 2026-11-19 | 0 | 0 | 22 |
+| 2026-11-18 | 29 | 4 | 103 |
+| 2026-11-17 | 12 | 1 | 173 |
+| 2026-11-16 | 0 | 0 | 0 |
+| 2026-11-15 | 0 | 0 | 0 |
+| 2026-11-14 | 0 | 0 | 0 |
+| 2026-11-13 | 0 | 0 | 0 |
+| 2026-11-12 | 0 | 0 | 0 |
+| 2026-11-11 | 0 | 0 | 0 |
+| 2026-11-10 | 0 | 0 | 0 |
+
+## Referring sites (last 14 days)
+
+| Site | Views | Unique |
+|---|---:|---:|
+| github.com | 28 | 6 |
+| blog.ok1sim.cz | 26 | 18 |
+| l.facebook.com | 7 | 6 |
+| lm.facebook.com | 3 | 3 |
+| m.facebook.com | 1 | 1 |
+
+## Popular content (last 14 days)
+
+| Page | Views | Unique |
+|---|---:|---:|
+| /michalsiman/aprs-kiss-app | 72 | 35 |
+| /michalsiman/aprs-kiss-app/blob/main/README.cs.md | 8 | 4 |
+| /michalsiman/aprs-kiss-app/tree/main | 6 | 2 |
+| /michalsiman/aprs-kiss-app/blob/main/assets/map-offline.png | 3 | 3 |
+| /michalsiman/aprs-kiss-app/actions/runs/44147515500 | 2 | 2 |
+| /michalsiman/aprs-kiss-app/blob/main/assets/messages.png | 2 | 2 |
+| /michalsiman/aprs-kiss-app/compare/v0.1.7...main | 2 | 2 |
+| /michalsiman/aprs-kiss-app/releases/tag/v0.1.16 | 2 | 2 |
+| /michalsiman/aprs-kiss-app/releases/tag/v0.1.40 | 2 | 2 |
+| /michalsiman/aprs-kiss-app/branches | 2 | 1 |
