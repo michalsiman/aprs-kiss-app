@@ -132,7 +132,7 @@ class MapView(View):
                    tight=True, spacing=6, vertical_alignment=ft.CrossAxisAlignment.CENTER),
             bgcolor=ft.Colors.PRIMARY, border_radius=22, padding=ft.Padding.symmetric(horizontal=14, vertical=10),
             shadow=ft.BoxShadow(blur_radius=6, color=ft.Colors.with_opacity(0.35, ft.Colors.BLACK)),
-            right=8, bottom=150, visible=False, tooltip=self.t("follow_back_tip"), on_click=self._centre_me,
+            left=8, bottom=40, visible=False, tooltip=self.t("follow_back_tip"), on_click=self._centre_me,  # above the scale
         )
         return ft.Stack([self.menu, overlay, self.controls.control, self.scale.control, self.base.credit,
                          self.measure_box, self.back_btn], expand=True)
