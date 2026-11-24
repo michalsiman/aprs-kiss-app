@@ -200,7 +200,7 @@ def out(name, lang, theme) -> Path:
 # ─── what to photograph (desktop 1300×820) ────────────────────────────────
 
 RAIL = {"map": 35, "messages": 100, "thursday": 165, "stations": 228, "terminal": 292, "chat": 356,
-        "monitor": 420, "bbs": 484, "tak": 548, "settings": 612}
+        "files": 420, "monitor": 484, "bbs": 548, "tak": 612, "settings": 676}
 SECTION = {"tnc": 92, "station": 154, "gps": 219, "tracker": 283, "digi": 347, "aprsis": 411, "vara": 475,
            "tak": 540, "bbs": 604, "maps": 668, "background": 732, "sounds": 796}
 
@@ -288,8 +288,8 @@ async def desktop(lang, theme, only):
 
 # ─── the phone (412×870 css px) ────────────────────────────────────────────
 
-DRAWER = {"messages": 139, "thursday": 195, "stations": 251, "terminal": 307, "chat": 363, "monitor": 419,
-          "tak": 474, "settings": 531}
+DRAWER = {"messages": 139, "thursday": 195, "stations": 251, "terminal": 307, "chat": 363, "files": 419,
+          "monitor": 475, "tak": 530, "settings": 587}
 
 
 async def phone(lang, theme, only):

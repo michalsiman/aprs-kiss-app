@@ -57,6 +57,7 @@ class Config:
     road_alert_km: int = 5  # …this far
     tracked_callsigns: str = ""
     accept_incoming: bool = False
+    files_accept: bool = False  # Files: other stations may connect and send us a file (YAPP); each is asked about
     # APRS-IS
     aprsis_enabled: bool = False
     licence_confirmed: bool = False

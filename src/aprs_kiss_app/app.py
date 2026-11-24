@@ -30,6 +30,7 @@ from .views.base import View, adapt, clock, distance_text
 from .views.bbs import BbsView
 from .views.tak import TakView
 from .views.chat import ChatView
+from .views.files import FilesView, size_text
 from .views.map import MapView
 from .views.messages import MessagesView
 from .views.monitor import MonitorView
@@ -40,8 +41,8 @@ from .views.thursday import ThursdayView
 
 _LOGGER = logging.getLogger(__name__)
 
-VIEWS = [MapView, MessagesView, ThursdayView, StationsView, TerminalView, ChatView, MonitorView, BbsView, TakView,
-         SettingsView]
+VIEWS = [MapView, MessagesView, ThursdayView, StationsView, TerminalView, ChatView, FilesView, MonitorView, BbsView,
+         TakView, SettingsView]
 # With BBS SERVER on the app is only the BBS; the monitor stays to see what the radio hears.
 BBS_VIEWS = [BbsView, MonitorView, SettingsView]
 TAK_VIEWS = [TakView, MonitorView, SettingsView]
@@ -612,7 +613,30 @@ class App:
                 v.on_event(kind, data)
         if kind == "message":
             self._notify_message(data)
+        elif kind == "file_offer":
+            self._file_offer(data)
         self._schedule_flush()
+
+    def _file_offer(self, offer: dict[str, Any]) -> None:
+        """Another station wants to send a file: take it or not (from any screen)."""
+        remote = offer["remote"]
+
+        def answer(yes: bool) -> None:
+            self.page.pop_dialog()
+            self.engine.answer_file(remote, yes)
+            if yes and self.has_view("files"):
+                self.select("files")
+
+        self.sounds.play("message")
+        if not self._foreground:
+            android_notify.notify(self.t("files_offer_title"), self.t("files_offer_text", call=remote,
+                                  name=offer["name"], size=size_text(offer["size"])), self.t("files"))
+        self.show_dialog(ft.AlertDialog(
+            title=ft.Text(self.t("files_offer_title")),
+            content=ft.Text(self.t("files_offer_text", call=remote, name=offer["name"], size=size_text(offer["size"]))),
+            actions=[ft.TextButton(self.t("files_refuse"), on_click=lambda _e: answer(False)),
+                     ft.FilledButton(self.t("files_accept_one"), icon=ft.Icons.DOWNLOAD, on_click=lambda _e: answer(True))],
+        ))
 
     def _schedule_flush(self) -> None:
         if self._flush_pending or self._closing:
