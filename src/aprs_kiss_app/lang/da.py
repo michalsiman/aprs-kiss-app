@@ -32,6 +32,7 @@ TEXTS = {
     "filter_repeater": "Kun repeatere (med deres frekvens)", "filter_repeater_short": "repeatere",
     "map_following": "Kortet følger mig (tracker); tryk for straks at vende tilbage efter at have flyttet kortet",
     "follow_back": "Tilbage til mig · {s} s", "follow_back_tip": "Tilbage til min position nu (efter nedtællingen sker det af sig selv)",
+    "road_alerts": "Advar om trafikproblemer forude (når trackeren kører)", "road_alert_km": "Se fremad", "road_alerts_hint": "Ulykker, vejarbejde og andre trafikmeldinger på kortet inden for den valgte afstand i kørselsretningen (en korridor langs din retning, bredere længere ude): en boble og en lyd, én gang for hver.", "road_ahead": "Trafikmelding {d} forude", "road_left": "til venstre", "road_right": "til højre", "road_more": "og {n} mere forude", "road_show": "Vis", "sound_road": "Trafikproblem forude (tracker)",
     "object_of": "objekt fra {call}",
     "measure_from": "Mål afstand herfra",
     "measure_from_me": "Afstand fra min position",

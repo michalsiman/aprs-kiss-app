@@ -32,6 +32,7 @@ TEXTS = {
     "filter_repeater": "Len prevádzače (s ich frekvenciou)", "filter_repeater_short": "prevádzače",
     "map_following": "Mapa ma sleduje (tracker); ťuknutím sa po posunutí mapy hneď vráti na mňa",
     "follow_back": "Späť na mňa · {s} s", "follow_back_tip": "Hneď späť na moju polohu (po odpočte sa mapa vráti sama)",
+    "road_alerts": "Upozorňovať na dopravné problémy predo mnou (keď beží tracker)", "road_alert_km": "Pozerať dopredu", "road_alerts_hint": "Nehody, práce na ceste a ďalšie dopravné hlásenia na mape do zvolenej vzdialenosti v smere jazdy (koridor pozdĺž tvojho smeru, ďalej širší): bublina a zvuk, pri každom raz.", "road_ahead": "Dopravné hlásenie {d} pred tebou", "road_left": "vľavo", "road_right": "vpravo", "road_more": "a ďalšie pred tebou: {n}", "road_show": "Ukázať", "sound_road": "Dopravný problém pred tebou (tracker)",
     "object_of": "objekt od {call}",
     "measure_from": "Merať vzdialenosť odtiaľto",
     "measure_from_me": "Vzdialenosť od mojej polohy",

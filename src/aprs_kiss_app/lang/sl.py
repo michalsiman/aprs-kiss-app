@@ -32,6 +32,7 @@ TEXTS = {
     "filter_repeater": "Samo repetitorji (s frekvenco)", "filter_repeater_short": "repetitorji",
     "map_following": "Zemljevid mi sledi (tracker); dotakni se za takojšnjo vrnitev po premiku zemljevida",
     "follow_back": "Nazaj name · {s} s", "follow_back_tip": "Takoj nazaj na moj položaj (po odštevanju se vrne sam)",
+    "road_alerts": "Opozori na težave na cesti pred mano (ko teče tracker)", "road_alert_km": "Glej naprej", "road_alerts_hint": "Nesreče, dela na cesti in druga prometna obvestila na zemljevidu do izbrane razdalje v smeri vožnje (koridor vzdolž tvoje smeri, dlje širši): oblaček in zvok, za vsako enkrat.", "road_ahead": "Prometno obvestilo {d} pred tabo", "road_left": "levo", "road_right": "desno", "road_more": "in še {n} pred tabo", "road_show": "Pokaži", "sound_road": "Težava na cesti pred tabo (tracker)",
     "object_of": "objekt od {call}",
     "measure_from": "Izmeri razdaljo od tu",
     "measure_from_me": "Razdalja od mojega položaja",

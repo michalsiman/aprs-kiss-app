@@ -14,7 +14,7 @@ from typing import Any
 
 from .aprsis import DEFAULT_PORT as DEFAULT_APRSIS_PORT
 from .aprsis import DEFAULT_SERVER as DEFAULT_APRSIS_HOST
-from . import mapfilter
+from . import mapfilter, roadalert
 from .ax25 import Address
 
 _LOGGER = logging.getLogger(__name__)
@@ -49,6 +49,8 @@ class Config:
     tracker_minutes: int = 2
     tracker_profile: str = "car"  # smart: walk, bike or car
     tracker_still_minutes: int = 60  # smart: standing still, once in this many minutes
+    road_alerts: bool = True  # while the tracker runs: warn about road incidents ahead…
+    road_alert_km: int = 5  # …this far
     tracked_callsigns: str = ""
     accept_incoming: bool = False
     # APRS-IS
@@ -98,6 +100,7 @@ class Config:
     sound_messages: bool = True  # a sound for a new APRS message
     sound_chat: bool = True  # … for a new packet chat line
     sound_tak: bool = True  # … for a new TAK GeoChat message
+    sound_road: bool = True  # … for a road incident ahead (tracker)
     theme: str = "auto"  # auto (as the desktop), light, dark
 
     @property
@@ -144,6 +147,8 @@ class Config:
             self.tracker_profile = "car"
         self.tracker_minutes = min(60, max(1, int(self.tracker_minutes or 2)))
         self.tracker_still_minutes = min(120, max(5, int(self.tracker_still_minutes or 60)))
+        if self.road_alert_km not in roadalert.DISTANCES_KM:
+            self.road_alert_km = 5
         if self.connection == "tcp" and not (0 < int(self.port) < 65536):
             raise ValueError("Invalid TCP port")
         return self  # licence_confirmed stays when APRS-IS is switched off: the sentence is typed once

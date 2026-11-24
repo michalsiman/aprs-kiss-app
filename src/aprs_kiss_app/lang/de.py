@@ -32,6 +32,7 @@ TEXTS = {
     "filter_repeater": "Nur Relais (mit ihrer Frequenz)", "filter_repeater_short": "Relais",
     "map_following": "Die Karte folgt mir (Tracker); antippen, um nach dem Verschieben sofort zurückzukehren",
     "follow_back": "Zurück zu mir · {s} s", "follow_back_tip": "Sofort zurück zu meiner Position (nach dem Countdown von selbst)",
+    "road_alerts": "Vor Verkehrsstörungen voraus warnen (wenn der Tracker läuft)", "road_alert_km": "Vorausschauen", "road_alerts_hint": "Unfälle, Baustellen und andere Verkehrsmeldungen auf der Karte bis zur gewählten Entfernung in Fahrtrichtung (ein Korridor entlang deiner Richtung, weiter weg breiter): eine Blase und ein Ton, für jede einmal.", "road_ahead": "Verkehrsmeldung {d} voraus", "road_left": "links", "road_right": "rechts", "road_more": "und {n} weitere voraus", "road_show": "Zeigen", "sound_road": "Verkehrsstörung voraus (Tracker)",
     "object_of": "Objekt von {call}",
     "measure_from": "Entfernung von hier messen",
     "measure_from_me": "Entfernung von meiner Position",

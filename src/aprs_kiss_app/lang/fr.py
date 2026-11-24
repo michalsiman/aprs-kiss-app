@@ -33,6 +33,7 @@ TEXTS = {
     "filter_repeater": "Relais seulement (avec leur fréquence)", "filter_repeater_short": "relais",
     "map_following": "La carte me suit (tracker) ; touchez pour revenir tout de suite après avoir déplacé la carte",
     "follow_back": "Revenir à moi · {s} s", "follow_back_tip": "Revenir tout de suite à ma position (à la fin du décompte, la carte revient seule)",
+    "road_alerts": "Prévenir des incidents routiers devant (quand le tracker tourne)", "road_alert_km": "Regarder devant", "road_alerts_hint": "Accidents, travaux et autres infos trafic sur la carte jusqu'à la distance choisie dans le sens de la marche (un couloir le long de ta direction, plus large au loin) : une bulle et un son, une fois pour chacun.", "road_ahead": "Incident routier à {d} devant", "road_left": "à gauche", "road_right": "à droite", "road_more": "et {n} autres devant", "road_show": "Afficher", "sound_road": "Incident routier devant (tracker)",
     "object_of": "objet de {call}",
     "measure_from": "Mesurer la distance d'ici",
     "measure_from_me": "Distance depuis ma position",

@@ -10,7 +10,7 @@ from pathlib import Path
 
 import flet as ft
 
-from aprs_kiss_core import android_bt, android_usb, tilemaps, tracker
+from aprs_kiss_core import android_bt, android_usb, roadalert, tilemaps, tracker
 from aprs_kiss_core.aprsis import licence_confirmed
 from aprs_kiss_core.bbs import BbsConfigError
 from aprs_kiss_core.bbs.storage import (
@@ -222,6 +222,9 @@ class SettingsView(View):
         self.trk_still = ft.Dropdown(label=t("trk_still"), value=str(c.tracker_still_minutes), width=200,
                                      options=mins(sorted({*tracker.STILL_MINUTES, c.tracker_still_minutes})))
         self.trk_hint = ft.Text(size=12, color=ft.Colors.ON_SURFACE_VARIANT)
+        self.road_alerts = ft.Checkbox(label=t("road_alerts"), value=c.road_alerts)
+        self.road_km = ft.Dropdown(label=t("road_alert_km"), value=str(c.road_alert_km), width=200,
+                                   options=[ft.DropdownOption(key=str(n), text=f"{n} km") for n in roadalert.DISTANCES_KM])
         self._trk_changed(update=False)
         self.digi_mode = ft.Dropdown(label=t("digi_mode"), value=c.digi_mode if c.digi_mode in ("off", "fillin", "wide")
                                      else "off", width=340, on_select=lambda _e: self._digi_changed(),
@@ -238,7 +241,7 @@ class SettingsView(View):
             "never", "tak", "always") else "never", width=320,
             options=[ft.DropdownOption(key=k, text=t(f"keep_{k}")) for k in ("never", "tak", "always")])
         self.sound_boxes = {key: ft.Checkbox(label=t(key), value=getattr(c, key))
-                            for key in ("sound_tx", "sound_messages", "sound_chat", "sound_tak")}
+                            for key in ("sound_tx", "sound_messages", "sound_chat", "sound_tak", "sound_road")}
         self.check_updates = ft.Checkbox(label=t("check_updates"), value=c.check_updates,
                                          visible=not distribution.store_updates())  # Google Play updates it
         self.theme = ft.Dropdown(label=t("theme"), value=c.theme if c.theme in ("auto", "light", "dark") else "auto",
@@ -269,7 +272,9 @@ class SettingsView(View):
                 _section("GPS", ft.Icons.GPS_FIXED, self.gps_source, self.gps_phone_hint) if self.app.mobile else
                 _section("GPS", ft.Icons.GPS_FIXED, self.gps_source, self.gps_row, self.gps_hint),
                 _section(t("trk_section"), ft.Icons.ROUTE, self.trk_mode,
-                         ft.Row([self.trk_minutes, self.trk_profile, self.trk_still], wrap=True), self.trk_hint),
+                         ft.Row([self.trk_minutes, self.trk_profile, self.trk_still], wrap=True), self.trk_hint,
+                         self.road_alerts, self.road_km,
+                         ft.Text(t("road_alerts_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT)),
                 _section(t("digi"), ft.Icons.REPEAT, self.digi_mode, self.digi_hops, self.digi_aliases, self.digi_hint),
                 _section(t("aprsis"), ft.Icons.PUBLIC, self.aprsis, self.licence_box, self.is_fields, self.is_state),
                 _section("VARA FM", ft.Icons.SETTINGS_INPUT_ANTENNA, ft.Row([self.vara_host, self.vara_port], wrap=True),
@@ -331,7 +336,7 @@ class SettingsView(View):
 
     async def _test_sounds(self, _e) -> None:
         """Each sound once, so they can be heard before choosing."""
-        for kind in ("tx", "message", "chat", "tak"):
+        for kind in ("tx", "message", "chat", "tak", "road"):
             self.app.sounds.play(kind, force=True)
             await asyncio.sleep(0.8)
 
@@ -575,6 +580,7 @@ class SettingsView(View):
             **{key: box.value for key, box in self.sound_boxes.items()},
             "tracker_mode": self.trk_mode.value or "fixed", "tracker_minutes": self.trk_minutes.value or "2",
             "tracker_profile": self.trk_profile.value or "car", "tracker_still_minutes": self.trk_still.value or "60",
+            "road_alerts": bool(self.road_alerts.value), "road_alert_km": self.road_km.value or "5",
             "digi_mode": self.digi_mode.value or "off", "digi_max_hops": self.digi_hops.value or "2",
             "digi_aliases": (self.digi_aliases.value or "").strip().upper(),
             "run_background": bool(self.run_bg.value), "keep_screen_on": self.keep_screen.value or "never",

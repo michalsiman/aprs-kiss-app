@@ -12,7 +12,7 @@ from typing import Any
 
 import flet as ft
 
-from aprs_kiss_core import android_bt, android_usb
+from aprs_kiss_core import android_bt, android_usb, roadalert
 from aprs_kiss_core.config import VERSION, Config, data_dir, load_config, save_config
 
 from . import theme
@@ -25,7 +25,7 @@ from .i18n import Translator
 from .phone_gps import PhoneGps
 from .tracker_ui import PositionButton
 from .symbols import symbol_info
-from .views.base import View, adapt, clock
+from .views.base import View, adapt, clock, distance_text
 from .views.bbs import BbsView
 from .views.tak import TakView
 from .views.chat import ChatView
@@ -633,6 +633,10 @@ class App:
             if n % THEME_EVERY == 0 and self.engine.config.theme == "auto":
                 await self.apply_theme()
             self.refresh_now()
+            try:
+                self._road_check()
+            except Exception:  # noqa: BLE001 - a warning is not worth stopping the app's clock
+                logging.getLogger(__name__).exception("Road alerts")
 
     async def apply_theme(self) -> None:
         if self.engine.config.theme == "auto":
@@ -892,6 +896,45 @@ class App:
     def tracked(self) -> set[str]:
         return {c.strip().upper() for c in self.engine.config.tracked_callsigns.replace(" ", ",").split(",")
                 if c.strip()}
+
+    # ─── road incidents ahead (while the tracker runs) ─────
+
+    def _road_check(self) -> None:
+        engine, conf = self.engine, self.engine.config
+        if not (conf.tracker_on and conf.road_alerts) or engine.exclusive_mode:
+            return
+        fix = engine.gps_fix()
+        if not fix:
+            return
+        if not hasattr(self, "road_alerts"):
+            self.road_alerts = roadalert.RoadAlerts()
+        course = roadalert.heading(fix.course, fix.speed_kmh, engine.my_track.get("track"))
+        found = self.road_alerts.check(time.time(), fix.latitude, fix.longitude, course,
+                                       list(engine.station.heard.values()), conf.road_alert_km)
+        if found:
+            self._road_warn(found)
+
+    def _road_warn(self, found: list) -> None:
+        """A bubble with the nearest incident ahead (and how many more), and a sound."""
+        entry, along, side = found[0]
+        t = self.t
+        where = t("road_ahead", d=distance_text(along))
+        if abs(side) >= 0.5:
+            where += f" ({t('road_right' if side > 0 else 'road_left')})"
+        pic, name, _known = symbol_info(entry.get("symbol_table"), entry.get("symbol"), t.language)
+        what = " · ".join(x for x in (entry["call"], name, (entry.get("comment") or "").strip()) if x)
+        lines = [ft.Text(where, weight=ft.FontWeight.BOLD, color=ft.Colors.BLACK_87),
+                 ft.Text(what, max_lines=3, overflow=ft.TextOverflow.ELLIPSIS, color=ft.Colors.BLACK_87)]
+        if len(found) > 1:
+            lines.append(ft.Text(t("road_more", n=len(found) - 1), size=12, color=ft.Colors.BLACK_87))
+        self.sounds.play("road")
+        self.show_dialog(ft.SnackBar(
+            ft.Row([ft.Text(pic or "⚠️", size=28), ft.Column(lines, spacing=2, tight=True, expand=True)],
+                   spacing=12, vertical_alignment=ft.CrossAxisAlignment.CENTER),
+            bgcolor=ft.Colors.AMBER_200, behavior=ft.SnackBarBehavior.FLOATING, width=520,
+            duration=20000, show_close_icon=True, close_icon_color=ft.Colors.BLACK_87,
+            action=ft.SnackBarAction(t("road_show"), text_color=ft.Colors.BROWN_900, on_click=lambda _e, c=entry["call"]: self.show_station(c)),
+        ))
 
     def toast(self, text: str, error: bool = False, seconds: float = 4) -> None:
         self.show_dialog(ft.SnackBar(

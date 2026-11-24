@@ -33,6 +33,7 @@ TEXTS = {
     "filter_repeater": "Tylko przemienniki (z ich częstotliwością)", "filter_repeater_short": "przemienniki",
     "map_following": "Mapa podąża za mną (tracker); dotknij, by po przesunięciu mapy od razu wrócić",
     "follow_back": "Wróć do mnie · {s} s", "follow_back_tip": "Od razu wróć do mojej pozycji (po odliczaniu mapa wróci sama)",
+    "road_alerts": "Ostrzegaj o utrudnieniach przed mną (gdy działa tracker)", "road_alert_km": "Patrz do przodu", "road_alerts_hint": "Wypadki, roboty drogowe i inne komunikaty na mapie do wybranej odległości w kierunku jazdy (korytarz wzdłuż kierunku, dalej szerszy): dymek i dźwięk, dla każdego raz.", "road_ahead": "Utrudnienie {d} przed tobą", "road_left": "po lewej", "road_right": "po prawej", "road_more": "i jeszcze {n} przed tobą", "road_show": "Pokaż", "sound_road": "Utrudnienie przed tobą (tracker)",
     "object_of": "obiekt od {call}",
     "measure_from": "Zmierz odległość stąd",
     "measure_from_me": "Odległość od mojej pozycji",

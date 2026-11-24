@@ -26,9 +26,10 @@ TONES = {
     "message": [(660, 90), (0, 40), (990, 140)],  # rising two-tone: an APRS message for you
     "chat": [(880, 70), (0, 40), (880, 70)],  # two short beeps: someone on packet chat
     "tak": [(990, 70), (0, 30), (1320, 70), (0, 30), (1760, 110)],  # rising three: TAK GeoChat
+    "road": [(880, 160), (0, 60), (660, 160), (0, 60), (880, 160), (0, 60), (660, 260)],  # hi-lo: road incident ahead
 }
-SETTING = {"tx": "sound_tx", "message": "sound_messages", "chat": "sound_chat", "tak": "sound_tak"}
-MIN_GAP = {"tx": 1.0, "message": 2.0, "chat": 2.0, "tak": 2.0}  # seconds between two of the same kind
+SETTING = {"tx": "sound_tx", "message": "sound_messages", "chat": "sound_chat", "tak": "sound_tak", "road": "sound_road"}
+MIN_GAP = {"tx": 1.0, "message": 2.0, "chat": 2.0, "tak": 2.0, "road": 5.0}  # seconds between two of the same kind
 
 
 def wav(pieces: list[tuple[int, int]], volume: float = 0.5) -> bytes:
