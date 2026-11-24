@@ -146,6 +146,10 @@ def main():
                   "'Administration: Read-only' on this repository")
     else:
         print("::notice::TRAFFIC_TOKEN is not set, traffic skipped")
+    if tr is None and os.path.exists(os.path.join(out, "views.csv")):
+        # show what was collected before, without today's lists
+        tr = (read_csv(os.path.join(out, "views.csv"), lambda r: r["date"]),
+              read_csv(os.path.join(out, "clones.csv"), lambda r: r["date"]), [], [])
     summary(out, today, downloads, tr)
 
 
