@@ -73,7 +73,9 @@ class FilesView(View):
             self.picked_box,
             accept_row, self.hint,
             ft.Container(self.list, expand=True, border_radius=8, bgcolor=ft.Colors.SURFACE_CONTAINER_LOWEST),
-            ft.Row([ft.TextButton(t("files_folder"), icon=ft.Icons.FOLDER_OPEN, on_click=self._open_folder)]),
+            # a phone cannot open the app's own folder: each received file has its "save a copy" button instead
+            ft.Row([ft.TextButton(t("files_folder"), icon=ft.Icons.FOLDER_OPEN, on_click=self._open_folder)],
+                   visible=not self.app.mobile),
         ], expand=True)
 
     def on_event(self, kind, data) -> None:
@@ -94,7 +96,7 @@ class FilesView(View):
         hints = []
         if not eng.station.tx_enabled:
             hints.append(t("files_tx_needed"))
-        if eng.config.files_accept:
+        if eng.config.files_accept and not self.app.mobile:
             hints.append(t("files_folder_is", path=str(eng.files_folder())))
         self.hint.value = " ".join(hints)
         self.hint.visible = bool(hints)

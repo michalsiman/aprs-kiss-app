@@ -11,7 +11,9 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
   9M2PJU-4 (satellite passes, sunrise and sunset) and MAILMY (e-mail from the radio). A tap on a command
   puts it in a new message to the service, ready to send; the answer comes in that conversation.
 - **Android**: the map goes edge to edge (no frame around it); the "Running" notification has its own icon
-  instead of a white square; the "Accept files" switch on Files wraps its label on a phone.
+  instead of a white square; the "Accept files" switch on Files wraps its label on a phone, and the "Open the folder"
+  button (which cannot open the app's private folder on a phone) is gone: a received file has its own
+  "save a copy" button.
 - **Spotting an activation (SOTA, POTA, WWFF, SIOTA, GMA, WCA castles, IOTA, lighthouses)**: Messages ›
   Spot sends a self-spot by radio as an APRS message to a gateway – APRS2SOTA (SOTAwatch; the callsign is
   registered with its operator first), Camilla DL0QW-12 (GMA, and SOTAwatch for a SOTA summit; registered
