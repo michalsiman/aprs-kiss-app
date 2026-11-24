@@ -4,7 +4,7 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
-## Unreleased
+## 1.0.2 beta – 2026-11-24
 
 - **Services on APRS**: Messages › Services lists the services that answer a message – FIND (where a
   station was last heard), REPEAT (the nearest repeaters), WXNOW (the nearest weather), UTC (the time),

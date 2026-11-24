@@ -20,7 +20,7 @@ from .ax25 import Address
 _LOGGER = logging.getLogger(__name__)
 
 APP_NAME = "aprs-kiss"
-VERSION = "1.0.1"
+VERSION = "1.0.2"
 # A beta (a pre-release on GitHub, tag vX.Y.Z-beta): betas take the next patch numbers (1.0.1, 1.0.2 …),
 # the next stable release a higher minor one (1.1.0), so updating always goes up.
 BETA = True
