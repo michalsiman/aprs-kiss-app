@@ -87,6 +87,9 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
   VARA běží zvlášť (Windows, nebo Wine na Linuxu) s rádiem na zvukové kartě, např. kabelem AIOC;
   aplikace s ní mluví přes její TCP rozhraní (porty 8300/8301) a ukazuje průběh spojení, PTT
   a buffer pro vysílání.
+- **Soubory**: posílání a příjem souborů přes packet radio – YAPP (standard BPQ, WinPacku, Paxonu) přes
+  spojení AX.25 s potvrzováním; před odesláním odhad času, během přenosu průběh, rychlost a zbývající čas;
+  každý příchozí soubor se nejdřív nabídne; přerušený přenos naváže.
 - **Chat**: prostý text na CQ, QST, ALL nebo vám, slyší ho všichni na kmitočtu; automatické rámce jako
   DX hlášení digipeaterů do chatu nepatří. Jak ho použít v jiném softwaru popisuje
   **[specifikace chatu](docs/CHAT.cs.md)**.

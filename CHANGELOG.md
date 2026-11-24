@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.1.54 – 2026-11-24
+
+- **Files** (new section): send a file to another station over packet radio and receive files – YAPP, the
+  packet radio standard (BPQ, WinPack, Paxon), over a connected AX.25 link that acknowledges and repeats
+  frames. Before sending, an estimate of the time (in excellent conditions, longer through digipeaters);
+  while it runs the progress, the speed, the bytes and time still to go; it can be cancelled. Receiving is
+  switched on in the section, every file is offered first (a dialog on any screen, a notification in the
+  background). An interrupted transfer goes on from where it stopped when the same file is sent again.
+- **Messages**:
+  - a longer text goes as several messages numbered 1/2, 2/2 … (up to five); the counter says how many;
+  - the conversation shows the station's distance and direction now and a button to see it on the map;
+    each received message keeps how far the sender was when it came;
+  - a conversation can be deleted (⋮ in the list);
+  - long messages wrap in their bubble; the radio / internet choice fits on a phone;
+  - the "new message" bar goes away by itself (it stayed on Android) and as soon as its conversation is open.
+
 ## 0.1.53 – 2026-11-24
 
 - **Phone: "You seem to be driving – switch the tracker on?"** When the app sees from the phone's GPS that

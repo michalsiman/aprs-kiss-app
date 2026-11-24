@@ -91,6 +91,9 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
   VARA runs on its own (Windows, or Wine on Linux) with the radio on a sound card such as an AIOC cable;
   the app talks to it over its TCP interface (ports 8300/8301) and shows its progress, PTT and the
   transmit buffer.
+- **Files**: send a file to another station and receive files over packet radio – YAPP (the standard of
+  BPQ, WinPack, Paxon) over a connected AX.25 link; a time estimate before sending, progress, speed and the
+  time left while it runs; every incoming file is offered first; an interrupted transfer resumes.
 - **Chat**: plain text to CQ, QST, ALL or you, heard by everybody on the frequency; automatic frames
   such as digipeater DX reports stay out. See the **[chat specification](docs/CHAT.md)** to use it
   from other software.
