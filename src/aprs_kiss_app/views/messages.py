@@ -7,6 +7,7 @@ import flet as ft
 import time
 
 from aprs_kiss_core.aprs import MAX_MESSAGE_PARTS, message_parts
+from aprs_kiss_core.geotext import find_positions, write_position
 
 from .base import View, bearing, clock, distance_km
 
@@ -68,7 +69,9 @@ class MessagesView(View):
                              bgcolor=ft.Colors.SURFACE_CONTAINER_LOWEST),
                 self.to,
                 self.text,
-                ft.Row([self.via, ft.Container(expand=True), self.count,
+                ft.Row([self.via, ft.IconButton(ft.Icons.MY_LOCATION, tooltip=self.t("pos_insert_mine"),
+                                                on_click=self._insert_mine),
+                        ft.Container(expand=True), self.count,
                         ft.IconButton(ft.Icons.SEND, tooltip=self.t("send"), on_click=self._send,
                                       style=ft.ButtonStyle(bgcolor=ft.Colors.PRIMARY, color=ft.Colors.ON_PRIMARY))],
                        vertical_alignment=ft.CrossAxisAlignment.CENTER),
@@ -246,8 +249,15 @@ class MessagesView(View):
             if state in STATE_ICONS:
                 icon, color = STATE_ICONS[state]
                 meta.append(ft.Icon(icon, size=14, color=color, tooltip=self.t(f"state_{state}")))
+        for p in find_positions(m["text"])[:1]:  # a position in the text: see it on the map
+            who = m["from"] if not out else m["to"]
+            meta.append(ft.IconButton(ft.Icons.MAP_OUTLINED, icon_size=16, tooltip=self.t("pos_on_map"),
+                                      style=ft.ButtonStyle(padding=0), width=24, height=24,
+                                      on_click=lambda _e, p=p, who=who: self.app.page.run_task(self.app.show_point, *p, who)))
         bubble = ft.Container(
-            ft.Column([ft.Text(m["text"], selectable=True), ft.Row(meta, spacing=6, tight=True)], spacing=2, tight=True),
+            ft.Column([ft.Text(m["text"], selectable=True),
+                       ft.Row(meta, spacing=6, tight=True, vertical_alignment=ft.CrossAxisAlignment.CENTER)],
+                      spacing=2, tight=True),
             padding=ft.Padding.symmetric(horizontal=12, vertical=8),
             border_radius=12,
             bgcolor=ft.Colors.PRIMARY_CONTAINER if out else ft.Colors.SURFACE_CONTAINER_HIGH,
@@ -259,6 +269,24 @@ class MessagesView(View):
                       alignment=ft.MainAxisAlignment.END if out else ft.MainAxisAlignment.START)
 
     # ─── actions ──────────────────────────────────────────────────────────
+
+    def _insert_mine(self, _e) -> None:
+        here = self.engine.my_position()
+        if not here:
+            self.app.toast(self.t("no_position"), error=True)
+            return
+        self.insert_text(write_position(*here))
+
+    def insert_text(self, text: str) -> None:
+        """Put a text (a position) into the message being written; a new message when no conversation is open."""
+        if not self.selected and not self.to.visible:
+            self.to.visible = True
+            self.to.value = ""
+            self._signature = None
+            self.refresh()
+        old = (self.text.value or "").rstrip()
+        self.text.value = f"{old} {text}".strip()
+        self._count()
 
     async def _new(self, _e) -> None:
         self.selected = None

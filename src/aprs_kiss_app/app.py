@@ -198,6 +198,24 @@ class App:
         self.refresh_now()
         _LOGGER.info("Settings applied: radio %.2f s, screen %.2f s", t1 - t0, time.monotonic() - t1)
 
+    async def send_position_text(self, lat: float, lon: float, where: str) -> None:
+        """A position (picked on the map) to everybody in the chat, or into a message being written."""
+        from aprs_kiss_core.geotext import write_position  # noqa: PLC0415
+
+        text = write_position(lat, lon)
+        if where == "chat":
+            if await self.guard(self.engine.send_chat(text)):
+                self.toast(self.t("pos_sent_chat"))
+        else:
+            self.view("messages").insert_text(text)
+            self.select("messages")
+
+    async def show_point(self, lat: float, lon: float, label: str = "") -> None:
+        """A position from a message or the chat on the map."""
+        self.select("map")
+        await self.view("map").show_point(lat, lon, label)
+        self.page.update()
+
     async def set_position(self, lat: float, lon: float) -> None:
         """From the map: becomes my position, saved at once and shown in Settings."""
         conf = Config.from_dict({**self.engine.config.to_dict(), "latitude": lat, "longitude": lon}).validate()

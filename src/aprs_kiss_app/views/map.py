@@ -64,9 +64,10 @@ class MapView(View):
         # measuring a distance: a dashed line between two points, a pin at each end
         self.measure_line = fm.PolylineLayer(polylines=[])
         self.measure_pins = fm.MarkerLayer(markers=[])
+        self.points = fm.MarkerLayer(markers=[])  # a position from a message or the chat, shown on request
         self._measure: list[tuple[float, float]] = []
         self.base = BaseMap(self.markers, center, self._zoom, MUTED_OPACITY if conf.map_muted else 1.0, self.trails,
-                            overlays=(self.measure_line, self.measure_pins))
+                            overlays=(self.measure_line, self.measure_pins, self.points))
         self.tiles = self.base.tiles
         self.map = fm.Map(
             expand=True,
@@ -461,6 +462,8 @@ class MapView(View):
             ft.PopupMenuItem(content=self.t("measure_from"), icon=ft.Icons.STRAIGHTEN, data="measure"),
             *([ft.PopupMenuItem(content=self.t("measure_from_me"), icon=ft.Icons.NEAR_ME, data="measure_me")]
               if here else []),
+            ft.PopupMenuItem(content=self.t("pos_to_chat"), icon=ft.Icons.FORUM_OUTLINED, data="chat"),
+            ft.PopupMenuItem(content=self.t("pos_to_message"), icon=ft.Icons.MAIL_OUTLINE, data="message"),
             ft.PopupMenuItem(content=self.t("set_my_position"), icon=ft.Icons.MY_LOCATION, data="me"),
             ft.PopupMenuItem(content=self.t("copy_coordinates", lat=f"{lat:.5f}", lon=f"{lon:.5f}"),
                              icon=ft.Icons.CONTENT_COPY, data="copy"),
@@ -482,6 +485,10 @@ class MapView(View):
                 self._draw_measure()
         elif e.item.data == "me":
             await self.app.set_position(lat, lon)
+        elif e.item.data == "chat":
+            await self.app.send_position_text(lat, lon, "chat")
+        elif e.item.data == "message":
+            await self.app.send_position_text(lat, lon, "message")
         elif e.item.data == "copy":
             await ft.Clipboard().set(f"{lat:.5f}, {lon:.5f}")
             self.app.toast(self.t("copied"))
@@ -499,6 +506,18 @@ class MapView(View):
     def _measure_clear(self, _e=None) -> None:
         self._measure = []
         self._draw_measure()
+
+    async def show_point(self, lat: float, lon: float, label: str = "") -> None:
+        """A position from a message or the chat: a red pin there, the map centred on it."""
+        self.points.markers = [fm.Marker(
+            # above the point: the tip of the pin is where the position is
+            coordinates=fm.MapLatitudeLongitude(lat, lon), width=180, height=58, alignment=ft.Alignment.TOP_CENTER,
+            content=ft.Column([
+                map_label(label, None, True) if label else ft.Container(),
+                ft.Icon(ft.Icons.LOCATION_ON, size=36, color="#C62828"),
+            ], spacing=0, alignment=ft.MainAxisAlignment.END, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
+        )]
+        await self.centre(lat, lon, max(self.base.zoom, 13))
 
     @staticmethod
     def _pin(lat: float, lon: float, color) -> fm.Marker:
