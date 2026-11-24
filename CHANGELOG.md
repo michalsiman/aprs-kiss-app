@@ -4,6 +4,15 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## Unreleased
+
+- **TNC over Bluetooth LE** (KISS over BLE, the standard of aprs.fi, Mobilinkd and others): Settings ›
+  Connection › *TNC over Bluetooth LE* finds the devices around (those offering KISS first) and connects to
+  the one picked, with reconnecting as for the other connections. For the CA2RXU LoRa APRS Tracker (Bluetooth
+  set to KISS), Mobilinkd TNC3/TNC4, PicoAPRS, B.B. Link, Vero VR-N76, BTECH UV-Pro and the like; on Android,
+  iPhone (its only Bluetooth for a TNC), Linux, Windows and macOS. Made with universal_ble (a Flet extension of
+  the app's own, packages/flet-ble-kiss).
+
 ## 1.0.2 beta – 2026-11-24
 
 - **Services on APRS**: Messages › Services lists the services that answer a message – FIND (where a

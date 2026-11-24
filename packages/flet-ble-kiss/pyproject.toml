@@ -1,0 +1,20 @@
+# The Flutter side of "TNC over Bluetooth LE" (KISS over BLE), as a Flet extension: `flet build` takes the
+# Dart package in src/flutter/flet_ble_kiss into the app. The Python side is in the app itself
+# (aprs_kiss_app/ble_flet.py), so that a run from source without this package still works.
+[project]
+name = "flet-ble-kiss"
+version = "0.1.0"
+description = "KISS TNC over Bluetooth Low Energy for Flet apps (universal_ble)"
+license = "MIT"
+requires-python = ">=3.10"
+dependencies = []
+
+[tool.setuptools.package-data]
+"flutter.flet_ble_kiss" = [
+    "pubspec.yaml",
+    "lib/**",
+]
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"

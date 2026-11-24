@@ -53,6 +53,29 @@ copyright = "Copyright (c) 2026 Michal Šiman (OK1SIM)"
 path = "src"
 module = "main"
 
+# TNC over Bluetooth LE (KISS over BLE): a Flet extension of our own (packages/flet-ble-kiss, Dart over
+# universal_ble), built into the app on every platform; the Python side is aprs_kiss_app/ble_flet.py.
+[tool.flet.dev_packages]
+flet-ble-kiss = "packages/flet-ble-kiss"
+
+[tool.flet.linux]
+dependencies = ["flet-ble-kiss"]
+
+[tool.flet.windows]
+dependencies = ["flet-ble-kiss"]
+
+[tool.flet.macos]
+dependencies = ["flet-ble-kiss"]
+
+[tool.flet.macos.info]
+NSBluetoothAlwaysUsageDescription = "A TNC or radio over Bluetooth LE (Settings › Connection)."
+
+[tool.flet.macos.entitlement]
+"com.apple.security.device.bluetooth" = true
+
+[tool.flet.ios]
+dependencies = ["flet-ble-kiss"]
+
 [tool.flet.android.permission]
 "android.permission.INTERNET" = true
 # Settings › GPS › "The phone's GPS" (asked for only when chosen)
@@ -68,6 +91,10 @@ module = "main"
 # older Android versions need BLUETOOTH
 "android.permission.BLUETOOTH_CONNECT" = true
 "android.permission.BLUETOOTH" = { maxSdkVersion = "30" }
+# … and TNC over Bluetooth LE: Android 12+ finds devices with BLUETOOTH_SCAN ("Nearby devices", not used for
+# the position); older Android versions scan with BLUETOOTH_ADMIN and the location permission (asked for then)
+"android.permission.BLUETOOTH_SCAN" = { usesPermissionFlags = "neverForLocation" }
+"android.permission.BLUETOOTH_ADMIN" = { maxSdkVersion = "30" }
 
 # A radio plugged into the phone: Android offers to open APRS & Packet for it ("always" = it opens by
 # itself, with USB access). The list of devices: src/android_res/xml/device_filter.xml; its <meta-data>
@@ -77,10 +104,11 @@ actions = ["android.hardware.usb.action.USB_DEVICE_ATTACHED"]
 
 [tool.flet.ios.info]
 NSLocationWhenInUseUsageDescription = "Your position for the map and the APRS beacon, when Settings › GPS uses the phone's GPS."
+NSBluetoothAlwaysUsageDescription = "A TNC or radio over Bluetooth LE (Settings › Connection)."
 
 # Android: pyjnius reaches the USB host API for a TNC on the phone's USB port (aprs_kiss_core/android_usb.py)
 [tool.flet.android]
-dependencies = ["pyjnius"]
+dependencies = ["pyjnius", "flet-ble-kiss"]
 # Android resources of our own (src/android_res, relative to the project): the USB devices we offer to handle when plugged in
 res_dir = "src/android_res"
 # The launcher icon: assets/icon_android.png is the icon blue to the edges (Android masks it to its own

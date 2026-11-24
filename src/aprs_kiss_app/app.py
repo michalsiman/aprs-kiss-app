@@ -12,8 +12,8 @@ from typing import Any
 
 import flet as ft
 
-from aprs_kiss_core import android_bt, android_usb, drivedetect, profiles, roadalert
-from . import android_notify
+from aprs_kiss_core import android_bt, android_usb, ble, drivedetect, profiles, roadalert
+from . import android_notify, ble_flet
 from aprs_kiss_core.config import VERSION, Config, data_dir, load_config, save_config
 
 from . import theme
@@ -87,6 +87,10 @@ class App:
 
         android_usb.register()  # Android: a TNC on the phone's USB port
         android_bt.register()  # … or over Bluetooth (SPP)
+        self.ble = ble_flet.setup()  # … or over Bluetooth LE (KISS over BLE), wherever the build has it
+        self.ble_ok = False  # known after the first answer of the BLE extension (settings offer it then)
+        if self.ble:
+            page.run_task(self._check_ble)
         config = await asyncio.to_thread(load_config, self.folder)
         if config.connection in ("usb", "bt") and not self.mobile:  # settings copied from a phone
             config = Config.from_dict({**config.to_dict(), "connection": "tcp"}).validate()
@@ -352,6 +356,9 @@ class App:
             return True
         width = width or getattr(page, "width", None) or 0
         return bool(width) and width < COMPACT_WIDTH
+
+    async def _check_ble(self) -> None:
+        self.ble_ok = await ble.available()
 
     def _on_resize(self, e) -> None:
         if self.views and self._is_compact(getattr(e, "width", None)) != self.compact:

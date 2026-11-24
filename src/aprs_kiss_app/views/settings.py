@@ -10,7 +10,7 @@ from pathlib import Path
 
 import flet as ft
 
-from aprs_kiss_core import android_bt, android_usb, profiles, roadalert, tilemaps, tracker
+from aprs_kiss_core import android_bt, android_usb, ble, profiles, roadalert, tilemaps, tracker
 from aprs_kiss_core.aprsis import licence_confirmed
 from aprs_kiss_core.bbs import BbsConfigError
 from aprs_kiss_core.bbs.storage import (
@@ -116,7 +116,10 @@ class SettingsView(View):
                                       + ([ft.DropdownOption(key="usb", text=t("conn_usb")),
                                           ft.DropdownOption(key="bt", text=t("conn_bt"))] if self.usb_ok
                                          else [] if self.app.mobile
-                                         else [ft.DropdownOption(key="serial", text=t("conn_serial"))]),
+                                         else [ft.DropdownOption(key="serial", text=t("conn_serial"))])
+                                      # KISS over Bluetooth LE: wherever the build has the extension (any platform)
+                                      + ([ft.DropdownOption(key="ble", text=t("conn_ble"))]
+                                         if self.app.ble_ok or c.connection == "ble" else []),
                                       on_select=lambda _e: self._connection_changed())
         self.host = ft.TextField(label=t("host"), value=c.host, width=240)
         self.port = ft.TextField(label=t("port"), value=str(c.port), width=110, input_filter=num)
@@ -376,6 +379,8 @@ class SettingsView(View):
         kind = self.connection.value if hasattr(self, "connection") else self.engine.config.connection
         if kind == "bt":  # the paired Bluetooth devices
             ports = [(d, d) for d in android_bt.list_devices()]
+        elif kind == "ble":  # found by the last scan (the refresh button scans)
+            ports = [(d, d) for d in ble.found]
         else:
             ports = [(d, d) for d in android_usb.list_devices()] if self.usb_ok else serial_ports()
         options = [ft.DropdownOption(key=d, text=desc) for d, desc in ports]
@@ -384,20 +389,42 @@ class SettingsView(View):
         return options
 
     def _refresh_ports(self, _e) -> None:
+        if self.connection.value == "ble":
+            self.app.page.run_task(self._scan_ble)
+            return
         self.device.options = self._port_options(self.device.value or "")
         if not self.device.options:
             self.app.toast(self.t("bt_none" if self.connection.value == "bt" else "no_ports"))
 
+    async def _scan_ble(self) -> None:
+        """Bluetooth LE devices around (a few seconds), those offering KISS first."""
+        self.app.toast(self.t("ble_scanning"))
+        try:
+            found = await ble.scan()
+        except Exception as err:  # noqa: BLE001 - Bluetooth off, not allowed …
+            self.app.toast(str(err) or type(err).__name__)
+            return
+        current = self.device.value or ""
+        self.device.options = self._port_options(current)
+        if not found:
+            self.app.toast(self.t("ble_none"))
+        elif not current or current not in found:
+            self.device.value = found[0]  # the nearest one offering KISS (or the first one seen)
+        self.app.page.update()
+
     def _connection_changed(self, update: bool = True) -> None:
-        serial = self.connection.value in ("serial", "usb", "bt")
+        kind = self.connection.value
+        serial = kind in ("serial", "usb", "bt", "ble")
         self.tcp_row.visible = not serial
         self.serial_row.visible = serial
-        self.baudrate.visible = self.connection.value != "bt"  # a Bluetooth link has no line speed
-        self.device.label = self.t("bt_device") if self.connection.value == "bt" else self.t("device")
+        self.baudrate.visible = kind not in ("bt", "ble")  # a Bluetooth link has no line speed
+        self.device.label = {"bt": self.t("bt_device"), "ble": self.t("ble_device")}.get(kind, self.t("device"))
         if update:
             self.device.options = self._port_options(self.device.value or "")
-            if self.connection.value == "bt" and not self.device.options:
+            if kind == "bt" and not self.device.options:
                 self.app.toast(self.t("bt_none"))
+            if kind == "ble" and not ble.found:
+                self.app.page.run_task(self._scan_ble)
             self.app.page.update()
 
     def _digi_changed(self, update: bool = True) -> None:

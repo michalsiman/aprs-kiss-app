@@ -1,0 +1,14 @@
+name: flet_ble_kiss
+description: KISS TNC over Bluetooth Low Energy for Flet apps
+version: 0.1.0
+publish_to: none
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+  flutter: ">=3.19.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  universal_ble: 3.2.0
+  flet: 1.1.2
