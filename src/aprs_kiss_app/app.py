@@ -1063,7 +1063,8 @@ class App:
                    spacing=12, vertical_alignment=ft.CrossAxisAlignment.CENTER),
             bgcolor=ft.Colors.AMBER_200 if kind == "road" else ft.Colors.LIGHT_BLUE_100,
             behavior=ft.SnackBarBehavior.FLOATING, width=520,
-            duration=20000 if kind == "road" else 10000, show_close_icon=True, close_icon_color=ft.Colors.BLACK_87,
+            duration=20000 if kind == "road" else 10000, persist=False, show_close_icon=True,
+            close_icon_color=ft.Colors.BLACK_87,
             action=ft.SnackBarAction(t("road_show"), text_color=ft.Colors.BROWN_900 if kind == "road" else ft.Colors.BLUE_900,
                                      on_click=lambda _e, c=entry["call"]: self.show_station(c)),
         ))
@@ -1098,12 +1099,29 @@ class App:
             self.view("messages").open_conversation(sender)
             self.select("messages")
 
-        self.show_dialog(ft.SnackBar(
+        # persist=False: with an action button Flutter would keep the bar until it is closed by hand
+        bar = ft.SnackBar(
             ft.Text(f"{self.t('message_from', call=sender)}: {message['text']}"),
             action=ft.SnackBarAction(label=self.t("messages"), on_click=open_it),
-            duration=5000,
+            duration=5000, persist=False,
             behavior=ft.SnackBarBehavior.FLOATING, width=520,
-        ))
+        )
+        self._message_notice = (sender.upper(), bar)
+        self.show_dialog(bar)
+
+    _message_notice: tuple[str, ft.SnackBar] | None = None
+
+    def message_read(self, call: str) -> None:
+        """The conversation is on screen: the bar about its new message has nothing more to say."""
+        notice = self._message_notice
+        if notice and notice[0] == call.upper():
+            self._message_notice = None
+            if notice[1].open:
+                notice[1].open = False
+                try:
+                    notice[1].update()
+                except Exception:  # noqa: BLE001 - already gone
+                    pass
 
     async def _beacon_now(self, _e) -> None:
         if not self.engine.my_position():

@@ -109,6 +109,7 @@ class MessagesView(View):
     def refresh(self) -> None:
         if self.app.current_key == self.key and self.selected:
             self.unread.discard(self.selected)
+            self.app.message_read(self.selected)
         groups = self._grouped()
         states = tuple(self.engine.message_state(m.get("msg_no")) for m in self.engine.messages
                        if m["direction"] == "out")
