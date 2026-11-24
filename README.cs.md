@@ -16,6 +16,11 @@ Ověřená funkčnost i s ručkami **VGC VR-N76** a **AnyTone UV890**.
 Připravená pro **Linux**, **Windows** a **Android**; sestavení pro **macOS** a **iOS** existují, ale na
 skutečném Macu, iPhonu ani iPadu je zatím nikdo nevyzkoušel – **hledáme testery** (viz [Platformy](#platformy)).
 
+**Vyzkoušeno na pásmu** (děkuji!): Linux a Windows s **Quanshengem** na USB kabelu; Windows s **VGC VR-N76**
+a **AnyTone 890** přes Bluetooth; **Direwolf** přes TCP/IP z jiného počítače; **tracker** na Androidu v autě
+s Quanshengem na USB kabelu i samostatně přes internet (APRS-IS). **Budu moc rád za nové testery a zpětnou
+vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.com/michalsiman/aprs-kiss-app/issues).
+
 ## Co umí
 
 ### APRS
@@ -31,11 +36,23 @@ skutečném Macu, iPhonu ani iPadu je zatím nikdo nevyzkoušel – **hledáme t
   v Evropě i dálnice a hlavní silnice (Natural Earth), asi 67 000 obcí nad 1 000 obyvatel a 30 nejvyšších
   hor každé země (GeoNames) – s přiblížením přibývají další. Přepíná se jedním tlačítkem; **když není internet, mapa se na ni
   přepne sama** a oznámí to, a jakmile se internet vrátí, vrátí se k OpenStreetMap.
-- **Filtry mapy**: jen meteostanice, jedoucí stanice, převaděče (ve štítku s kmitočtem a pásmem) nebo
-  dopravní problémy. Když běží tracker, mapa tě sleduje jako navigace a umí upozornit na dopravní
-  problémy a jiné jedoucí stanice před tebou.
-- **Profily**: až tři SSID tvé značky, každé s vlastní ikonou; přepínají se klepnutím na značku
-  v horní liště.
+- **Filtry mapy** (trychtýř): jen **meteostanice**, jen **jedoucí** stanice (pohnuly se za posledních
+  10 minut; nově slyšená stanice zůstane, dokud není jasné, že stojí), jen **převaděče**, jen **dopravní
+  problémy** (nehody, práce na silnici, povodně, mlha, sníh) – libovolně kombinovatelné, pamatují se.
+- **Převaděče ukazují kmitočet** přímo ve štítku – pásmo barevně (2 m zeleně, 70 cm purpurově) a druh
+  provozu, pokud je v komentáři (DMR, D-Star, C4FM, NXDN, TETRA). Stejně tak **meteostanice ukazují
+  teplotu**.
+- **Značky se nepřekrývají**: stanice na jednom místě nebo blízko sebe se rozestoupí, tenká šedá čára vede
+  ze středu symbolu k tečce, kde stanice opravdu je. **Ocásky** (poslední půlhodina, i vaše vlastní z GPS),
+  APRS **objekty** jako samostatná místa, nesmyslné skoky se ignorují. **Měření vzdálenosti** podržením
+  prstu na dvou bodech.
+- **Mapa jako navigace, když běží tracker**: jste uprostřed s přiblížením na ulice; posunete-li mapou,
+  tlačítko **Zpět na mě** odpočítává 15 s a pak se mapa vrátí sama.
+- **Upozornění před vámi, když běží tracker** (vypnutá, dokud je nezapnete): **dopravní hlášení**
+  a **jiné jedoucí stanice** (jedou stejným směrem, proti vám, nebo křižují) v laloku před vámi – při
+  rychlé jízdě dlouhém a úzkém, ve městě širokém, nikdy za vámi; bublina a zvuk.
+- **Profily**: až tři SSID vaší značky, každé s vlastní ikonou (auto, ručka, domov); klepnutím na značku
+  v horní liště se přepne – poloha, zprávy, terminál, vše jde pod ním.
 - **APRS-IS**: jedním přepínačem se poloha (teď, pravidelně, tracker) i zprávy posílají i přes internet;
   s vypnutým vysíláním jde vše jen přes internet.
 - **Tracker**: tlačítko polohy v horní liště pošle polohu jednou, nebo spustí tracker (▶) – poloha z GPS
@@ -90,6 +107,11 @@ skutečném Macu, iPhonu ani iPadu je zatím nikdo nevyzkoušel – **hledáme t
 
 ### Aplikace
 
+- **Horní lišta jako přístrojová deska**, na počítači i na telefonu: kontrolky **TNC**, **IS** a **GPS**
+  svítí zeleně, když fungují, tlačítko polohy / trackeru, **TX** s červeným rámečkem při zapnutém vysílání
+  a celé červené, když rámec odchází do éteru (IS na vteřinu zčervená, když něco jde do APRS-IS). Na počítači
+  jsou kontrolky větší a po najetí myší řeknou svůj stav; na telefonu jsou TNC, IS a GPS v jednom malém
+  bloku, aby se vešla celá značka.
 - **KISS přes TCP** (Direwolf, síťový most) nebo **sériový/USB port** (seznam portů, na Linuxu se
   stálými názvy `/dev/serial/by-id`); TX delay pro TNC; po výpadku se připojí sama.
 - **16 jazyků**: brazilská portugalština, čeština, dánština, angličtina, francouzština, chorvatština,
@@ -124,41 +146,45 @@ skutečném Macu, iPhonu ani iPadu je zatím nikdo nevyzkoušel – **hledáme t
 
 ## Snímky obrazovky
 
-Pořízené se simulovaným TNC a VARA (`tests/fake_tnc.py --tak`, `tests/fake_vara.py`); kliknutím se
+Pořízené se simulovaným TNC (`tests/fake_tnc.py --scene --tak`, `tools/screenshots.py`); kliknutím se
 zvětší. Řídí se motivem GitHubu, stejně jako aplikace: používá světlý nebo tmavý režim systému.
 
 <table>
 <tr>
-<td colspan="2"><a href="assets/cs/map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/map-light.png"><img src="assets/cs/map.png" alt="Mapa slyšených stanic s APRS symboly"></picture></a><br><sub>Mapa slyšených stanic</sub></td>
+<td colspan="2"><a href="assets/cs/map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/map-light.png"><img src="assets/cs/map.png" alt="Mapa: symboly, převaděče s kmitočtem, nehoda, ocásky"></picture></a><br><sub>Mapa: symboly, převaděče s kmitočtem, nehoda, ocásky</sub></td>
 </tr>
 <tr>
-<td colspan="2"><a href="assets/cs/phone-map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-map-light.png"><img src="assets/cs/phone-map.png" width="19%" alt="Telefon: mapa, horní lišta jako přístrojová deska"></picture></a> <a href="assets/cs/phone-menu.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-menu-light.png"><img src="assets/cs/phone-menu.png" width="19%" alt="Telefon: nabídka"></picture></a> <a href="assets/cs/phone-tak.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-tak-light.png"><img src="assets/cs/phone-tak.png" width="19%" alt="Telefon: mapa TAK"></picture></a> <a href="assets/cs/phone-tak-chat.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-tak-chat-light.png"><img src="assets/cs/phone-tak-chat.png" width="19%" alt="Telefon: TAK GeoChat s pohybem týmu"></picture></a> <a href="assets/cs/phone-settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-settings-light.png"><img src="assets/cs/phone-settings.png" width="19%" alt="Telefon: Nastavení, pozadí a obrazovka"></picture></a><br><sub>Na telefonu: mapa, nabídka, mapa a GeoChat v TAK, Nastavení</sub></td>
+<td colspan="2"><a href="assets/cs/phone-map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-map-light.png"><img src="assets/cs/phone-map.png" width="13%" alt="mapa"></picture></a> <a href="assets/cs/phone-filter.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-filter-light.png"><img src="assets/cs/phone-filter.png" width="13%" alt="filtry"></picture></a> <a href="assets/cs/phone-profiles.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-profiles-light.png"><img src="assets/cs/phone-profiles.png" width="13%" alt="profily"></picture></a> <a href="assets/cs/phone-menu.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-menu-light.png"><img src="assets/cs/phone-menu.png" width="13%" alt="nabídka"></picture></a> <a href="assets/cs/phone-settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-settings-light.png"><img src="assets/cs/phone-settings.png" width="13%" alt="nastavení"></picture></a> <a href="assets/cs/phone-tak.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-tak-light.png"><img src="assets/cs/phone-tak.png" width="13%" alt="mapa TAK"></picture></a> <a href="assets/cs/phone-tak-chat.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-tak-chat-light.png"><img src="assets/cs/phone-tak-chat.png" width="13%" alt="TAK GeoChat"></picture></a><br><sub>Na telefonu: mapa, filtry, profily, nabídka, nastavení, mapa TAK, TAK GeoChat</sub></td>
 </tr>
 <tr>
-<td width="50%"><a href="assets/cs/map-offline.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/map-offline-light.png"><img src="assets/cs/map-offline.png" alt="Offline mapa: hranice a města bez internetu"></picture></a><br><sub>Offline mapa (bez internetu)</sub></td>
-<td width="50%"><a href="assets/cs/messages.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/messages-light.png"><img src="assets/cs/messages.png" alt="APRS zprávy, odeslaná potvrzená"></picture></a><br><sub>Zprávy, odeslaná je potvrzená</sub></td>
+<td width="50%"><a href="assets/cs/map-filter.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/map-filter-light.png"><img src="assets/cs/map-filter.png" alt="Filtry mapy"></picture></a><br><sub>Filtry mapy</sub></td>
+<td width="50%"><a href="assets/cs/map-repeaters.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/map-repeaters-light.png"><img src="assets/cs/map-repeaters.png" alt="Jen převaděče s kmitočtem, pásmem a druhem provozu"></picture></a><br><sub>Jen převaděče s kmitočtem, pásmem a druhem provozu</sub></td>
 </tr>
 <tr>
-<td width="50%"><a href="assets/cs/thursday.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/thursday-light.png"><img src="assets/cs/thursday.png" alt="APRS Thursday: síť HOTG s vlastním přehledem"></picture></a><br><sub>#APRSThursday</sub></td>
-<td width="50%"><a href="assets/cs/stations.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/stations-light.png"><img src="assets/cs/stations.png" alt="Slyšené stanice se vzdáleností a směrem"></picture></a><br><sub>Stanice se vzdáleností a směrem</sub></td>
+<td width="50%"><a href="assets/cs/map-offline.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/map-offline-light.png"><img src="assets/cs/map-offline.png" alt="Základní offline mapa (bez internetu)"></picture></a><br><sub>Základní offline mapa (bez internetu)</sub></td>
+<td width="50%"><a href="assets/cs/messages.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/messages-light.png"><img src="assets/cs/messages.png" alt="Zprávy jako konverzace"></picture></a><br><sub>Zprávy jako konverzace</sub></td>
 </tr>
 <tr>
-<td width="50%"><a href="assets/cs/terminal.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/terminal-light.png"><img src="assets/cs/terminal.png" alt="Packet terminál: uložená BBS, spojení přes AX.25"></picture></a><br><sub>Terminál přes AX.25 packet</sub></td>
-<td width="50%"><a href="assets/cs/terminal-vara.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/terminal-vara-light.png"><img src="assets/cs/terminal-vara.png" alt="Packet terminál přes VARA FM"></picture></a><br><sub>Terminál přes VARA FM</sub></td>
+<td width="50%"><a href="assets/cs/thursday.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/thursday-light.png"><img src="assets/cs/thursday.png" alt="#APRSThursday"></picture></a><br><sub>#APRSThursday</sub></td>
+<td width="50%"><a href="assets/cs/stations.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/stations-light.png"><img src="assets/cs/stations.png" alt="Stanice se vzdáleností a směrem"></picture></a><br><sub>Stanice se vzdáleností a směrem</sub></td>
 </tr>
 <tr>
+<td width="50%"><a href="assets/cs/terminal.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/terminal-light.png"><img src="assets/cs/terminal.png" alt="Terminál: připojeno k BBS přes AX.25"></picture></a><br><sub>Terminál: připojeno k BBS přes AX.25</sub></td>
 <td width="50%"><a href="assets/cs/chat.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/chat-light.png"><img src="assets/cs/chat.png" alt="Packet chat"></picture></a><br><sub>Packet chat</sub></td>
-<td width="50%"><a href="assets/cs/monitor.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/monitor-light.png"><img src="assets/cs/monitor.png" alt="Monitor rámců, TAK rámce dekódované"></picture></a><br><sub>Monitor rámců</sub></td>
 </tr>
 <tr>
-<td colspan="2"><a href="assets/cs/tak.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/tak-light.png"><img src="assets/cs/tak.png" alt="TAK: stanice podle týmů na mapě a GeoChat"></picture></a><br><sub>TAK: stanice podle týmů a GeoChat</sub></td>
+<td width="50%"><a href="assets/cs/monitor.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/monitor-light.png"><img src="assets/cs/monitor.png" alt="Monitor rámců"></picture></a><br><sub>Monitor rámců</sub></td>
+<td width="50%"><a href="assets/cs/settings-tracker.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/settings-tracker-light.png"><img src="assets/cs/settings-tracker.png" alt="Tracker a upozornění před tebou"></picture></a><br><sub>Tracker a upozornění před tebou</sub></td>
 </tr>
 <tr>
-<td width="50%"><a href="assets/cs/bbs.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/bbs-light.png"><img src="assets/cs/bbs.png" alt="BBS SERVER: aplikace jako packetová BBS"></picture></a><br><sub>BBS SERVER</sub></td>
-<td width="50%"><a href="assets/cs/bbs-confirm.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/bbs-confirm-light.png"><img src="assets/cs/bbs-confirm.png" alt="Zapnutí BBS SERVER vyžaduje napsat větu"></picture></a><br><sub>BBS SERVER se zapíná napsáním věty</sub></td>
+<td colspan="2"><a href="assets/cs/tak.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/tak-light.png"><img src="assets/cs/tak.png" alt="TAK: stanice podle týmů a GeoChat"></picture></a><br><sub>TAK: stanice podle týmů a GeoChat</sub></td>
 </tr>
 <tr>
-<td width="50%"><a href="assets/cs/settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/settings-light.png"><img src="assets/cs/settings.png" alt="Nastavení: připojení TNC a stanice"></picture></a><br><sub>Nastavení: TNC a stanice</sub></td>
+<td width="50%"><a href="assets/cs/bbs.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/bbs-light.png"><img src="assets/cs/bbs.png" alt="BBS SERVER"></picture></a><br><sub>BBS SERVER</sub></td>
+<td width="50%"><a href="assets/cs/bbs-confirm.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/bbs-confirm-light.png"><img src="assets/cs/bbs-confirm.png" alt="BBS SERVER se zapíná opsáním věty"></picture></a><br><sub>BBS SERVER se zapíná opsáním věty</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="assets/cs/settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/settings-light.png"><img src="assets/cs/settings.png" alt="Nastavení: stanice a profily"></picture></a><br><sub>Nastavení: stanice a profily</sub></td>
 <td width="50%"><a href="assets/cs/settings-more.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/settings-more-light.png"><img src="assets/cs/settings-more.png" alt="Nastavení: pozadí a obrazovka, zvuky"></picture></a><br><sub>Nastavení: pozadí a obrazovka, zvuky</sub></td>
 </tr>
 </table>

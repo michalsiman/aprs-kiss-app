@@ -16,6 +16,12 @@ Verified also with the **VGC VR-N76** and **AnyTone UV890** handhelds.
 Ready for **Linux**, **Windows** and **Android**; **macOS** and **iOS** builds exist but nobody has tried
 them on a real Mac, iPhone or iPad yet – **testers wanted** (see [Platforms](#platforms)).
 
+**Tried on the air** (thank you!): Linux and Windows with a **Quansheng** on a USB cable; Windows with a
+**VGC VR-N76** and an **AnyTone 890** over Bluetooth; **Direwolf** over TCP/IP from another computer; the
+Android **tracker** in a car with a Quansheng on a USB cable, and on its own over the internet (APRS-IS).
+**New testers and feedback are very welcome** – any radio, any TNC, any platform: write an
+[issue](https://github.com/michalsiman/aprs-kiss-app/issues).
+
 ## What it does
 
 ### APRS
@@ -31,11 +37,23 @@ them on a real Mac, iPhone or iPad yet – **testers wanted** (see [Platforms](#
   (Natural Earth); in Europe also motorways and main roads (Natural Earth), some 67,000 places of 1,000
   people and more and each country's 30 highest peaks (GeoNames) – more of them as you zoom in. One button switches to it; **with no internet the map
   switches to it by itself** and tells you so, and goes back to OpenStreetMap when the internet returns.
-- **Map filters**: only weather stations, moving stations, repeaters (their tags show the frequency and
-  band) or road incidents. While the tracker runs the map follows you like a navigation, and can warn of
-  road incidents and other moving stations ahead.
-- **Profiles**: up to three SSIDs of your callsign, each with its own symbol; a tap on the callsign
-  in the top bar switches between them.
+- **Map filters** (the funnel): only **weather stations**, only **moving** stations (moved in the last
+  10 minutes; a station just heard stays until it is clear it stands still), only **repeaters**, only
+  **road incidents** (crashes, work zones, floods, fog, snow) – any mix, remembered.
+- **Repeaters show their frequency** right in their tag – band in colour (2 m green, 70 cm magenta) and the
+  digital mode when the comment says it (DMR, D-Star, C4FM, NXDN, TETRA). **Weather stations show their
+  temperature** in the same way.
+- **Markers never cover each other**: stations at one place or close together move apart, a thin grey line
+  leads from the middle of the symbol to a dot where the station really is. **Trails** (the last half hour,
+  also your own from the GPS), APRS **objects** as places of their own, impossible jumps ignored.
+  **Measure a distance** by a long press on two points.
+- **Navigation-like map while the tracker runs**: you stay in the middle at a street zoom; move the map and
+  a **Back to me** button counts down 15 s, then the map comes back by itself.
+- **Warnings ahead while the tracker runs** (off until you switch them on): **road incidents** and
+  **other moving stations** (going your way, coming towards you or crossing) in a lobe ahead of you –
+  long and narrow when you drive fast, wide in town, never behind; a bubble and a sound.
+- **Profiles**: up to three SSIDs of your callsign, each with its own symbol (car, handheld, home); a tap
+  on the callsign in the top bar switches – position, messages, terminal, everything goes under it.
 - **APRS-IS**: one switch sends your position (now, regular, tracker) and messages over the internet too;
   with transmitting off it all goes over the internet only.
 - **Tracker**: the position button in the top bar sends your position once, or starts the tracker (▶) –
@@ -92,6 +110,11 @@ them on a real Mac, iPhone or iPad yet – **testers wanted** (see [Platforms](#
 
 ### The app
 
+- **Top bar as a dashboard**, on a computer and on a phone: **TNC**, **IS** and **GPS** lamps green when
+  working, the position / tracker button, **TX** with a red frame while transmitting is on and all red while
+  a frame goes out on air (IS red for a second when something goes to APRS-IS). On a computer the lamps
+  are larger and tell their state when you point at them; on a phone TNC, IS and GPS share one small block
+  so the whole callsign fits.
 - **KISS over TCP** (Direwolf, a network bridge) or a **serial/USB port** (the list shows the ports,
   with stable `/dev/serial/by-id` names on Linux); TX delay for the TNC; reconnects by itself.
 - In **16 languages**: Brazilian Portuguese, Croatian, Czech, Danish, English, French, German, Italian,
@@ -125,41 +148,45 @@ them on a real Mac, iPhone or iPad yet – **testers wanted** (see [Platforms](#
 
 ## Screenshots
 
-Taken with the simulated TNC and VARA (`tests/fake_tnc.py --tak`, `tests/fake_vara.py`); click for
+Taken with the simulated TNC (`tests/fake_tnc.py --scene --tak`, `tools/screenshots.py`); click for
 full size. They follow your GitHub theme, and so does the app: it uses the system's light or dark mode.
 
 <table>
 <tr>
-<td colspan="2"><a href="assets/map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/map-light.png"><img src="assets/map.png" alt="Map of heard stations with APRS symbols"></picture></a><br><sub>Map of heard stations</sub></td>
+<td colspan="2"><a href="assets/map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/map-light.png"><img src="assets/map.png" alt="Map: symbols, repeaters with their frequency, a road incident, trails"></picture></a><br><sub>Map: symbols, repeaters with their frequency, a road incident, trails</sub></td>
 </tr>
 <tr>
-<td colspan="2"><a href="assets/phone-map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-map-light.png"><img src="assets/phone-map.png" width="19%" alt="Phone: the map, the top bar as a dashboard"></picture></a> <a href="assets/phone-menu.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-menu-light.png"><img src="assets/phone-menu.png" width="19%" alt="Phone: the menu"></picture></a> <a href="assets/phone-tak.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-tak-light.png"><img src="assets/phone-tak.png" width="19%" alt="Phone: TAK map"></picture></a> <a href="assets/phone-tak-chat.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-tak-chat-light.png"><img src="assets/phone-tak-chat.png" width="19%" alt="Phone: TAK GeoChat with the team's moves"></picture></a> <a href="assets/phone-settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-settings-light.png"><img src="assets/phone-settings.png" width="19%" alt="Phone: Settings, background and screen"></picture></a><br><sub>On a phone: the map, the menu, TAK map and GeoChat, Settings</sub></td>
+<td colspan="2"><a href="assets/phone-map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-map-light.png"><img src="assets/phone-map.png" width="13%" alt="the map"></picture></a> <a href="assets/phone-filter.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-filter-light.png"><img src="assets/phone-filter.png" width="13%" alt="filters"></picture></a> <a href="assets/phone-profiles.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-profiles-light.png"><img src="assets/phone-profiles.png" width="13%" alt="profiles"></picture></a> <a href="assets/phone-menu.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-menu-light.png"><img src="assets/phone-menu.png" width="13%" alt="the menu"></picture></a> <a href="assets/phone-settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-settings-light.png"><img src="assets/phone-settings.png" width="13%" alt="Settings"></picture></a> <a href="assets/phone-tak.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-tak-light.png"><img src="assets/phone-tak.png" width="13%" alt="TAK map"></picture></a> <a href="assets/phone-tak-chat.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-tak-chat-light.png"><img src="assets/phone-tak-chat.png" width="13%" alt="TAK GeoChat"></picture></a><br><sub>On a phone: the map, filters, profiles, the menu, Settings, TAK map, TAK GeoChat</sub></td>
 </tr>
 <tr>
-<td width="50%"><a href="assets/map-offline.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/map-offline-light.png"><img src="assets/map-offline.png" alt="The offline map: borders and cities without internet"></picture></a><br><sub>Offline map (no internet needed)</sub></td>
-<td width="50%"><a href="assets/messages.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/messages-light.png"><img src="assets/messages.png" alt="APRS messages, the sent one acknowledged"></picture></a><br><sub>Messages, the sent one acknowledged</sub></td>
+<td width="50%"><a href="assets/map-filter.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/map-filter-light.png"><img src="assets/map-filter.png" alt="Map filters"></picture></a><br><sub>Map filters</sub></td>
+<td width="50%"><a href="assets/map-repeaters.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/map-repeaters-light.png"><img src="assets/map-repeaters.png" alt="Only repeaters, with frequency, band and mode"></picture></a><br><sub>Only repeaters, with frequency, band and mode</sub></td>
 </tr>
 <tr>
-<td width="50%"><a href="assets/thursday.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/thursday-light.png"><img src="assets/thursday.png" alt="APRS Thursday: the HOTG net with its own feed"></picture></a><br><sub>#APRSThursday</sub></td>
-<td width="50%"><a href="assets/stations.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/stations-light.png"><img src="assets/stations.png" alt="Stations heard, with distance and direction"></picture></a><br><sub>Stations with distance and direction</sub></td>
+<td width="50%"><a href="assets/map-offline.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/map-offline-light.png"><img src="assets/map-offline.png" alt="Basic offline map (no internet needed)"></picture></a><br><sub>Basic offline map (no internet needed)</sub></td>
+<td width="50%"><a href="assets/messages.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/messages-light.png"><img src="assets/messages.png" alt="Messages as conversations"></picture></a><br><sub>Messages as conversations</sub></td>
 </tr>
 <tr>
-<td width="50%"><a href="assets/terminal.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/terminal-light.png"><img src="assets/terminal.png" alt="Packet terminal: a saved BBS, connected over AX.25"></picture></a><br><sub>Terminal over AX.25 packet</sub></td>
-<td width="50%"><a href="assets/terminal-vara.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/terminal-vara-light.png"><img src="assets/terminal-vara.png" alt="Packet terminal over VARA FM"></picture></a><br><sub>Terminal over VARA FM</sub></td>
+<td width="50%"><a href="assets/thursday.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/thursday-light.png"><img src="assets/thursday.png" alt="#APRSThursday"></picture></a><br><sub>#APRSThursday</sub></td>
+<td width="50%"><a href="assets/stations.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/stations-light.png"><img src="assets/stations.png" alt="Stations with distance and direction"></picture></a><br><sub>Stations with distance and direction</sub></td>
 </tr>
 <tr>
+<td width="50%"><a href="assets/terminal.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/terminal-light.png"><img src="assets/terminal.png" alt="Terminal: connected to a BBS over AX.25"></picture></a><br><sub>Terminal: connected to a BBS over AX.25</sub></td>
 <td width="50%"><a href="assets/chat.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/chat-light.png"><img src="assets/chat.png" alt="Packet chat"></picture></a><br><sub>Packet chat</sub></td>
-<td width="50%"><a href="assets/monitor.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/monitor-light.png"><img src="assets/monitor.png" alt="Frame monitor, TAK frames decoded"></picture></a><br><sub>Frame monitor</sub></td>
 </tr>
 <tr>
-<td colspan="2"><a href="assets/tak.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/tak-light.png"><img src="assets/tak.png" alt="TAK: stations by team on the map and GeoChat"></picture></a><br><sub>TAK: stations by team and GeoChat</sub></td>
+<td width="50%"><a href="assets/monitor.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/monitor-light.png"><img src="assets/monitor.png" alt="Frame monitor"></picture></a><br><sub>Frame monitor</sub></td>
+<td width="50%"><a href="assets/settings-tracker.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-tracker-light.png"><img src="assets/settings-tracker.png" alt="Tracker and warnings ahead"></picture></a><br><sub>Tracker and warnings ahead</sub></td>
 </tr>
 <tr>
-<td width="50%"><a href="assets/bbs.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/bbs-light.png"><img src="assets/bbs.png" alt="BBS SERVER: the app as a packet BBS"></picture></a><br><sub>BBS SERVER</sub></td>
-<td width="50%"><a href="assets/bbs-confirm.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/bbs-confirm-light.png"><img src="assets/bbs-confirm.png" alt="Switching BBS SERVER on takes a typed sentence"></picture></a><br><sub>BBS SERVER is switched on with a typed sentence</sub></td>
+<td colspan="2"><a href="assets/tak.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/tak-light.png"><img src="assets/tak.png" alt="TAK: stations by team and GeoChat"></picture></a><br><sub>TAK: stations by team and GeoChat</sub></td>
 </tr>
 <tr>
-<td width="50%"><a href="assets/settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-light.png"><img src="assets/settings.png" alt="Settings: TNC connection and station"></picture></a><br><sub>Settings: TNC and station</sub></td>
+<td width="50%"><a href="assets/bbs.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/bbs-light.png"><img src="assets/bbs.png" alt="BBS SERVER"></picture></a><br><sub>BBS SERVER</sub></td>
+<td width="50%"><a href="assets/bbs-confirm.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/bbs-confirm-light.png"><img src="assets/bbs-confirm.png" alt="BBS SERVER is switched on with a typed sentence"></picture></a><br><sub>BBS SERVER is switched on with a typed sentence</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="assets/settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-light.png"><img src="assets/settings.png" alt="Settings: station and profiles"></picture></a><br><sub>Settings: station and profiles</sub></td>
 <td width="50%"><a href="assets/settings-more.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-more-light.png"><img src="assets/settings-more.png" alt="Settings: background and screen, sounds"></picture></a><br><sub>Settings: background and screen, sounds</sub></td>
 </tr>
 </table>

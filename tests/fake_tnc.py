@@ -48,11 +48,35 @@ SAMPLES = [
 ]
 
 
+def _pos(lat: float, lon: float, table: str = "/", code: str = ">") -> str:
+    return f"{int(lat):02d}{(lat % 1) * 60:05.2f}N{table}{int(lon):03d}{(lon % 1) * 60:05.2f}E{code}"
+
+
+def _obj(name: str, lat: float, lon: float, table: str, code: str, comment: str) -> str:
+    return f";{name:<9}*111111z{_pos(lat, lon, table, code)}{comment}"
+
+
+# --scene: a busy afternoon around Plzeň for the screenshots (repeaters with their frequency, road
+# incidents, weather, a car with a trail), sent at once when the app connects
+SCENE = [
+    ("OK1KPL-10", "APRS", [], _obj("439.350MO", 49.7712, 13.4630, "/", "r", "439.350MHz T088 -760 OK0BPL Rokycany, FM + DMR CC1")),
+    ("OK1KPL-10", "APRS", [], _obj("145.775PL", 49.6930, 13.2950, "/", "r", "145.775MHz T088 -600 OK0BL Plzen")),
+    ("OK1KPL-10", "APRS", [], _obj("ER-OK0EB", 49.8400, 13.5600, "E", "0", "438.725MHz T077 R18k SvxLink, EchoLink")),
+    ("OK1KPL-10", "APRS", [], _obj("OK0DSK B", 49.6600, 13.5300, "D", "a", "RNG0001 70cm Voice (D-Star) 438.600MHz -7.6000MHz")),
+    ("OK1DOP-1", "APRS", [], _obj("D5 km 107", 49.7280, 13.2150, "\\", "'", "Nehoda, uzavren levy pruh / crash, left lane closed")),
+    ("OK1DOP-1", "APRS", [], _obj("I26 prace", 49.7900, 13.4000, "\\", "j", "Prace na silnici, kyvadlovy provoz / road works")),
+    ("OK1WX-13", "APRS", [], "@111111z" + _pos(49.7020, 13.4410, "/", "_") + "270/004g009t041r000p000P000h85b10142Rokycany WX"),
+    ("OK1LOR-7", "APRS", ["WIDE1-1"], "=" + _pos(49.7600, 13.3100, "/", "[") + "Walking the dog"),
+    ("OK1TRK-14", "APRS", ["OK0DIG*", "WIDE2-1"], "=" + _pos(49.6800, 13.4600, "/", "u") + "180/052Truck to Nepomuk"),
+]
+CAR_TRAIL = [(49.7440 + 0.0006 * k, 13.3950 + 0.0055 * k) for k in range(8)]  # OK1CAR-9 east of Plzeň
+
+
 TAK_TEAM = [  # (uid, callsign, lat, lon, team, role)
-    ("ANDROID-a1b2c3", "ALFA-1", 49.6120, 13.1470, "Cyan", "Team Lead"),
-    ("ANDROID-d4e5f6", "ALFA-2", 49.6320, 13.1890, "Cyan", "Team Member"),
-    ("ANDROID-0718aa", "MEDIC", 49.6010, 13.1820, "Red", "Medic"),
-    ("ANDROID-99bb01", "RTO", 49.6400, 13.1350, "Green", "RTO"),
+    ("ANDROID-a1b2c3", "ALFA-1", 49.7620, 13.3450, "Cyan", "Team Lead"),
+    ("ANDROID-d4e5f6", "ALFA-2", 49.7700, 13.3900, "Cyan", "Team Member"),
+    ("ANDROID-0718aa", "MEDIC", 49.7330, 13.3980, "Red", "Medic"),
+    ("ANDROID-99bb01", "RTO", 49.7290, 13.3420, "Green", "RTO"),
 ]
 TAK_CHAT = [
     ("ANDROID-a1b2c3", "ALFA-1", "Checkpoint 2 reached, moving north"),
@@ -93,7 +117,7 @@ class FakeTnc:
                 await self.send_to_client(ax25.Frame(A("APRS"), A("OK1ABC-9"), [A("WIDE1-1")], text.encode()))
 
     async def tak_traffic(self):
-        """TAK stations around Stod: positions now and then, a GeoChat every third round (--tak)."""
+        """TAK stations around Plzeň: positions now and then, a GeoChat every third round (--tak)."""
         n = 0
         while True:
             for uid, call, lat, lon, team, role in TAK_TEAM:
@@ -159,9 +183,24 @@ class FakeTnc:
         if frame.destination == self.bbs_call and not frame.is_ui:
             self.bbs_session(frame.source).handle(frame)
 
+    async def scene(self):
+        await asyncio.sleep(1.5)
+        for src, dst, path, info in SCENE:
+            await self.send_to_client(ax25.Frame(A(dst), A(src), [A(p) for p in path], info.encode()))
+            await asyncio.sleep(0.05)
+        for src, dst, path, info in SAMPLES:
+            await self.send_to_client(ax25.Frame(A(dst), A(src), [A(p) for p in path], info.encode()))
+            await asyncio.sleep(0.05)
+        for lat, lon in CAR_TRAIL:
+            info = "=" + _pos(lat, lon) + "075/048On the road to Rokycany"
+            await self.send_to_client(ax25.Frame(A("APRS"), A("OK1CAR-9"), [A("WIDE1-1")], info.encode()))
+            await asyncio.sleep(0.6)
+
     async def client(self, reader, writer):
         print("client connected", flush=True)
         self.writer = writer
+        if getattr(self.args, "scene", False):
+            asyncio.ensure_future(self.scene())
         decoder = ax25.KissDecoder()
         try:
             while data := await reader.read(1024):
@@ -187,4 +226,5 @@ if __name__ == "__main__":
     p.add_argument("--interval", type=float, default=20)
     p.add_argument("--tak", action="store_true", help="also send TAK positions and GeoChat")
     p.add_argument("--message-every", type=int, default=3, help="a message to us every N packets, 0 = never")
+    p.add_argument("--scene", action="store_true", help="send a busy area at once (for screenshots)")
     asyncio.run(FakeTnc(p.parse_args()).run())

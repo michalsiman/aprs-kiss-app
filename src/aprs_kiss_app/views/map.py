@@ -327,13 +327,25 @@ class MapView(View):
                                      shadow=ft.BoxShadow(blur_radius=3, offset=ft.Offset(0, 1),
                                                          color=ft.Colors.with_opacity(0.25, ft.Colors.BLACK))),
                         map_label(label, color, bold, sub=freq,
-                                  band=freq.split(" · ")[1] if freq and " · " in freq else None),
+                                  band="°C" if freq and freq.endswith("°C")
+                                  else freq.split(" · ")[1] if freq and " · " in freq else None),
                     ],
                     spacing=1, tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                 ),
                 on_click=on_click,
             ),
         )
+
+    def _temperature(self, entry: dict) -> str | None:
+        """A weather station's temperature for the second line of its tag ("4.8 °C"; "4,8 °C" in Czech…)."""
+        wx = entry.get("weather")
+        temp = wx.get("temperature") if isinstance(wx, dict) else None
+        if not isinstance(temp, (int, float)):
+            return None
+        text = f"{temp:.1f}"
+        if self.t.language not in ("en",):
+            text = text.replace(".", ",")  # most of the app's languages write a decimal comma
+        return f"{text} °C"
 
     @staticmethod
     def _dot(lat: float, lon: float) -> fm.Marker:
@@ -373,7 +385,8 @@ class MapView(View):
             if not visible(self.app, e) or not mapfilter.shown(e, kinds, now):
                 continue
             wanted.append((e["call"], lat, lon, emoji(e.get("symbol_table"), e.get("symbol")),
-                           station_color(self.app, e), bool(e.get("last_rf")), repeater.label(e)))
+                           station_color(self.app, e), bool(e.get("last_rf")),
+                           repeater.label(e) or self._temperature(e)))
             if conf.map_trails:
                 points = tuple((p[1], p[2]) for p in e.get("track", ()) if now - p[0] <= TRAIL_SECONDS)
                 if len(points) >= 2:

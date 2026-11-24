@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- **Weather stations show their temperature** on the map, in the second line of their tag (like a
+  repeater's frequency).
+- New screenshots (`tools/screenshots.py` takes them all, `tests/fake_tnc.py --scene` plays a busy area).
+
 ## 0.1.52 – 2026-11-24
 
 - **Phone top bar**: the text in the small TNC and IS lamps sits in the middle of its frame.

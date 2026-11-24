@@ -24,7 +24,8 @@ MAP_TEXT = {COLOR_RF: "#1565C0", COLOR_IS: "#546E7A", COLOR_TRACKED: "#E65100", 
 MAP_TEXT_OTHER = "#263238"
 
 
-BAND_TEXT = {"2 m": "#2E7D32", "70 cm": "#C2185B"}  # a repeater's band at a glance: 2 m green, 70 cm magenta
+BAND_TEXT = {"2 m": "#2E7D32", "70 cm": "#C2185B",  # a repeater's band at a glance: 2 m green, 70 cm magenta
+             "°C": "#0277BD"}  # a weather station's temperature
 BAND_TEXT_OTHER = "#5D4037"
 
 
