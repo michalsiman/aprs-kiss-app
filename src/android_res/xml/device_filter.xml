@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- USB devices APRS & Packet offers to handle when plugged in (Android asks "Open APRS & Packet…?").
+     The same kinds android_usb.py talks to. -->
+<resources>
+    <!-- USB CDC (ACM): the Quansheng UV-K1/K5 V3 with the F4HWN KISS TNC ("PUYA CDC DEMO"), Mobilinkd,
+         NinoTNC and most TNCs with a USB port -->
+    <usb-device class="2" />
+    <!-- serial adapters in programming cables and TNCs -->
+    <usb-device vendor-id="1027" />  <!-- FTDI -->
+    <usb-device vendor-id="4292" />  <!-- Silicon Labs CP210x -->
+    <usb-device vendor-id="6790" />  <!-- WCH CH340 -->
+    <usb-device vendor-id="1659" />  <!-- Prolific PL2303 -->
+</resources>

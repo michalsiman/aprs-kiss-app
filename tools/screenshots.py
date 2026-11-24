@@ -63,6 +63,7 @@ def state(lang: str) -> dict:
         ("in", "OK1ABC-9", "OK1SIM-7", "Ahoj, jsem na D5 u Rokycan, slyšíš mě?" if cs else "Hi, I am on the D5 near Rokycany, copy?", 1500),
         ("out", "OK1SIM-7", "OK1ABC-9", "Slyším 5/9, šťastnou cestu!" if cs else "Copy 5/9, safe trip!", 1380),
         ("in", "OK1MNO-7", "OK1SIM-7", "Jsem na Krkavci, výhled je super" if cs else "On top of Krkavec, great view", 600),
+        ("in", "OK1ABC-9", "OK1SIM-7", ("Stojím tady: " if cs else "Parked here: ") + "QTH 49.69500, 13.42000", 240),
         ("out", "OK1SIM-7", "OK1MNO-7", "Pošli fotku :-)" if cs else "Send a photo :-)", 540),
     ]
     th = [
@@ -75,7 +76,8 @@ def state(lang: str) -> dict:
     return {
         "msg_counter": 12,
         "messages": [{"direction": d, "from": f, "to": t, "text": x, "time": now - ago, "msg_no": str(i + 1),
-                      "via": "radio"} for i, (d, f, t, x, ago) in enumerate(msgs)],
+                      "via": "radio", **({"km": 6.2, "bearing": 150} if d == "in" else {})}
+                     for i, (d, f, t, x, ago) in enumerate(msgs)],
         "thursday": [{"time": now - ago, "from": f, "text": x, "kind": k, "via": "internet"} for f, x, k, ago in th],
         "thursday_joined": now - 2400, "thursday_cq": now - 2400,
     }
@@ -151,20 +153,22 @@ class Browser:
 class Run:
     """The fake TNC and the app (web) with prepared settings, for one language, theme and screen."""
 
-    def __init__(self, lang, theme, phone=False, tak=False, **conf):
+    def __init__(self, lang, theme, phone=False, tak=False, send_file=0, **conf):
         self.lang, self.theme, self.phone, self.tak, self.conf = lang, theme, phone, tak, conf
+        self.send_file = send_file
 
     async def __aenter__(self):
         free(TNC_PORT)
         free(APP_PORT)
-        self.data = Path(tempfile.mkdtemp(prefix="shots-data-"))
+        self.data = Path(tempfile.mkdtemp(prefix="aprs-kiss-"))
         c = config(self.lang, self.theme, **self.conf)
         c.pop("_now")
         (self.data / "config.json").write_text(json.dumps(c))
         (self.data / "state.json").write_text(json.dumps(state(self.lang)))
         env = {**os.environ, "PYTHONPATH": str(ROOT / "src")}
         self.tnc = subprocess.Popen([PY, str(ROOT / "tests" / "fake_tnc.py"), "--port", str(TNC_PORT), "--scene",
-                                     "--interval", "6", "--message-every", "0", *(["--tak"] if self.tak else [])],
+                                     "--interval", "6", "--message-every", "0", *(["--tak"] if self.tak else []),
+                                     *(["--send-file", str(self.send_file)] if self.send_file else [])],
                                     env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         app_env = {**env, "APRS_KISS_DATA": str(self.data), "FLET_FORCE_WEB_SERVER": "true"}
         if self.phone:
@@ -230,7 +234,7 @@ async def desktop(lang, theme, only):
         await b.click(1210, 26, 5)  # transmit on (the message bar goes away)
         if want("messages"):
             await b.click(52, RAIL["messages"], 2)
-            await b.click(170, 185, 2)
+            await b.click(170, 133, 2)  # OK1ABC-9: the newest, with a position in its message
             await b.shot(out("messages", lang, theme))
         if want("thursday"):
             await b.click(52, RAIL["thursday"], 2)
@@ -279,6 +283,16 @@ async def desktop(lang, theme, only):
         async with Run(lang, theme, bbs_enabled=True) as b:
             await b.click(52, RAIL["bbs"], 3)
             await b.shot(out("bbs", lang, theme))
+    if want("files") or want("files-offer"):
+        async with Run(lang, theme, send_file=20, files_accept=True) as b:
+            await b.click(1210, 26, 3)  # transmit on: the link needs our acknowledgements
+            await b.click(52, RAIL["files"], 3)
+            await b.wait(12)  # OK1XYZ connects and offers a picture
+            if want("files-offer"):
+                await b.shot(out("files-offer", lang, theme))
+            await b.click(777, 457, 25)  # accept, and let a part of it come in
+            if want("files"):
+                await b.shot(out("files", lang, theme))
     if want("tak"):
         async with Run(lang, theme, tak=True, tak_enabled=True) as b:
             await b.wait(25)  # the team reports in

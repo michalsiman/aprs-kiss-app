@@ -31,6 +31,7 @@ ax25 = _load("ax25")
 aprs = _load("aprs")
 session = _load("session")
 tak = _load("tak")
+yapp = _load("yapp")
 
 A = ax25.Address.parse
 
@@ -182,6 +183,31 @@ class FakeTnc:
             return
         if frame.destination == self.bbs_call and not frame.is_ui:
             self.bbs_session(frame.source).handle(frame)
+        elif self.file_session is not None and frame.destination == self.file_session.me and not frame.is_ui:
+            self.file_session.handle(frame)
+
+    file_session = None
+
+    async def send_file(self):
+        """--send-file: OK1XYZ connects to us and sends a picture (YAPP), as another station would."""
+        await asyncio.sleep(self.args.send_file)
+        me, to = A("OK1XYZ"), A(self.args.mycall)
+
+        async def send(raw: bytes):
+            await self.send_to_client(ax25.Frame.decode(raw))
+
+        data = bytes((i * 7 + i // 3) % 256 for i in range(36000))
+
+        def on_state(state: str, reason: str):
+            print(f"file session: {state} ({reason})", flush=True)
+            if state == "connected":
+                sender.start()
+
+        sess = session.Session(me, to, [], send, lambda _t: None, on_state)
+        sender = yapp.Sender("mapa-okoli.jpg", data, sess.send_bytes, lambda s, d: print("file:", s, d, flush=True))
+        sess.on_data = sender.feed
+        self.file_session = sess
+        sess.connect()
 
     async def scene(self):
         await asyncio.sleep(1.5)
@@ -201,6 +227,8 @@ class FakeTnc:
         self.writer = writer
         if getattr(self.args, "scene", False):
             asyncio.ensure_future(self.scene())
+        if getattr(self.args, "send_file", 0):
+            asyncio.ensure_future(self.send_file())
         decoder = ax25.KissDecoder()
         try:
             while data := await reader.read(1024):
@@ -227,4 +255,5 @@ if __name__ == "__main__":
     p.add_argument("--tak", action="store_true", help="also send TAK positions and GeoChat")
     p.add_argument("--message-every", type=int, default=3, help="a message to us every N packets, 0 = never")
     p.add_argument("--scene", action="store_true", help="send a busy area at once (for screenshots)")
+    p.add_argument("--send-file", type=float, default=0, help="N seconds after the app connects, send it a file (YAPP)")
     asyncio.run(FakeTnc(p.parse_args()).run())

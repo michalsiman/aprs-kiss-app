@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="1.0.1" date="2026-11-24" type="development">
+      <description>
+        <p>Beta: on Android, a radio plugged in offers to open the app.</p>
+      </description>
+    </release>
     <release version="1.0.0" date="2026-11-24">
       <description>
         <p>The first stable version. Testers can get beta versions too (Settings › App).</p>

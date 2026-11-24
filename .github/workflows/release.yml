@@ -149,6 +149,11 @@ jobs:
           distribution: temurin
           java-version: "17"
       - run: pip install "flet[all]==1.1.2"
+      - name: Flet's build template with the USB device filter (a radio plugged in opens the app)
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/tpl.zip" https://github.com/flet-dev/flet/releases/download/v1.1.2/flet-build-template.zip
+          unzip -q "$RUNNER_TEMP/tpl.zip" -d "$RUNNER_TEMP/tpl"
+          python packaging/android/patch_template.py "$RUNNER_TEMP/tpl/build"
       - name: flet build apk (GitHub) and aab (Google Play)
         # Signed with the project's own key (secrets ANDROID_KEYSTORE_B64 and ANDROID_KEYSTORE_PASSWORD), so each
         # release installs over the previous one; without the secrets a throwaway key is used, and no .aab is
@@ -171,9 +176,10 @@ jobs:
             echo "::warning::No Android signing key in the secrets: the .apk is signed with a throwaway key, no .aab"
           fi
           build() {
-            flet build "$1" --yes --no-rich-output --skip-flutter-doctor --build-number "$BUILD" "${SIGN[@]}" || {
+            TPL=(--template "$RUNNER_TEMP/tpl/build")
+            flet build "$1" --yes --no-rich-output --skip-flutter-doctor --build-number "$BUILD" "${TPL[@]}" "${SIGN[@]}" || {
               echo "Retrying the Android build"; sleep 30
-              flet build "$1" --yes --no-rich-output --skip-flutter-doctor --build-number "$BUILD" "${SIGN[@]}"; }
+              flet build "$1" --yes --no-rich-output --skip-flutter-doctor --build-number "$BUILD" "${TPL[@]}" "${SIGN[@]}"; }
           }
           mkdir -p dist
           build apk

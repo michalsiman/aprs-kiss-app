@@ -4,6 +4,12 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## 1.0.1 beta – 2026-11-24
+
+- **Android: a radio plugged in opens the app.** When a TNC is plugged into the phone (the Quansheng with
+  the F4HWN KISS TNC, other USB CDC TNCs, FTDI / CP210x / CH340 / PL2303 cables), Android offers
+  "Open APRS & Packet to handle …"; with *always* ticked the app opens by itself and gets the USB access.
+
 ## 1.0.0 – 2026-11-24
 
 - **The first stable version** – the same as 0.1.55, plus:
