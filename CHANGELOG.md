@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.53 – 2026-11-24
 
 - **Phone: "You seem to be driving – switch the tracker on?"** When the app sees from the phone's GPS that
   you are on the move with the tracker off, it asks (in the background with a notification; a tap opens

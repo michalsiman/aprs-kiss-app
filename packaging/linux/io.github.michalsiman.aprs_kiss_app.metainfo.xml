@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.53" date="2026-11-24">
+      <description>
+        <p>Weather stations show their temperature on the map; the phone offers to switch the tracker on when you seem to be driving.</p>
+      </description>
+    </release>
     <release version="0.1.52" date="2026-11-24">
       <description>
         <p>Text centred in the phone's small TNC and IS lamps.</p>
