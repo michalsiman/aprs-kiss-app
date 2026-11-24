@@ -90,7 +90,8 @@ jobs:
             --gpg-keys=packaging/flatpak/aprs-kiss.gpg \
             repo "aprs-kiss-${{ needs.linux.outputs.version }}-x86_64.flatpak" $ID stable
       - name: Publish to the Flatpak repository (GitHub Pages)
-        if: startsWith(github.ref, 'refs/tags/v') || inputs.publish
+        # betas (tag vX.Y.Z-beta) stay out: Linux Mint's update manager offers only stable versions
+        if: (startsWith(github.ref, 'refs/tags/v') && !contains(github.ref_name, '-beta')) || inputs.publish
         env:
           VERSION: ${{ needs.linux.outputs.version }}
           GPG_KEY: ${{ secrets.FLATPAK_GPG_KEY }}
@@ -279,6 +280,9 @@ jobs:
       - run: find out -type f
       - uses: softprops/action-gh-release@v2
         with:
+          # a beta is a pre-release: the apps' "new version" check passes it by unless asked for betas
+          prerelease: ${{ contains(github.ref_name, '-beta') }}
+          make_latest: ${{ !contains(github.ref_name, '-beta') }}
           fail_on_unmatched_files: false
           files: |
             out/linux/*.tar.gz

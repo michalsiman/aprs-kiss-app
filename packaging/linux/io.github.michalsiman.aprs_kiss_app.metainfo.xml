@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="1.0.0" date="2026-11-24">
+      <description>
+        <p>The first stable version. Testers can get beta versions too (Settings › App).</p>
+      </description>
+    </release>
     <release version="0.1.55" date="2026-11-24">
       <description>
         <p>Send your position or any place from the map (coordinates or locator) to the chat or in a message; positions in messages and chat open on the map.</p>

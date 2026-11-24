@@ -43,3 +43,17 @@ class UpdatesTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class BetaTest(unittest.TestCase):
+    def test_newest_includes_betas_and_skips_drafts(self):
+        from aprs_kiss_app.updates import newest
+        releases = [{"tag_name": "v1.0.0", "prerelease": False}, {"tag_name": "v1.0.2-beta", "prerelease": True},
+                    {"tag_name": "v1.0.1-beta", "prerelease": True}, {"tag_name": "v9.9.9", "draft": True}]
+        self.assertEqual(newest(releases)["tag_name"], "v1.0.2-beta")
+
+    def test_beta_label_is_newer_than_the_stable_before_it(self):
+        from aprs_kiss_app.updates import is_newer
+        self.assertTrue(is_newer("1.0.1 beta", "1.0.0"))
+        self.assertTrue(is_newer("1.1.0", "1.0.3"))
+        self.assertFalse(is_newer("1.0.0", "1.0.2"))

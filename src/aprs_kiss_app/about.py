@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING
 
 import flet as ft
 
-from aprs_kiss_core.config import VERSION
+from aprs_kiss_core.config import VERSION_LABEL
 
 from . import distribution
 from .views.base import clock
@@ -81,7 +81,7 @@ def show_about(app: App) -> None:
                     _icon(),
                     ft.Column([
                         ft.Text("APRS & Packet", size=22, weight=ft.FontWeight.BOLD),
-                        ft.Text(t("about_version", version=VERSION), color=small),
+                        ft.Text(t("about_version", version=VERSION_LABEL), color=small),
                     ], spacing=2, tight=True),
                 ],
                 spacing=16,

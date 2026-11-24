@@ -1,5 +1,15 @@
 # Changelog
 
+Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1, 1.0.2 …, tagged
+`vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
+*Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
+
+## 1.0.0 – 2026-11-24
+
+- **The first stable version** – the same as 0.1.55, plus:
+- **Beta versions for testers**: Settings › App › *Also offer beta versions*. From now on new features come
+  as betas first and now and then as a new stable version.
+
 ## 0.1.55 – 2026-11-24
 
 - **Positions in the chat and in messages**:

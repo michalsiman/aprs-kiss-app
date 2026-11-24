@@ -12,7 +12,8 @@ and its [KISS TNC app](https://github.com/armel/uv-k1-k5v3-firmware-custom/wiki/
 (Direwolf, a hardware TNC, the radio's USB serial port, or the KISS TCP bridge from the integration).
 Verified also with the **VGC VR-N76** and **AnyTone UV890** handhelds.
 
-**Status: actively developed** – new versions come out often (see [CHANGELOG](CHANGELOG.md)).
+**Status: version 1.0, actively developed.** Stable versions (1.0, 1.1 …) now and then; between them
+**beta versions** for testers – tick *Also offer beta versions* in Settings (see [CHANGELOG](CHANGELOG.md)).
 Ready for **Linux**, **Windows** and **Android**; **macOS** and **iOS** builds exist but nobody has tried
 them on a real Mac, iPhone or iPad yet – **testers wanted** (see [Platforms](#platforms)).
 

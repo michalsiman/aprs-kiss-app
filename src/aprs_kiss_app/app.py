@@ -887,7 +887,8 @@ class App:
             await self.check_updates(force=False)
 
     async def check_updates(self, force: bool = True) -> None:
-        self.update_state = await asyncio.to_thread(updates.check, self.folder, force)
+        self.update_state = await asyncio.to_thread(updates.check, self.folder, force, None,
+                                                    self.engine.config.update_beta)
         self._show_update()
         st = self.update_state
         if st.available and st.notified != st.latest and not self._closing:

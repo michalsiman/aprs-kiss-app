@@ -266,6 +266,8 @@ class SettingsView(View):
                             for key in ("sound_tx", "sound_messages", "sound_chat", "sound_tak", "sound_road", "sound_meet")}
         self.check_updates = ft.Checkbox(label=t("check_updates"), value=c.check_updates,
                                          visible=not distribution.store_updates())  # Google Play updates it
+        self.update_beta = ft.Checkbox(label=t("update_beta"), value=c.update_beta,
+                                       visible=not distribution.store_updates())  # testers: the betas too
         self.theme = ft.Dropdown(label=t("theme"), value=c.theme if c.theme in ("auto", "light", "dark") else "auto",
                                  width=240,
                                  options=[ft.DropdownOption(key="auto", text=t("theme_auto")),
@@ -317,7 +319,7 @@ class SettingsView(View):
                          ft.Row([ft.OutlinedButton(t("sound_test"), icon=ft.Icons.PLAY_ARROW,
                                                    on_click=self._test_sounds)])),
                 _section(t("app_section"), ft.Icons.TUNE, ft.Row([self.language, self.theme], wrap=True),
-                         self.check_updates,
+                         self.check_updates, self.update_beta,
                          ft.Row([ft.OutlinedButton(t("about"), icon=ft.Icons.INFO_OUTLINE,
                                                    on_click=lambda _e: self._about())])),
                 self.error,
@@ -610,7 +612,7 @@ class SettingsView(View):
             "aprsis_passcode": self.passcode.value, "aprsis_radius_km": self.radius.value,
             "igate_rx": self.igate_rx.value, "igate_tx": self.igate_tx.value,
             "language": self.language.value or "",
-            "check_updates": self.check_updates.value,
+            "check_updates": self.check_updates.value, "update_beta": bool(self.update_beta.value),
             **{key: box.value for key, box in self.sound_boxes.items()},
             "tracker_mode": self.trk_mode.value or "fixed", "tracker_minutes": self.trk_minutes.value or "2",
             "tracker_profile": self.trk_profile.value or "car", "tracker_still_minutes": self.trk_still.value or "60",

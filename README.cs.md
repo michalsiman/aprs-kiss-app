@@ -12,7 +12,8 @@ a jeho [aplikací KISS TNC](https://github.com/armel/uv-k1-k5v3-firmware-custom/
 s jakýmkoliv KISS TNC (Direwolf, hardwarové TNC, USB sériový port rádia nebo KISS TCP most z integrace).
 Ověřená funkčnost i s ručkami **VGC VR-N76** a **AnyTone UV890**.
 
-**Stav: aktivní vývoj** – nové verze vycházejí často (viz [CHANGELOG](CHANGELOG.md), anglicky).
+**Stav: verze 1.0, aktivní vývoj.** Ostré verze (1.0, 1.1 …) jednou za čas, mezi nimi **beta verze** pro
+testery – zaškrtněte v Nastavení *Nabízet i beta verze* (viz [CHANGELOG](CHANGELOG.md), anglicky).
 Připravená pro **Linux**, **Windows** a **Android**; sestavení pro **macOS** a **iOS** existují, ale na
 skutečném Macu, iPhonu ani iPadu je zatím nikdo nevyzkoušel – **hledáme testery** (viz [Platformy](#platformy)).
 

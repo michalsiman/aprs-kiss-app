@@ -20,7 +20,11 @@ from .ax25 import Address
 _LOGGER = logging.getLogger(__name__)
 
 APP_NAME = "aprs-kiss"
-VERSION = "0.1.55"
+VERSION = "1.0.0"
+# A beta (a pre-release on GitHub, tag vX.Y.Z-beta): betas take the next patch numbers (1.0.1, 1.0.2 …),
+# the next stable release a higher minor one (1.1.0), so updating always goes up.
+BETA = False
+VERSION_LABEL = f"{VERSION} beta" if BETA else VERSION
 MIN_BEACON_MINUTES = 10
 
 
@@ -94,7 +98,8 @@ class Config:
     bbs_enabled: bool = False  # run the BBS server (its own SSID, below)
     bbs_ssid: int = 1  # the BBS answers on your callsign with this SSID
     bbs_list: str = ""  # saved BBSes and nodes for the terminal: JSON [{"call": ..., "path": ...}]
-    check_updates: bool = True  # ask GitHub once a day whether a newer version is out
+    check_updates: bool = True
+    update_beta: bool = False  # also offer beta versions (pre-releases on GitHub): for testers  # ask GitHub once a day whether a newer version is out
     disclaimer_accepted: bool = False  # the first-start warning (transmitting needs a licence) was accepted
     language_asked: bool = False
     bbs_sentence_ok: bool = False  # the BBS SERVER sentence was typed once: not asked again
