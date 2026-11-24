@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import flet as ft
 
-from .base import View, clock
+import time
+
+from .base import View, bearing, clock, distance_km
 
 MAX_TEXT = 67  # APRS message text limit
 STATE_ICONS = {
@@ -43,6 +45,11 @@ class MessagesView(View):
         )
         # On a phone one side at a time: the conversations, or one conversation with a back button.
         self.back = ft.IconButton(ft.Icons.ARROW_BACK, tooltip=self.t("back"), on_click=self._back, visible=False)
+        # where the other station is: how far from us, and a button to see it on the map
+        self.where = ft.Text(size=12, color=ft.Colors.ON_SURFACE_VARIANT, no_wrap=True,
+                             overflow=ft.TextOverflow.ELLIPSIS)
+        self.on_map = ft.IconButton(ft.Icons.MAP_OUTLINED, tooltip=self.t("show_on_map"), on_click=self._show_on_map,
+                                    visible=False)
         self.left = left = ft.Column(
             [
                 ft.FilledTonalButton(self.t("new_message"), icon=ft.Icons.EDIT, on_click=self._new),
@@ -53,7 +60,8 @@ class MessagesView(View):
         )
         self.right = right = ft.Column(
             [
-                ft.Row([self.back, self.title], spacing=4),
+                ft.Row([self.back, ft.Column([self.title, self.where], spacing=0, tight=True, expand=True),
+                        self.on_map], spacing=4, vertical_alignment=ft.CrossAxisAlignment.CENTER),
                 ft.Container(ft.SelectionArea(self.thread), expand=True, border_radius=8,
                              bgcolor=ft.Colors.SURFACE_CONTAINER_LOWEST),
                 self.to,
@@ -126,6 +134,7 @@ class MessagesView(View):
         self.conversations.controls = [self._conversation_tile(call, msgs) for call, msgs in groups.items()]
         if not groups:
             self.conversations.controls = [ft.Text(self.t("no_messages"), color=ft.Colors.ON_SURFACE_VARIANT)]
+        self._where()
         if self.selected:
             self.title.value = self.selected
             self.thread.controls = [self._bubble(m) for m in groups.get(self.selected, [])]
@@ -158,15 +167,67 @@ class MessagesView(View):
                             color=ft.Colors.PRIMARY if unread else None),
             title=ft.Text(call, weight=ft.FontWeight.BOLD if unread else None),
             subtitle=ft.Text(last["text"], max_lines=1, overflow=ft.TextOverflow.ELLIPSIS),
-            trailing=ft.Text(clock(last["time"]), size=11),
+            trailing=ft.Row([
+                ft.Text(clock(last["time"]), size=11),
+                ft.PopupMenuButton(icon=ft.Icons.MORE_VERT, tooltip=self.t("more"), items=[
+                    ft.PopupMenuItem(self.t("conv_delete"), icon=ft.Icons.DELETE_OUTLINE,
+                                     on_click=lambda _e, c=call: self._ask_delete(c))]),
+            ], tight=True, spacing=0, vertical_alignment=ft.CrossAxisAlignment.CENTER),
             selected=call == self.selected,
             dense=True,
             on_click=lambda _e, c=call: self.open_conversation(c),
         )
 
+    def _ask_delete(self, call: str) -> None:
+        def yes(_e) -> None:
+            self.app.page.pop_dialog()
+            self.engine.delete_conversation(call)
+            self.unread.discard(call)
+            if self.selected == call:
+                self.selected = None
+            self._signature = None
+            self.refresh()
+            self.app.page.update()
+
+        self.app.show_dialog(ft.AlertDialog(
+            title=ft.Text(self.t("conv_delete_title", call=call)),
+            content=ft.Text(self.t("conv_delete_ask")),
+            actions=[ft.TextButton(self.t("cancel"), on_click=lambda _e: self.app.page.pop_dialog()),
+                     ft.FilledButton(self.t("conv_delete"), icon=ft.Icons.DELETE_OUTLINE, on_click=yes)],
+        ))
+
+    def _station(self) -> dict | None:
+        heard = self.engine.station.heard
+        entry = heard.get(self.selected) if self.selected else None
+        return entry if entry and entry.get("latitude") is not None else None
+
+    def _where(self) -> None:
+        """The station's distance and direction from us now, and how old its position is."""
+        entry = self._station()
+        here = self.engine.my_position()
+        self.on_map.visible = entry is not None
+        self.where.visible = bool(entry and here)
+        if entry and here:
+            km = distance_km(*here, entry["latitude"], entry["longitude"])
+            dist = f"{km * 1000:.0f} m" if km < 1 else f"{km:.1f} km" if km < 10 else f"{km:.0f} km"
+            self.where.value = self.t("msg_where", d=dist, dir=bearing(*here, entry["latitude"], entry["longitude"]),
+                                      age=self.t.age(time.time() - entry["last_heard"]))
+
+    async def _show_on_map(self, _e) -> None:
+        entry = self._station()
+        if entry:
+            self.app.select("map")
+            await self.app.view("map").centre(entry["latitude"], entry["longitude"])
+
     def _bubble(self, m: dict) -> ft.Control:
         out = m["direction"] == "out"
         meta: list[ft.Control] = [ft.Text(clock(m["time"]), size=11, color=ft.Colors.ON_SURFACE_VARIANT)]
+        if m.get("km") is not None:  # how far the sender was when the message came
+            km = m["km"]
+            dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
+            dist = f"{km * 1000:.0f} m" if km < 1 else f"{km:.1f} km" if km < 10 else f"{km:.0f} km"
+            meta.append(ft.Text(f"📍 {dist} {dirs[round(m.get('bearing', 0) / 45) % 8]}", size=11,
+                                color=ft.Colors.ON_SURFACE_VARIANT, tooltip=self.t("msg_distance_then")))
         if m.get("via"):
             meta.append(ft.Text(self.t(f"via_{m['via']}") if m["via"] in ("radio", "internet", "both") else m["via"],
                                 size=11, color=ft.Colors.ON_SURFACE_VARIANT))

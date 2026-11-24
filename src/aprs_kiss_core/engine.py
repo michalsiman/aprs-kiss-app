@@ -21,6 +21,7 @@ from __future__ import annotations
 import asyncio
 import contextlib
 import logging
+import math
 import time
 from collections import deque
 from collections.abc import Callable
@@ -33,7 +34,7 @@ from .aprsis import AprsIsClient, gate_to_is, passcode, third_party
 from .ax25 import PF, U_DM, Address, Frame
 from .bbs import BbsConfigError, BbsServer
 from . import digipeater, tak
-from .tracker import Tracker, course_speed
+from .tracker import Tracker, course_speed, distance_m
 from .station import _track as station_track
 from . import vara as vara_mod
 from .gps import GpsFix, GpsReader, PushedGps
@@ -856,10 +857,23 @@ class Engine:
             return
         item = {"direction": "in", "from": message["from"], "to": str(self.me), "text": message["text"],
                 "time": message["received_at"], "msg_no": message.get("msg_no"), "via": message.get("via")}
+        item.update(self._distance_to(message["from"]))  # how far the sender was when the message came
         self.messages.append(item)
         self._schedule_save()
         self._emit("message", message)
         self._emit("aprs_message", {"message": item})
+
+    def _distance_to(self, call: str) -> dict[str, float]:
+        """{"km": …, "bearing": …} from where we are to the station's last known position, or {}."""
+        here = self.my_position()
+        there = self.station.heard.get(call) or self.station.heard.get(call.upper()) or {}
+        if not here or there.get("latitude") is None or there.get("longitude") is None:
+            return {}
+        lat1, lon1, lat2, lon2 = map(math.radians, (*here, there["latitude"], there["longitude"]))
+        y = math.sin(lon2 - lon1) * math.cos(lat2)
+        x = math.cos(lat1) * math.sin(lat2) - math.sin(lat1) * math.cos(lat2) * math.cos(lon2 - lon1)
+        return {"km": round(distance_m(*here, there["latitude"], there["longitude"]) / 1000, 2),
+                "bearing": round(math.degrees(math.atan2(y, x)) % 360)}
 
     # ─── #APRSThursday ────────────────────────────────────────────────────
 
@@ -932,6 +946,21 @@ class Engine:
         self._schedule_save()
         self._emit("aprs_message", {"message": item})
         return msg.as_dict()
+
+    def delete_conversation(self, call: str) -> int:
+        """Forget all messages with this station (in and out); how many went."""
+        call = call.upper()
+
+        def party(m: dict[str, Any]) -> str:
+            return (m["from"] if m["direction"] == "in" else m["to"]).upper()
+
+        keep = [m for m in self.messages if party(m) != call]
+        gone = len(self.messages) - len(keep)
+        self.messages = deque(keep, maxlen=MESSAGE_HISTORY)
+        if gone:
+            self._schedule_save()
+            self._on_update()
+        return gone
 
     def message_state(self, msg_no: str | None) -> str | None:
         msg = self.station.outgoing.get(str(msg_no)) if msg_no else None
