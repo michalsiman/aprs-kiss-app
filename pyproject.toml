@@ -81,8 +81,8 @@ NSLocationWhenInUseUsageDescription = "Your position for the map and the APRS be
 # Android: pyjnius reaches the USB host API for a TNC on the phone's USB port (aprs_kiss_core/android_usb.py)
 [tool.flet.android]
 dependencies = ["pyjnius"]
-# Android resources of our own (src/android_res): the USB devices we offer to handle when plugged in
-res_dir = "android_res"
+# Android resources of our own (src/android_res, relative to the project): the USB devices we offer to handle when plugged in
+res_dir = "src/android_res"
 # The launcher icon: assets/icon_android.png is the icon blue to the edges (Android masks it to its own
 # shape), so no white margin around it; this colour is behind it, the blue of the icon's middle.
 adaptive_icon_background = "#3D46B2"
