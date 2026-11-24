@@ -13,6 +13,8 @@
 [![flet](https://img.shields.io/badge/Flet-1.1.2-5C2D91)](https://flet.dev/)
 ![ham](https://img.shields.io/badge/ham%20radio-APRS%20%C2%B7%20AX.25%20%C2%B7%20KISS-e8590c)
 
+<p align="center"><a href="assets/map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/map-light.png"><img src="assets/map.png" width="50%" alt="APRS & Packet on a computer: the map with stations, repeaters and trails"></picture></a></p>
+
 An APRS station and packet radio terminal for a radio with a **KISS TNC**, as a normal application for
 computers and **Android phones** – no Home Assistant, no web server. It is the standalone sibling of the
 [APRS & Packet Home Assistant integration](https://github.com/michalsiman/aprs-kiss-ha) and shares

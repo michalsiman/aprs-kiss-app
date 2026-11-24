@@ -13,6 +13,8 @@
 [![flet](https://img.shields.io/badge/Flet-1.1.2-5C2D91)](https://flet.dev/)
 ![ham](https://img.shields.io/badge/ham%20radio-APRS%20%C2%B7%20AX.25%20%C2%B7%20KISS-e8590c)
 
+<p align="center"><a href="assets/cs/map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/map-light.png"><img src="assets/cs/map.png" width="50%" alt="APRS & Packet na počítači: mapa se stanicemi, převaděči a ocásky"></picture></a></p>
+
 APRS stanice a packet radio terminál pro rádio s **KISS TNC** jako obyčejná aplikace pro počítač
 i **telefon s Androidem** – bez Home Assistantu, bez webového serveru. Je to samostatný sourozenec
 [integrace APRS & Packet pro Home Assistant](https://github.com/michalsiman/aprs-kiss-ha) a sdílí
