@@ -520,8 +520,8 @@ class App:
                 row if self.compact else [
                     self.menu_btn,
                     self.callsign_btn,
+                    ft.Container(expand=True),  # all the lamps on the right
                     self.lamps["tnc"], self.lamps["is"], self.lamps["gps"],
-                    ft.Container(expand=True),
                     self.update_btn,
                     self.position_btn.control,
                     self.lamps["tx"],
