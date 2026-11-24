@@ -67,7 +67,12 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
   button chooses between *online*, *imported* and *basic offline*. Vector maps (Mapsforge, vector MBTiles)
   are not supported.
 - **Messages** as conversations: retried until acknowledged, delivery state shown, incoming messages
-  acknowledged automatically; a new message to any callsign; a notice when one arrives.
+  acknowledged automatically; a new message to any callsign; a notice when one arrives. A longer text goes
+  as several messages numbered 1/2, 2/2 …; the conversation shows how far the station is (and how far it was
+  when each message came) with a button to see it on the map; conversations can be deleted.
+- **Positions in messages and the chat**: send yours, or any place picked on the map – as coordinates or as
+  a Maidenhead locator (the map's menu shows the locator of every place); a position written in a message
+  or a chat line (decimal degrees, degrees and minutes, APRS's own, a locator) opens on the map with a pin.
 - **#APRSThursday**: its own section for the weekly HOTG net through ANSRVR – check in with one
   button, read the group's messages apart from your inbox, see when the next net starts, leave the group.
 - **Stations** heard on the radio or seen on APRS-IS: distance, direction, comment, weather, the path;
@@ -181,6 +186,10 @@ full size. They follow your GitHub theme, and so does the app: it uses the syste
 <tr>
 <td width="50%"><a href="assets/monitor.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/monitor-light.png"><img src="assets/monitor.png" alt="Frame monitor"></picture></a><br><sub>Frame monitor</sub></td>
 <td width="50%"><a href="assets/settings-tracker.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-tracker-light.png"><img src="assets/settings-tracker.png" alt="Tracker and warnings ahead"></picture></a><br><sub>Tracker and warnings ahead</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="assets/files.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/files-light.png"><img src="assets/files.png" alt="Files: a picture coming in over packet radio, progress and time left"></picture></a><br><sub>Files: a picture coming in over packet radio, progress and time left</sub></td>
+<td width="50%"><a href="assets/files-offer.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/files-offer-light.png"><img src="assets/files-offer.png" alt="A file from another station is offered first"></picture></a><br><sub>A file from another station is offered first</sub></td>
 </tr>
 <tr>
 <td colspan="2"><a href="assets/tak.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/tak-light.png"><img src="assets/tak.png" alt="TAK: stations by team and GeoChat"></picture></a><br><sub>TAK: stations by team and GeoChat</sub></td>

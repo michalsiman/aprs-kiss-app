@@ -65,7 +65,12 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
   z/x/y nebo ZIP/7z, ve kterém jsou takové soubory (7z na počítači se 7-Zipem). I víc map naráz; tlačítkem
   mapy se volí *online*, *stažená* a *základní offline*. Vektorové mapy (Mapsforge, vektorové MBTiles) nejdou.
 - **Zprávy** jako konverzace: opakované až do potvrzení, se stavem doručení, příchozí se potvrzují
-  automaticky; nová zpráva na libovolnou značku; upozornění, když nějaká přijde.
+  automaticky; nová zpráva na libovolnou značku; upozornění, když nějaká přijde. Delší text odejde jako
+  více zpráv číslovaných 1/2, 2/2 …; v konverzaci je vidět, jak daleko stanice je (i jak daleko byla, když
+  zpráva přišla) s tlačítkem na mapu; konverzace jde smazat.
+- **Poloha ve zprávách a v chatu**: pošlete svoji, nebo libovolné místo vybrané na mapě – jako souřadnice
+  nebo jako lokátor (nabídka mapy ukazuje lokátor každého místa); poloha napsaná ve zprávě nebo v chatu
+  (desetinné stupně, stupně a minuty, APRS zápis, lokátor) se otevře na mapě se špendlíkem.
 - **#APRSThursday**: vlastní sekce pro čtvrteční síť HOTG přes ANSRVR – zapojení jedním tlačítkem,
   zprávy skupiny zvlášť mimo běžné zprávy, kdy začíná další akce, odhlášení ze skupiny.
 - **Stanice** slyšené rádiem nebo viděné na APRS-IS: vzdálenost, směr, komentář, počasí, cesta;
@@ -179,6 +184,10 @@ zvětší. Řídí se motivem GitHubu, stejně jako aplikace: používá světl�
 <tr>
 <td width="50%"><a href="assets/cs/monitor.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/monitor-light.png"><img src="assets/cs/monitor.png" alt="Monitor rámců"></picture></a><br><sub>Monitor rámců</sub></td>
 <td width="50%"><a href="assets/cs/settings-tracker.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/settings-tracker-light.png"><img src="assets/cs/settings-tracker.png" alt="Tracker a upozornění před tebou"></picture></a><br><sub>Tracker a upozornění před tebou</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="assets/cs/files.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/files-light.png"><img src="assets/cs/files.png" alt="Soubory: příjem obrázku přes packet radio, průběh a zbývající čas"></picture></a><br><sub>Soubory: příjem obrázku přes packet radio, průběh a zbývající čas</sub></td>
+<td width="50%"><a href="assets/cs/files-offer.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/files-offer-light.png"><img src="assets/cs/files-offer.png" alt="Soubor od jiné stanice se nejdřív nabídne"></picture></a><br><sub>Soubor od jiné stanice se nejdřív nabídne</sub></td>
 </tr>
 <tr>
 <td colspan="2"><a href="assets/cs/tak.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/tak-light.png"><img src="assets/cs/tak.png" alt="TAK: stanice podle týmů a GeoChat"></picture></a><br><sub>TAK: stanice podle týmů a GeoChat</sub></td>
