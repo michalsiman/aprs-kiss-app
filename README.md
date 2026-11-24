@@ -64,4 +64,31 @@ Updated 2026-11-24 by `.github/workflows/stats.yml`. Raw data: the CSV files on 
 | v0.1.1 | 3 |
 | v0.1.0 | 1 |
 
-Traffic is not collected: add the TRAFFIC_TOKEN secret (see the workflow).
+## Views, last 30 days
+
+| Day | Views | Unique visitors | Clones |
+|---|---:|---:|---:|
+| 2026-11-23 | 55 | 20 | 663 |
+| 2026-11-22 | 41 | 15 | 251 |
+| 2026-11-21 | 2 | 1 | 4 |
+| 2026-11-20 | 0 | 0 | 6 |
+| 2026-11-19 | 0 | 0 | 22 |
+| 2026-11-18 | 29 | 4 | 103 |
+| 2026-11-17 | 12 | 1 | 173 |
+| 2026-11-16 | 0 | 0 | 0 |
+| 2026-11-15 | 0 | 0 | 0 |
+| 2026-11-14 | 0 | 0 | 0 |
+| 2026-11-13 | 0 | 0 | 0 |
+| 2026-11-12 | 0 | 0 | 0 |
+| 2026-11-11 | 0 | 0 | 0 |
+| 2026-11-10 | 0 | 0 | 0 |
+
+## Referring sites (last 14 days)
+
+| Site | Views | Unique |
+|---|---:|---:|
+
+## Popular content (last 14 days)
+
+| Page | Views | Unique |
+|---|---:|---:|
