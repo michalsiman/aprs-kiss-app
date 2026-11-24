@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.50 – 2026-11-24
+
+- **Phone top bar**: TNC, IS and GPS share one small block (IS and GPS above, TNC below), so the whole
+  callsign with its SSID fits again (since 0.1.49 the SSID was cut off).
+- **Map filter menu**: one line per filter, nothing cut off on a phone.
+- **TNC errors in your language**: USB and Bluetooth TNC messages (no TNC plugged in, permission,
+  Bluetooth off, not paired, …) are shown translated instead of in English.
+
 ## 0.1.49 – 2026-11-24
 
 - **Station profiles**: one callsign, up to three SSIDs, each with its own symbol (Settings › Station).

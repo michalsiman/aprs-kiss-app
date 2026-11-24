@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.50" date="2026-11-24">
+      <description>
+        <p>The whole callsign fits in the phone's top bar again; one-line map filter menu; TNC errors translated.</p>
+      </description>
+    </release>
     <release version="0.1.49" date="2026-11-24">
       <description>
         <p>Station profiles: up to three SSIDs with their own symbol, switched by tapping the callsign; map lines start in the middle of the symbol.</p>
