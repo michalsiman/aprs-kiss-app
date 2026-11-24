@@ -20,10 +20,10 @@ from .ax25 import Address
 _LOGGER = logging.getLogger(__name__)
 
 APP_NAME = "aprs-kiss"
-VERSION = "1.0.3"
+VERSION = "1.1.0"
 # A beta (a pre-release on GitHub, tag vX.Y.Z-beta): betas take the next patch numbers (1.0.1, 1.0.2 …),
 # the next stable release a higher minor one (1.1.0), so updating always goes up.
-BETA = True
+BETA = False
 VERSION_LABEL = f"{VERSION} beta" if BETA else VERSION
 MIN_BEACON_MINUTES = 10
 

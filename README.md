@@ -2,6 +2,17 @@
 
 **English** · [Česky](README.cs.md)
 
+[![stable](https://img.shields.io/github/v/release/michalsiman/aprs-kiss-app?label=stable&color=2ea043)](https://github.com/michalsiman/aprs-kiss-app/releases/latest)
+[![beta](https://img.shields.io/github/v/release/michalsiman/aprs-kiss-app?include_prereleases&label=beta&color=d29922)](https://github.com/michalsiman/aprs-kiss-app/releases)
+[![downloads](https://img.shields.io/github/downloads/michalsiman/aprs-kiss-app/total?label=downloads)](https://github.com/michalsiman/aprs-kiss-app/releases)
+[![tests](https://img.shields.io/github/actions/workflow/status/michalsiman/aprs-kiss-app/tests.yml?branch=main&label=tests)](https://github.com/michalsiman/aprs-kiss-app/actions/workflows/tests.yml)
+[![licence](https://img.shields.io/github/license/michalsiman/aprs-kiss-app?label=licence)](LICENSE)
+[![platforms](https://img.shields.io/badge/platforms-Linux%20%7C%20Windows%20%7C%20Android%20%7C%20macOS%20%7C%20iOS-3D46B2)](#platforms)
+![languages](https://img.shields.io/badge/languages-16-3D46B2)
+[![python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![flet](https://img.shields.io/badge/Flet-1.1.2-5C2D91)](https://flet.dev/)
+![ham](https://img.shields.io/badge/ham%20radio-APRS%20%C2%B7%20AX.25%20%C2%B7%20KISS-e8590c)
+
 An APRS station and packet radio terminal for a radio with a **KISS TNC**, as a normal application for
 computers and **Android phones** – no Home Assistant, no web server. It is the standalone sibling of the
 [APRS & Packet Home Assistant integration](https://github.com/michalsiman/aprs-kiss-ha) and shares
@@ -12,7 +23,7 @@ and its [KISS TNC app](https://github.com/armel/uv-k1-k5v3-firmware-custom/wiki/
 (Direwolf, a hardware TNC, the radio's USB serial port, or the KISS TCP bridge from the integration).
 Verified also with the **VGC VR-N76** and **AnyTone UV890** handhelds.
 
-**Status: version 1.0, actively developed.** Stable versions (1.0, 1.1 …) now and then; between them
+**Status: version 1.1, actively developed.** Stable versions (1.0, 1.1 …) now and then; between them
 **beta versions** for testers – tick *Also offer beta versions* in Settings (see [CHANGELOG](CHANGELOG.md)).
 Ready for **Linux**, **Windows** and **Android**; **macOS** and **iOS** builds exist but nobody has tried
 them on a real Mac, iPhone or iPad yet – **testers wanted** (see [Platforms](#platforms)).
@@ -73,6 +84,12 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
 - **Positions in messages and the chat**: send yours, or any place picked on the map – as coordinates or as
   a Maidenhead locator (the map's menu shows the locator of every place); a position written in a message
   or a chat line (decimal degrees, degrees and minutes, APRS's own, a locator) opens on the map with a pin.
+- **Spotting an activation** (Messages › Spot): SOTA, POTA, WWFF, SIOTA, GMA, WCA castles, IOTA and
+  lighthouses – a self-spot goes by radio as an APRS message to APRS2SOTA, Camilla (GMA) or APSPOT, checked
+  and shortened to fit, with the gateway's answer in its conversation.
+- **Services on APRS** (Messages › Services): FIND (where a station was last heard), REPEAT (the nearest
+  repeaters), WXNOW (the nearest weather), UTC, satellite passes and sunrise (9M2PJU-4), e-mail (MAILMY) –
+  a tap puts the command in a message, the answer comes back as one.
 - **#APRSThursday**: its own section for the weekly HOTG net through ANSRVR – check in with one
   button, read the group's messages apart from your inbox, see when the next net starts, leave the group.
 - **Stations** heard on the radio or seen on APRS-IS: distance, direction, comment, weather, the path;
@@ -147,7 +164,8 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
   a frame goes out on air – a tap on TX switches transmitting, a tap on TNC or GPS tells their state.
 - **The TNC on the phone's USB port** (OTG cable): the Quansheng with the F4HWN KISS firmware and other
   CDC-ACM TNCs, CP210x and FTDI cables; **over Bluetooth** (a paired TNC or radio with the serial port
-  profile, e.g. Mobilinkd TNC3 or a handheld with a Bluetooth KISS TNC); or over the network.
+  profile, e.g. Mobilinkd TNC3 or a handheld with a Bluetooth KISS TNC); **over Bluetooth LE** (KISS over
+  BLE: a LoRa APRS tracker, Mobilinkd TNC4, PicoAPRS …, found by a scan in Settings); or over the network.
 - **The phone's GPS** as your position.
 - **Running in the background** (Settings › Background and screen): receiving, beacons, messages and TAK
   go on when the app is not on screen or the phone is locked, with a notification.
@@ -353,6 +371,7 @@ Linux, Windows and Android are used every day; macOS and iOS are built but untes
 | KISS over TCP | ✅ | ✅ | ✅ | ✅ | ✅ (sideloaded) |
 | USB serial | ✅ | ✅ (COM ports) | ✅ | ✅ (OTG: CDC-ACM, CP210x, FTDI) | ❌ (iOS) |
 | Bluetooth TNC (SPP) | ✅ (as a serial port: rfcomm) | ✅ (as a COM port) | – | ✅ (paired, in Settings) | ❌ (BLE only) |
+| Bluetooth LE TNC (KISS over BLE) | ✅ | ✅ | ✅ | ✅ | ✅ |
 | USB GPS module | ✅ | ✅ (COM ports) | ✅ | – | ❌ |
 | Phone's own GPS | – | – | – | ✅ | ✅ |
 | VARA FM | ✅ (VARA in Wine) | ✅ | VARA on another computer | VARA on another computer | VARA on another computer |

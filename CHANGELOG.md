@@ -4,6 +4,19 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## 1.1.0 – 2026-11-24
+
+The betas 1.0.1–1.0.3 as a stable version:
+
+- **TNC over Bluetooth LE** (KISS over BLE) on every platform, iPhone included: a LoRa APRS tracker,
+  Mobilinkd TNC4, PicoAPRS, B.B. Link and others, found by a scan in Settings › Connection.
+- **Spotting an activation** (Messages › Spot): SOTA, POTA, WWFF, SIOTA, GMA, WCA castles, IOTA and
+  lighthouses, by radio through APRS2SOTA, Camilla or APSPOT.
+- **Services on APRS** (Messages › Services): FIND, REPEAT, WXNOW, UTC, satellite passes (9M2PJU-4) and
+  e-mail (MAILMY), one tap each.
+- **Android**: a radio plugged in opens the app; the map edge to edge; the notification's own icon; the
+  Files screen fitted to a phone.
+
 ## 1.0.3 beta – 2026-11-24
 
 - **TNC over Bluetooth LE** (KISS over BLE, the standard of aprs.fi, Mobilinkd and others): Settings ›
