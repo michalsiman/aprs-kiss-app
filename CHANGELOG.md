@@ -6,9 +6,10 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 
 ## Unreleased
 
-- **Spotting an activation (SOTA, POTA, WWFF, SIOTA)**: Messages › Spot sends a self-spot as an APRS
-  message to a gateway – APRS2SOTA (SOTAwatch; the callsign is registered with its operator first) or
-  APSPOT (pota.app, SOTAwatch, ParksnPeaks; an account there). The reference is checked, kHz is turned
+- **Spotting an activation (SOTA, POTA, WWFF, SIOTA, GMA, WCA castles, IOTA, lighthouses)**: Messages ›
+  Spot sends a self-spot by radio as an APRS message to a gateway – APRS2SOTA (SOTAwatch; the callsign is
+  registered with its operator first), Camilla DL0QW-12 (GMA, and SOTAwatch for a SOTA summit; registered
+  GMA users) or APSPOT (pota.app, SOTAwatch, ParksnPeaks; an account there). The reference is checked, kHz is turned
   into MHz, the comment is shortened to fit one message, a test spot can be sent; the dialog shows the
   message before it goes and the gateway's answer comes in its conversation. The last spot is remembered.
 

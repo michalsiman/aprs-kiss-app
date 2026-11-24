@@ -12,8 +12,16 @@ class SpottingTest(unittest.TestCase):
     def test_apspot(self):
         self.assertEqual(build(Spot("POTA", "CZ-0001", "7144", "SSB", "cq"), "OK1SIM-7"),
                          ("APSPOT", "! POTA CZ-0001 7.144 SSB cq"))
-        self.assertEqual(build(Spot("WWFF", "OKFF-0001", "7.032", "CW"), "OK1SIM")[1], "! WWFF OKFF-0001 7.032 CW")
+        self.assertEqual(build(Spot("WWFF", "OKFF-0001", "7.032", "CW", gateway="APSPOT"), "OK1SIM")[1], "! WWFF OKFF-0001 7.032 CW")
         self.assertEqual(build(Spot("SOTA", "OK/PL-001", "7.032", "CW", gateway="APSPOT"), "OK1SIM")[0], "APSPOT")
+
+    def test_camilla(self):
+        self.assertEqual(build(Spot("WWFF", "okff-0001", "7034.5", "cw", "qrv"), "OK1SIM-7"),
+                         ("DL0QW-12", "OK1SIM OKFF-0001 7.0345 CW qrv"))
+        self.assertEqual(build(Spot("WCA", "OK-00123", "3.7", "SSB"), "OK1SIM")[0], "DL0QW-12")
+        self.assertEqual(build(Spot("SOTA", "OK/PL-001", "7.1", "SSB", gateway="DL0QW-12"), "OK1SIM")[0], "DL0QW-12")
+        with self.assertRaises(SpotError):
+            build(Spot("IOTA", "XX-1", "7.1", "SSB"), "OK1SIM")
 
     def test_modes_and_test(self):
         self.assertIn(" DATA", build(Spot("POTA", "CZ-0001", "14.074", "FT8"), "OK1SIM")[1])

@@ -12,6 +12,10 @@ the internet too, when the station has it and it is chosen). Two gateways:
   "! POTA CZ-0001 7.144 SSB CQ"; the callsign is the sender's. Modes SSB CW FM AM DATA (FT8 too for POTA,
   though it has been refused: sent as DATA here). An account on the target site is needed;
   "aptest" in the comment gets a simulated answer without posting.
+- Camilla (gma.rocks, DL0QW-12) - GMA summits, WCA castles, WWFF, IOTA islands, lighthouses and SOTA (a SOTA
+  summit is spotted on SOTAwatch too). Message to "DL0QW-12": "<callsign> <reference> <freq> <mode> [comment]",
+  e.g. "OK1SIM OKFF-0001 7.0345 CW qrv"; kHz or MHz. Registered GMA users only (free, gma.rocks); it always
+  answers a spot it posted.
 
 An APRS message carries up to 67 characters: the comment is shortened to fit.
 """
@@ -23,11 +27,22 @@ from dataclasses import dataclass
 
 from .aprs import MAX_MESSAGE_TEXT
 
-PROGRAMS = ("SOTA", "POTA", "WWFF", "SIOTA")
-GATEWAYS = ("APRS2SOTA", "APSPOT")
+PROGRAMS = ("SOTA", "POTA", "WWFF", "SIOTA", "GMA", "WCA", "IOTA", "LH")
+CAMILLA = "DL0QW-12"
+GATEWAYS = ("APRS2SOTA", "APSPOT", CAMILLA)
+GATEWAY_NAMES = {"APRS2SOTA": "APRS2SOTA", "APSPOT": "APSPOT", CAMILLA: "Camilla (GMA)"}
+# the gateways for each program, the default first
+PROGRAM_GATEWAYS = {
+    "SOTA": ("APRS2SOTA", CAMILLA, "APSPOT"),
+    "POTA": ("APSPOT",),
+    "WWFF": (CAMILLA, "APSPOT"),
+    "SIOTA": ("APSPOT",),
+    "GMA": (CAMILLA,), "WCA": (CAMILLA,), "IOTA": (CAMILLA,), "LH": (CAMILLA,),
+}
 MODES = {
     "APRS2SOTA": ("SSB", "CW", "FM", "AM", "DATA", "DV", "OTHER"),
     "APSPOT": ("SSB", "CW", "FM", "AM", "DATA"),
+    CAMILLA: ("SSB", "CW", "FM", "AM", "DATA", "DV"),
 }
 # what each program's references look like, and an example (shown when one looks wrong)
 REFERENCE = {
@@ -35,6 +50,10 @@ REFERENCE = {
     "POTA": (re.compile(r"^[A-Z0-9]{1,4}-\d{4,5}$"), "CZ-0001"),
     "WWFF": (re.compile(r"^[A-Z0-9]{1,4}FF-\d{4}$"), "OKFF-0001"),
     "SIOTA": (re.compile(r"^[A-Z0-9/-]{3,16}$"), "VK-ABC3"),
+    "GMA": (re.compile(r"^[A-Z0-9]{1,4}/[A-Z0-9]{2,3}-\d{3,4}$|^[A-Z0-9]{1,4}FF-\d{4}$"), "DA/TH-001"),
+    "WCA": (re.compile(r"^[A-Z0-9]{1,4}-\d{5}$"), "OK-00001"),
+    "IOTA": (re.compile(r"^(AF|AN|AS|EU|NA|OC|SA)-\d{3}$"), "EU-001"),
+    "LH": (re.compile(r"^[A-Z0-9/-]{4,12}$"), "FRA-001"),
 }
 # the address our own station shows: the SOTA gateway wants no SSID ("OK1SIM", "OK1SIM/P")
 _SSID = re.compile(r"-\d{1,2}$")
@@ -60,11 +79,11 @@ class Spot:
 
 
 def gateways_for(program: str) -> tuple[str, ...]:
-    return GATEWAYS if program == "SOTA" else ("APSPOT",)
+    return PROGRAM_GATEWAYS.get(program, ("APSPOT",))
 
 
 def default_gateway(program: str) -> str:
-    return "APRS2SOTA" if program == "SOTA" else "APSPOT"
+    return gateways_for(program)[0]
 
 
 def normalize_reference(text: str) -> str:
@@ -111,9 +130,11 @@ def build(spot: Spot, mycall: str) -> tuple[str, str]:
     comment = " ".join((spot.comment or "").split())
     if spot.test:
         # APSPOT answers as if posted ("aptest"); APRS2SOTA marks the spot as a test on SOTAwatch
-        comment = ("aptest " if gateway == "APSPOT" else "TEST ") + comment
+        comment = ("aptest " if gateway == "APSPOT" else "TEST ") + comment  # Camilla: posted, marked TEST
     if gateway == "APRS2SOTA":
         head = f"{ref} {freq} {mode} {base_call(mycall)}"
+    elif gateway == CAMILLA:
+        head = f"{base_call(mycall)} {ref} {freq} {mode}"
     else:
         head = f"! {program} {ref} {freq} {mode}"
     room = MAX_MESSAGE_TEXT - len(head) - 1

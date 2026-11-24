@@ -9,7 +9,7 @@ import flet as ft
 
 from aprs_kiss_core.aprs import MAX_MESSAGE_PARTS, message_parts
 from aprs_kiss_core.geotext import find_positions, write_position
-from aprs_kiss_core.spotting import MODES, PROGRAMS, Spot, SpotError, build as build_spot, default_gateway, gateways_for
+from aprs_kiss_core.spotting import CAMILLA, GATEWAY_NAMES, MODES, PROGRAMS, Spot, SpotError, build as build_spot, default_gateway, gateways_for
 
 from .base import View, bearing, clock, distance_km
 
@@ -311,8 +311,9 @@ class MessagesView(View):
         except ValueError:
             last = {}
         program = ft.Dropdown(label=t("spot_program"), value=last.get("program", "SOTA"), dense=True, width=130,
-                              options=[ft.DropdownOption(key=p, text=p) for p in PROGRAMS])
-        gateway = ft.Dropdown(label=t("spot_gateway"), dense=True, width=160)
+                              options=[ft.DropdownOption(key=p, text=t("spot_lighthouse") if p == "LH" else p)
+                                       for p in PROGRAMS])
+        gateway = ft.Dropdown(label=t("spot_gateway"), dense=True, width=180)
         ref = ft.TextField(label=t("spot_ref"), value=last.get("reference", ""), dense=True, width=150,
                            capitalization=ft.TextCapitalization.CHARACTERS)
         freq = ft.TextField(label=t("spot_freq"), value=last.get("frequency", ""), dense=True, width=170,
@@ -339,7 +340,7 @@ class MessagesView(View):
         def program_changed(_e=None, keep_gateway: str = "") -> None:
             p = program.value or "SOTA"
             choices = gateways_for(p)
-            gateway.options = [ft.DropdownOption(key=g, text=g) for g in choices]
+            gateway.options = [ft.DropdownOption(key=g, text=GATEWAY_NAMES[g]) for g in choices]
             gateway.value = keep_gateway if keep_gateway in choices else default_gateway(p)
             gateway_changed(keep_mode=mode.value or last.get("mode", "SSB"))
 
@@ -348,7 +349,7 @@ class MessagesView(View):
             mode.options = [ft.DropdownOption(key=m, text=m) for m in MODES[g]]
             wanted = keep_mode or mode.value
             mode.value = wanted if wanted in MODES[g] else "SSB"
-            hint.value = t("spot_hint_aprs2sota" if g == "APRS2SOTA" else "spot_hint_apspot")
+            hint.value = t({"APRS2SOTA": "spot_hint_aprs2sota", CAMILLA: "spot_hint_camilla"}.get(g, "spot_hint_apspot"))
             update_preview()
             if _e is not None:
                 self.app.page.update()
