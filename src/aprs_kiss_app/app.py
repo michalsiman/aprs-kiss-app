@@ -12,7 +12,8 @@ from typing import Any
 
 import flet as ft
 
-from aprs_kiss_core import android_bt, android_usb, profiles, roadalert
+from aprs_kiss_core import android_bt, android_usb, drivedetect, profiles, roadalert
+from . import android_notify
 from aprs_kiss_core.config import VERSION, Config, data_dir, load_config, save_config
 
 from . import theme
@@ -650,6 +651,7 @@ class App:
             self.refresh_now()
             try:
                 self._road_check()
+                self._drive_check()
             except Exception:  # noqa: BLE001 - a warning is not worth stopping the app's clock
                 logging.getLogger(__name__).exception("Road alerts")
 
@@ -750,6 +752,10 @@ class App:
             if not self._foreground:
                 self._resumed_at = time.monotonic()
             self._foreground = True
+            if getattr(self, "_drive_pending", False):  # the notification was tapped (or the app opened): ask now
+                self._drive_pending = False
+                android_notify.cancel()
+                self._offer_tracker()
         elif value in ("pause", "hide", "detach"):
             self._foreground = False
 
@@ -966,6 +972,51 @@ class App:
         if settings and self.current_key == "settings":
             self.select("settings", force=True)
         self.toast(self.t("profile_now", call=new.callsign))
+
+    # ─── on a phone: driving with the tracker off - offer to switch it on ─────
+
+    _drive_pending = False
+    _notify_asked = False
+    _drive: drivedetect.DriveDetector | None = None
+
+    def _drive_check(self) -> None:
+        engine, conf = self.engine, self.engine.config
+        if not (self.mobile and conf.offer_tracker and conf.gps_source == "phone") or conf.tracker_on \
+                or engine.exclusive_mode or not conf.configured:
+            self._drive = None
+            return
+        if self._foreground and conf.run_background and not self._notify_asked:
+            self._notify_asked = True  # Android 13+: notifications need a yes, asked while on screen
+            android_notify.ask_permission()
+        fix = engine.gps_fix()
+        if not fix:
+            return
+        if self._drive is None:
+            self._drive = drivedetect.DriveDetector()
+        if not self._drive.update(time.time(), fix.latitude, fix.longitude, fix.speed_kmh):
+            return
+        if self._foreground:
+            self._offer_tracker()
+        else:  # in the background: a notification; a tap brings the app back and it asks
+            self._drive_pending = True
+            android_notify.notify(self.t("drive_title"), self.t("drive_text"), self.t("drive_channel"))
+
+    def _offer_tracker(self) -> None:
+        if self.engine.config.tracker_on:
+            return
+
+        def answer(yes: bool) -> None:
+            self.page.pop_dialog()
+            if yes and not self.engine.config.tracker_on:
+                self.position_btn._toggle(None)  # noqa: SLF001 - the same as the menu's "start"
+
+        self.sounds.play("meet")
+        self.show_dialog(ft.AlertDialog(
+            title=ft.Text(self.t("drive_title")),
+            content=ft.Text(self.t("drive_ask")),
+            actions=[ft.TextButton(self.t("drive_no"), on_click=lambda _e: answer(False)),
+                     ft.FilledButton(self.t("drive_yes"), icon=ft.Icons.PLAY_ARROW, on_click=lambda _e: answer(True))],
+        ))
 
     # ─── road incidents and moving stations ahead (while the tracker runs; both off by default) ─────
 

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- **Phone: "You seem to be driving – switch the tracker on?"** When the app sees from the phone's GPS that
+  you are on the move with the tracker off, it asks (in the background with a notification; a tap opens
+  the app and asks). Once per trip; again only after standing still for a quarter of an hour or after two
+  hours. Needs running in the background; can be switched off in Settings › Tracker. Not on computers.
 - **Weather stations show their temperature** on the map, in the second line of their tag (like a
   repeater's frequency).
 - New screenshots (`tools/screenshots.py` takes them all, `tests/fake_tnc.py --scene` plays a busy area).
