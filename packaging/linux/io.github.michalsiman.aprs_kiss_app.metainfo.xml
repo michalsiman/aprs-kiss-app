@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.52" date="2026-11-24">
+      <description>
+        <p>Text centred in the phone's small TNC and IS lamps.</p>
+      </description>
+    </release>
     <release version="0.1.51" date="2026-11-24">
       <description>
         <p>Computer top bar with the same lamps as on a phone (TNC, IS, GPS, position, TX); the back-to-me button moved above the scale.</p>

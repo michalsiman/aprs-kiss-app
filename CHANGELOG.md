@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.52 – 2026-11-24
+
+- **Phone top bar**: the text in the small TNC and IS lamps sits in the middle of its frame.
+
 ## 0.1.51 – 2026-11-24
 
 - **Computer top bar** (Linux, Windows, macOS): the same lamps as on a phone – TNC, IS, GPS, the position /
