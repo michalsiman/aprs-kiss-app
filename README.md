@@ -34,6 +34,8 @@ them on a real Mac, iPhone or iPad yet – **testers wanted** (see [Platforms](#
 - **Map filters**: only weather stations, moving stations, repeaters (their tags show the frequency and
   band) or road incidents. While the tracker runs the map follows you like a navigation, and can warn of
   road incidents and other moving stations ahead.
+- **Profiles**: up to three SSIDs of your callsign, each with its own symbol; a tap on the callsign
+  in the top bar switches between them.
 - **APRS-IS**: one switch sends your position (now, regular, tracker) and messages over the internet too;
   with transmitting off it all goes over the internet only.
 - **Tracker**: the position button in the top bar sends your position once, or starts the tracker (▶) –

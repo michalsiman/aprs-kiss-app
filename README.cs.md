@@ -34,6 +34,8 @@ skutečném Macu, iPhonu ani iPadu je zatím nikdo nevyzkoušel – **hledáme t
 - **Filtry mapy**: jen meteostanice, jedoucí stanice, převaděče (ve štítku s kmitočtem a pásmem) nebo
   dopravní problémy. Když běží tracker, mapa tě sleduje jako navigace a umí upozornit na dopravní
   problémy a jiné jedoucí stanice před tebou.
+- **Profily**: až tři SSID tvé značky, každé s vlastní ikonou; přepínají se klepnutím na značku
+  v horní liště.
 - **APRS-IS**: jedním přepínačem se poloha (teď, pravidelně, tracker) i zprávy posílají i přes internet;
   s vypnutým vysíláním jde vše jen přes internet.
 - **Tracker**: tlačítko polohy v horní liště pošle polohu jednou, nebo spustí tracker (▶) – poloha z GPS

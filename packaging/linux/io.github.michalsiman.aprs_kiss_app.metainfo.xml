@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.49" date="2026-11-24">
+      <description>
+        <p>Station profiles: up to three SSIDs with their own symbol, switched by tapping the callsign; map lines start in the middle of the symbol.</p>
+      </description>
+    </release>
     <release version="0.1.48" date="2026-11-24">
       <description>
         <p>Map filters (weather, moving, repeaters, road incidents); repeaters show their frequency and band; the map follows you while the tracker runs, with a back-to-me countdown; optional warnings of road incidents and moving stations ahead.</p>

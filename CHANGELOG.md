@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.49 – 2026-11-24
+
+- **Station profiles**: one callsign, up to three SSIDs, each with its own symbol (Settings › Station).
+  A tap on the callsign in the top bar picks one; from then on everything (position, tracker, messages,
+  terminal, chat, APRS-IS) goes out under it.
+- **Map**: the grey line to a moved station's real place now starts in the middle of its symbol's disc.
+
 ## 0.1.48 – 2026-11-24
 
 - **Map filters** (funnel button): only weather stations, only moving stations (moved in the last 10
