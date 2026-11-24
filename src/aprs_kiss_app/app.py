@@ -249,7 +249,9 @@ class App:
         small: half height, for the phone's TNC / IS / GPS block (two rows in the height of one lamp);
         large: a computer's top bar, which has the room."""
         if isinstance(content, str):
-            content = ft.Text(content, size=8 if small else 15 if large else 12, weight=ft.FontWeight.BOLD)
+            # line height = font size: in the small lamps the text sits in the middle of the frame
+            content = ft.Text(content, size=8 if small else 15 if large else 12, weight=ft.FontWeight.BOLD,
+                              style=ft.TextStyle(height=1.0) if small else None)
         return ft.Container(content, on_click=on_click, tooltip=tooltip, height=12 if small else 36 if large else 26,
                             alignment=ft.Alignment.CENTER, data=1.0 if small else 2.0 if large else 1.5,
                             padding=ft.Padding.symmetric(horizontal=3 if small else 12 if large else 6),
