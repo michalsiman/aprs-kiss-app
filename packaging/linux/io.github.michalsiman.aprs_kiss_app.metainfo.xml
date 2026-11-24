@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="0.1.55" date="2026-11-24">
+      <description>
+        <p>Send your position or any place from the map (coordinates or locator) to the chat or in a message; positions in messages and chat open on the map.</p>
+      </description>
+    </release>
     <release version="0.1.54" date="2026-11-24">
       <description>
         <p>New Files section: files over packet radio (YAPP) with progress, resume and a time estimate. Messages: several parts numbered 1/2, 2/2; distance and a map button in a conversation; deleting a conversation; long messages wrap.</p>

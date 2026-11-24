@@ -198,11 +198,12 @@ class App:
         self.refresh_now()
         _LOGGER.info("Settings applied: radio %.2f s, screen %.2f s", t1 - t0, time.monotonic() - t1)
 
-    async def send_position_text(self, lat: float, lon: float, where: str) -> None:
-        """A position (picked on the map) to everybody in the chat, or into a message being written."""
-        from aprs_kiss_core.geotext import write_position  # noqa: PLC0415
+    async def send_position_text(self, lat: float, lon: float, where: str, locator: bool = False) -> None:
+        """A position (picked on the map) to everybody in the chat, or into a message being written;
+        as coordinates, or as a Maidenhead locator ("LOC JO70XQ")."""
+        from aprs_kiss_core.geotext import position_to_locator, write_position  # noqa: PLC0415
 
-        text = write_position(lat, lon)
+        text = f"LOC {position_to_locator(lat, lon)}" if locator else write_position(lat, lon)
         if where == "chat":
             if await self.guard(self.engine.send_chat(text)):
                 self.toast(self.t("pos_sent_chat"))

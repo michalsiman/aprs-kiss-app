@@ -28,6 +28,15 @@ class GeoTextTest(unittest.TestCase):
         self.assertAlmostEqual(lon, 13.708, delta=0.01)
         self.near(find_positions("loc jo60uf"), lat, lon)
 
+    def test_locator_of_a_position_and_back(self):
+        from aprs_kiss_core.geotext import position_to_locator
+        self.assertEqual(position_to_locator(49.7475, 13.3776), "JN69QR")
+        self.assertEqual(position_to_locator(50.229, 13.708), "JO60UF")
+        lat, lon = locator_to_position(position_to_locator(-33.8688, 151.2093))
+        self.assertAlmostEqual(lat, -33.8688, delta=0.05)
+        self.assertAlmostEqual(lon, 151.2093, delta=0.05)
+        self.near(find_positions("LOC JN69PS"), *locator_to_position("JN69PS"))
+
     def test_not_positions(self):
         for text in ("OK1SIM-7 145.800 MHz", "teplota 12.5, vlhkost 80", "verze 0.1.54", "438.725, 145.775",
                      "cas 12:30, 3 km", "OK1ABC"):

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.55 – 2026-11-24
+
+- **Positions in the chat and in messages**:
+  - send yours to the chat (a button by the text), or put it into a message being written;
+  - on the map, a long press (right click) on any place: send that position to the chat or in a message,
+    as coordinates ("QTH 49.74750, 13.37760") or as a locator ("LOC JN69QR");
+  - the map's menu shows the place's Maidenhead locator (a tap copies it);
+  - a position written in a message or a chat line gets a map button: the map shows it with a red pin and
+    the sender's callsign. Understood are decimal degrees, degrees and minutes (or seconds) with N/E,
+    APRS's own "4944.85N/01322.66E" and six-character locators.
+
 ## 0.1.54 – 2026-11-24
 
 - **Files** (new section): send a file to another station over packet radio and receive files – YAPP, the

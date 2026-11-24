@@ -458,12 +458,20 @@ class MapView(View):
         lat, lon = round(e.coordinates.latitude, 5), round(lon, 5)
         self._picked = (lat, lon)
         here = self.engine.my_position()
+        from aprs_kiss_core.geotext import position_to_locator  # noqa: PLC0415
+
+        loc = position_to_locator(lat, lon)
         self.menu.items = [
+            ft.PopupMenuItem(content=ft.Text(self.t("locator_is", loc=loc), weight=ft.FontWeight.BOLD),
+                             icon=ft.Icons.GRID_ON, data="copy_loc"),
+            ft.PopupMenuItem(),
             ft.PopupMenuItem(content=self.t("measure_from"), icon=ft.Icons.STRAIGHTEN, data="measure"),
             *([ft.PopupMenuItem(content=self.t("measure_from_me"), icon=ft.Icons.NEAR_ME, data="measure_me")]
               if here else []),
             ft.PopupMenuItem(content=self.t("pos_to_chat"), icon=ft.Icons.FORUM_OUTLINED, data="chat"),
             ft.PopupMenuItem(content=self.t("pos_to_message"), icon=ft.Icons.MAIL_OUTLINE, data="message"),
+            ft.PopupMenuItem(content=self.t("loc_to_chat", loc=loc), icon=ft.Icons.FORUM_OUTLINED, data="loc_chat"),
+            ft.PopupMenuItem(content=self.t("loc_to_message", loc=loc), icon=ft.Icons.MAIL_OUTLINE, data="loc_message"),
             ft.PopupMenuItem(content=self.t("set_my_position"), icon=ft.Icons.MY_LOCATION, data="me"),
             ft.PopupMenuItem(content=self.t("copy_coordinates", lat=f"{lat:.5f}", lon=f"{lon:.5f}"),
                              icon=ft.Icons.CONTENT_COPY, data="copy"),
@@ -487,6 +495,13 @@ class MapView(View):
             await self.app.set_position(lat, lon)
         elif e.item.data == "chat":
             await self.app.send_position_text(lat, lon, "chat")
+        elif e.item.data in ("loc_chat", "loc_message"):
+            await self.app.send_position_text(lat, lon, "chat" if e.item.data == "loc_chat" else "message", locator=True)
+        elif e.item.data == "copy_loc":
+            from aprs_kiss_core.geotext import position_to_locator  # noqa: PLC0415
+
+            await ft.Clipboard().set(position_to_locator(lat, lon))
+            self.app.toast(self.t("copied"))
         elif e.item.data == "message":
             await self.app.send_position_text(lat, lon, "message")
         elif e.item.data == "copy":

@@ -73,3 +73,11 @@ def find_positions(text: str) -> list[tuple[float, float]]:
 
 def write_position(lat: float, lon: float) -> str:
     return f"QTH {lat:.5f}, {lon:.5f}"
+
+
+def position_to_locator(lat: float, lon: float) -> str:
+    """The six-character Maidenhead locator of a position ("JO70XQ")."""
+    lon = min(max(lon + 180, 0), 359.999999)
+    lat = min(max(lat + 90, 0), 179.999999)
+    return (chr(65 + int(lon // 20)) + chr(65 + int(lat // 10)) + str(int(lon % 20 // 2)) + str(int(lat % 10))
+            + chr(97 + int(lon % 2 * 12)) + chr(97 + int(lat % 1 * 24))).upper()
