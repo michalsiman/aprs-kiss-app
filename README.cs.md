@@ -259,7 +259,8 @@ Apple pouští aplikace do iPhonu jen přes App Store nebo podepsané vývojář
 projekt nemá. Ve vydání je **nepodepsaný `aprs-kiss-…-ios-unsigned.ipa`**, který si do zařízení dáte
 nástrojem pro sideloading jako [AltStore](https://altstore.io/) nebo [Sideloadly](https://sideloadly.io/);
 ten ho podepíše vaším vlastním Apple ID (s bezplatným Apple ID je potřeba ho každých 7 dní obnovit).
-Stejně jako na Androidu se k TNC připojuje po síti.
+K TNC se připojuje po síti nebo přes **Bluetooth LE** (KISS over BLE – klasický sériový Bluetooth iOS
+aplikacím nedovolí).
 **Na skutečném iPhonu ani iPadu zatím vyzkoušený není – hledáme testery:** pokud to můžete zkusit,
 napište prosím, jak to dopadlo, do [issues](https://github.com/michalsiman/aprs-kiss-app/issues).
 
@@ -345,18 +346,24 @@ Workflow *Release packages* jednou spustí `flet build linux` a z výsledku udě
 src/
   aprs_kiss_core/   rádio, bez uživatelského rozhraní: KISS, AX.25 (UI i spojení), APRS,
                     APRS-IS/iGate, stanice (potvrzení, opakování, limity), BBS server (bbs/),
-                    TAK (tak.py), USB GPS (gps.py), VARA FM (vara.py), APRS Thursday (thursday.py)
-                    a Engine, který to spojuje a hlásí události posluchačům
+                    TAK (tak.py), USB GPS (gps.py), VARA FM (vara.py), APRS Thursday (thursday.py),
+                    spoty (spotting.py), služby na APRS (services.py), způsoby připojení TNC
+                    (android_usb.py, android_bt.py, ble.py) a Engine, který to spojuje a hlásí
+                    události posluchačům
   aprs_kiss_app/    uživatelské rozhraní ve Fletu: jedna obrazovka = jeden view; data offline mapy (offline/)
   main.py           vstupní bod pro `flet run` / `flet build`
+packages/
+  flet-ble-kiss/    vlastní rozšíření Fletu: KISS přes Bluetooth LE v Dartu (universal_ble)
 tests/              testy jednotek, testy enginu proti fake_tnc.py a fake_vara.py
 ```
 
 - **Flet** (Python, vykresluje Flutter): jeden kód pro počítač i mobil, nativní okno,
   žádný webový server.
 - **Způsoby připojení jsou rozšiřitelné** (`aprs_kiss_core.connection.register_transport`): TCP
-  a sériový port jsou vestavěné; USB na Androidu a Bluetooth TNC můžou přibýt jako vlastní způsoby
-  připojení bez zásahu do kódu KISS/AX.25.
+  a sériový port jsou vestavěné; USB na Androidu, klasický Bluetooth (SPP) a Bluetooth LE jsou vlastní
+  způsoby připojení bez zásahu do kódu KISS/AX.25. Bluetooth LE jde přes vlastní rozšíření Fletu
+  (`packages/flet-ble-kiss`), které `flet build` přidá do sestavení pro každou platformu; při spuštění
+  ze zdrojáků bez něj se Bluetooth LE prostě nenabízí.
 - Moduly jádra jsou stejné jako v integraci pro Home Assistant (tam `hub.py`, tady `engine.py`).
   V plánu je vydat jádro jako jeden balíček, který budou používat obě.
 

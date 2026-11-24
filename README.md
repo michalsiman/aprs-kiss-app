@@ -261,7 +261,8 @@ Apple lets apps onto an iPhone only through the App Store or signed by a develop
 project does not have. The release has an **unsigned `aprs-kiss-…-ios-unsigned.ipa`** that you can put on
 your device with a sideloading tool such as [AltStore](https://altstore.io/) or
 [Sideloadly](https://sideloadly.io/), which signs it with your own Apple ID (with a free Apple ID it has
-to be refreshed every 7 days). Like on Android, the TNC is reached over the network.
+to be refreshed every 7 days). The TNC is reached over the network or over **Bluetooth LE** (KISS over
+BLE – iOS lets apps use no classic serial Bluetooth).
 **Not tried on a real iPhone or iPad yet – testers wanted:** if you can try it, please tell us how it went
 in the [issues](https://github.com/michalsiman/aprs-kiss-app/issues).
 
@@ -347,18 +348,24 @@ The *Release packages* workflow runs `flet build linux` once and makes the tarba
 src/
   aprs_kiss_core/   the radio, no user interface: KISS, AX.25 (UI + connected mode), APRS,
                     APRS-IS/iGate, the station (acks, retries, limits), the BBS server (bbs/),
-                    TAK (tak.py), USB GPS (gps.py), VARA FM (vara.py), APRS Thursday (thursday.py)
-                    and the Engine that ties it together and announces events to listeners
+                    TAK (tak.py), USB GPS (gps.py), VARA FM (vara.py), APRS Thursday (thursday.py),
+                    spots (spotting.py), APRS services (services.py), the TNC transports
+                    (android_usb.py, android_bt.py, ble.py) and the Engine that ties it together
+                    and announces events to listeners
   aprs_kiss_app/    the Flet user interface: one view per screen; the offline map data (offline/)
   main.py           entry point for `flet run` / `flet build`
+packages/
+  flet-ble-kiss/    a Flet extension of our own: KISS over Bluetooth LE in Dart (universal_ble)
 tests/              unit tests, engine tests against fake_tnc.py and fake_vara.py
 ```
 
 - **Flet** (Python, drawn by Flutter): one code base for desktop and mobile, a native window,
   no web server.
 - **Transports are pluggable** (`aprs_kiss_core.connection.register_transport`): TCP and
-  serial are built in; Android USB host and Bluetooth TNCs can be added as their own transports
-  without touching the KISS/AX.25 code.
+  serial are built in; Android USB host, classic Bluetooth (SPP) and Bluetooth LE are transports of
+  their own, without touching the KISS/AX.25 code. Bluetooth LE goes through the app's own Flet
+  extension (`packages/flet-ble-kiss`), which `flet build` puts into every platform's build; a run from
+  source without it simply does not offer Bluetooth LE.
 - The core modules are the same as in the Home Assistant integration (`hub.py` there,
   `engine.py` here). The plan is to publish the core as one package both use.
 
