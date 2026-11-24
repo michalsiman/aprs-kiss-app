@@ -15,9 +15,11 @@ Standard library only. Usage: collect_stats.py <data-dir>
 
 import csv
 import datetime as dt
+import http.client
 import json
 import os
 import sys
+import time
 import urllib.error
 import urllib.request
 
@@ -31,8 +33,17 @@ def get(path, token):
         "User-Agent": "aprs-kiss-app-stats",
         **({"Authorization": f"Bearer {token}"} if token else {}),
     })
-    with urllib.request.urlopen(req, timeout=30) as r:
-        return json.load(r)
+    for attempt in range(4):
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                return json.load(r)
+        except urllib.error.HTTPError as e:
+            if e.code < 500 or attempt == 3:
+                raise
+        except (http.client.IncompleteRead, urllib.error.URLError, TimeoutError, ConnectionError):
+            if attempt == 3:
+                raise
+        time.sleep(5 * (attempt + 1))
 
 
 def read_csv(path, key):
