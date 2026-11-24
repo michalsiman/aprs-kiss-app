@@ -486,7 +486,8 @@ class App:
         # The map stays on screen under the other screens (they are opaque): hiding it would make
         # Flutter throw it away and build it again, tiles and all, at every return to it.
         self.holders = [ft.Container(v.control if v.built else None, visible=False, expand=True,
-                                     padding=ft.Padding.all(pad), bgcolor=None if v.keep_alive else ft.Colors.SURFACE,
+                                     padding=None if v.keep_alive else ft.Padding.all(pad),  # the map edge to edge
+                                     bgcolor=None if v.keep_alive else ft.Colors.SURFACE,
                                      left=0, top=0, right=0, bottom=0)
                         for v in self.views]
         stacked = sorted(range(len(self.views)), key=lambda i: not self.views[i].keep_alive)  # the map at the bottom

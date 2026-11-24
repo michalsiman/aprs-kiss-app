@@ -9,6 +9,7 @@ import flet as ft
 
 from aprs_kiss_core.aprs import MAX_MESSAGE_PARTS, message_parts
 from aprs_kiss_core.geotext import find_positions, write_position
+from aprs_kiss_core.services import SERVICES
 from aprs_kiss_core.spotting import CAMILLA, GATEWAY_NAMES, MODES, PROGRAMS, Spot, SpotError, build as build_spot, default_gateway, gateways_for
 
 from .base import View, bearing, clock, distance_km
@@ -59,7 +60,10 @@ class MessagesView(View):
             [
                 ft.Row([ft.FilledTonalButton(self.t("new_message"), icon=ft.Icons.EDIT, on_click=self._new),
                         ft.OutlinedButton(self.t("spot_button"), icon=ft.Icons.TERRAIN, on_click=self._spot,
-                                          tooltip=self.t("spot_title"))], wrap=True, spacing=6),
+                                          tooltip=self.t("spot_title")),
+                        ft.OutlinedButton(self.t("services_button"), icon=ft.Icons.MISCELLANEOUS_SERVICES,
+                                          on_click=self._services, tooltip=self.t("services_title"))],
+                       wrap=True, spacing=6),
                 self.conversations,
             ],
             width=None if compact else 250,
@@ -391,6 +395,40 @@ class MessagesView(View):
             scrollable=True,
             actions=[ft.TextButton(t("cancel"), on_click=lambda _e: self.app.page.pop_dialog()),
                      ft.FilledButton(t("spot_send"), icon=ft.Icons.SEND, on_click=send)],
+        ))
+
+    # ─── services that answer a message (FIND, REPEAT, WXNOW, UTC, satellites, e-mail) ─────
+
+    def _services(self, _e=None) -> None:
+        """A list of the services; a command opens the conversation with it put in the message field,
+        ready to send (or to finish: a callsign, an address)."""
+        t = self.t
+
+        def use(call: str, command: str):
+            async def go(_e) -> None:
+                self.app.page.pop_dialog()
+                self.compose_to(call)
+                self.text.value = command
+                self._count()
+                await self.text.focus()
+            return go
+
+        rows: list[ft.Control] = []
+        for svc in SERVICES:
+            buttons = [ft.OutlinedButton(command.strip() or t("svc_type"), on_click=use(svc.call, command),
+                                         style=ft.ButtonStyle(padding=ft.Padding.symmetric(horizontal=10)))
+                       for command in svc.commands]
+            rows.append(ft.Column([
+                ft.Text(svc.call, weight=ft.FontWeight.BOLD, font_family="monospace", selectable=True),
+                ft.Text(t(svc.key), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
+                ft.Row(buttons, wrap=True, spacing=6, run_spacing=4),
+            ], tight=True, spacing=4))
+        self.app.show_dialog(ft.AlertDialog(
+            title=ft.Text(t("services_title")),
+            content=ft.Container(ft.Column([ft.Text(t("services_hint"), size=12), *rows], tight=True, spacing=14),
+                                 width=480),
+            scrollable=True,
+            actions=[ft.TextButton(t("close"), on_click=lambda _e: self.app.page.pop_dialog())],
         ))
 
     def compose_to(self, call: str) -> None:

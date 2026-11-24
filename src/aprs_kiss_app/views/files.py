@@ -56,7 +56,11 @@ class FilesView(View):
         self.picked: tuple[str, bytes] | None = None
         self.picked_box = ft.Container(visible=False, padding=10, border_radius=8,
                                        bgcolor=ft.Colors.SECONDARY_CONTAINER)
-        self.accept = ft.Switch(label=t("files_accept"), value=conf.files_accept, on_change=self._accept_changed)
+        self.accept = ft.Switch(value=conf.files_accept, on_change=self._accept_changed)
+        # the label beside it wraps on a phone (a Switch's own label does not); a tap on it flips the switch
+        accept_row = ft.Row([self.accept, ft.Container(ft.Text(t("files_accept")), expand=True,
+                                                       on_click=self._accept_tapped)],
+                            vertical_alignment=ft.CrossAxisAlignment.CENTER)
         self.list = ft.ListView(expand=True, spacing=6, padding=ft.Padding.all(8))
         self.hint = ft.Text(size=12, color=ft.Colors.ON_SURFACE_VARIANT)
         self._signature = None
@@ -67,7 +71,7 @@ class FilesView(View):
                     ft.FilledTonalButton(t("files_pick"), icon=ft.Icons.ATTACH_FILE, on_click=self._pick)],
                    wrap=True, vertical_alignment=ft.CrossAxisAlignment.CENTER),
             self.picked_box,
-            self.accept, self.hint,
+            accept_row, self.hint,
             ft.Container(self.list, expand=True, border_radius=8, bgcolor=ft.Colors.SURFACE_CONTAINER_LOWEST),
             ft.Row([ft.TextButton(t("files_folder"), icon=ft.Icons.FOLDER_OPEN, on_click=self._open_folder)]),
         ], expand=True)
@@ -219,8 +223,12 @@ class FilesView(View):
         self.refresh()
         self.app.page.update()
 
-    def _accept_changed(self, e) -> None:
-        self.engine.config.files_accept = bool(e.control.value)
+    def _accept_tapped(self, _e) -> None:
+        self.accept.value = not self.accept.value
+        self._accept_changed(None)
+
+    def _accept_changed(self, _e) -> None:
+        self.engine.config.files_accept = bool(self.accept.value)
         self.engine.accept_incoming = self.engine.config.accept_incoming or self.engine.config.files_accept
         self.app.save_config_soon()
         self._signature = None

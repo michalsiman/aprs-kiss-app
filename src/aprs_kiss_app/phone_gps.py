@@ -67,6 +67,7 @@ class PhoneGps:
             self._background_on = self.background
             self.geo.configuration = self._settings()
             self.geo.update()  # the stream starts again, with or without the foreground service
+            self._restyle_soon()
         if self.wanted:
             target = self._target()
             if target and self.last and self.running:
@@ -104,6 +105,7 @@ class PhoneGps:
                     self.geo.on_position_change = self._position
                     self.geo.on_error = self._error
                     self.geo.update()  # with a handler set, the phone starts sending positions
+                    self._restyle_soon()
                     self._state(True)
                     first = await self._first_fix(ft, fg)
                     if first:
@@ -113,6 +115,19 @@ class PhoneGps:
                 _LOGGER.info("Phone location: %s", err)
                 self._state(False, str(err) or type(err).__name__)
             await asyncio.sleep(RETRY_SECONDS)
+
+    def _restyle_soon(self) -> None:
+        if self.background:
+            self.app.page.run_task(self._restyle)
+
+    async def _restyle(self) -> None:
+        """The service's notification with our icon, once the service has posted it."""
+        from .android_notify import restyle_service_notification  # noqa: PLC0415
+
+        for wait in (1, 2, 3, 5, 10):
+            await asyncio.sleep(wait)
+            if restyle_service_notification():
+                return
 
     async def _first_fix(self, ft, fg):
         """A position at once (the phone's last known one), before the stream sends its first."""
