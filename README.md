@@ -64,46 +64,4 @@ Updated 2026-11-24 by `.github/workflows/stats.yml`. Raw data: the CSV files on 
 | v0.1.1 | 3 |
 | v0.1.0 | 1 |
 
-## Views, last 30 days
-
-| Day | Views | Unique visitors | Clones |
-|---|---:|---:|---:|
-| 2026-11-23 | 55 | 20 | 663 |
-| 2026-11-22 | 41 | 15 | 251 |
-| 2026-11-21 | 2 | 1 | 4 |
-| 2026-11-20 | 0 | 0 | 6 |
-| 2026-11-19 | 0 | 0 | 22 |
-| 2026-11-18 | 29 | 4 | 103 |
-| 2026-11-17 | 12 | 1 | 173 |
-| 2026-11-16 | 0 | 0 | 0 |
-| 2026-11-15 | 0 | 0 | 0 |
-| 2026-11-14 | 0 | 0 | 0 |
-| 2026-11-13 | 0 | 0 | 0 |
-| 2026-11-12 | 0 | 0 | 0 |
-| 2026-11-11 | 0 | 0 | 0 |
-| 2026-11-10 | 0 | 0 | 0 |
-
-## Referring sites (last 14 days)
-
-| Site | Views | Unique |
-|---|---:|---:|
-| github.com | 28 | 6 |
-| blog.ok1sim.cz | 26 | 18 |
-| l.facebook.com | 7 | 6 |
-| lm.facebook.com | 3 | 3 |
-| m.facebook.com | 1 | 1 |
-
-## Popular content (last 14 days)
-
-| Page | Views | Unique |
-|---|---:|---:|
-| /michalsiman/aprs-kiss-app | 72 | 35 |
-| /michalsiman/aprs-kiss-app/blob/main/README.cs.md | 8 | 4 |
-| /michalsiman/aprs-kiss-app/tree/main | 6 | 2 |
-| /michalsiman/aprs-kiss-app/blob/main/assets/map-offline.png | 3 | 3 |
-| /michalsiman/aprs-kiss-app/actions/runs/44147515500 | 2 | 2 |
-| /michalsiman/aprs-kiss-app/blob/main/assets/messages.png | 2 | 2 |
-| /michalsiman/aprs-kiss-app/compare/v0.1.7...main | 2 | 2 |
-| /michalsiman/aprs-kiss-app/releases/tag/v0.1.16 | 2 | 2 |
-| /michalsiman/aprs-kiss-app/releases/tag/v0.1.40 | 2 | 2 |
-| /michalsiman/aprs-kiss-app/branches | 2 | 1 |
+Traffic is not collected: add the TRAFFIC_TOKEN secret (see the workflow).
