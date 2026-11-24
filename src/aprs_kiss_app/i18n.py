@@ -44,6 +44,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "road_alerts": "Warn about road incidents ahead (while the tracker runs)", "road_alert_km": "Look ahead", "road_alerts_hint": "Crashes, work zones and other traffic reports on the map in a lobe ahead of you: the chosen distance straight ahead, less to the sides, never behind. Slowly (in town) the lobe is wide, fast (main roads) long and narrow. A bubble and a sound, once for each.", "road_ahead": "Road incident {d} ahead", "road_left": "to the left", "road_right": "to the right", "road_more": "and {n} more ahead", "road_show": "Show", "sound_road": "Road incident ahead (tracker)",
         "trk_menu_road": "Warn: road incidents ahead", "trk_menu_meet": "Warn: moving stations ahead",
         "profile_pick": "Switch profile (SSID and symbol)", "profile_title": "Station profile", "profile_edit": "Edit profiles", "profile_add_hint": "You can add more profiles (up to three) in Settings › Station.", "profile_now": "From now on everything goes out as {call}", "profile_unused": "— not used", "profile_active": "Active profile", "profiles_hint": "Profiles: up to three SSIDs, each with its own symbol. Tap your callsign in the top bar to switch; from then on everything (position, messages, terminal, chat) goes out under the chosen one.", "profile_dup": "Each profile needs its own SSID.",
+        "err_usb_none": "No USB TNC plugged in (an OTG adapter may be needed)", "err_usb_open": "Could not open {dev}", "err_usb_busy": "{dev} is in use", "err_usb_perm": "Not allowed to use {dev}: allow it when Android asks", "err_usb_write": "Writing to the USB TNC failed", "err_bt_none": "This phone has no Bluetooth", "err_bt_perm": "Not allowed to use Bluetooth: allow \"Nearby devices\" for the app", "err_bt_off": "Bluetooth is off: switch it on", "err_bt_nopaired": "No paired Bluetooth device: pair the TNC in Android's Bluetooth settings first", "err_bt_unpaired": "The Bluetooth device {dev} is not paired", "err_bt_connect": "Could not connect to {dev}: {why}", "err_not_connected": "The TNC is not connected",
         "meet_alerts": "Warn about other moving stations ahead (you catch one up, or it comes towards you)", "meet_ahead": "Moving station {d} ahead", "meet_same": "Moving station {d} ahead, going your way", "meet_towards": "Moving station {d} ahead, coming towards you", "meet_across": "Moving station {d} ahead, crossing your way", "sound_meet": "Moving station ahead (tracker)",
         "object_of": "object of {call}",
         "measure_from": "Measure distance from here",
@@ -210,6 +211,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "road_alerts": "Upozorňovat na dopravní problémy před sebou (když běží tracker)", "road_alert_km": "Dívat se dopředu", "road_alerts_hint": "Nehody, práce na silnici a další dopravní hlášení na mapě v laloku před tebou: rovně do zvolené vzdálenosti, do stran méně, za tebe nikdy. Pomalu (ve městě) je lalok široký, rychle (hlavní silnice, dálnice) dlouhý a úzký. Bublina a zvuk, u každého jednou.", "road_ahead": "Dopravní hlášení {d} před tebou", "road_left": "vlevo", "road_right": "vpravo", "road_more": "a další před tebou: {n}", "road_show": "Ukázat", "sound_road": "Dopravní problém před tebou (tracker)",
         "trk_menu_road": "Hlásit dopravní problémy před sebou", "trk_menu_meet": "Hlásit jedoucí stanice před sebou",
         "profile_pick": "Přepnout profil (SSID a ikona)", "profile_title": "Profil stanice", "profile_edit": "Upravit profily", "profile_add_hint": "Další profily (až tři) přidáš v Nastavení › Stanice.", "profile_now": "Od teď se vše posílá jako {call}", "profile_unused": "— nepoužit", "profile_active": "Aktivní profil", "profiles_hint": "Profily: až tři SSID, každé s vlastní ikonou. Přepínají se klepnutím na značku v horní liště; od té chvíle se vše (poloha, zprávy, terminál, chat) posílá pod vybraným.", "profile_dup": "Každý profil musí mít jiné SSID.",
+        "err_usb_none": "Není připojené žádné USB TNC (může být potřeba OTG redukce)", "err_usb_open": "Nepodařilo se otevřít {dev}", "err_usb_busy": "{dev} používá jiná aplikace", "err_usb_perm": "Chybí povolení pro {dev}: povol ho, až se Android zeptá", "err_usb_write": "Zápis do USB TNC selhal", "err_bt_none": "Tento telefon nemá Bluetooth", "err_bt_perm": "Chybí povolení pro Bluetooth: povol aplikaci „Zařízení v okolí“", "err_bt_off": "Bluetooth je vypnuté: zapni ho", "err_bt_nopaired": "Žádné spárované Bluetooth zařízení: nejdřív spáruj TNC v nastavení Bluetooth v Androidu", "err_bt_unpaired": "Bluetooth zařízení {dev} není spárované", "err_bt_connect": "Nepodařilo se připojit k {dev}: {why}", "err_not_connected": "TNC není připojené",
         "meet_alerts": "Upozorňovat na jiné jedoucí stanice před sebou (dojíždíš je, nebo jedou proti tobě)", "meet_ahead": "Jedoucí stanice {d} před tebou", "meet_same": "Jedoucí stanice {d} před tebou, jede stejným směrem", "meet_towards": "Jedoucí stanice {d} před tebou, jede proti tobě", "meet_across": "Jedoucí stanice {d} před tebou, křižuje tvůj směr", "sound_meet": "Jedoucí stanice před tebou (tracker)",
         "object_of": "objekt od {call}",
         "measure_from": "Měřit vzdálenost odsud",
@@ -405,6 +407,32 @@ class Translator:
     def __call__(self, key: str, **kwargs: object) -> str:
         text = TEXTS[self.language].get(key) or TEXTS["en"].get(key) or key
         return text.format(**kwargs) if kwargs else text
+
+    # Messages of the core (English, also in the log) shown in the user's language.
+    ERRORS = (
+        (r"No USB TNC plugged in.*", "err_usb_none"),
+        (r"Could not open (?P<dev>.+)", "err_usb_open"),
+        (r"(?P<dev>.+) is in use", "err_usb_busy"),
+        (r"Not allowed to use Bluetooth.*", "err_bt_perm"),
+        (r"Not allowed to use (?P<dev>.+): allow it when Android asks", "err_usb_perm"),
+        (r"Writing to the USB TNC failed", "err_usb_write"),
+        (r"This phone has no Bluetooth", "err_bt_none"),
+        (r"Bluetooth is off.*", "err_bt_off"),
+        (r"No paired Bluetooth device.*", "err_bt_nopaired"),
+        (r"The Bluetooth device (?P<dev>.+) is not paired", "err_bt_unpaired"),
+        (r"Could not connect to (?P<dev>.+?): (?P<why>.*)", "err_bt_connect"),
+        (r"KISS TNC is not connected", "err_not_connected"),
+    )
+
+    def error(self, text: str | None) -> str:
+        """A core error in this language when it is one we know, else as it is."""
+        import re  # noqa: PLC0415
+
+        for pattern, key in self.ERRORS:
+            m = re.fullmatch(pattern, (text or "").strip())
+            if m and key in TEXTS.get(self.language, {}):
+                return self(key, **m.groupdict())
+        return text or ""
 
     def age(self, seconds: float) -> str:
         seconds = max(0, int(seconds))

@@ -170,7 +170,8 @@ class MapView(View):
 
     def _filter_btn(self) -> ft.Control:
         self.filter_items = {
-            kind: ft.PopupMenuItem(_label(self.t(f"filter_{kind}")), icon=icon,
+            # one line each: the explanation in brackets does not fit a phone's menu
+            kind: ft.PopupMenuItem(self.t(f"filter_{kind}").split(" (")[0], icon=icon,
                                    on_click=lambda _e, k=kind: self._toggle_filter(k))
             for kind, icon in self.FILTER_ICONS.items()
         }

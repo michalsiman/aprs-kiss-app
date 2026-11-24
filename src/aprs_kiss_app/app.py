@@ -239,23 +239,25 @@ class App:
     def _tnc_info(self, _e=None) -> None:
         """A phone has no hover: a tap on "TNC" tells what is going on with it."""
         st = self.engine.status()
-        self.toast(self.tnc_text.value if st["tnc_connected"] else (st.get("tnc_error") or self.tnc_text.value or ""),
+        self.toast(self.tnc_text.value if st["tnc_connected"] else (self.t.error(st.get("tnc_error")) or self.tnc_text.value or ""),
                    error=not st["tnc_connected"])
 
     @staticmethod
-    def _lamp(content: str | ft.Control, on_click, tooltip: str | None = None) -> ft.Container:
-        """One dashboard lamp: all the same height and frame, a word or an icon inside."""
+    def _lamp(content: str | ft.Control, on_click, tooltip: str | None = None, small: bool = False) -> ft.Container:
+        """One dashboard lamp: all the same height and frame, a word or an icon inside.
+        small: half height, for the TNC / IS / GPS block (two rows in the height of one lamp)."""
         if isinstance(content, str):
-            content = ft.Text(content, size=12, weight=ft.FontWeight.BOLD)
-        return ft.Container(content, on_click=on_click, tooltip=tooltip, height=26, alignment=ft.Alignment.CENTER,
-                            padding=ft.Padding.symmetric(horizontal=6), border_radius=5,
-                            border=ft.Border.all(1.5, ft.Colors.OUTLINE))
+            content = ft.Text(content, size=8 if small else 12, weight=ft.FontWeight.BOLD)
+        return ft.Container(content, on_click=on_click, tooltip=tooltip, height=12 if small else 26,
+                            alignment=ft.Alignment.CENTER, data=1.0 if small else 1.5,
+                            padding=ft.Padding.symmetric(horizontal=3 if small else 6), border_radius=3 if small else 5,
+                            border=ft.Border.all(1.0 if small else 1.5, ft.Colors.OUTLINE))
 
     def _light(self, key: str, state: str | None) -> None:
         """A lamp: "on" green, "tx" red and filled, None grey; hidden when the thing is not in use."""
         lamp = self.lamps[key]
         color = {"on": ft.Colors.GREEN, "tx": ft.Colors.RED, "armed": ft.Colors.RED}.get(state, ft.Colors.OUTLINE)
-        lamp.border = ft.Border.all(1.5, color)
+        lamp.border = ft.Border.all(lamp.data or 1.5, color)
         lamp.bgcolor = ft.Colors.RED if state == "tx" else None
         lamp.content.color = ft.Colors.WHITE if state == "tx" else color
 
@@ -466,7 +468,7 @@ class App:
         self.callsign = ft.Text(weight=ft.FontWeight.BOLD, size=18)
         # a tap on the callsign: pick another profile (SSID and symbol)
         self.callsign_btn = ft.Container(self.callsign, on_click=self._pick_profile, border_radius=6,
-                                         padding=ft.Padding.symmetric(horizontal=4, vertical=2),
+                                         padding=ft.Padding.symmetric(vertical=2),  # no side padding: room for the SSID
                                          tooltip=self.t("profile_pick"))
         self.tnc_dot = ft.Icon(ft.Icons.CIRCLE, size=12)
         self.tnc_text = ft.Text(size=13)
@@ -490,9 +492,12 @@ class App:
         self.tnc_text.visible = self.gps_text.visible = not self.compact
         # a phone: TNC, IS, GPS and TX as lamps on a dashboard - green when working, grey when not,
         # TX red while transmitting is on; a tap tells the state (TX: switches it)
-        self.lamps = {key: self._lamp(text, on_click) for key, text, on_click in (
+        # On a phone TNC, IS and GPS share one block the height of a lamp (IS and GPS above, TNC below),
+        # so the callsign with its SSID has room.
+        small = self.compact
+        self.lamps = {key: self._lamp(text, on_click, small=small and key != "tx") for key, text, on_click in (
             ("tnc", "TNC", self._tnc_info), ("is", "IS", None),
-            ("gps", ft.Icon(ft.Icons.SATELLITE_ALT, size=16), self._gps_info),  # a satellite instead of a word
+            ("gps", ft.Icon(ft.Icons.SATELLITE_ALT, size=9 if small else 16), self._gps_info),  # a satellite, not a word
             ("tx", "TX", self._tx_tap))}
         # "send my position" (once, or again and again: the tracker), a lamp in the same frame on a phone
         self.position_btn = PositionButton(self, self.compact)
@@ -500,8 +505,11 @@ class App:
             self.callsign_btn.expand = True
             self.callsign.no_wrap = True
             self.callsign.overflow = ft.TextOverflow.ELLIPSIS
-            row = [self.menu_btn, self.callsign_btn, self.lamps["tnc"], self.lamps["is"], self.lamps["gps"],
-                   self.update_btn, self.position_btn.control, self.lamps["tx"]]
+            links = ft.Column([ft.Row([self.lamps["is"], self.lamps["gps"]], spacing=2, tight=True),
+                               self.lamps["tnc"]], spacing=2, tight=True,
+                              horizontal_alignment=ft.CrossAxisAlignment.CENTER)
+            self.lamps["tnc"].width = 42  # as wide as IS and GPS above it
+            row = [self.menu_btn, self.callsign_btn, links, self.update_btn, self.position_btn.control, self.lamps["tx"]]
         status = ft.Container(
             ft.Row(
                 row if self.compact else [
@@ -661,7 +669,7 @@ class App:
         self.callsign.value = st["callsign"] or "—"
         self.tnc_dot.color = ft.Colors.GREEN if st["tnc_connected"] else ft.Colors.RED
         self.tnc_text.value = self.t("connected") if st["tnc_connected"] else self.t("disconnected")
-        self.tnc_text.tooltip = None if st["tnc_connected"] else st.get("tnc_error")
+        self.tnc_text.tooltip = None if st["tnc_connected"] else self.t.error(st.get("tnc_error")) or None
         aprsis = st.get("aprsis")
         self.is_box.visible = aprsis is not None
         if aprsis:
