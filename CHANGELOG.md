@@ -8,7 +8,7 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 
 - **Unread messages stay counted while Messages is open**: the red number in the menu (and on the
   selected Messages item) goes away only when the messages are read, not as soon as the screen opens.
-- **A red dot next to an unread conversation**, besides the bold callsign.
+- **A red dot on the envelope of an unread conversation** (on the left), besides the bold callsign.
 - **A serial TNC that is not there is said plainly**: instead of "Could not configure port: (5, …)" the app
   says the port does not answer (probably not the radio's), is not there, is not allowed (the dialout group)
   or is not chosen – in the app's language, with what to do. The Linux ports ttyS0…ttyS31 with nothing

@@ -184,12 +184,11 @@ class MessagesView(View):
         last = msgs[-1]
         unread = call in self.unread
         return ft.ListTile(
+            # unread: a red dot on the envelope on the left, and the callsign in bold
             leading=ft.Icon(ft.Icons.MARK_EMAIL_UNREAD if unread else ft.Icons.PERSON,
-                            color=ft.Colors.PRIMARY if unread else None),
-            # unread: bold, and a red dot next to the callsign
-            title=ft.Row([ft.Text(call, weight=ft.FontWeight.BOLD if unread else None),
-                          ft.Container(width=9, height=9, border_radius=5, bgcolor=ft.Colors.RED, visible=unread)],
-                         spacing=6, tight=True, vertical_alignment=ft.CrossAxisAlignment.CENTER),
+                            color=ft.Colors.PRIMARY if unread else None,
+                            badge=ft.Badge(small_size=11, bgcolor=ft.Colors.RED) if unread else None),
+            title=ft.Text(call, weight=ft.FontWeight.BOLD if unread else None),
             subtitle=ft.Text(last["text"], max_lines=1, overflow=ft.TextOverflow.ELLIPSIS),
             trailing=ft.Row([
                 ft.Text(clock(last["time"]), size=11),
