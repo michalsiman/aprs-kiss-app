@@ -186,7 +186,10 @@ class MessagesView(View):
         return ft.ListTile(
             leading=ft.Icon(ft.Icons.MARK_EMAIL_UNREAD if unread else ft.Icons.PERSON,
                             color=ft.Colors.PRIMARY if unread else None),
-            title=ft.Text(call, weight=ft.FontWeight.BOLD if unread else None),
+            # unread: bold, and a red dot next to the callsign
+            title=ft.Row([ft.Text(call, weight=ft.FontWeight.BOLD if unread else None),
+                          ft.Container(width=9, height=9, border_radius=5, bgcolor=ft.Colors.RED, visible=unread)],
+                         spacing=6, tight=True, vertical_alignment=ft.CrossAxisAlignment.CENTER),
             subtitle=ft.Text(last["text"], max_lines=1, overflow=ft.TextOverflow.ELLIPSIS),
             trailing=ft.Row([
                 ft.Text(clock(last["time"]), size=11),

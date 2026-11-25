@@ -470,7 +470,7 @@ class App:
             selected_index=0,
             label_type=ft.NavigationRailLabelType.ALL,
             min_width=88,
-            destinations=[ft.NavigationRailDestination(icon=v.icon, selected_icon=v.selected_icon,
+            destinations=[ft.NavigationRailDestination(icon=ft.Icon(v.icon), selected_icon=ft.Icon(v.selected_icon or v.icon),
                                                        label=self.t(v.key)) for v in self.views],
             on_change=lambda e: self.select(self.views[e.control.selected_index].key),
         )
@@ -481,7 +481,8 @@ class App:
         self.drawer = ft.NavigationDrawer(
             controls=[ft.Container(ft.Text("APRS & Packet", weight=ft.FontWeight.BOLD, size=16),
                                    padding=ft.Padding.only(left=28, top=20, bottom=12))]
-            + [ft.NavigationDrawerDestination(icon=ft.Icon(v.icon), selected_icon=v.selected_icon, label=self.t(v.key))
+            + [ft.NavigationDrawerDestination(icon=ft.Icon(v.icon), selected_icon=ft.Icon(v.selected_icon or v.icon),
+                                              label=self.t(v.key))
                for v in self.views]
             + [ft.Divider(), self.about_item],
             on_change=self._menu_selected, on_dismiss=self._menu_dismissed,
@@ -766,10 +767,12 @@ class App:
             self.position_btn.refresh()
         if self.has_view("messages"):
             messages = self.view("messages")
-            dest = self.rail.destinations[self.views.index(messages)]
-            dest.badge = str(len(messages.unread)) if messages.unread else None
-            self.drawer.controls[1 + self.views.index(messages)].icon.badge = dest.badge
-            self.menu_btn.badge = dest.badge  # the menu is closed on a phone: unread messages show on ☰
+            badge = str(len(messages.unread)) if messages.unread else None
+            # on the plain and the selected icon: the count stays while Messages is open, until they are read
+            for dest in (self.rail.destinations[self.views.index(messages)],
+                         self.drawer.controls[1 + self.views.index(messages)]):
+                dest.icon.badge = dest.selected_icon.badge = badge
+            self.menu_btn.badge = badge  # the menu is closed on a phone: unread messages show on ☰
 
     # ─── new versions ─────────────────────────────────────────────────────
 

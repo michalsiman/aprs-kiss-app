@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="1.1.1" date="2026-11-25" type="development">
+      <description>
+        <p>Beta: unread messages stay counted while Messages is open; a red dot marks unread conversations; plain-words serial TNC errors.</p>
+      </description>
+    </release>
     <release version="1.1.0" date="2026-11-24">
       <description>
         <p>A TNC over Bluetooth LE (a LoRa APRS tracker, Mobilinkd TNC4, PicoAPRS …); spotting a SOTA, POTA, WWFF, GMA and other activation by radio; services on APRS (FIND, REPEAT, WXNOW, UTC, satellite passes, e-mail) in Messages; Android: a radio plugged in opens the app, and smaller fixes.</p>
