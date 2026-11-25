@@ -17,6 +17,7 @@ from . import android_notify, ble_flet
 from aprs_kiss_core.config import VERSION, Config, data_dir, load_config, save_config
 
 from . import theme
+from . import hig
 from aprs_kiss_core.engine import Engine, TransmitRefused
 
 from .about import show_about
@@ -74,8 +75,9 @@ class App:
         page = self.page
         page.title = "APRS & Packet"
         page.theme_mode = ft.ThemeMode.SYSTEM
-        page.theme = self._theme()
-        page.dark_theme = self._theme()
+        # experimental branch "hig": the look after Apple's Human Interface Guidelines (hig.py)
+        page.theme = hig.theme(False, self.mobile)
+        page.dark_theme = hig.theme(True, self.mobile)
         page.padding = 0
         page.window.prevent_close = True
         page.window.on_event = self._on_window_event
@@ -280,15 +282,17 @@ class App:
         return ft.Container(content, on_click=on_click, tooltip=tooltip, height=12 if small else 36 if large else 26,
                             alignment=ft.Alignment.CENTER, data=1.0 if small else 2.0 if large else 1.5,
                             padding=ft.Padding.symmetric(horizontal=3 if small else 12 if large else 6),
-                            border_radius=3 if small else 7 if large else 5,
-                            border=ft.Border.all(1.0 if small else 2.0 if large else 1.5, ft.Colors.OUTLINE))
+                            border_radius=6 if small else 18 if large else 13,   # HIG: capsules
+                            border=ft.Border.all(1.0 if small else 1.5 if large else 1.2, ft.Colors.OUTLINE))
 
     def _light(self, key: str, state: str | None) -> None:
         """A lamp: "on" green, "tx" red and filled, None grey; hidden when the thing is not in use."""
         lamp = self.lamps[key]
-        color = {"on": ft.Colors.GREEN, "tx": ft.Colors.RED, "armed": ft.Colors.RED}.get(state, ft.Colors.OUTLINE)
+        dark = self.page.theme_mode == ft.ThemeMode.DARK
+        green, red = hig.system(hig.GREEN, dark), hig.system(hig.RED, dark)
+        color = {"on": green, "tx": red, "armed": red}.get(state, ft.Colors.OUTLINE)
         lamp.border = ft.Border.all(lamp.data or 1.5, color)
-        lamp.bgcolor = ft.Colors.RED if state == "tx" else None
+        lamp.bgcolor = red if state == "tx" else ft.Colors.with_opacity(0.12, color) if state else None
         lamp.content.color = ft.Colors.WHITE if state == "tx" else color
 
     _on_air_until = 0.0
@@ -486,10 +490,21 @@ class App:
             + [ft.Divider(), self.about_item],
             on_change=self._menu_selected, on_dismiss=self._menu_dismissed,
         )
-        self.page.drawer = self.drawer if self.compact else None
-        self.menu_btn = ft.IconButton(ft.Icons.MENU, tooltip=self.t("menu"), on_click=self._open_menu,
-                                      visible=self.compact)
-        pad = 6 if self.compact else 12
+        # HIG: no slide-in menu – a tab bar on a phone, a sidebar on a computer (built below)
+        self.page.drawer = None
+        self.menu_btn = ft.IconButton(ft.Icons.MENU, tooltip=self.t("menu"), on_click=self._open_menu, visible=False)
+        self._badge: str | None = None
+        n = len(self.views)
+        self.tab_views = list(range(n)) if n <= 5 else list(range(4))   # the rest under "More"
+        self.tab_icons = [ft.Icon(self.views[i].icon) for i in self.tab_views]
+        dests = [ft.NavigationBarDestination(icon=self.tab_icons[k], selected_icon=self.views[i].selected_icon,
+                                             label=self.t(self.views[i].key)) for k, i in enumerate(self.tab_views)]
+        if n > 5:
+            dests.append(ft.NavigationBarDestination(icon=ft.Icons.MORE_HORIZ, label=self.t("hig_more")))
+        self.tabbar = ft.NavigationBar(destinations=dests, on_change=self._tab_changed, selected_index=0)
+        self.sidebar = ft.Column(spacing=2, scroll=ft.ScrollMode.AUTO, expand=True)
+        self.screen_title = ft.Text(size=15, weight=ft.FontWeight.W_600, no_wrap=True)
+        pad = 10 if self.compact else 20
         # The map stays on screen under the other screens (they are opaque): hiding it would make
         # Flutter throw it away and build it again, tiles and all, at every return to it.
         self.holders = [ft.Container(v.control if v.built else None, visible=False, expand=True,
@@ -549,7 +564,8 @@ class App:
         status = ft.Container(
             ft.Row(
                 row if self.compact else [
-                    self.menu_btn,
+                    self.screen_title,
+                    ft.Text("·", color=ft.Colors.ON_SURFACE_VARIANT),
                     self.callsign_btn,
                     ft.Container(expand=True),  # all the lamps on the right
                     self.lamps["tnc"], self.lamps["is"], self.lamps["gps"],
@@ -563,16 +579,29 @@ class App:
                 vertical_alignment=ft.CrossAxisAlignment.CENTER,
             ),
             # a phone: the menu button close to the left edge, the TX lamp a little away from the right one
-            padding=ft.Padding.only(left=2, right=10, top=2, bottom=2) if self.compact
-            else ft.Padding.symmetric(horizontal=16, vertical=6),
-            bgcolor=ft.Colors.SURFACE_CONTAINER,
+            padding=ft.Padding.only(left=10, right=10, top=4, bottom=4) if self.compact
+            else ft.Padding.symmetric(horizontal=16, vertical=8),
+            bgcolor=ft.Colors.with_opacity(0.94, ft.Colors.SURFACE_CONTAINER),     # HIG bar: translucent
+            border=ft.Border.only(bottom=ft.BorderSide(0.5, ft.Colors.OUTLINE)),  # with a hairline
         )
         self.page.controls.clear()
         self.page.add(
             ft.SafeArea(
                 ft.Row(
-                    ([] if self.compact else [self.rail, ft.VerticalDivider(width=1)])
-                    + [ft.Column([status, ft.Stack([self.holders[i] for i in stacked], expand=True)],
+                    ([] if self.compact else [
+                        ft.Container(ft.Column([
+                            ft.Container(ft.Text("APRS & Packet", size=13, weight=ft.FontWeight.W_600,
+                                                 color=ft.Colors.ON_SURFACE_VARIANT),
+                                         padding=ft.Padding.only(left=10, top=14, bottom=6)),
+                            self.sidebar,
+                            ft.Container(hig.sidebar_item(ft.Icons.INFO_OUTLINE, self.t("about"), False,
+                                                          lambda _e: show_about(self)),
+                                         padding=ft.Padding.only(bottom=10)),
+                        ], spacing=0), width=212, padding=ft.Padding.symmetric(horizontal=10),
+                            bgcolor=ft.Colors.with_opacity(0.55, ft.Colors.SURFACE_CONTAINER_HIGH)),
+                        ft.VerticalDivider(width=0.5, thickness=0.5)])
+                    + [ft.Column([status, ft.Stack([self.holders[i] for i in stacked], expand=True)]
+                                 + ([self.tabbar] if self.compact else []),
                                  expand=True, spacing=0)],
                     expand=True,
                     spacing=0,
@@ -585,6 +614,66 @@ class App:
             self.select(key)
         finally:
             self._building = False
+
+    # ─── HIG navigation: sidebar (computer), tab bar + "More" (phone) ────
+
+    def _nav_selected(self, index: int) -> None:
+        if not self.compact:
+            self.sidebar.controls = [
+                hig.sidebar_item(v.selected_icon if i == index and v.selected_icon else v.icon, self.t(v.key),
+                                 i == index, lambda _e, k=v.key: self.select(k),
+                                 self._badge if v.key == "messages" else None)
+                for i, v in enumerate(self.views)]
+            self.screen_title.value = self.t(self.views[index].key)
+        else:
+            self.tabbar.selected_index = (self.tab_views.index(index) if index in self.tab_views
+                                          else len(self.tab_views))
+
+    def _tab_changed(self, e) -> None:
+        k = e.control.selected_index
+        if k < len(self.tab_views):
+            self.select(self.views[self.tab_views[k]].key)
+        else:
+            self._show_more()
+
+    def _show_more(self) -> None:
+        """The phone's "More" tab: the other screens and About as an iOS grouped list in a sheet."""
+        rest = [v for i, v in enumerate(self.views) if i not in self.tab_views]
+
+        def go(key):
+            async def handler(_e) -> None:
+                self.page.pop_dialog()
+                self.select(key)
+            return handler
+
+        async def about(_e) -> None:
+            self.page.pop_dialog()
+            show_about(self)
+
+        def row(icon, label, on_click, last=False):
+            return ft.Container(ft.Row([ft.Icon(icon, color=ft.Colors.PRIMARY, size=22),
+                                        ft.Text(label, size=17, expand=True),
+                                        ft.Icon(ft.Icons.CHEVRON_RIGHT, color=ft.Colors.ON_SURFACE_VARIANT, size=20)],
+                                       spacing=14),
+                                padding=ft.Padding.symmetric(horizontal=16, vertical=12), on_click=on_click,
+                                border=None if last else ft.Border.only(bottom=ft.BorderSide(0.5, ft.Colors.OUTLINE)))
+
+        group = lambda rows: ft.Container(ft.Column(rows, spacing=0), bgcolor=ft.Colors.SURFACE_CONTAINER,  # noqa: E731
+                                          border_radius=hig.GROUP_RADIUS, clip_behavior=ft.ClipBehavior.ANTI_ALIAS)
+        rows = [row(v.icon, self.t(v.key), go(v.key), last=k == len(rest) - 1) for k, v in enumerate(rest)]
+        sheet = ft.BottomSheet(
+            ft.Container(ft.Column([
+                ft.Container(ft.Container(width=36, height=5, border_radius=3, bgcolor=ft.Colors.OUTLINE),
+                             alignment=ft.Alignment.CENTER, padding=ft.Padding.only(bottom=8)),
+                ft.Text(self.t("hig_more"), size=22, weight=ft.FontWeight.BOLD),
+                group(rows),
+                group([row(ft.Icons.INFO_OUTLINE, self.t("about"), about, last=True)]),
+            ], tight=True, spacing=14, scroll=ft.ScrollMode.AUTO),
+                padding=ft.Padding.only(left=16, right=16, top=10, bottom=24), bgcolor=ft.Colors.SURFACE),
+            bgcolor=ft.Colors.SURFACE, shape=ft.RoundedRectangleBorder(radius=hig.DIALOG_RADIUS),
+            on_dismiss=lambda _e: self._nav_selected(self.current) or self.page.update(),
+        )
+        self.page.show_dialog(sheet)
 
     @property
     def current_key(self) -> str:
@@ -620,6 +709,7 @@ class App:
         self.current = index
         self.rail.selected_index = index
         self.drawer.selected_index = index
+        self._nav_selected(index)
         if self.holders[index].content is not self.views[index].control:
             self.holders[index].content = self.views[index].control  # built the first time it is shown
         for i, holder in enumerate(self.holders):
@@ -770,6 +860,12 @@ class App:
             dest.badge = str(len(messages.unread)) if messages.unread else None
             self.drawer.controls[1 + self.views.index(messages)].icon.badge = dest.badge
             self.menu_btn.badge = dest.badge  # the menu is closed on a phone: unread messages show on ☰
+            if dest.badge != self._badge:
+                self._badge = dest.badge
+                i = self.views.index(messages)
+                if i in self.tab_views:
+                    self.tab_icons[self.tab_views.index(i)].badge = dest.badge
+                self._nav_selected(self.current)
 
     # ─── new versions ─────────────────────────────────────────────────────
 

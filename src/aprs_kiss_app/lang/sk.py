@@ -165,7 +165,7 @@ TEXTS = {
     "update_failed": "Nové verzie sa nepodarilo skontrolovať", "update_checked": "skontrolované {when}",
     "update_check_now": "Skontrolovať teraz",
     "check_updates": "Raz denne skontrolovať nové verzie (dotaz na GitHub, nič o tebe sa neposiela)",
-    "about": "O aplikácii", "about_version": "Verzia {version}",
+    "about": "O aplikácii", "hig_more": "Ďalšie", "about_version": "Verzia {version}",
     "about_what": "APRS stanica a packet radio terminál pre rádio s KISS TNC: mapa počutých staníc, "
                   "APRS správy s potvrdením, terminál pre BBS a uzly, packet chat, monitor rámcov "
                   "a APRS-IS s voliteľným iGate.",

@@ -167,7 +167,7 @@ TEXTS = {
     "update_failed": "Nie udało się sprawdzić nowych wersji", "update_checked": "sprawdzono {when}",
     "update_check_now": "Sprawdź teraz",
     "check_updates": "Sprawdzaj nowe wersje raz dziennie (zapytanie do GitHuba, nic o tobie nie jest wysyłane)",
-    "about": "O aplikacji", "about_version": "Wersja {version}",
+    "about": "O aplikacji", "hig_more": "Więcej", "about_version": "Wersja {version}",
     "about_what": "Stacja APRS i terminal packet radio dla radia z KISS TNC: mapa odebranych stacji, "
                   "wiadomości APRS z potwierdzeniem, terminal do BBS i węzłów, czat packet, monitor ramek "
                   "oraz APRS-IS z opcjonalnym iGate.",

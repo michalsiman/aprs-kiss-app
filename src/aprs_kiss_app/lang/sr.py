@@ -165,7 +165,7 @@ TEXTS = {
     "update_failed": "Провера нових верзија није успела", "update_checked": "проверено {when}",
     "update_check_now": "Провери сада",
     "check_updates": "Једном дневно провери нове верзије (пита GitHub, ништа о вама не шаље)",
-    "about": "О апликацији", "about_version": "Верзија {version}",
+    "about": "О апликацији", "hig_more": "Више", "about_version": "Верзија {version}",
     "about_what": "APRS станица и packet radio терминал за радио са KISS TNC-ом: мапа чутих станица, "
                   "APRS поруке са потврдом, терминал за BBS и чворове, packet ћаскање, монитор оквира "
                   "и APRS-IS са опционим iGate-ом.",

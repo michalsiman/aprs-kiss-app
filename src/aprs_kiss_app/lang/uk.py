@@ -166,7 +166,7 @@ TEXTS = {
     "update_failed": "Не вдалося перевірити нові версії", "update_checked": "перевірено {when}",
     "update_check_now": "Перевірити зараз",
     "check_updates": "Раз на день перевіряти нові версії (запит до GitHub, нічого про вас не надсилається)",
-    "about": "Про застосунок", "about_version": "Версія {version}",
+    "about": "Про застосунок", "hig_more": "Більше", "about_version": "Версія {version}",
     "about_what": "APRS-станція і термінал packet radio для радіостанції з KISS TNC: мапа почутих станцій, "
                   "APRS-повідомлення з підтвердженням, термінал для BBS і вузлів, packet-чат, монітор кадрів "
                   "і APRS-IS з необов'язковим iGate.",

@@ -165,7 +165,7 @@ TEXTS = {
     "update_failed": "Provjera novih verzija nije uspjela", "update_checked": "provjereno {when}",
     "update_check_now": "Provjeri sada",
     "check_updates": "Jednom dnevno provjeri nove verzije (pita GitHub, ništa o vama ne šalje)",
-    "about": "O aplikaciji", "about_version": "Verzija {version}",
+    "about": "O aplikaciji", "hig_more": "Više", "about_version": "Verzija {version}",
     "about_what": "APRS stanica i packet radio terminal za radio s KISS TNC-om: karta čutih stanica, APRS poruke "
                   "s potvrdom, terminal za BBS-ove i čvorove, packet chat, monitor okvira i APRS-IS s "
                   "neobaveznim iGateom.",

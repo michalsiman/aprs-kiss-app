@@ -173,7 +173,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "update_failed": "Could not check for new versions", "update_checked": "checked {when}",
         "update_check_now": "Check now",
         "check_updates": "Check for new versions once a day (asks GitHub, sends nothing about you)",
-        "about": "About", "about_version": "Version {version}",
+        "about": "About", "hig_more": "More", "about_version": "Version {version}",
         "about_what": "An APRS station and packet radio terminal for a radio with a KISS TNC: a map of the "
                       "stations heard, APRS messages with acknowledgement, a terminal for BBSes and nodes, "
                       "packet chat, a frame monitor and APRS-IS with an optional iGate.",
@@ -354,7 +354,7 @@ TEXTS: dict[str, dict[str, str]] = {
         "update_failed": "Nové verze se nepodařilo zkontrolovat", "update_checked": "kontrola {when}",
         "update_check_now": "Zkontrolovat teď",
         "check_updates": "Jednou denně zkontrolovat nové verze (dotaz na GitHub, nic o tobě se neposílá)",
-        "about": "O aplikaci", "about_version": "Verze {version}",
+        "about": "O aplikaci", "hig_more": "Další", "about_version": "Verze {version}",
         "about_what": "APRS stanice a packet radio terminál pro rádio s KISS TNC: mapa slyšených stanic, "
                       "APRS zprávy s potvrzením, terminál pro BBS a nody, packet chat, monitor rámců "
                       "a APRS-IS s volitelnou iGate.",

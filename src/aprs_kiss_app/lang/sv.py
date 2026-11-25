@@ -165,7 +165,7 @@ TEXTS = {
     "update_failed": "Kunde inte leta efter nya versioner", "update_checked": "kontrollerat {when}",
     "update_check_now": "Kontrollera nu",
     "check_updates": "Leta efter nya versioner en gång om dagen (frågar GitHub, skickar inget om dig)",
-    "about": "Om", "about_version": "Version {version}",
+    "about": "Om", "hig_more": "Mer", "about_version": "Version {version}",
     "about_what": "En APRS-station och en packet radio-terminal för en radio med KISS-TNC: en karta över hörda "
                   "stationer, APRS-meddelanden med kvittens, en terminal för BBS:er och noder, packet-chatt, "
                   "en rammonitor och APRS-IS med valfri iGate.",

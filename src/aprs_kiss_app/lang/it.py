@@ -166,7 +166,7 @@ TEXTS = {
     "update_failed": "Impossibile cercare nuove versioni", "update_checked": "controllato {when}",
     "update_check_now": "Controlla ora",
     "check_updates": "Cerca nuove versioni una volta al giorno (chiede a GitHub, non invia nulla su di te)",
-    "about": "Informazioni", "about_version": "Versione {version}",
+    "about": "Informazioni", "hig_more": "Altro", "about_version": "Versione {version}",
     "about_what": "Una stazione APRS e un terminale packet radio per una radio con TNC KISS: una mappa delle "
                   "stazioni ascoltate, messaggi APRS con conferma, un terminale per BBS e nodi, chat packet, "
                   "un monitor dei frame e APRS-IS con iGate opzionale.",

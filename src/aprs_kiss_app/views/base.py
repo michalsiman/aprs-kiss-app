@@ -148,6 +148,19 @@ def _wrapping(box: ft.Checkbox) -> ft.Control:
                   spacing=0, visible=box.visible, vertical_alignment=ft.CrossAxisAlignment.CENTER)
 
 
+def _hig_field(c) -> None:
+    """HIG (experimental branch): a field is a rounded grey fill without a frame; the accent shows
+    as a thin line only while typing."""
+    c._hig = True
+    if c.border in (None, ft.InputBorder.OUTLINE):
+        c.border = ft.InputBorder.OUTLINE
+        c.filled = True
+        c.border_radius = c.border_radius or 10
+        c.border_color = ft.Colors.TRANSPARENT
+        c.focused_border_color = ft.Colors.PRIMARY
+        c.focused_border_width = 1.5
+
+
 def _children(control: ft.Control) -> list:
     out = []
     for name in ("content", "controls", "actions", "title"):
@@ -170,6 +183,8 @@ def adapt(control: ft.Control, fit_width: float | None = None) -> ft.Control:
         seen.add(id(c))
         if isinstance(c, ft.TextField) and c.capitalization == ft.TextCapitalization.CHARACTERS:
             _uppercase(c)
+        if isinstance(c, (ft.TextField, ft.Dropdown)) and not getattr(c, "_hig", False):
+            _hig_field(c)
         if fit_width:
             width = getattr(c, "width", None)
             if isinstance(width, (int, float)) and width > fit_width:
