@@ -175,7 +175,7 @@ class SettingsView(View):
         lang_index = 3 if t.language == "cs" else 2
         # profiles: up to three SSIDs, each with its own symbol; the active one is picked in the top bar
         items = profiles.load(c)
-        self.prof_ssid, self.prof_symbol = [], []
+        self.prof_ssid, self.prof_symbol, self.prof_comment = [], [], []
         rows = []
         for i in range(profiles.MAX):
             p = items[i] if i < len(items) else None
@@ -189,17 +189,25 @@ class SettingsView(View):
             self.prof_ssid.append(ft.Dropdown(label=t("ssid"), value=str(p["ssid"]) if p else "", width=330,
                                               options=ssid_opts))
             self.prof_symbol.append(ft.Dropdown(label=t("symbol"), value=sym, width=330, options=sym_opts))
+            # each profile its own position comment (the first one: the comment so far, if it has none)
+            own = p.get("comment") if p else None
+            self.prof_comment.append(ft.TextField(label=t("comment"), max_length=43, width=670,
+                                                  value=own if isinstance(own, str) else (c.comment if p else "")))
             active = p is not None and i == c.profile
             mark = ft.Container(ft.Text(str(i + 1), weight=ft.FontWeight.BOLD,
                                         color=ft.Colors.ON_PRIMARY if active else None),
                                 width=28, height=28, border_radius=14, alignment=ft.Alignment.CENTER,
                                 bgcolor=ft.Colors.PRIMARY if active else ft.Colors.SURFACE_CONTAINER_HIGHEST,
                                 tooltip=t("profile_active") if active else None)
-            rows.append(ft.Row([mark, self.prof_ssid[i], self.prof_symbol[i]], wrap=True,
-                               vertical_alignment=ft.CrossAxisAlignment.CENTER))
+            head = ft.Row([mark, ft.Text(t("profile_active"), weight=ft.FontWeight.BOLD, color=ft.Colors.PRIMARY,
+                                         visible=active)], spacing=10, vertical_alignment=ft.CrossAxisAlignment.CENTER)
+            rows.append(ft.Column([head, ft.Row([self.prof_ssid[i], self.prof_symbol[i]], wrap=True,
+                                                vertical_alignment=ft.CrossAxisAlignment.CENTER),
+                                   self.prof_comment[i]], spacing=8, tight=True))
         self.profile_rows = ft.Column([ft.Text(t("profiles_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
                                        *rows], spacing=8, tight=True)
-        self.comment = ft.TextField(label=t("comment"), value=c.comment, expand=True, max_length=43)
+        self.comment = ft.TextField(label=t("comment"), value=c.comment, expand=True, max_length=43,
+                                    visible=False)  # the comment is per profile now (above)
         self.path = ft.TextField(label=t("digipath"), value=c.path, width=240,
                                  capitalization=ft.TextCapitalization.CHARACTERS)
         self.lat = ft.TextField(label=t("latitude"), value="" if c.latitude is None else str(c.latitude), width=160)
@@ -618,7 +626,8 @@ class SettingsView(View):
                 continue
             if i == old.profile:
                 active = len(items)
-            items.append({"ssid": int(value), "symbol": sym_box.value or "/-"})
+            items.append({"ssid": int(value), "symbol": sym_box.value or "/-",
+                          "comment": (self.prof_comment[i].value or "").strip()})
         one = len(items) == 1 and not old.profiles  # never had profiles: stays so
         data = {
             **old.to_dict(),
@@ -627,7 +636,7 @@ class SettingsView(View):
             "txdelay_ms": self.txdelay.value,
             "callsign": profiles.full_call(call, items[active]["ssid"]),
             "symbol": items[active]["symbol"], "profiles": "" if one else profiles.dump(items),
-            "profile": 0 if one else active, "comment": self.comment.value, "path": self.path.value,
+            "profile": 0 if one else active, "comment": items[active]["comment"], "path": self.path.value,
             "latitude": (self.lat.value or "").replace(",", ".").strip(),
             "longitude": (self.lon.value or "").replace(",", ".").strip(),
             "beacon_minutes": self.beacon.value, "beacon_is": self.beacon_is.value,
@@ -665,7 +674,10 @@ class SettingsView(View):
             return False
         _call, data = self._form()
         try:
-            return Config.from_dict(data).to_dict() != self.engine.config.to_dict()
+            # both normalised: settings saved by an older version (profiles without their own comment)
+            # are not a change
+            saved = Config.from_dict(self.engine.config.to_dict()).validate().to_dict()
+            return Config.from_dict(data).validate().to_dict() != saved
         except (ValueError, TypeError):
             return True  # something typed that cannot even be read: certainly a change
 

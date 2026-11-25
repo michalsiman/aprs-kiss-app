@@ -32,8 +32,16 @@ class ProfilesTest(unittest.TestCase):
         conf = Config(callsign="OK1SIM", profile=5,
                       profiles='[{"ssid": 9, "symbol": "/>"}, {"ssid": 9, "symbol": "/["}, {"ssid": 99}, "x"]')
         conf.validate()
-        self.assertEqual(profiles.load(conf), [{"ssid": 9, "symbol": "/>"}])
+        self.assertEqual(profiles.load(conf), [{"ssid": 9, "symbol": "/>", "comment": ""}])
         self.assertEqual((conf.profile, conf.callsign), (0, "OK1SIM-9"))
+
+    def test_each_profile_has_its_own_comment(self):
+        conf = Config(callsign="OK1SIM-9", comment="old", profiles=profiles.dump([
+            {"ssid": 9, "symbol": "/>", "comment": "v autě"}, {"ssid": 7, "symbol": "/[", "comment": "op. Michal"},
+            {"ssid": 0, "symbol": "/-"}])).validate()
+        self.assertEqual(conf.comment, "v autě")
+        self.assertEqual(profiles.switch(conf, 1).comment, "op. Michal")
+        self.assertEqual(profiles.switch(conf, 2).comment, "old")  # none of its own: the comment used before
 
 
 if __name__ == "__main__":

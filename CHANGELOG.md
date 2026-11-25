@@ -4,6 +4,12 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## Unreleased
+
+- **Each profile has its own position comment** (Settings › Station, under its SSID and icon); switching the
+  profile in the top bar switches the comment too. Profiles saved before start with the comment used so far.
+- **"Active profile"** is written next to the number of the profile in use.
+
 ## 1.1.1 beta – 2026-11-25
 
 - **Unread messages stay counted while Messages is open**: the red number in the menu (and on the
