@@ -236,12 +236,27 @@ class App:
         return (self.page.platform in (ft.PagePlatform.ANDROID, ft.PagePlatform.IOS)
                 or os.environ.get("APRS_KISS_PHONE") == "1")
 
+    @staticmethod
+    def _menus() -> dict:
+        """Pop-up menus (map tools, filters, ⋮) and drop-down lists: a lighter background, a thin grey
+        frame and a shadow, so they stand out from the bars and the map under them."""
+        frame = ft.BorderSide(1, ft.Colors.with_opacity(0.7, ft.Colors.OUTLINE))
+        return {
+            "popup_menu_theme": ft.PopupMenuTheme(
+                color=ft.Colors.SURFACE_CONTAINER_HIGHEST, elevation=10, shadow_color=ft.Colors.BLACK,
+                shape=ft.RoundedRectangleBorder(radius=10, side=frame)),
+            "dropdown_theme": ft.DropdownTheme(menu_style=ft.MenuStyle(
+                bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST, elevation=10, shadow_color=ft.Colors.BLACK, side=frame,
+                shape=ft.RoundedRectangleBorder(radius=10))),
+        }
+
     def _theme(self) -> ft.Theme:
         """Phones get smaller type and denser fields: their screens are narrow and many have large fonts set."""
         if not self.mobile:
-            return ft.Theme(color_scheme_seed=ft.Colors.INDIGO)
+            return ft.Theme(color_scheme_seed=ft.Colors.INDIGO, **self._menus())
         size = lambda n: ft.TextStyle(size=n, color=ft.Colors.ON_SURFACE)  # noqa: E731 - a style without a color turns black
         return ft.Theme(
+            **self._menus(),
             color_scheme_seed=ft.Colors.INDIGO,
             visual_density=ft.VisualDensity.COMPACT,
             text_theme=ft.TextTheme(

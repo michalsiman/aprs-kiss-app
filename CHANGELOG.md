@@ -12,6 +12,8 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
   by bike, by car) – a car profile can beacon smartly, a handheld one every few minutes. The interval when
   standing still stays one for all (Settings › Tracker).
 - **"Active profile"** is written next to the number of the profile in use.
+- **Menus stand out**: pop-up menus (map tools, filters, ⋮) and drop-down lists have a lighter background, a
+  thin grey frame and a shadow, so they no longer blend with the bar or the map under them.
 
 ## 1.1.1 beta – 2026-11-25
 
