@@ -497,8 +497,10 @@ class App:
         n = len(self.views)
         self.tab_views = list(range(n)) if n <= 5 else list(range(4))   # the rest under "More"
         self.tab_icons = [ft.Icon(self.views[i].icon) for i in self.tab_views]
+        # HIG: tab labels short and on one line ("APRS Thursday" → "Thursday")
+        short = lambda text: text.split()[-1] if len(text) > 10 and " " in text else text  # noqa: E731
         dests = [ft.NavigationBarDestination(icon=self.tab_icons[k], selected_icon=self.views[i].selected_icon,
-                                             label=self.t(self.views[i].key)) for k, i in enumerate(self.tab_views)]
+                                             label=short(self.t(self.views[i].key))) for k, i in enumerate(self.tab_views)]
         if n > 5:
             dests.append(ft.NavigationBarDestination(icon=ft.Icons.MORE_HORIZ, label=self.t("hig_more")))
         self.tabbar = ft.NavigationBar(destinations=dests, on_change=self._tab_changed, selected_index=0)
