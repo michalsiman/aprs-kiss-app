@@ -69,7 +69,7 @@ TEXTS = {
     "trk_car": "Autom",
     "trk_still": "Keď stojím, raz za",
     "trk_hint_fixed": "Spúšťa sa tlačidlom polohy v hornej lište (▶︎). Keď beží, poloha z GPS sa posiela sama v tomto intervale – rádiom, keď je zapnuté TX, a cez internet, ak je to zvolené v Stanici.",
-    "trk_hint_smart": "Ako APRS a LoRa APRS trackery: keď stojíte, raz za nastavený čas; v pohybe tým častejšie, čím rýchlejšie idete (až zhruba raz za minútu), a hneď v zákrute, aby stopa sledovala cestu. Spúšťa sa tlačidlom polohy v hornej lište (▶︎).",
+    "trk_per_profile": "Pevný interval alebo SmartBeaconing a čím sa pohybuješ sa nastavuje pri každom profile v Stanici.", "trk_hint_smart": "Ako APRS a LoRa APRS trackery: keď stojíte, raz za nastavený čas; v pohybe tým častejšie, čím rýchlejšie idete (až zhruba raz za minútu), a hneď v zákrute, aby stopa sledovala cestu. Spúšťa sa tlačidlom polohy v hornej lište (▶︎).",
     "pos_send_now": "Odoslať polohu teraz",
     "trk_start": "Spustiť tracker",
     "trk_stop": "Pozastaviť tracker",

@@ -176,6 +176,8 @@ class SettingsView(View):
         # profiles: up to three SSIDs, each with its own symbol; the active one is picked in the top bar
         items = profiles.load(c)
         self.prof_ssid, self.prof_symbol, self.prof_comment = [], [], []
+        self.prof_trk_mode, self.prof_trk_min, self.prof_trk_move = [], [], []
+        mins = lambda values: [ft.DropdownOption(key=str(n), text=f"{n} min") for n in values]  # noqa: E731
         rows = []
         for i in range(profiles.MAX):
             p = items[i] if i < len(items) else None
@@ -193,6 +195,19 @@ class SettingsView(View):
             own = p.get("comment") if p else None
             self.prof_comment.append(ft.TextField(label=t("comment"), max_length=43, width=670,
                                                   value=own if isinstance(own, str) else (c.comment if p else "")))
+            # the tracker of this profile: fixed interval, or SmartBeaconing and how we move
+            pm = (p or {}).get("tracker_mode", c.tracker_mode)
+            pmin = int((p or {}).get("tracker_minutes", c.tracker_minutes))
+            self.prof_trk_mode.append(ft.Dropdown(
+                label=t("trk_mode"), value=pm, width=330, on_select=lambda _e, k=i: self._prof_trk_changed(k),
+                options=[ft.DropdownOption(key="fixed", text=t("trk_fixed")),
+                         ft.DropdownOption(key="smart", text=t("trk_smart"))]))
+            self.prof_trk_min.append(ft.Dropdown(label=t("trk_minutes"), value=str(pmin), width=330,
+                                                 options=mins(sorted({*tracker.FIXED_MINUTES, pmin}))))
+            self.prof_trk_move.append(ft.Dropdown(
+                label=t("trk_profile"), value=(p or {}).get("tracker_profile", c.tracker_profile), width=330,
+                options=[ft.DropdownOption(key=k, text=t(f"trk_{k}")) for k in ("walk", "bike", "car")]))
+            self._prof_trk_changed(i, update=False)
             active = p is not None and i == c.profile
             mark = ft.Container(ft.Text(str(i + 1), weight=ft.FontWeight.BOLD,
                                         color=ft.Colors.ON_PRIMARY if active else None),
@@ -203,7 +218,9 @@ class SettingsView(View):
                                          visible=active)], spacing=10, vertical_alignment=ft.CrossAxisAlignment.CENTER)
             rows.append(ft.Column([head, ft.Row([self.prof_ssid[i], self.prof_symbol[i]], wrap=True,
                                                 vertical_alignment=ft.CrossAxisAlignment.CENTER),
-                                   self.prof_comment[i]], spacing=8, tight=True))
+                                   self.prof_comment[i],
+                                   ft.Row([self.prof_trk_mode[i], self.prof_trk_min[i], self.prof_trk_move[i]],
+                                          wrap=True)], spacing=8, tight=True))
         self.profile_rows = ft.Column([ft.Text(t("profiles_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
                                        *rows], spacing=8, tight=True)
         self.comment = ft.TextField(label=t("comment"), value=c.comment, expand=True, max_length=43,
@@ -244,14 +261,6 @@ class SettingsView(View):
         # App
         # APRS digipeater
         mins = lambda values: [ft.DropdownOption(key=str(n), text=f"{n} min") for n in values]  # noqa: E731
-        self.trk_mode = ft.Dropdown(label=t("trk_mode"), value=c.tracker_mode, width=420,
-                                    on_select=lambda _e: self._trk_changed(),
-                                    options=[ft.DropdownOption(key="fixed", text=t("trk_fixed")),
-                                             ft.DropdownOption(key="smart", text=t("trk_smart"))])
-        self.trk_minutes = ft.Dropdown(label=t("trk_minutes"), value=str(c.tracker_minutes), width=200,
-                                       options=mins(sorted({*tracker.FIXED_MINUTES, c.tracker_minutes})))
-        self.trk_profile = ft.Dropdown(label=t("trk_profile"), value=c.tracker_profile, width=200,
-                                       options=[ft.DropdownOption(key=k, text=t(f"trk_{k}")) for k in ("walk", "bike", "car")])
         self.trk_still = ft.Dropdown(label=t("trk_still"), value=str(c.tracker_still_minutes), width=200,
                                      options=mins(sorted({*tracker.STILL_MINUTES, c.tracker_still_minutes})))
         self.trk_hint = ft.Text(size=12, color=ft.Colors.ON_SURFACE_VARIANT)
@@ -309,8 +318,7 @@ class SettingsView(View):
                          self.beacon, self.tracked, self.incoming, expanded=first),
                 _section("GPS", ft.Icons.GPS_FIXED, self.gps_source, self.gps_phone_hint) if self.app.mobile else
                 _section("GPS", ft.Icons.GPS_FIXED, self.gps_source, self.gps_row, self.gps_hint),
-                _section(t("trk_section"), ft.Icons.ROUTE, self.trk_mode,
-                         ft.Row([self.trk_minutes, self.trk_profile, self.trk_still], wrap=True), self.trk_hint,
+                _section(t("trk_section"), ft.Icons.ROUTE, self.trk_still, self.trk_hint,
                          self.offer_tracker, self.road_alerts, self.meet_alerts, self.road_km,
                          ft.Text(t("road_alerts_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT)),
                 _section(t("digi"), ft.Icons.REPEAT, self.digi_mode, self.digi_hops, self.digi_aliases, self.digi_hint),
@@ -476,10 +484,15 @@ class SettingsView(View):
         self.is_state.value = f"{self.t('aprsis_state')}: {state}"
 
     def _trk_changed(self, update: bool = True) -> None:
-        smart = self.trk_mode.value == "smart"
-        self.trk_minutes.visible = not smart
-        self.trk_profile.visible = self.trk_still.visible = smart
-        self.trk_hint.value = self.t("trk_hint_smart" if smart else "trk_hint_fixed")
+        # fixed interval or SmartBeaconing is chosen per profile (Station); here what is for all of them
+        self.trk_hint.value = f"{self.t('trk_per_profile')} {self.t('trk_hint_smart')}"
+        if update:
+            self.app.page.update()
+
+    def _prof_trk_changed(self, i: int, update: bool = True) -> None:
+        smart = self.prof_trk_mode[i].value == "smart"
+        self.prof_trk_min[i].visible = not smart
+        self.prof_trk_move[i].visible = smart
         if update:
             self.app.page.update()
 
@@ -627,7 +640,10 @@ class SettingsView(View):
             if i == old.profile:
                 active = len(items)
             items.append({"ssid": int(value), "symbol": sym_box.value or "/-",
-                          "comment": (self.prof_comment[i].value or "").strip()})
+                          "comment": (self.prof_comment[i].value or "").strip(),
+                          "tracker_mode": self.prof_trk_mode[i].value or "fixed",
+                          "tracker_minutes": int(self.prof_trk_min[i].value or 2),
+                          "tracker_profile": self.prof_trk_move[i].value or "car"})
         one = len(items) == 1 and not old.profiles  # never had profiles: stays so
         data = {
             **old.to_dict(),
@@ -653,8 +669,8 @@ class SettingsView(View):
             "language": self.language.value or "",
             "check_updates": self.check_updates.value, "update_beta": bool(self.update_beta.value),
             **{key: box.value for key, box in self.sound_boxes.items()},
-            "tracker_mode": self.trk_mode.value or "fixed", "tracker_minutes": self.trk_minutes.value or "2",
-            "tracker_profile": self.trk_profile.value or "car", "tracker_still_minutes": self.trk_still.value or "60",
+            "tracker_mode": items[active]["tracker_mode"], "tracker_minutes": items[active]["tracker_minutes"],
+            "tracker_profile": items[active]["tracker_profile"], "tracker_still_minutes": self.trk_still.value or "60",
             "offer_tracker": bool(self.offer_tracker.value), "road_alerts": bool(self.road_alerts.value), "meet_alerts": bool(self.meet_alerts.value),
             "road_alert_km": self.road_km.value or "5",
             "digi_mode": self.digi_mode.value or "off", "digi_max_hops": self.digi_hops.value or "2",

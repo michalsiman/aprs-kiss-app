@@ -70,7 +70,7 @@ TEXTS = {
     "trk_car": "Samochodem",
     "trk_still": "Na postoju raz na",
     "trk_hint_fixed": "Uruchamiany przyciskiem pozycji na górnym pasku (▶︎). Gdy działa, pozycja z GPS wysyła się sama w tym odstępie – radiem przy włączonym TX, przez internet, jeśli wybrano to w Stacji.",
-    "trk_hint_smart": "Jak trackery APRS i LoRa APRS: na postoju raz na ustawiony czas; w ruchu tym częściej, im szybciej (do mniej więcej raz na minutę), i od razu na zakręcie, aby ślad trzymał się drogi. Uruchamiany przyciskiem pozycji na górnym pasku (▶︎).",
+    "trk_per_profile": "Stały interwał lub SmartBeaconing oraz sposób poruszania się ustawiasz dla każdego profilu w Stacji.", "trk_hint_smart": "Jak trackery APRS i LoRa APRS: na postoju raz na ustawiony czas; w ruchu tym częściej, im szybciej (do mniej więcej raz na minutę), i od razu na zakręcie, aby ślad trzymał się drogi. Uruchamiany przyciskiem pozycji na górnym pasku (▶︎).",
     "pos_send_now": "Wyślij pozycję teraz",
     "trk_start": "Uruchom tracker",
     "trk_stop": "Wstrzymaj tracker",

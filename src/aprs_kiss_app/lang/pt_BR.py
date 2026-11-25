@@ -69,7 +69,7 @@ TEXTS = {
     "trk_car": "De carro",
     "trk_still": "Parado, uma vez a cada",
     "trk_hint_fixed": "Iniciado pelo botão de posição no topo (▶︎). Enquanto roda, a posição do GPS sai sozinha neste intervalo – por rádio com TX ligado, pela internet se escolhido em Estação.",
-    "trk_hint_smart": "Como os trackers APRS e LoRa APRS: parado, uma vez no tempo escolhido; em movimento, mais vezes quanto mais rápido (até cerca de uma vez por minuto), e logo numa curva, para o rastro seguir a estrada. Iniciado pelo botão de posição no topo (▶︎).",
+    "trk_per_profile": "Intervalo fixo ou SmartBeaconing e como você se desloca são definidos em cada perfil, em Estação.", "trk_hint_smart": "Como os trackers APRS e LoRa APRS: parado, uma vez no tempo escolhido; em movimento, mais vezes quanto mais rápido (até cerca de uma vez por minuto), e logo numa curva, para o rastro seguir a estrada. Iniciado pelo botão de posição no topo (▶︎).",
     "pos_send_now": "Enviar minha posição agora",
     "trk_start": "Iniciar o tracker",
     "trk_stop": "Pausar o tracker",

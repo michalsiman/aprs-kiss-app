@@ -69,7 +69,7 @@ TEXTS = {
     "trk_car": "Autom",
     "trk_still": "Kad stojim, jednom u",
     "trk_hint_fixed": "Pokreće se gumbom položaja u gornjoj traci (▶︎). Dok radi, položaj s GPS-a šalje se sam u ovom razmaku – radiom kad je TX uključen, internetom ako je to odabrano u Stanici.",
-    "trk_hint_smart": "Kao APRS i LoRa APRS trackeri: kad stojite, jednom u odabranom vremenu; u pokretu to češće što brže idete (do otprilike jednom u minuti), i odmah u zavoju, da trag prati cestu. Pokreće se gumbom položaja u gornjoj traci (▶︎).",
+    "trk_per_profile": "Stalni interval ili SmartBeaconing i način kretanja postavljaju se za svaki profil u Stanici.", "trk_hint_smart": "Kao APRS i LoRa APRS trackeri: kad stojite, jednom u odabranom vremenu; u pokretu to češće što brže idete (do otprilike jednom u minuti), i odmah u zavoju, da trag prati cestu. Pokreće se gumbom položaja u gornjoj traci (▶︎).",
     "pos_send_now": "Pošalji moj položaj sada",
     "trk_start": "Pokreni tracker",
     "trk_stop": "Pauziraj tracker",

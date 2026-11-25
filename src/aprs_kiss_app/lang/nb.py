@@ -69,7 +69,7 @@ TEXTS = {
     "trk_car": "Med bil",
     "trk_still": "Når jeg står stille, én gang per",
     "trk_hint_fixed": "Startes med posisjonsknappen øverst (▶︎). Mens den går, sendes GPS-posisjonen av seg selv med dette intervallet – via radio når TX er på, via internett hvis valgt under Stasjon.",
-    "trk_hint_smart": "Som APRS- og LoRa APRS-trackere: stillestående én gang per valgt tid; i bevegelse oftere jo fortere du kjører (ned til omtrent én gang i minuttet), og straks i en sving, så sporet følger veien. Startes med posisjonsknappen øverst (▶︎).",
+    "trk_per_profile": "Fast intervall eller SmartBeaconing, og hvordan du beveger deg, stilles inn for hver profil under Stasjon.", "trk_hint_smart": "Som APRS- og LoRa APRS-trackere: stillestående én gang per valgt tid; i bevegelse oftere jo fortere du kjører (ned til omtrent én gang i minuttet), og straks i en sving, så sporet følger veien. Startes med posisjonsknappen øverst (▶︎).",
     "pos_send_now": "Send posisjonen min nå",
     "trk_start": "Start trackeren",
     "trk_stop": "Sett trackeren på pause",

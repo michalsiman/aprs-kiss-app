@@ -8,6 +8,9 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 
 - **Each profile has its own position comment** (Settings › Station, under its SSID and icon); switching the
   profile in the top bar switches the comment too. Profiles saved before start with the comment used so far.
+- **Each profile has its own tracker way**: a fixed interval, or SmartBeaconing and how you move (on foot,
+  by bike, by car) – a car profile can beacon smartly, a handheld one every few minutes. The interval when
+  standing still stays one for all (Settings › Tracker).
 - **"Active profile"** is written next to the number of the profile in use.
 
 ## 1.1.1 beta – 2026-11-25

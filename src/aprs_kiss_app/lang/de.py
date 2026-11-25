@@ -69,7 +69,7 @@ TEXTS = {
     "trk_car": "Mit dem Auto",
     "trk_still": "Im Stand einmal in",
     "trk_hint_fixed": "Gestartet mit dem Positionsknopf oben (▶︎). Solange er läuft, geht die GPS-Position von selbst in diesem Abstand hinaus – per Funk bei eingeschaltetem TX, über das Internet, wenn unter Station gewählt.",
-    "trk_hint_smart": "Wie die APRS- und LoRa-APRS-Tracker: im Stand einmal in der hier gewählten Zeit; in Bewegung umso öfter, je schneller (bis etwa einmal pro Minute), und sofort in einer Kurve, damit die Spur der Straße folgt. Gestartet mit dem Positionsknopf oben (▶︎).",
+    "trk_per_profile": "Festes Intervall oder SmartBeaconing und wie du dich bewegst, stellst du bei jedem Profil unter Station ein.", "trk_hint_smart": "Wie die APRS- und LoRa-APRS-Tracker: im Stand einmal in der hier gewählten Zeit; in Bewegung umso öfter, je schneller (bis etwa einmal pro Minute), und sofort in einer Kurve, damit die Spur der Straße folgt. Gestartet mit dem Positionsknopf oben (▶︎).",
     "pos_send_now": "Position jetzt senden",
     "trk_start": "Tracker starten",
     "trk_stop": "Tracker pausieren",

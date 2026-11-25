@@ -69,7 +69,7 @@ TEXTS = {
     "trk_car": "Z avtom",
     "trk_still": "Ko stojim, enkrat na",
     "trk_hint_fixed": "Zažene se z gumbom položaja v zgornji vrstici (▶︎). Ko teče, se položaj iz GPS pošilja sam v tem razmiku – po radiu, ko je TX vklopljen, prek interneta, če je to izbrano pri Postaji.",
-    "trk_hint_smart": "Kot sledilniki APRS in LoRa APRS: ko stojite, enkrat v izbranem času; med premikanjem toliko pogosteje, kolikor hitreje greste (do približno enkrat na minuto), in takoj v ovinku, da sled sledi cesti. Zažene se z gumbom položaja v zgornji vrstici (▶︎).",
+    "trk_per_profile": "Stalni interval ali SmartBeaconing in način premikanja nastaviš za vsak profil v Postaji.", "trk_hint_smart": "Kot sledilniki APRS in LoRa APRS: ko stojite, enkrat v izbranem času; med premikanjem toliko pogosteje, kolikor hitreje greste (do približno enkrat na minuto), in takoj v ovinku, da sled sledi cesti. Zažene se z gumbom položaja v zgornji vrstici (▶︎).",
     "pos_send_now": "Pošlji moj položaj zdaj",
     "trk_start": "Zaženi sledilnik",
     "trk_stop": "Začasno ustavi sledilnik",
