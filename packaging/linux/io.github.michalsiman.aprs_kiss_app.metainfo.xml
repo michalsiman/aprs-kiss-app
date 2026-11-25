@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="1.1.2" date="2026-11-25" type="development">
+      <description>
+        <p>Beta: each profile has its own position comment and tracker way (fixed interval or SmartBeaconing); the active profile is marked; menus stand out with a frame and a shadow.</p>
+      </description>
+    </release>
     <release version="1.1.1" date="2026-11-25" type="development">
       <description>
         <p>Beta: unread messages stay counted while Messages is open; a red dot marks unread conversations; plain-words serial TNC errors.</p>

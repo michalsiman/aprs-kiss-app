@@ -4,7 +4,7 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
-## Unreleased
+## 1.1.2 beta – 2026-11-25
 
 - **Each profile has its own position comment** (Settings › Station, under its SSID and icon); switching the
   profile in the top bar switches the comment too. Profiles saved before start with the comment used so far.
