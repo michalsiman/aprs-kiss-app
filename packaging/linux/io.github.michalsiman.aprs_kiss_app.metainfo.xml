@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="1.2.4" date="2026-11-26" type="development">
+      <description>
+        <p>Beta: All/Unread filter and search in Messages; APRS Thursday in Messages › Services and its relays no longer in Messages; a walkie-talkie icon; the offline map light in the dark mode; menus fit in every language.</p>
+      </description>
+    </release>
     <release version="1.2.3" date="2026-11-26" type="development">
       <description>
         <p>Beta: radio and internet as two remembered icons in Messages; the new-message form shows at once; menu boxes that keep the menu open; framed dialogs; a log with Copy log in About.</p>

@@ -4,6 +4,20 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## 1.2.4 beta – 2026-11-26
+
+- **Messages: All / Unread** filter, each with its count of messages in a circle, and a **search** field
+  next to them: only conversations whose callsign or messages have the text (case and accents ignored),
+  with the message found shown under the callsign.
+- **APRS Thursday moved to Messages › Services** (first there), out of the menu; its radio/internet choice
+  is the same two remembered icons as in Messages.
+- **ANSRVR's relays ("N:HOTG …") go to APRS Thursday**, not to Messages as one conversation per station;
+  the ones already in Messages are moved there.
+- **Radio is a walkie-talkie icon** (our own drawing) in the radio/internet choice.
+- **The offline map is light in the dark mode too**, like the OSM and imported maps.
+- **Menus**: the map choice has round marks (an empty ring when not chosen); long texts in other languages
+  (French, Slovenian, …) wrap instead of running out of the menu.
+
 ## 1.2.3 beta – 2026-11-26
 
 - **Messages: radio and internet as two icons** (an antenna and a globe) instead of a drop-down: one or
