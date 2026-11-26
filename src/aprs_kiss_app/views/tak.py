@@ -47,8 +47,9 @@ class TakView(View):
         on = self.engine.tak_mode
         self.switch = ft.Switch(label=None if on else self.t("tak"), value=on, on_change=self._toggle,
                                 scale=0.75 if on else None)
-        self.state = ft.Text(size=12 if on else 15, weight=ft.FontWeight.BOLD, no_wrap=True,
-                             overflow=ft.TextOverflow.ELLIPSIS, expand=on)
+        # off: the whole explanation, wrapped; on: one short line (the rest in its tooltip)
+        self.state = ft.Text(size=12 if on else 15, weight=ft.FontWeight.BOLD if on else ft.FontWeight.W_500,
+                             no_wrap=on, overflow=ft.TextOverflow.ELLIPSIS if on else None, expand=on)
         self.hint = ft.Text(size=12, color=ft.Colors.ON_SURFACE_VARIANT)
         if not on:
             header = ft.Container(
