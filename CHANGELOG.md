@@ -4,6 +4,19 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## 1.2.3 beta – 2026-11-26
+
+- **Messages: radio and internet as two icons** (an antenna and a globe) instead of a drop-down: one or
+  both on, remembered until changed; the last one on cannot be switched off.
+- **The new-message form shows at once** after a tap on +, then the cursor goes to To (before, the screen
+  changed only after the keyboard came up, so a tap looked missed).
+- **On/off lines in menus are boxes** (map filters, Muted map, the tracker's alerts): an empty faint frame
+  when off, and ticking one keeps the menu open; back or a tap outside closes it.
+- **Dialogs and bottom sheets have the same thin grey frame** and shadow as the menus.
+- **A log for finding faults**: the app writes a small log file (lifecycle, back, errors, and what blocks
+  the app when it stops answering for 10 s); *About › Copy log* puts its end in the clipboard. The app's
+  clock no longer stops after an error, and the screen is sent again when the app comes back on screen.
+
 ## 1.2.2 beta – 2026-11-26
 
 - **Stations: why the list is empty** – "No station matches the filter", or "All 13 stations were heard only

@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="1.2.3" date="2026-11-26" type="development">
+      <description>
+        <p>Beta: radio and internet as two remembered icons in Messages; the new-message form shows at once; menu boxes that keep the menu open; framed dialogs; a log with Copy log in About.</p>
+      </description>
+    </release>
     <release version="1.2.2" date="2026-11-26" type="development">
       <description>
         <p>Beta: the station list says why it is empty (filter, or only internet stations hidden); the TAK explanation is shown whole.</p>
