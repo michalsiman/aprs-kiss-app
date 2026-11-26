@@ -4,13 +4,30 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## 1.3.0 – 2026-11-26
+
+The betas 1.2.1–1.2.4 as a stable version:
+
+- **Messages look and work better**: a coloured circle with a letter for each conversation and its count of
+  unread messages; *All / Unread* filter with counts and a full-text search; *⋮ › Mark all as read*;
+  unread messages stay unread after a restart or an update; the new-message form shows at once.
+- **Radio and internet** as two remembered icons (a walkie-talkie and a globe) in Messages and APRS Thursday.
+- **Notifications** say how many messages are unread in all.
+- **APRS Thursday**: ANSRVR's relays ("N:HOTG …") go to its screen, not to Messages.
+- **Menus**: boxes and round marks with an empty frame, ticking keeps the menu open, long texts in other
+  languages wrap; dialogs framed like the menus.
+- **Map**: the offline map is light in the dark mode too.
+- **Stations** say why the list is empty; the TAK explanation is shown whole.
+- **Reliability**: a log (*About › Copy log*) with a watchdog that records what blocks the app; on a phone,
+  when Android restarts the screen part, the old session is stopped before the new one starts.
+
 ## 1.2.4 beta – 2026-11-26
 
 - **Messages: All / Unread** filter, each with its count of messages in a circle, and a **search** field
   next to them: only conversations whose callsign or messages have the text (case and accents ignored),
   with the message found shown under the callsign.
 - **APRS Thursday moved to Messages › Services** (first there), out of the menu; its radio/internet choice
-  is the same two remembered icons as in Messages.
+  is the same two remembered icons as in Messages. (Back in the menu in 1.3.0.)
 - **ANSRVR's relays ("N:HOTG …") go to APRS Thursday**, not to Messages as one conversation per station;
   the ones already in Messages are moved there.
 - **Radio is a walkie-talkie icon** (our own drawing) in the radio/internet choice.
