@@ -558,8 +558,11 @@ class App:
         stacked = sorted(range(len(self.views)), key=lambda i: not self.views[i].keep_alive)  # the map at the bottom
 
         self.callsign = ft.Text(weight=ft.FontWeight.BOLD, size=18)
+        self.symbol_pic = ft.Text(size=20)  # the profile's APRS symbol, as on the map
         # a tap on the callsign: pick another profile (SSID and symbol)
-        self.callsign_btn = ft.Container(self.callsign, on_click=self._pick_profile, border_radius=6,
+        self.callsign_btn = ft.Container(ft.Row([self.symbol_pic, self.callsign], spacing=6, tight=True,
+                                                vertical_alignment=ft.CrossAxisAlignment.CENTER),
+                                         on_click=self._pick_profile, border_radius=6,
                                          padding=ft.Padding.symmetric(vertical=2),  # no side padding: room for the SSID
                                          tooltip=self.t("profile_pick"))
         self.tnc_dot = ft.Icon(ft.Icons.CIRCLE, size=12)
@@ -798,6 +801,10 @@ class App:
     def _update_status(self) -> None:
         st = self.engine.status()
         self.callsign.value = st["callsign"] or "—"
+        sym = self.engine.config.symbol or ""
+        pic, name, _known = symbol_info(sym[:1], sym[1:], self.t.language) if len(sym) == 2 else ("", "", False)
+        self.symbol_pic.value, self.symbol_pic.tooltip = pic, name or None
+        self.symbol_pic.visible = bool(pic) and self.engine.config.configured
         self.tnc_dot.color = ft.Colors.GREEN if st["tnc_connected"] else ft.Colors.RED
         self.tnc_text.value = self.t("connected") if st["tnc_connected"] else self.t("disconnected")
         self.tnc_text.tooltip = None if st["tnc_connected"] else self.t.error(st.get("tnc_error")) or None
