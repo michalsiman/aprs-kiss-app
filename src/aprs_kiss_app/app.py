@@ -13,7 +13,7 @@ from typing import Any
 import flet as ft
 
 from aprs_kiss_core import android_bt, android_usb, ble, drivedetect, profiles, roadalert
-from . import android_notify, ble_flet
+from . import android_notify, ble_flet, desktop_notify
 from aprs_kiss_core.config import VERSION, Config, data_dir, load_config, save_config
 
 from . import theme
@@ -136,6 +136,10 @@ class App:
     async def _on_window_event(self, e: ft.WindowEvent) -> None:
         if e.type == ft.WindowEventType.CLOSE:
             self._confirm_quit()
+        elif e.type in (ft.WindowEventType.BLUR, ft.WindowEventType.MINIMIZE, ft.WindowEventType.HIDE):
+            self._window_away = True  # new messages: the system's notification
+        elif e.type in (ft.WindowEventType.FOCUS, ft.WindowEventType.RESTORE, ft.WindowEventType.SHOW):
+            self._window_away = False
 
     def _confirm_quit(self) -> None:
         """Closing the window stops receiving, beacons and the iGate, so ask first."""
@@ -691,6 +695,9 @@ class App:
         if not self._foreground:
             android_notify.notify(self.t("files_offer_title"), self.t("files_offer_text", call=remote,
                                   name=offer["name"], size=size_text(offer["size"])), self.t("files"))
+        elif self._window_away and not self.mobile:
+            desktop_notify.notify(self.t("files_offer_title"), self.t("files_offer_text", call=remote,
+                                  name=offer["name"], size=size_text(offer["size"])), "file")
         self.show_dialog(ft.AlertDialog(
             title=ft.Text(self.t("files_offer_title")),
             content=ft.Text(self.t("files_offer_text", call=remote, name=offer["name"], size=size_text(offer["size"]))),
@@ -1183,13 +1190,28 @@ class App:
 
     _open_pending: tuple[str, str] | None = None  # a notification was posted: where a tap on it leads
 
+    _window_away = False  # a computer: the window is not the active one (another app in front, minimized)
+
+    def _away(self) -> bool:
+        """Nobody is looking: the phone app in the background, or the computer's window not in front."""
+        return not self._foreground or self._window_away
+
+    def _system_notify(self, title: str, text: str, nid: int) -> bool:
+        """The system's own notification (Android, Linux, Windows, macOS); False where there is none."""
+        if self.android:
+            return android_notify.notify(title, text, self.t("messages"), channel=android_notify.MESSAGES_CHANNEL,
+                                         nid=nid, silent=True)  # the app beeps itself
+        if self.mobile or getattr(self.page, "web", False):
+            return False  # iOS: the app does not run in the background; a browser: no system of ours
+        return desktop_notify.notify(title, text, "chat" if nid == android_notify.CHAT_ID else "message")
+
     def _notify_chat(self, entry: dict[str, Any]) -> None:
-        """A chat line while the app is in the background: a notification (on screen the chat shows it)."""
-        if self._foreground or not self.has_view("chat"):
+        """A chat line while nobody looks: a notification (on screen the chat shows it)."""
+        if not self._away() or not self.has_view("chat"):
             return
-        if android_notify.notify(f"{self.t('chat')} · {entry['from']}", entry["text"], self.t("messages"),
-                                 channel=android_notify.MESSAGES_CHANNEL, nid=android_notify.CHAT_ID, silent=True):
-            self._open_pending = ("chat", "")
+        if self._system_notify(f"{self.t('chat')} · {entry['from']}", entry["text"], android_notify.CHAT_ID) \
+                and self.android:
+            self._open_pending = ("chat", "")  # a tap on it brings the app back: to the chat
 
     def _open_notified(self) -> None:
         """Back on screen after a message or chat notification: that conversation, the notification gone."""
@@ -1208,12 +1230,11 @@ class App:
     def _notify_message(self, message: dict[str, Any]) -> None:
         if not self.has_view("messages"):
             return
-        if not self._foreground:  # in the background: Android's notification, a tap opens the conversation
-            if android_notify.notify(self.t("message_from", call=message["from"]), message["text"],
-                                     self.t("messages"), channel=android_notify.MESSAGES_CHANNEL,
-                                     nid=android_notify.MESSAGE_ID, silent=True):
+        if self._away():  # the system's notification; on a phone a tap on it opens the conversation
+            if self._system_notify(self.t("message_from", call=message["from"]), message["text"],
+                                   android_notify.MESSAGE_ID) and self.android:
                 self._open_pending = ("messages", message["from"])
-                return
+                return  # a computer: the bar below waits in the window too
         if self.current_key == "messages" and self.view("messages").selected == message["from"].upper():
             return
         sender = message["from"]

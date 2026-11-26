@@ -6,9 +6,11 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 
 ## Unreleased
 
-- **Android: a notification for a new message or chat line** while the app is in the background (the app
-  beeps itself, so the notification is silent). A tap opens that conversation (or the chat). Android 13+
-  asks once for the permission to show notifications.
+- **A notification for a new message or chat line** when you are not looking at the app: on Android while
+  it is in the background (silent, the app beeps itself; a tap opens that conversation or the chat; Android
+  13+ asks once for the permission), on a computer while its window is not in front – Linux (also the
+  Flatpak, through the notification portal), Windows (a toast, shown under Windows PowerShell) and macOS.
+  An incoming file is announced the same way. Not on iPhone: iOS stops the app in the background.
 - **Back from a conversation on a phone**: the back gesture in an open conversation goes to the list of
   conversations first; only the next one goes to the previous screen.
 - **Services › REPEAT works**: it wants `n 3 2m`, `n 3 70cm` (how many, which band), not "nearest", which it
