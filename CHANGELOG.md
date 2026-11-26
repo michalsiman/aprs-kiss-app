@@ -11,6 +11,8 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
   asks once for the permission to show notifications.
 - **Back from a conversation on a phone**: the back gesture in an open conversation goes to the list of
   conversations first; only the next one goes to the previous screen.
+- **Services › REPEAT works**: it wants `n 3 2m`, `n 3 70cm` (how many, which band), not "nearest", which it
+  answered with "Unknown command!".
 
 ## 1.1.2 beta – 2026-11-25
 
