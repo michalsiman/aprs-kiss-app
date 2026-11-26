@@ -4,6 +4,14 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## Unreleased
+
+- **Android: a notification for a new message or chat line** while the app is in the background (the app
+  beeps itself, so the notification is silent). A tap opens that conversation (or the chat). Android 13+
+  asks once for the permission to show notifications.
+- **Back from a conversation on a phone**: the back gesture in an open conversation goes to the list of
+  conversations first; only the next one goes to the previous screen.
+
 ## 1.1.2 beta – 2026-11-25
 
 - **Each profile has its own position comment** (Settings › Station, under its SSID and icon); switching the

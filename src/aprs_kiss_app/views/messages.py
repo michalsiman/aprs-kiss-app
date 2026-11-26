@@ -172,6 +172,13 @@ class MessagesView(View):
             return
         open_ = bool(self.selected or self.to.visible)
         self.left.visible, self.right.visible, self.back.visible = not open_, open_, open_
+        self.app._update_back()  # the back gesture closes the conversation first
+
+    def can_back(self) -> bool:
+        return self.app.compact and bool(self.selected or self.to.visible)
+
+    def go_back(self) -> None:
+        self._back(None)
 
     def _back(self, _e) -> None:
         self.selected = None

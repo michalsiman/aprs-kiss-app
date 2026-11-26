@@ -415,16 +415,31 @@ class App:
         view = self.page.views[0] if self.page.views else None
         if view is None:
             return
-        can = not (self._drawer_open or self._history or self.current_key == "settings")
+        inner = self._inner_back() is not None
+        can = not (self._drawer_open or inner or self._history or self.current_key == "settings")
         if view.can_pop != can or view.on_confirm_pop is None:
             view.can_pop = can
             view.on_confirm_pop = self._back
+
+    def _inner_back(self):
+        """The screen on show when it has a step back of its own (an open conversation), else None."""
+        index = getattr(self, "current", None)
+        if index is None or not 0 <= index < len(self.views):
+            return None
+        view = self.views[index]
+        return view if view.built and view.can_back() else None
 
     async def _back(self, e) -> None:
         view = e.control
         await view.confirm_pop(False)  # the app decides: never let the view itself go
         if self._drawer_open:
             await self._close_menu()
+            return
+        current = self._inner_back()
+        if current is not None:
+            current.go_back()  # e.g. from a conversation back to the list of them
+            self._update_back()
+            self.page.update()
             return
         while self._history and not self.has_view(self._history[-1]):
             self._history.pop()  # a screen of another mode (BBS, TAK) that is gone
@@ -656,6 +671,8 @@ class App:
                 v.on_event(kind, data)
         if kind == "message":
             self._notify_message(data)
+        elif kind == "chat" and not data.get("entry", {}).get("out"):
+            self._notify_chat(data["entry"])
         elif kind == "file_offer":
             self._file_offer(data)
         self._schedule_flush()
@@ -717,6 +734,9 @@ class App:
                 await self.apply_theme()
             self.refresh_now()
             try:
+                if not self._notify_asked and self.android and self._foreground and self.engine.config.configured:
+                    self._notify_asked = True  # Android 13+: notifications (new messages) need a yes
+                    android_notify.ask_permission()
                 self._road_check()
                 self._drive_check()
             except Exception:  # noqa: BLE001 - a warning is not worth stopping the app's clock
@@ -823,6 +843,8 @@ class App:
             self._foreground = True
             with contextlib.suppress(Exception):  # a radio plugged in meanwhile: connect it now
                 self.engine.connection.retry_now()
+            if getattr(self, "_open_pending", None):  # a message notification was tapped (or the app opened)
+                self._open_notified()
             if getattr(self, "_drive_pending", False):  # the notification was tapped (or the app opened): ask now
                 self._drive_pending = False
                 android_notify.cancel()
@@ -1159,9 +1181,39 @@ class App:
             self.toast(f"{self.t('not_sent')}: {err}", error=True)
         return False
 
+    _open_pending: tuple[str, str] | None = None  # a notification was posted: where a tap on it leads
+
+    def _notify_chat(self, entry: dict[str, Any]) -> None:
+        """A chat line while the app is in the background: a notification (on screen the chat shows it)."""
+        if self._foreground or not self.has_view("chat"):
+            return
+        if android_notify.notify(f"{self.t('chat')} · {entry['from']}", entry["text"], self.t("messages"),
+                                 channel=android_notify.MESSAGES_CHANNEL, nid=android_notify.CHAT_ID, silent=True):
+            self._open_pending = ("chat", "")
+
+    def _open_notified(self) -> None:
+        """Back on screen after a message or chat notification: that conversation, the notification gone."""
+        pending, self._open_pending = self._open_pending, None
+        if not pending:
+            return
+        android_notify.cancel(android_notify.MESSAGE_ID)
+        android_notify.cancel(android_notify.CHAT_ID)
+        key, call = pending
+        if not self.has_view(key):
+            return
+        if key == "messages":
+            self.view("messages").open_conversation(call)
+        self.select(key)
+
     def _notify_message(self, message: dict[str, Any]) -> None:
         if not self.has_view("messages"):
             return
+        if not self._foreground:  # in the background: Android's notification, a tap opens the conversation
+            if android_notify.notify(self.t("message_from", call=message["from"]), message["text"],
+                                     self.t("messages"), channel=android_notify.MESSAGES_CHANNEL,
+                                     nid=android_notify.MESSAGE_ID, silent=True):
+                self._open_pending = ("messages", message["from"])
+                return
         if self.current_key == "messages" and self.view("messages").selected == message["from"].upper():
             return
         sender = message["from"]

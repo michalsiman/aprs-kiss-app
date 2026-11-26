@@ -63,6 +63,13 @@ class View:
     def shown(self) -> None:
         self.refresh()
 
+    def can_back(self) -> bool:
+        """Something inside the screen to go back from (an open conversation on a phone)."""
+        return False
+
+    def go_back(self) -> None:
+        """Android's back gesture when can_back(): one step back inside the screen."""
+
 
 def short_path(path) -> str:
     """A path with the home folder as ~, shorter to read (and without the user name)."""

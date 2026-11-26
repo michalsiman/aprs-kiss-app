@@ -83,7 +83,13 @@ def restyle_service_notification() -> bool:
     return False  # not posted yet
 
 
-def notify(title: str, text: str, channel_name: str) -> bool:
+MESSAGES_CHANNEL = "aprs_kiss_messages"  # a message or a chat line came in (the app beeps itself: silent channel)
+MESSAGE_ID = 4250
+CHAT_ID = 4251
+
+
+def notify(title: str, text: str, channel_name: str, channel: str = CHANNEL, nid: int = NOTIFICATION_ID,
+           silent: bool = False) -> bool:
     """Show a notification that opens the app when tapped; False when it could not."""
     try:
         jnius, activity = _activity()
@@ -93,9 +99,11 @@ def notify(title: str, text: str, channel_name: str) -> bool:
         if sdk >= 26:
             NotificationChannel = jnius.autoclass("android.app.NotificationChannel")
             NotificationManager = jnius.autoclass("android.app.NotificationManager")
-            manager.createNotificationChannel(NotificationChannel(CHANNEL, channel_name,
-                                                                  NotificationManager.IMPORTANCE_HIGH))
-            builder = jnius.autoclass("android.app.Notification$Builder")(activity, CHANNEL)
+            ch = NotificationChannel(channel, channel_name, NotificationManager.IMPORTANCE_HIGH)
+            if silent:
+                ch.setSound(None, None)  # the app plays its own beep (Settings → sounds)
+            manager.createNotificationChannel(ch)
+            builder = jnius.autoclass("android.app.Notification$Builder")(activity, channel)
         else:
             builder = jnius.autoclass("android.app.Notification$Builder")(activity)
         PendingIntent = jnius.autoclass("android.app.PendingIntent")
@@ -105,19 +113,22 @@ def notify(title: str, text: str, channel_name: str) -> bool:
         builder.setSmallIcon(_small_icon(activity))
         builder.setContentTitle(title)
         builder.setContentText(text)
+        style = jnius.autoclass("android.app.Notification$BigTextStyle")()
+        style.bigText(text)
+        builder.setStyle(style)  # a long message whole when pulled down
         builder.setAutoCancel(True)
         builder.setContentIntent(pending)
-        manager.notify(NOTIFICATION_ID, builder.build())
+        manager.notify(nid, builder.build())
         return True
     except Exception as err:  # noqa: BLE001 - not Android or not allowed
         _LOGGER.info("Notification not shown: %s", err)
         return False
 
 
-def cancel() -> None:
+def cancel(nid: int = NOTIFICATION_ID) -> None:
     try:
         jnius, activity = _activity()
         manager = activity.getSystemService(jnius.autoclass("android.content.Context").NOTIFICATION_SERVICE)
-        manager.cancel(NOTIFICATION_ID)
+        manager.cancel(nid)
     except Exception:  # noqa: BLE001
         pass
