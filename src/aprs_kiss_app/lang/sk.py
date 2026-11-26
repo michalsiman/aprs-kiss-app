@@ -8,7 +8,7 @@ TEXTS = {
     "transmit": "Vysielanie", "tx_on": "Vysielanie je ZAPNUTÉ", "tx_off": "Vysielanie je vypnuté (iba príjem)",
     "tx_refused": "Neodoslané: vysielanie je vypnuté",
     "not_sent": "Neodoslané", "send": "Odoslať", "to": "Komu", "text": "Text", "via": "Cez",
-    "via_radio": "Rádio", "via_internet": "Internet", "via_both": "Rádio + internet", "via_one_needed": "Správa musí ísť aspoň jednou cestou: rádiom alebo internetom.",
+    "via_radio": "Rádio", "via_internet": "Internet", "via_both": "Rádio + internet", "via_one_needed": "Správa musí ísť aspoň jednou cestou: rádiom alebo internetom.", "log_copy": "Kopírovať protokol", "log_copied": "Posledných {n} riadkov protokolu je v schránke.",
     "new_message": "Nová správa", "message_from": "Správa od {call}",
     "state_pending": "čaká na potvrdenie", "state_acked": "doručené", "state_rejected": "odmietnuté",
     "state_failed": "nedoručené",

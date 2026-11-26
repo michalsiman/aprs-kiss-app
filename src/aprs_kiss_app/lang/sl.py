@@ -8,7 +8,7 @@ TEXTS = {
     "transmit": "Oddajanje", "tx_on": "Oddajanje je VKLOPLJENO", "tx_off": "Oddajanje je izklopljeno (samo sprejem)",
     "tx_refused": "Ni poslano: oddajanje je izklopljeno",
     "not_sent": "Ni poslano", "send": "Pošlji", "to": "Za", "text": "Besedilo", "via": "Prek",
-    "via_radio": "Radio", "via_internet": "Internet", "via_both": "Radio + internet", "via_one_needed": "Sporočilo mora iti vsaj po eni poti: po radiu ali internetu.",
+    "via_radio": "Radio", "via_internet": "Internet", "via_both": "Radio + internet", "via_one_needed": "Sporočilo mora iti vsaj po eni poti: po radiu ali internetu.", "log_copy": "Kopiraj dnevnik", "log_copied": "Zadnjih {n} vrstic dnevnika je v odložišču.",
     "new_message": "Novo sporočilo", "message_from": "Sporočilo od {call}",
     "state_pending": "čaka na potrditev", "state_acked": "dostavljeno", "state_rejected": "zavrnjeno",
     "state_failed": "ni dostavljeno",

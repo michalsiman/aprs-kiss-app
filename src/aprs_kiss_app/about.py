@@ -112,7 +112,17 @@ def show_about(app: App) -> None:
         width=480,
         scroll=ft.ScrollMode.AUTO,
     )
+    async def copy_log(_e) -> None:
+        """The end of the log (what went on lately) to the clipboard, to paste into a message or an e-mail."""
+        try:
+            lines = (app.folder / "app.log").read_text(encoding="utf-8", errors="replace").splitlines()
+        except OSError:
+            lines = []
+        await ft.Clipboard().set(f"APRS & Packet {VERSION_LABEL}\n" + "\n".join(lines[-400:]))
+        app.toast(t("log_copied", n=min(len(lines), 400)))
+
     app.show_dialog(ft.AlertDialog(
         content=content,
-        actions=[ft.TextButton(t("close"), on_click=lambda _e: app.page.pop_dialog())],
+        actions=[ft.TextButton(t("log_copy"), icon=ft.Icons.BUG_REPORT_OUTLINED, on_click=copy_log),
+                 ft.TextButton(t("close"), on_click=lambda _e: app.page.pop_dialog())],
     ))

@@ -8,7 +8,7 @@ TEXTS = {
     "transmit": "Senden", "tx_on": "Senden ist EIN", "tx_off": "Senden ist aus (nur Empfang)",
     "tx_refused": "Nicht gesendet: Senden ist ausgeschaltet",
     "not_sent": "Nicht gesendet", "send": "Senden", "to": "An", "text": "Text", "via": "Über",
-    "via_radio": "Funk", "via_internet": "Internet", "via_both": "Funk + Internet", "via_one_needed": "Eine Nachricht braucht mindestens einen Weg: Funk oder Internet.",
+    "via_radio": "Funk", "via_internet": "Internet", "via_both": "Funk + Internet", "via_one_needed": "Eine Nachricht braucht mindestens einen Weg: Funk oder Internet.", "log_copy": "Protokoll kopieren", "log_copied": "Die letzten {n} Zeilen des Protokolls sind in der Zwischenablage.",
     "new_message": "Neue Nachricht", "message_from": "Nachricht von {call}",
     "state_pending": "wartet auf Bestätigung", "state_acked": "zugestellt", "state_rejected": "abgelehnt",
     "state_failed": "nicht zugestellt",

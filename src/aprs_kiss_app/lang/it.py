@@ -8,7 +8,7 @@ TEXTS = {
     "transmit": "Trasmissione", "tx_on": "Trasmissione ATTIVA", "tx_off": "Trasmissione disattivata (solo ricezione)",
     "tx_refused": "Non inviato: la trasmissione è disattivata",
     "not_sent": "Non inviato", "send": "Invia", "to": "A", "text": "Testo", "via": "Via",
-    "via_radio": "Radio", "via_internet": "Internet", "via_both": "Radio + internet", "via_one_needed": "Un messaggio deve andare almeno in un modo: radio o internet.",
+    "via_radio": "Radio", "via_internet": "Internet", "via_both": "Radio + internet", "via_one_needed": "Un messaggio deve andare almeno in un modo: radio o internet.", "log_copy": "Copia il registro", "log_copied": "Le ultime {n} righe del registro sono negli appunti.",
     "new_message": "Nuovo messaggio", "message_from": "Messaggio da {call}",
     "state_pending": "in attesa di conferma", "state_acked": "consegnato", "state_rejected": "rifiutato",
     "state_failed": "non consegnato",

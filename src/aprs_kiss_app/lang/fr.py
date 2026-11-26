@@ -8,7 +8,7 @@ TEXTS = {
     "transmit": "Émission", "tx_on": "L'émission est ACTIVÉE", "tx_off": "Émission désactivée (réception seule)",
     "tx_refused": "Non envoyé : l'émission est désactivée",
     "not_sent": "Non envoyé", "send": "Envoyer", "to": "À", "text": "Texte", "via": "Via",
-    "via_radio": "Radio", "via_internet": "Internet", "via_both": "Radio + internet", "via_one_needed": "Un message doit passer par au moins une voie : radio ou internet.",
+    "via_radio": "Radio", "via_internet": "Internet", "via_both": "Radio + internet", "via_one_needed": "Un message doit passer par au moins une voie : radio ou internet.", "log_copy": "Copier le journal", "log_copied": "Les {n} dernières lignes du journal sont dans le presse-papiers.",
     "new_message": "Nouveau message", "message_from": "Message de {call}",
     "state_pending": "en attente d'accusé", "state_acked": "remis", "state_rejected": "refusé",
     "state_failed": "non remis",

@@ -6,6 +6,7 @@ import asyncio
 import os
 import contextlib
 import logging
+import logging.handlers
 import time
 from collections.abc import Awaitable
 from typing import Any
@@ -439,6 +440,7 @@ class App:
         return view if view.built and view.can_back() else None
 
     async def _back(self, e) -> None:
+        _LOGGER.info("Back (screen %s, menu open %s)", self.current_key, self._drawer_open)
         view = e.control
         await view.confirm_pop(False)  # the app decides: never let the view itself go
         if self._drawer_open:
@@ -849,6 +851,7 @@ class App:
     def _lifecycle(self, e) -> None:
         state = getattr(e, "state", None)
         value = getattr(state, "value", state)
+        _LOGGER.info("Lifecycle: %s (screen %s)", value, getattr(self, "current", None))
         if value in ("resume", "show"):
             if not self._foreground:
                 self._resumed_at = time.monotonic()
@@ -1338,8 +1341,35 @@ class App:
         ))
 
 
+LOG_FILE = "app.log"
+
+
+def _log_to_file() -> None:
+    """Also into a small file in the data folder (two of 512 kB at most): what went on before a freeze or a
+    crash on a phone can be copied from About and sent."""
+    root = logging.getLogger()
+    if any(getattr(h, "_aprs_kiss", False) for h in root.handlers):
+        return
+    try:
+        handler = logging.handlers.RotatingFileHandler(data_dir() / LOG_FILE, maxBytes=512_000, backupCount=1,
+                                                       encoding="utf-8")
+    except OSError:
+        return
+    handler._aprs_kiss = True
+    handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
+    root.addHandler(handler)
+
+    def on_error(loop, context) -> None:  # an error in a task nobody waits for: into the log too
+        _LOGGER.error("Unhandled: %s", context.get("message"), exc_info=context.get("exception"))
+        loop.default_exception_handler(context)
+
+    with contextlib.suppress(RuntimeError):
+        asyncio.get_running_loop().set_exception_handler(on_error)
+
+
 async def main(page: ft.Page) -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+    _log_to_file()
     _LOGGER.info("APRS & Packet %s, data in %s", VERSION, data_dir())
     app = App(page)
     await app.start()

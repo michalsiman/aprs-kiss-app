@@ -8,7 +8,7 @@ TEXTS = {
     "transmit": "Sending", "tx_on": "Sending er PÅ", "tx_off": "Sending er av (kun mottak)",
     "tx_refused": "Ikke sendt: sending er slått av",
     "not_sent": "Ikke sendt", "send": "Send", "to": "Til", "text": "Tekst", "via": "Via",
-    "via_radio": "Radio", "via_internet": "Internett", "via_both": "Radio + internett", "via_one_needed": "En melding må gå minst én vei: radio eller internett.",
+    "via_radio": "Radio", "via_internet": "Internett", "via_both": "Radio + internett", "via_one_needed": "En melding må gå minst én vei: radio eller internett.", "log_copy": "Kopier logg", "log_copied": "De siste {n} linjene av loggen er på utklippstavlen.",
     "new_message": "Ny melding", "message_from": "Melding fra {call}",
     "state_pending": "venter på kvittering", "state_acked": "levert", "state_rejected": "avvist",
     "state_failed": "ikke levert",
