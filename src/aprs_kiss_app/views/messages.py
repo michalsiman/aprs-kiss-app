@@ -58,12 +58,14 @@ class MessagesView(View):
                                     visible=False)
         self.left = left = ft.Column(
             [
-                ft.Row([ft.FilledTonalButton(self.t("new_message"), icon=ft.Icons.EDIT, on_click=self._new),
+                ft.Row([ft.IconButton(ft.Icons.ADD, tooltip=self.t("new_message"), on_click=self._new,
+                                      style=ft.ButtonStyle(bgcolor=ft.Colors.PRIMARY, color=ft.Colors.ON_PRIMARY,
+                                                           shape=ft.CircleBorder())),
                         ft.OutlinedButton(self.t("spot_button"), icon=ft.Icons.TERRAIN, on_click=self._spot,
                                           tooltip=self.t("spot_title")),
                         ft.OutlinedButton(self.t("services_button"), icon=ft.Icons.MISCELLANEOUS_SERVICES,
                                           on_click=self._services, tooltip=self.t("services_title"))],
-                       wrap=True, spacing=6),
+                       wrap=True, spacing=6),  # one line: a round + for a new message, Spot, Services
                 self.conversations,
             ],
             width=None if compact else 250,

@@ -15,6 +15,9 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
   conversations first; only the next one goes to the previous screen.
 - **Services › REPEAT works**: it wants `n 3 2m`, `n 3 70cm` (how many, which band), not "nearest", which it
   answered with "Unknown command!".
+- **Messages: one line on top** – a round **+** for a new message, then Spot and Services.
+- **Letters with accents read right**: UTF-8 heard over the radio is read as UTF-8 (it was Latin-1), and text
+  broken on the way ("TURKÄ°YE") is put right ("TURKİYE").
 - A reject or ack with a garbled message number (e.g. "rejÊ") is no longer shown as a message.
 
 ## 1.1.2 beta – 2026-11-25

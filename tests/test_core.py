@@ -229,6 +229,28 @@ class StationTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual([m["text"] for m in messages], ["reject this"])
         await st.close()
 
+    async def test_utf8_and_mojibake_messages_read_right(self):
+        """TB7MIK-10's "TURKİYE 73!" came as "TURKÄ°YE": UTF-8 over RF, and UTF-8 read as Latin-1 on the way."""
+        from aprs_kiss_core import aprs
+        from aprs_kiss_core.parser import parse
+        messages = []
+
+        async def send(raw):
+            pass
+
+        st = station.Station(station.StationConfig("OK1SIM-7"), send, parse, lambda p: None,
+                             messages.append, lambda: None, lambda: 1)
+        st.handle_frame(ax25.Frame(ax25.Address.parse("APRS"), ax25.Address.parse("TB7MIK-10"), [],
+                                   ":OK1SIM-7 :TURKİYE 73! Příliš".encode()).encode())
+        st.handle_frame(ax25.Frame(ax25.Address.parse("APRS"), ax25.Address.parse("TB7MIK-9"), [],
+                                   ":OK1SIM-7 :TURKÄ°YE 73!".encode()).encode())
+        await asyncio.sleep(0.1)
+        self.assertEqual([m["text"] for m in messages], ["TURKİYE 73! Příliš", "TURKİYE 73!"])
+        self.assertEqual(aprs.fix_mojibake("Ahoj Ã¡ÄŸ"), "Ahoj áğ")
+        for keep in ("Grüße aus Köln", "plain", "Ä alone", "73 Â°"):
+            self.assertEqual(aprs.fix_mojibake(keep), keep if keep != "73 Â°" else "73 °")
+        await st.close()
+
     async def test_third_party_packet_from_an_igate(self):
         """OK0MIL-1 puts OK1ULX-10's internet position and a message for us on the air."""
         from aprs_kiss_core.parser import parse
