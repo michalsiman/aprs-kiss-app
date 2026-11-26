@@ -480,8 +480,17 @@ class Engine:
         if not self._loaded:
             stored = await asyncio.to_thread(load_state, self._folder)
             self._msg_counter = int(stored.get("msg_counter", 0))
-            self.messages.extend(stored.get("messages", []))
             self.thursday.extend(stored.get("thursday", []))
+            for m in stored.get("messages", []):  # HOTG relays kept as messages by older versions: to Thursday
+                if m.get("direction") == "in" and thursday.is_group_text(m.get("text", "")):
+                    self.thursday.append({"time": m.get("time", 0), "from": m.get("from", ""), "kind": "in",
+                                          "text": thursday.strip_prefix(m.get("text", "")), "via": m.get("via")})
+                else:
+                    self.messages.append(m)
+            if len(self.thursday) > 1:
+                ordered = sorted(self.thursday, key=lambda e: e.get("time", 0))
+                self.thursday.clear()
+                self.thursday.extend(ordered)
             self.thursday_joined = float(stored.get("thursday_joined", 0) or 0)
             self.thursday_cq = float(stored.get("thursday_cq", 0) or 0)
             self._loaded = True

@@ -37,6 +37,10 @@ class WindowTest(unittest.TestCase):
         self.assertEqual(len(long), 67)
         self.assertTrue(thursday.is_group_text("cq hotg hi"))
         self.assertEqual(thursday.strip_prefix("CQ HOTG Hi there"), "Hi there")
+        # how ANSRVR passes on another member's message
+        self.assertTrue(thursday.is_group_text("N:HOTG Enjoy APRS!!"))
+        self.assertEqual(thursday.strip_prefix("N:HOTG Greetings from Ohio"), "Greetings from Ohio")
+        self.assertFalse(thursday.is_group_text("N:HOTGX not ours"))
         self.assertTrue(thursday.is_server("ANSRVR"))
         self.assertFalse(thursday.is_server("OK1ABC"))
 
