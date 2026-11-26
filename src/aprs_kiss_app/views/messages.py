@@ -388,11 +388,17 @@ class MessagesView(View):
         self._count()
 
     async def _new(self, _e) -> None:
+        # Show the empty form at once (only what changes on screen), then put the cursor in "to"; the list of
+        # conversations is rebuilt by the next refresh, unseen. Before, the whole list was rebuilt first and
+        # the screen changed only after the keyboard came up: a tap looked missed.
         self.selected = None
         self.to.visible = True
         self.to.value = ""
-        self._signature = None
-        self.refresh()
+        self.title.value = self.t("new_message")
+        self.thread.controls = []
+        self.where.visible = self.on_map.visible = False
+        self._sides()
+        self.app.page.update()
         await self.to.focus()
 
     # ─── self-spotting an activation (SOTA, POTA, WWFF, SIOTA) ─────────────
