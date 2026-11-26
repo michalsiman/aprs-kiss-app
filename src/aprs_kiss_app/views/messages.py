@@ -30,7 +30,7 @@ class MessagesView(View):
 
     def build(self) -> ft.Control:
         self.selected: str | None = None
-        self.unread: set[str] = set()
+        self.unread: set[str] = self._load_unread()
         self._signature = None
         self.conversations = ft.ListView(expand=True, spacing=2)
         self.thread = ft.ListView(expand=True, spacing=8, auto_scroll=True, padding=ft.Padding.all(12))
@@ -64,8 +64,11 @@ class MessagesView(View):
                         ft.OutlinedButton(self.t("spot_button"), icon=ft.Icons.TERRAIN, on_click=self._spot,
                                           tooltip=self.t("spot_title")),
                         ft.OutlinedButton(self.t("services_button"), icon=ft.Icons.MISCELLANEOUS_SERVICES,
-                                          on_click=self._services, tooltip=self.t("services_title"))],
-                       wrap=True, spacing=6),  # one line: a round + for a new message, Spot, Services
+                                          on_click=self._services, tooltip=self.t("services_title")),
+                        ft.PopupMenuButton(icon=ft.Icons.MORE_VERT, tooltip=self.t("more"), items=[
+                            ft.PopupMenuItem(self.t("mark_all_read"), icon=ft.Icons.MARK_EMAIL_READ,
+                                             on_click=self._mark_all_read)])],
+                       wrap=True, spacing=6),  # one line: a round + for a new message, Spot, Services, ⋮
                 self.conversations,
             ],
             width=None if compact else 250,
@@ -122,26 +125,63 @@ class MessagesView(View):
             groups.setdefault(self._party(m), []).append(m)
         return dict(sorted(groups.items(), key=lambda kv: -kv[1][-1]["time"]))
 
+    # ─── unread conversations (kept in a file: a restart or an update keeps them unread) ───
+
+    def _unread_file(self):
+        return self.app.folder / "unread.json"
+
+    def _load_unread(self) -> set[str]:
+        try:
+            data = json.loads(self._unread_file().read_text(encoding="utf-8"))
+            return {str(c).upper() for c in data} if isinstance(data, list) else set()
+        except (OSError, ValueError, AttributeError):
+            return set()
+
+    def _save_unread(self) -> None:
+        try:
+            path = self._unread_file()
+            tmp = path.with_suffix(".tmp")
+            tmp.write_text(json.dumps(sorted(self.unread)), encoding="utf-8")
+            tmp.replace(path)
+        except (OSError, AttributeError):
+            pass
+
+    def _set_unread(self, call: str, unread: bool) -> None:
+        if (call in self.unread) != unread:
+            (self.unread.add if unread else self.unread.discard)(call)
+            self._save_unread()
+
+    def _mark_all_read(self, _e=None) -> None:
+        if self.unread:
+            self.unread.clear()
+            self._save_unread()
+        self._signature = None
+        self.refresh()
+        self.app.page.update()
+
     # ─── events ───────────────────────────────────────────────────────────
 
     def on_event(self, kind, data) -> None:
         if kind == "message":
             sender = data["from"].upper()
             if not (self.app.current_key == self.key and self.selected == sender):
-                self.unread.add(sender)
+                self._set_unread(sender, True)
 
     def open_conversation(self, call: str) -> None:
         self.selected = call.upper()
         self.to.visible = False
-        self.unread.discard(self.selected)
+        self._set_unread(self.selected, False)
         self._signature = None
         self.refresh()
 
     def refresh(self) -> None:
         if self.app.current_key == self.key and self.selected:
-            self.unread.discard(self.selected)
+            self._set_unread(self.selected, False)
             self.app.message_read(self.selected)
         groups = self._grouped()
+        if getattr(self.engine, "_loaded", False) and self.unread - groups.keys():  # conversations gone meanwhile
+            self.unread &= groups.keys()
+            self._save_unread()
         states = tuple(self.engine.message_state(m.get("msg_no")) for m in self.engine.messages
                        if m["direction"] == "out")
         signature = (len(self.engine.messages), self.selected, states, tuple(sorted(self.unread)),
@@ -214,7 +254,7 @@ class MessagesView(View):
         def yes(_e) -> None:
             self.app.page.pop_dialog()
             self.engine.delete_conversation(call)
-            self.unread.discard(call)
+            self._set_unread(call, False)
             if self.selected == call:
                 self.selected = None
             self._signature = None
