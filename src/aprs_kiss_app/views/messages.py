@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import re
 import time
+import unicodedata
 
 import flet as ft
 
@@ -219,7 +220,7 @@ class MessagesView(View):
             self._save_unread()
         states = tuple(self.engine.message_state(m.get("msg_no")) for m in self.engine.messages
                        if m["direction"] == "out")
-        signature = (len(self.engine.messages), self.selected, states, tuple(sorted(self.unread.items())), self.only_unread,
+        signature = (len(self.engine.messages), self.selected, states, tuple(sorted(self.unread.items())), self.only_unread, self._needle(),
                      self.engine.aprsis is not None, self.engine.config.beacon_is)
         if signature == self._signature:
             return
@@ -227,9 +228,18 @@ class MessagesView(View):
         self.via_picker.sync()  # not chosen yet: follows the APRS-IS switch in Settings
         self._show_filter()
         shown = {c: m for c, m in groups.items() if c in self.unread} if self.only_unread else groups
-        self.conversations.controls = [self._conversation_tile(call, msgs) for call, msgs in shown.items()]
+        needle, hits = self._needle(), {}
+        if needle:  # only conversations whose callsign or some message has the text; that message shown
+            for call, msgs in shown.items():
+                hit = next((m for m in reversed(msgs) if needle in self._fold(m["text"])), None)
+                if hit or needle in self._fold(call):
+                    hits[call] = hit
+            shown = {c: m for c, m in shown.items() if c in hits}
+        self.conversations.controls = [self._conversation_tile(call, msgs, hits.get(call))
+                                       for call, msgs in shown.items()]
         if groups and not shown:
-            self.conversations.controls = [ft.Text(self.t("no_unread"), color=ft.Colors.ON_SURFACE_VARIANT)]
+            empty = "no_found" if needle else "no_unread"
+            self.conversations.controls = [ft.Text(self.t(empty), color=ft.Colors.ON_SURFACE_VARIANT)]
         if not groups:
             self.conversations.controls = [ft.Text(self.t("no_messages"), color=ft.Colors.ON_SURFACE_VARIANT)]
         self._where()
@@ -273,7 +283,25 @@ class MessagesView(View):
             False: self._pill(self.t("filter_all_msgs"), lambda _e: self._set_only_unread(False)),
             True: self._pill(self.t("filter_unread"), lambda _e: self._set_only_unread(True)),
         }
-        return ft.Row([self.filter_pills[False][0], self.filter_pills[True][0]], spacing=8)
+        # full text: callsigns and message texts, without regard to case and accents
+        self.search = ft.TextField(hint_text=self.t("msg_search"), prefix_icon=ft.Icons.SEARCH, dense=True,
+                                   expand=True, height=36, content_padding=ft.Padding.symmetric(horizontal=8),
+                                   text_size=13, on_change=lambda _e: self._search_changed())
+        return ft.Row([self.filter_pills[False][0], self.filter_pills[True][0], self.search], spacing=8,
+                      vertical_alignment=ft.CrossAxisAlignment.CENTER)
+
+    @staticmethod
+    def _fold(text: str) -> str:
+        """For searching: lower case, no accents (žluť = zlut)."""
+        return "".join(c for c in unicodedata.normalize("NFKD", text.casefold()) if not unicodedata.combining(c))
+
+    def _needle(self) -> str:
+        return self._fold((getattr(self, "search", None) and self.search.value or "").strip())
+
+    def _search_changed(self) -> None:
+        self._signature = None
+        self.refresh()
+        self.app.page.update()
 
     @staticmethod
     def _pill(text: str, on_click) -> tuple[ft.Container, ft.Text, ft.Container]:
@@ -302,8 +330,8 @@ class MessagesView(View):
         self.refresh()
         self.app.page.update()
 
-    def _conversation_tile(self, call: str, msgs: list[dict]) -> ft.Control:
-        last = msgs[-1]
+    def _conversation_tile(self, call: str, msgs: list[dict], hit: dict | None = None) -> ft.Control:
+        last = hit or msgs[-1]  # when searching: the message with the text found
         unread = self.unread.get(call, 0)
         letter = avatar_letter(call)
         return ft.ListTile(

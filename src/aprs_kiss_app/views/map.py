@@ -11,7 +11,7 @@ import flet_map as fm
 from aprs_kiss_core import mapfilter, repeater
 
 from ..legend import COLOR_ME, map_label, show_legend, station_color, visible
-from ..offline_map import MIN_ZOOM, BaseMap, Region, ScaleBar, gestures
+from ..offline_map import LAND, MIN_ZOOM, BaseMap, Region, ScaleBar, gestures
 from ..symbols import emoji
 from ..declutter import from_px, spread, to_px
 from .map_source import MapSourceButton, _label
@@ -71,7 +71,7 @@ class MapView(View):
         self.tiles = self.base.tiles
         self.map = fm.Map(
             expand=True,
-            bgcolor=ft.Colors.SURFACE,
+            bgcolor=LAND,  # light in the dark mode too, like all the maps
             initial_center=fm.MapLatitudeLongitude(*center),
             initial_zoom=self._zoom,
             min_zoom=MIN_ZOOM,

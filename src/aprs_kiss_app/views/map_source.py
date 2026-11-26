@@ -12,14 +12,18 @@ import flet as ft
 ICONS = {"online": ft.Icons.CLOUD_OUTLINED, "imported": ft.Icons.TERRAIN, "basic": ft.Icons.CLOUD_OFF}
 
 
+LABEL_WIDTH = 170  # the round mark, the icon and this fit a pop-up menu (Flutter: at most 280 wide)
+
+
 def _label(text: str) -> ft.Control:
     """"Online map (OpenStreetMap)": the part in brackets on a second, smaller line, so long names
     stay inside the menu on a phone."""
     if text.endswith(")") and " (" in text:
         main, sub = text[:-1].split(" (", 1)
-        return ft.Column([ft.Text(main), ft.Text(sub, size=12, color=ft.Colors.ON_SURFACE_VARIANT)],
+        return ft.Column([ft.Text(main, max_width=LABEL_WIDTH),
+                          ft.Text(sub, size=12, color=ft.Colors.ON_SURFACE_VARIANT, max_width=LABEL_WIDTH)],
                          spacing=0, tight=True)
-    return ft.Text(text)
+    return ft.Text(text, max_width=LABEL_WIDTH)  # a long name (Slovenian…) wraps inside the menu
 
 
 def _choice_icon(icon, on: bool) -> ft.Control:

@@ -18,7 +18,7 @@ from ..legend import map_label
 from .map_source import MapSourceButton
 from .base import View, clock, distance_km
 from .bbs import _plain
-from ..offline_map import MIN_ZOOM, BaseMap, ScaleBar, gestures
+from ..offline_map import LAND, MIN_ZOOM, BaseMap, ScaleBar, gestures
 from .base import toggle
 from .map import MapControls
 
@@ -90,7 +90,7 @@ class TakView(View):
         self.base = BaseMap(self.markers, here or (49.8, 15.5), self._zoom)
         self._camera_asked = 0.0
         self.map = fm.Map(
-            expand=True, bgcolor=ft.Colors.SURFACE,
+            expand=True, bgcolor=LAND,  # light in the dark mode too, like all the maps
             initial_center=fm.MapLatitudeLongitude(*(here or (49.8, 15.5))), initial_zoom=self._zoom, min_zoom=MIN_ZOOM,
             layers=self.base.layers(self.app.offline_map(), self.app.imported_shown()), on_pointer_up=self._gesture_end,
             interaction_configuration=gestures(),

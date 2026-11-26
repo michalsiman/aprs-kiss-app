@@ -22,6 +22,10 @@ ATTRIBUTION = "Natural Earth, GeoNames"
 BORDER = "#7B5EA7"
 COAST = "#4A7FB0"
 WATER_HINT = "#DCE9F5"
+# The map is light in the dark mode too, like the OSM and imported tiles: land, names and dots in fixed colours
+LAND = "#F2EFE9"  # OpenStreetMap's land colour, also under tiles still loading
+CITY_COLOR = "#2B2B2B"
+TOWN_COLOR = "#555555"
 
 
 @functools.lru_cache(maxsize=1)
@@ -138,9 +142,9 @@ def city_markers(level: int, region: Region | None = None) -> list[fm.Marker]:
             coordinates=fm.MapLatitudeLongitude(lat, lon), width=140, height=30,
             content=ft.Column([
                 ft.Container(width=7 if capital else 5, height=7 if capital else 5, border_radius=4,
-                             bgcolor=ft.Colors.ON_SURFACE),
+                             bgcolor=CITY_COLOR),
                 ft.Text(name, size=11 if capital else 10, weight=ft.FontWeight.BOLD if capital else None,
-                        color=ft.Colors.ON_SURFACE_VARIANT, no_wrap=True),
+                        color=CITY_COLOR, no_wrap=True),
             ], spacing=0, tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
         ))
     return out
@@ -166,8 +170,8 @@ def town_markers(zoom: float, region: Region | None = None) -> list[fm.Marker]:
     return [fm.Marker(
         coordinates=fm.MapLatitudeLongitude(lat, lon), width=120, height=26,
         content=ft.Column([
-            ft.Container(width=4, height=4, border_radius=2, bgcolor=ft.Colors.ON_SURFACE_VARIANT),
-            ft.Text(name, size=9, color=ft.Colors.ON_SURFACE_VARIANT, no_wrap=True),
+            ft.Container(width=4, height=4, border_radius=2, bgcolor=TOWN_COLOR),
+            ft.Text(name, size=9, color=TOWN_COLOR, no_wrap=True),
         ], spacing=0, tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER),
     ) for name, lat, lon, pop in data().get("towns", [])
         if pop >= least and (region is None or region.contains(lat, lon))]

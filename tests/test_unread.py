@@ -56,5 +56,12 @@ class AvatarTest(unittest.TestCase):
         self.assertNotEqual(avatar_color("A"), avatar_color("B"))
 
 
+class SearchTest(unittest.TestCase):
+    def test_fold_ignores_case_and_accents(self):
+        fold = MessagesView._fold
+        self.assertEqual(fold("Žluťoučký KŮŇ"), "zlutoucky kun")
+        self.assertIn(fold("zdravim"), fold("Zdravím, tady OK1TNT"))
+
+
 if __name__ == "__main__":
     unittest.main()
