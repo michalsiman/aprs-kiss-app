@@ -579,17 +579,7 @@ class MessagesView(View):
                 await self.text.focus()
             return go
 
-        async def thursday(_e) -> None:
-            self.app.page.pop_dialog()
-            self.app.select("thursday")
-
         rows: list[ft.Control] = []
-        if self.app.has_view("thursday"):  # first: APRS Thursday, its own screen (once in the menu)
-            rows.append(ft.Column([
-                ft.Text(self.t("thursday"), weight=ft.FontWeight.BOLD),
-                ft.Text(t("svc_thursday"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
-                ft.Row([ft.FilledTonalButton(t("svc_thursday_open"), icon=ft.Icons.EVENT, on_click=thursday)]),
-            ], tight=True, spacing=4))
         for svc in SERVICES:
             buttons = [ft.OutlinedButton(command.strip() or t("svc_type"), on_click=use(svc.call, command),
                                          style=ft.ButtonStyle(padding=ft.Padding.symmetric(horizontal=10)))
