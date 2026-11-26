@@ -213,6 +213,22 @@ class StationTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(sent, ["OK1SIM-7>APZHAK,WIDE1-1,WIDE2-1::OK1ABC   :ack7"])
         await st.close()
 
+    async def test_broken_reject_is_not_a_message(self):
+        """OK1TNT-14 sent "rej" with a garbled message number: not shown as a message."""
+        from aprs_kiss_core.parser import parse
+        messages = []
+
+        async def send(raw):
+            pass
+
+        st = station.Station(station.StationConfig("OK1SIM-7"), send, parse, lambda p: None,
+                             messages.append, lambda: None, lambda: 1)
+        for info in (":OK1SIM-7 :rej\xc3\x8a".encode("latin-1"), b":OK1SIM-7 :reject this"):
+            st.handle_frame(ax25.Frame(ax25.Address.parse("APRS"), ax25.Address.parse("OK1TNT-14"), [], info).encode())
+        await asyncio.sleep(0.1)
+        self.assertEqual([m["text"] for m in messages], ["reject this"])
+        await st.close()
+
     async def test_third_party_packet_from_an_igate(self):
         """OK0MIL-1 puts OK1ULX-10's internet position and a message for us on the air."""
         from aprs_kiss_core.parser import parse
