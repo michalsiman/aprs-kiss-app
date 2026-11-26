@@ -414,7 +414,7 @@ class App:
     async def _menu_selected(self, e) -> None:
         """A screen picked in the phone's menu: the menu slides away and the screen opens."""
         await self._close_menu()
-        self.select(self.views[e.control.selected_index].key)
+        self.select(self.menu_views[e.control.selected_index].key)
 
     # ─── Android's back gesture ───────────────────────────────────────────
     # It closes the menu when it is open, else goes back to the screen shown before (like a browser),
@@ -508,6 +508,7 @@ class App:
         if self.mobile:  # BBS SERVER is for computers only
             classes = [c for c in classes if c is not BbsView]
         self.views = [cls(self) for cls in classes]
+        self.menu_views = [v for v in self.views if v.in_menu]  # the screens in the menu (rail, drawer)
         if key not in {v.key for v in self.views}:
             key = self.views[0].key
         self.rail = ft.NavigationRail(
@@ -515,8 +516,8 @@ class App:
             label_type=ft.NavigationRailLabelType.ALL,
             min_width=88,
             destinations=[ft.NavigationRailDestination(icon=ft.Icon(v.icon), selected_icon=ft.Icon(v.selected_icon or v.icon),
-                                                       label=self.t(v.key)) for v in self.views],
-            on_change=lambda e: self.select(self.views[e.control.selected_index].key),
+                                                       label=self.t(v.key)) for v in self.menu_views],
+            on_change=lambda e: self.select(self.menu_views[e.control.selected_index].key),
         )
         # a phone: About is at the end of the menu (no room for its button in the top bar)
         self.about_item = ft.ListTile(leading=ft.Icon(ft.Icons.INFO_OUTLINE), title=ft.Text(self.t("about")),
@@ -527,7 +528,7 @@ class App:
                                    padding=ft.Padding.only(left=28, top=20, bottom=12))]
             + [ft.NavigationDrawerDestination(icon=ft.Icon(v.icon), selected_icon=ft.Icon(v.selected_icon or v.icon),
                                               label=self.t(v.key))
-               for v in self.views]
+               for v in self.menu_views]
             + [ft.Divider(), self.about_item],
             on_change=self._menu_selected, on_dismiss=self._menu_dismissed,
         )
@@ -640,6 +641,13 @@ class App:
         v.control  # noqa: B018 - built on first use
         return v
 
+    def _menu_index(self, view) -> int | None:
+        """Where the screen is in the menu; a screen not in it marks the one it is reached from."""
+        if not view.in_menu:
+            parent = getattr(view, "menu_parent", None)
+            view = next((v for v in self.menu_views if v.key == parent), None)
+        return self.menu_views.index(view) if view in self.menu_views else None
+
     def has_view(self, key: str) -> bool:
         """In BBS SERVER mode only some of the views exist."""
         return any(v.key == key for v in self.views)
@@ -663,8 +671,7 @@ class App:
                 self.page.run_task(self.view("settings").require_call)
         index = next(i for i, v in enumerate(self.views) if v.key == key)
         self.current = index
-        self.rail.selected_index = index
-        self.drawer.selected_index = index
+        self.rail.selected_index = self.drawer.selected_index = self._menu_index(self.views[index])
         if self.holders[index].content is not self.views[index].control:
             self.holders[index].content = self.views[index].control  # built the first time it is shown
         for i, holder in enumerate(self.holders):
@@ -824,8 +831,8 @@ class App:
             messages = self.view("messages")
             badge = str(messages.unread_total) if messages.unread else None
             # on the plain and the selected icon: the count stays while Messages is open, until they are read
-            for dest in (self.rail.destinations[self.views.index(messages)],
-                         self.drawer.controls[1 + self.views.index(messages)]):
+            for dest in (self.rail.destinations[self.menu_views.index(messages)],
+                         self.drawer.controls[1 + self.menu_views.index(messages)]):
                 dest.icon.badge = dest.selected_icon.badge = badge
             self.menu_btn.badge = badge  # the menu is closed on a phone: unread messages show on ☰
 

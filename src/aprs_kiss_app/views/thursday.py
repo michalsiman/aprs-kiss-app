@@ -29,6 +29,8 @@ def local_time(ts: float) -> str:
 
 class ThursdayView(View):
     key = "thursday"
+    in_menu = False  # opened from Messages › Services; the menu shows Messages meanwhile
+    menu_parent = "messages"
     icon = ft.Icons.EVENT_OUTLINED
     selected_icon = ft.Icons.EVENT
 
