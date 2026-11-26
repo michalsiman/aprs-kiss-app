@@ -60,11 +60,17 @@ def state(lang: str) -> dict:
     now = time.time()
     cs = lang == "cs"
     msgs = [
+        ("in", "DL1ABC-9", "OK1SIM-7", "Gruss aus Bayern, bin morgen in Plzen" if cs else "Greetings from Bavaria, in Plzen tomorrow", 9000),
+        ("out", "OK1SIM-7", "DL1ABC-9", "Super, ozvi se na 145.500" if cs else "Great, call me on 145.500", 8800),
+        ("in", "REPEAT", "OK1SIM-7", "OK0BP 145.6625 -0.6 88.5 Plzen 12km", 7200),
+        ("in", "OK2XYZ-7", "OK1SIM-7", "Díky za spojení, 73!" if cs else "Thanks for the QSO, 73!", 5400),
         ("in", "OK1ABC-9", "OK1SIM-7", "Ahoj, jsem na D5 u Rokycan, slyšíš mě?" if cs else "Hi, I am on the D5 near Rokycany, copy?", 1500),
         ("out", "OK1SIM-7", "OK1ABC-9", "Slyším 5/9, šťastnou cestu!" if cs else "Copy 5/9, safe trip!", 1380),
         ("in", "OK1MNO-7", "OK1SIM-7", "Jsem na Krkavci, výhled je super" if cs else "On top of Krkavec, great view", 600),
-        ("in", "OK1ABC-9", "OK1SIM-7", ("Stojím tady: " if cs else "Parked here: ") + "QTH 49.69500, 13.42000", 240),
         ("out", "OK1SIM-7", "OK1MNO-7", "Pošli fotku :-)" if cs else "Send a photo :-)", 540),
+        ("in", "OK1MNO-7", "OK1SIM-7", "Za chvíli, ještě vybaluju anténu" if cs else "In a moment, unpacking the antenna", 420),
+        ("in", "OK1ABC-9", "OK1SIM-7", ("Stojím tady: " if cs else "Parked here: ") + "QTH 49.69500, 13.42000", 240),
+        ("in", "OK1ABC-9", "OK1SIM-7", "Dáš kafe?" if cs else "Coffee?", 120),
     ]
     th = [
         ("ANSRVR", "You are now joined to HOTG for 12 hours", "server", 3000),
@@ -153,8 +159,9 @@ class Browser:
 class Run:
     """The fake TNC and the app (web) with prepared settings, for one language, theme and screen."""
 
-    def __init__(self, lang, theme, phone=False, tak=False, send_file=0, **conf):
+    def __init__(self, lang, theme, phone=False, tak=False, send_file=0, usb=False, unread=None, **conf):
         self.lang, self.theme, self.phone, self.tak, self.conf = lang, theme, phone, tak, conf
+        self.usb, self.unread = usb, unread or {}
         self.send_file = send_file
 
     async def __aenter__(self):
@@ -165,6 +172,9 @@ class Run:
         c.pop("_now")
         (self.data / "config.json").write_text(json.dumps(c))
         (self.data / "state.json").write_text(json.dumps(state(self.lang)))
+        # unread conversations, with how many messages each: the counts on the circles, filters and menu
+        (self.data / "unread.json").write_text(json.dumps({"OK1ABC-9": 2, "OK1MNO-7": 1, "OK2XYZ-7": 1,
+                                                           **self.unread}))
         env = {**os.environ, "PYTHONPATH": str(ROOT / "src")}
         self.tnc = subprocess.Popen([PY, str(ROOT / "tests" / "fake_tnc.py"), "--port", str(TNC_PORT), "--scene",
                                      "--interval", "6", "--message-every", "0", *(["--tak"] if self.tak else []),
@@ -173,6 +183,8 @@ class Run:
         app_env = {**env, "APRS_KISS_DATA": str(self.data), "FLET_FORCE_WEB_SERVER": "true"}
         if self.phone:
             app_env["APRS_KISS_PHONE"] = "1"
+        if self.usb:  # the phone's TNC choices: USB and Bluetooth too
+            app_env["APRS_KISS_USB"] = "1"
         self.app = subprocess.Popen([PY, "-c", "import flet as ft; from aprs_kiss_app.app import main; "
                                      f"ft.run(main, port={APP_PORT}, view=ft.AppView.WEB_BROWSER)"],
                                     env=app_env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -217,31 +229,54 @@ async def desktop(lang, theme, only):
         if want("map"):
             await b.shot(out("map", lang, theme))
         if want("map-filter") or want("map-repeaters"):
-            await b.click(307, 92)
+            await b.click(295, 80)
+            await b.click(400, 140, 1.5)  # moving only: ticked, the menu stays open
             if want("map-filter"):
                 await b.shot(out("map-filter", lang, theme))
-            await b.click(420, 200, 4)  # repeaters only
+            await b.click(400, 140, 1)  # moving off again
+            await b.click(400, 188, 4)  # repeaters only
+            await b.key("Escape", 2)
             if want("map-repeaters"):
                 await b.shot(out("map-repeaters", lang, theme))
-            await b.click(307, 92)
-            await b.click(420, 310, 4)  # show all
-        if want("map-offline"):
-            await b.click(387, 92)
-            await b.click(494, 208, 3)  # the basic offline map
-            await b.shot(out("map-offline", lang, theme))
-            await b.click(387, 92)
-            await b.click(494, 96, 2)  # online again
+            await b.click(295, 80)
+            await b.click(400, 300, 3)  # show all
+            await b.key("Escape", 2)
+        if want("map-source") or want("map-offline"):
+            await b.click(376, 80)
+            await b.click(460, 206, 3)  # the basic offline map: chosen, the menu stays open over it
+            if want("map-source"):
+                await b.shot(out("map-source", lang, theme))
+            await b.key("Escape", 2)
+            if want("map-offline"):
+                await b.shot(out("map-offline", lang, theme))
+            await b.click(376, 80)
+            await b.click(460, 88, 2)  # online again
+            await b.key("Escape", 2)
+        if want("tracker-menu"):
+            await b.click(1154, 26, 2)
+            await b.shot(out("tracker-menu", lang, theme))
+            await b.key("Escape", 2)
         await b.click(1210, 26, 5)  # transmit on (the message bar goes away)
         if want("messages"):
             await b.click(52, RAIL["messages"], 2)
-            await b.click(170, 133, 2)  # OK1ABC-9: the newest, with a position in its message
+            await b.click(250, 192, 2)  # OK1ABC-9: the newest, with a position in its message
             await b.shot(out("messages", lang, theme))
+        if want("messages-unread"):
+            await b.click(52, RAIL["messages"], 2)
+            await b.click(240, 132, 2)  # Unread: only the conversations with unread messages, their counts
+            await b.shot(out("messages-unread", lang, theme))
+            await b.click(150, 132, 2)  # All again
         if want("thursday"):
             await b.click(52, RAIL["thursday"], 2)
             await b.shot(out("thursday", lang, theme))
-        if want("stations"):
+        if want("stations") or want("station"):
             await b.click(52, RAIL["stations"], 2)
-            await b.shot(out("stations", lang, theme))
+            if want("stations"):
+                await b.shot(out("stations", lang, theme))
+            if want("station"):
+                await b.click(400, 140, 2.5)  # the first station's details: map, message, QRZ.com
+                await b.shot(out("station", lang, theme))
+                await b.key("Escape", 2)
         if want("terminal"):
             await b.click(52, RAIL["terminal"], 2)
             await b.click(200, 141)
@@ -279,6 +314,12 @@ async def desktop(lang, theme, only):
             await b.click(52, RAIL["bbs"], 2)
             await b.click(190, 96, 2)
             await b.shot(out("bbs-confirm", lang, theme))
+    if want("settings-tnc"):
+        # a radio with a built-in KISS TNC over Bluetooth LE: the device and its frequency
+        async with Run(lang, theme, connection="ble") as b:
+            await b.click(52, RAIL["settings"], 2)
+            await b.click(700, SECTION["tnc"], 2)
+            await b.shot(out("settings-tnc", lang, theme))
     if want("bbs"):
         async with Run(lang, theme, bbs_enabled=True) as b:
             await b.click(52, RAIL["bbs"], 3)
@@ -308,14 +349,16 @@ DRAWER = {"messages": 139, "thursday": 195, "stations": 251, "terminal": 307, "c
 
 async def phone(lang, theme, only):
     want = lambda name: not only or name in only  # noqa: E731
-    if any(want(n) for n in ("phone-map", "phone-menu", "phone-filter", "phone-profiles", "phone-settings")):
+    if any(want(n) for n in ("phone-map", "phone-menu", "phone-filter", "phone-profiles", "phone-settings",
+                             "phone-messages")):
         profiles = json.dumps([{"ssid": 7, "symbol": "/["}, {"ssid": 9, "symbol": "/>"}, {"ssid": 0, "symbol": "/-"}])
         async with Run(lang, theme, phone=True, profiles=profiles, symbol="/[") as b:
             await b.wait(4)
             if want("phone-map"):
                 await b.shot(out("phone-map", lang, theme))
             if want("phone-filter"):
-                await b.click(196, 78, 2)
+                await b.click(190, 72, 1)
+                await b.click(150, 130, 2)  # weather stations only: the box ticked, the menu open
                 await b.shot(out("phone-filter", lang, theme))
                 await b.key("Escape", 2)
             if want("phone-profiles"):
@@ -326,11 +369,23 @@ async def phone(lang, theme, only):
                 await b.click(24, 32, 2)
                 await b.shot(out("phone-menu", lang, theme))
                 await b.key("Escape", 2)
+            if want("phone-messages"):
+                await b.click(24, 32, 2)
+                await b.click(100, DRAWER["messages"], 3)
+                await b.shot(out("phone-messages", lang, theme))
             if want("phone-settings"):
                 await b.click(24, 32, 2)
                 await b.click(100, DRAWER["settings"], 3)
                 await b.click(200, 268, 3)  # the tracker section
                 await b.shot(out("phone-settings", lang, theme))
+    if want("phone-tnc"):
+        # every way to a TNC on a phone: TCP/IP, USB (serial), Bluetooth and Bluetooth LE
+        async with Run(lang, theme, phone=True, usb=True, connection="ble") as b:
+            await b.click(24, 32, 2)
+            await b.click(100, DRAWER["settings"], 3)
+            await b.click(200, 76, 3)  # the TNC section
+            await b.click(150, 140, 2)  # the connection list, open
+            await b.shot(out("phone-tnc", lang, theme))
     if want("phone-tak") or want("phone-tak-chat"):
         async with Run(lang, theme, phone=True, tak=True, tak_enabled=True) as b:
             await b.wait(25)

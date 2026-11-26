@@ -25,7 +25,11 @@ and its [KISS TNC app](https://github.com/armel/uv-k1-k5v3-firmware-custom/wiki/
 (Direwolf, a hardware TNC, the radio's USB serial port, or the KISS TCP bridge from the integration).
 Verified also with the **VGC VR-N76** and **AnyTone UV890** handhelds.
 
-**Status: version 1.1, actively developed.** Stable versions (1.0, 1.1 …) now and then; between them
+> **📻 VGC VR-N76 (and its twins BTECH UV-PRO, Radioddity GA-5WB):** tried on the air over Bluetooth with the
+> radio's built-in KISS TNC – no cable, no extra TNC. **New in 1.4: the app tunes the radio** – type a
+> frequency in *Settings › TNC connection* and tap *Tune* (firmware 0.7.11 or newer).
+
+**Status: version 1.5, actively developed.** Stable versions (1.0, 1.1 … 1.5) now and then; between them
 **beta versions** for testers – tick *Also offer beta versions* in Settings (see [CHANGELOG](CHANGELOG.md)).
 Ready for **Linux**, **Windows** and **Android**; **macOS** and **iOS** builds exist but nobody has tried
 them on a real Mac, iPhone or iPad yet – **testers wanted** (see [Platforms](#platforms)).
@@ -44,12 +48,12 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
   position, tracked callsigns highlighted. Buttons to centre on you, a *Muted map* that fades the map
   so the stations stand out, stations from the internet on or off, *Last 2 hours* only, and a legend
   of the symbols – small icons that light up when on. Zoom buttons, a compass that turns the map north
-  up again, a scale bar; two fingers turn the map only with a clear twist. Right-click (long press on a
+  up again, a scale bar; two fingers turn the map only with a clear twist. **Menus stay open** while you tick their boxes or pick a map (an empty frame shows what is off); back or a tap outside closes them. Right-click (long press on a
   phone) the map: *Set as my position*. Only the stations around what is on screen are drawn, so the map
   stays quick also on a phone.
 - **Offline map** bundled with the app: country borders, coastlines and about 1,000 bigger cities
   (Natural Earth); in Europe also motorways and main roads (Natural Earth), some 67,000 places of 1,000
-  people and more and each country's 30 highest peaks (GeoNames) – more of them as you zoom in. One button switches to it; **with no internet the map
+  people and more and each country's 30 highest peaks (GeoNames) – more of them as you zoom in. Light in the dark mode too, like the online maps. One button switches to it; **with no internet the map
   switches to it by itself** and tells you so, and goes back to OpenStreetMap when the internet returns.
 - **Map filters** (the funnel): only **weather stations**, only **moving** stations (moved in the last
   10 minutes; a station just heard stays until it is clear it stands still), only **repeaters**, only
@@ -66,8 +70,9 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
 - **Warnings ahead while the tracker runs** (off until you switch them on): **road incidents** and
   **other moving stations** (going your way, coming towards you or crossing) in a lobe ahead of you –
   long and narrow when you drive fast, wide in town, never behind; a bubble and a sound.
-- **Profiles**: up to three SSIDs of your callsign, each with its own symbol (car, handheld, home); a tap
-  on the callsign in the top bar switches – position, messages, terminal, everything goes under it.
+- **Profiles**: up to three SSIDs of your callsign, each with its own symbol (car, handheld, home), comment
+  and tracker way; the top bar shows the active one's symbol next to the callsign, a tap on it switches –
+  position, messages, terminal, everything goes under it.
 - **APRS-IS**: one switch sends your position (now, regular, tracker) and messages over the internet too;
   with transmitting off it all goes over the internet only.
 - **Tracker**: the position button in the top bar sends your position once, or starts the tracker (▶) –
@@ -79,10 +84,17 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
   tiles, or a ZIP/7z with such files inside (7z on a computer with 7-Zip). Several maps at once; the map
   button chooses between *online*, *imported* and *basic offline*. Vector maps (Mapsforge, vector MBTiles)
   are not supported.
-- **Messages** as conversations: retried until acknowledged, delivery state shown, incoming messages
-  acknowledged automatically; a new message to any callsign; a notice when one arrives. A longer text goes
-  as several messages numbered 1/2, 2/2 …; the conversation shows how far the station is (and how far it was
-  when each message came) with a button to see it on the map; conversations can be deleted.
+- **Messages** as conversations: each with a **coloured circle and a letter** (the suffix's first, OK1ABC → A)
+  and a **red count of its unread messages**; **All / Unread** filters with their counts and a **search** in
+  callsigns and texts (case and accents ignored); *⋮ › Mark all as read*. Unread stays unread after a restart
+  or an update. Retried until acknowledged, delivery state shown, incoming messages acknowledged
+  automatically; a new message to any callsign with the round **+**. **Radio and internet** are two icons
+  (a walkie-talkie and a globe), one or both, remembered. A longer text goes as several messages numbered
+  1/2, 2/2 …; the conversation shows how far the station is (and how far it was when each message came) with a
+  button to see it on the map; back from a conversation goes to the list first; conversations can be deleted.
+- **Notifications** of a new message or chat line while you are not looking: on Android in the background (a
+  tap opens the conversation; it says how many messages are unread in all), on Linux, Windows and macOS while
+  the window is not in front.
 - **Positions in messages and the chat**: send yours, or any place picked on the map – as coordinates or as
   a Maidenhead locator (the map's menu shows the locator of every place); a position written in a message
   or a chat line (decimal degrees, degrees and minutes, APRS's own, a locator) opens on the map with a pin.
@@ -93,9 +105,11 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
   repeaters), WXNOW (the nearest weather), UTC, satellite passes and sunrise (9M2PJU-4), e-mail (MAILMY) –
   a tap puts the command in a message, the answer comes back as one.
 - **#APRSThursday**: its own section for the weekly HOTG net through ANSRVR – check in with one
-  button, read the group's messages apart from your inbox, see when the next net starts, leave the group.
+  button, read the group's messages apart from your inbox (ANSRVR's relays never land in Messages), see when
+  the next net starts, leave the group; by radio, internet or both, remembered.
 - **Stations** heard on the radio or seen on APRS-IS: distance, direction, comment, weather, the path;
-  a filter and a legend. Stations an iGate relays from the internet by radio (third-party packets)
+  a filter and a legend; the count says how many are shown of all, and an empty list says why. A station's
+  details offer the map, a message and its **QRZ.com** page (the base callsign). Stations an iGate relays from the internet by radio (third-party packets)
   show up too.
 - **Position beacon** every N minutes and a *Send position now* button in the top bar; status and
   unproto. Icon (APRS symbol), comment, SSID and path in Settings.
@@ -143,8 +157,13 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
   a frame goes out on air (IS red for a second when something goes to APRS-IS). On a computer the lamps
   are larger and tell their state when you point at them; on a phone TNC, IS and GPS share one small block
   so the whole callsign fits.
-- **KISS over TCP** (Direwolf, a network bridge) or a **serial/USB port** (the list shows the ports,
-  with stable `/dev/serial/by-id` names on Linux); TX delay for the TNC; reconnects by itself.
+- **Four ways to the TNC**: **KISS over TCP/IP** (Direwolf, a network bridge, a Wi-Fi TNC), a **serial/USB
+  port** (the list shows the ports, with stable `/dev/serial/by-id` names on Linux; on a phone the USB port
+  through an OTG cable), **Bluetooth** (a paired TNC or radio, serial port profile) and **Bluetooth LE** (KISS
+  over BLE); TX delay for the TNC; reconnects by itself.
+- **Tune the radio from the app**: radios with a built-in KISS TNC over Bluetooth – **VGC VR-N76, BTECH
+  UV-PRO, Radioddity GA-5WB** (firmware 0.7.11+) – take a frequency from *Settings › TNC connection*
+  (*Tune*, and *Its own* to go back), through the KISS SetHardware command. The power cannot be set this way.
 - In **16 languages**: Brazilian Portuguese, Croatian, Czech, Danish, English, French, German, Italian,
   Norwegian (Bokmål), Polish, Serbian (Cyrillic), Slovak, Slovenian, Spanish, Swedish and Ukrainian;
   it follows the system language or you pick one in Settings.
@@ -158,6 +177,9 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
   be accepted: transmitting needs an amateur radio licence.
 - Tells you when a new version is out: asks GitHub at most once a day for the latest release,
   sends nothing about you; can be switched off in Settings. On Android *Download* fetches the new .apk.
+- **A log for finding faults**: *About › Copy log* puts the end of a small log in the clipboard (what went
+  on before a freeze; a watchdog writes down what blocks the app). On a phone, when Android restarts the
+  app's screen part in the background, it comes back on the screen you had open.
 
 ### On a phone (Android)
 
@@ -185,15 +207,23 @@ full size. They follow your GitHub theme, and so does the app: it uses the syste
 <td colspan="2"><a href="assets/map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/map-light.png"><img src="assets/map.png" alt="Map: symbols, repeaters with their frequency, a road incident, trails"></picture></a><br><sub>Map: symbols, repeaters with their frequency, a road incident, trails</sub></td>
 </tr>
 <tr>
-<td colspan="2"><a href="assets/phone-map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-map-light.png"><img src="assets/phone-map.png" width="13%" alt="the map"></picture></a> <a href="assets/phone-filter.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-filter-light.png"><img src="assets/phone-filter.png" width="13%" alt="filters"></picture></a> <a href="assets/phone-profiles.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-profiles-light.png"><img src="assets/phone-profiles.png" width="13%" alt="profiles"></picture></a> <a href="assets/phone-menu.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-menu-light.png"><img src="assets/phone-menu.png" width="13%" alt="the menu"></picture></a> <a href="assets/phone-settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-settings-light.png"><img src="assets/phone-settings.png" width="13%" alt="Settings"></picture></a> <a href="assets/phone-tak.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-tak-light.png"><img src="assets/phone-tak.png" width="13%" alt="TAK map"></picture></a> <a href="assets/phone-tak-chat.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-tak-chat-light.png"><img src="assets/phone-tak-chat.png" width="13%" alt="TAK GeoChat"></picture></a><br><sub>On a phone: the map, filters, profiles, the menu, Settings, TAK map, TAK GeoChat</sub></td>
+<td colspan="2"><a href="assets/phone-map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-map-light.png"><img src="assets/phone-map.png" width="13%" alt="the map"></picture></a> <a href="assets/phone-filter.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-filter-light.png"><img src="assets/phone-filter.png" width="13%" alt="filters"></picture></a> <a href="assets/phone-profiles.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-profiles-light.png"><img src="assets/phone-profiles.png" width="13%" alt="profiles"></picture></a> <a href="assets/phone-menu.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-menu-light.png"><img src="assets/phone-menu.png" width="13%" alt="the menu"></picture></a> <a href="assets/phone-messages.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-messages-light.png"><img src="assets/phone-messages.png" width="13%" alt="Messages"></picture></a> <a href="assets/phone-tnc.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-tnc-light.png"><img src="assets/phone-tnc.png" width="13%" alt="TNC: TCP/IP, USB, Bluetooth, Bluetooth LE"></picture></a> <a href="assets/phone-settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-settings-light.png"><img src="assets/phone-settings.png" width="13%" alt="Settings"></picture></a> <a href="assets/phone-tak.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-tak-light.png"><img src="assets/phone-tak.png" width="13%" alt="TAK map"></picture></a> <a href="assets/phone-tak-chat.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-tak-chat-light.png"><img src="assets/phone-tak-chat.png" width="13%" alt="TAK GeoChat"></picture></a><br><sub>On a phone: the map, filters, profiles, the menu, Messages, the TNC (TCP/IP, USB, Bluetooth, Bluetooth LE), Settings, TAK map, TAK GeoChat</sub></td>
 </tr>
 <tr>
-<td width="50%"><a href="assets/map-filter.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/map-filter-light.png"><img src="assets/map-filter.png" alt="Map filters"></picture></a><br><sub>Map filters</sub></td>
+<td width="50%"><a href="assets/map-filter.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/map-filter-light.png"><img src="assets/map-filter.png" alt="Map filters: the menu stays open while you tick"></picture></a><br><sub>Map filters: the menu stays open while you tick</sub></td>
 <td width="50%"><a href="assets/map-repeaters.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/map-repeaters-light.png"><img src="assets/map-repeaters.png" alt="Only repeaters, with frequency, band and mode"></picture></a><br><sub>Only repeaters, with frequency, band and mode</sub></td>
 </tr>
 <tr>
+<td width="50%"><a href="assets/map-source.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/map-source-light.png"><img src="assets/map-source.png" alt="Choosing the map: online, imported, basic offline"></picture></a><br><sub>Choosing the map: online, imported, basic offline</sub></td>
 <td width="50%"><a href="assets/map-offline.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/map-offline-light.png"><img src="assets/map-offline.png" alt="Basic offline map (no internet needed)"></picture></a><br><sub>Basic offline map (no internet needed)</sub></td>
-<td width="50%"><a href="assets/messages.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/messages-light.png"><img src="assets/messages.png" alt="Messages as conversations"></picture></a><br><sub>Messages as conversations</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="assets/messages.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/messages-light.png"><img src="assets/messages.png" alt="Messages: conversations with unread counts, filters and search"></picture></a><br><sub>Messages: conversations with unread counts, filters and search</sub></td>
+<td width="50%"><a href="assets/messages-unread.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/messages-unread-light.png"><img src="assets/messages-unread.png" alt="Only the unread conversations"></picture></a><br><sub>Only the unread conversations</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="assets/tracker-menu.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/tracker-menu-light.png"><img src="assets/tracker-menu.png" alt="The position and tracker menu"></picture></a><br><sub>The position and tracker menu</sub></td>
+<td width="50%"><a href="assets/station.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/station-light.png"><img src="assets/station.png" alt="A station's details: map, message, QRZ.com"></picture></a><br><sub>A station's details: map, message, QRZ.com</sub></td>
 </tr>
 <tr>
 <td width="50%"><a href="assets/thursday.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/thursday-light.png"><img src="assets/thursday.png" alt="#APRSThursday"></picture></a><br><sub>#APRSThursday</sub></td>
@@ -220,7 +250,10 @@ full size. They follow your GitHub theme, and so does the app: it uses the syste
 </tr>
 <tr>
 <td width="50%"><a href="assets/settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-light.png"><img src="assets/settings.png" alt="Settings: station and profiles"></picture></a><br><sub>Settings: station and profiles</sub></td>
-<td width="50%"><a href="assets/settings-more.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-more-light.png"><img src="assets/settings-more.png" alt="Settings: background and screen, sounds"></picture></a><br><sub>Settings: background and screen, sounds</sub></td>
+<td width="50%"><a href="assets/settings-tnc.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-tnc-light.png"><img src="assets/settings-tnc.png" alt="TNC over Bluetooth LE, and the radio's frequency (VR-N76, UV-PRO, GA-5WB)"></picture></a><br><sub>TNC over Bluetooth LE, and the radio's frequency (VR-N76, UV-PRO, GA-5WB)</sub></td>
+</tr>
+<tr>
+<td colspan="2"><a href="assets/settings-more.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-more-light.png"><img src="assets/settings-more.png" width="50%" alt="Settings: background and screen, sounds"></picture></a><br><sub>Settings: background and screen, sounds</sub></td>
 </tr>
 </table>
 

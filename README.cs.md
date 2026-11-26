@@ -25,7 +25,11 @@ a jeho [aplikací KISS TNC](https://github.com/armel/uv-k1-k5v3-firmware-custom/
 s jakýmkoliv KISS TNC (Direwolf, hardwarové TNC, USB sériový port rádia nebo KISS TCP most z integrace).
 Ověřená funkčnost i s ručkami **VGC VR-N76** a **AnyTone UV890**.
 
-**Stav: verze 1.1, aktivní vývoj.** Ostré verze (1.0, 1.1 …) jednou za čas, mezi nimi **beta verze** pro
+> **📻 VGC VR-N76 (a jeho dvojčata BTECH UV-PRO, Radioddity GA-5WB):** vyzkoušené na pásmu přes Bluetooth
+> s vestavěným KISS TNC rádia – bez kabelu a bez dalšího TNC. **Nově od verze 1.4 aplikace rádio i naladí** –
+> stačí zadat frekvenci v *Nastavení › Připojení k TNC* a klepnout na *Naladit* (firmware 0.7.11 a novější).
+
+**Stav: verze 1.5, aktivní vývoj.** Ostré verze (1.0, 1.1 … 1.5) jednou za čas, mezi nimi **beta verze** pro
 testery – zaškrtněte v Nastavení *Nabízet i beta verze* (viz [CHANGELOG](CHANGELOG.md), anglicky).
 Připravená pro **Linux**, **Windows** a **Android**; sestavení pro **macOS** a **iOS** existují, ale na
 skutečném Macu, iPhonu ani iPadu je zatím nikdo nevyzkoušel – **hledáme testery** (viz [Platformy](#platformy)).
@@ -43,12 +47,12 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
   zvýrazněné sledované značky. Tlačítka pro vycentrování na vás, *Tlumená mapa*, která mapu ztlumí,
   aby stanice vynikly, stanice z internetu zapnout/vypnout, jen *Posledních 2 h* a legenda
   symbolů – malé ikonky, které svítí, když jsou zapnuté. Tlačítka zoomu, kompas, který mapu vrátí severem
-  nahoru, měřítko; dvěma prsty se mapa otočí jen výrazným natočením. Pravé tlačítko (na telefonu podržení
+  nahoru, měřítko; dvěma prsty se mapa otočí jen výrazným natočením. **Nabídky zůstávají otevřené**, když v nich zaškrtáváte nebo vybíráte mapu (prázdný rámeček ukazuje, co je vypnuté); zavře je tlačítko zpět nebo klepnutí mimo ně. Pravé tlačítko (na telefonu podržení
   prstu) na mapě: *Nastavit jako moji polohu*. Kreslí se jen stanice v okolí toho, co je na obrazovce,
   takže mapa zůstává svižná i na telefonu.
 - **Offline mapa** přímo v aplikaci: hranice států, pobřeží a asi 1 000 větších měst (Natural Earth),
   v Evropě i dálnice a hlavní silnice (Natural Earth), asi 67 000 obcí nad 1 000 obyvatel a 30 nejvyšších
-  hor každé země (GeoNames) – s přiblížením přibývají další. Přepíná se jedním tlačítkem; **když není internet, mapa se na ni
+  hor každé země (GeoNames) – s přiblížením přibývají další. I v tmavém režimu je světlá, stejně jako mapy online. Přepíná se jedním tlačítkem; **když není internet, mapa se na ni
   přepne sama** a oznámí to, a jakmile se internet vrátí, vrátí se k OpenStreetMap.
 - **Filtry mapy** (trychtýř): jen **meteostanice**, jen **jedoucí** stanice (pohnuly se za posledních
   10 minut; nově slyšená stanice zůstane, dokud není jasné, že stojí), jen **převaděče**, jen **dopravní
@@ -65,8 +69,9 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
 - **Upozornění před vámi, když běží tracker** (vypnutá, dokud je nezapnete): **dopravní hlášení**
   a **jiné jedoucí stanice** (jedou stejným směrem, proti vám, nebo křižují) v laloku před vámi – při
   rychlé jízdě dlouhém a úzkém, ve městě širokém, nikdy za vámi; bublina a zvuk.
-- **Profily**: až tři SSID vaší značky, každé s vlastní ikonou (auto, ručka, domov); klepnutím na značku
-  v horní liště se přepne – poloha, zprávy, terminál, vše jde pod ním.
+- **Profily**: až tři SSID vaší značky, každé s vlastní ikonou (auto, ručka, domov), komentářem a způsobem
+  trackeru; horní lišta ukazuje vedle značky ikonu aktivního profilu, klepnutím se přepne – poloha, zprávy,
+  terminál, vše jde pod ním.
 - **APRS-IS**: jedním přepínačem se poloha (teď, pravidelně, tracker) i zprávy posílají i přes internet;
   s vypnutým vysíláním jde vše jen přes internet.
 - **Tracker**: tlačítko polohy v horní liště pošle polohu jednou, nebo spustí tracker (▶) – poloha z GPS
@@ -77,10 +82,16 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
   odkudkoli – rastrové dlaždicové mapy **MBTiles, PMTiles, SQLiteDB** (OsmAnd, Locus), **ZIP** s dlaždicemi
   z/x/y nebo ZIP/7z, ve kterém jsou takové soubory (7z na počítači se 7-Zipem). I víc map naráz; tlačítkem
   mapy se volí *online*, *stažená* a *základní offline*. Vektorové mapy (Mapsforge, vektorové MBTiles) nejdou.
-- **Zprávy** jako konverzace: opakované až do potvrzení, se stavem doručení, příchozí se potvrzují
-  automaticky; nová zpráva na libovolnou značku; upozornění, když nějaká přijde. Delší text odejde jako
-  více zpráv číslovaných 1/2, 2/2 …; v konverzaci je vidět, jak daleko stanice je (i jak daleko byla, když
-  zpráva přišla) s tlačítkem na mapu; konverzace jde smazat.
+- **Zprávy** jako konverzace: každá s **barevným kolečkem s písmenem** (první písmeno za číslicí, OK1ABC → A)
+  a **červeným počtem nepřečtených zpráv**; filtry **Vše / Nepřečtené** s počty a **hledání** ve značkách
+  i textech (bez ohledu na velikost písmen a diakritiku); *⋮ › Označit vše jako přečtené*. Nepřečtené zůstanou
+  nepřečtené i po restartu a aktualizaci. Opakované až do potvrzení, se stavem doručení, příchozí se
+  potvrzují automaticky; nová zpráva na libovolnou značku kulatým **+**. **Rádiem a internetem** jsou dvě
+  ikony (ruční vysílačka a zeměkoule), jedna nebo obě, zapamatované. Delší text odejde jako více zpráv
+  číslovaných 1/2, 2/2 …; v konverzaci je vidět, jak daleko stanice je (i jak daleko byla, když zpráva
+  přišla) s tlačítkem na mapu; zpět z konverzace vede nejdřív na seznam; konverzace jde smazat.
+- **Notifikace** nové zprávy nebo řádku chatu, když se zrovna nedíváte: na Androidu na pozadí (klepnutí
+  otevře konverzaci; uvádí, kolik je celkem nepřečtených), na Linuxu, Windows a macOS, když okno není vepředu.
 - **Poloha ve zprávách a v chatu**: pošlete svoji, nebo libovolné místo vybrané na mapě – jako souřadnice
   nebo jako lokátor (nabídka mapy ukazuje lokátor každého místa); poloha napsaná ve zprávě nebo v chatu
   (desetinné stupně, stupně a minuty, APRS zápis, lokátor) se otevře na mapě se špendlíkem.
@@ -91,9 +102,11 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
   převaděče), WXNOW (počasí z nejbližší meteostanice), UTC, přelety satelitů a východ slunce (9M2PJU-4),
   e-mail (MAILMY) – klepnutím se příkaz vloží do zprávy, odpověď přijde zprávou.
 - **#APRSThursday**: vlastní sekce pro čtvrteční síť HOTG přes ANSRVR – zapojení jedním tlačítkem,
-  zprávy skupiny zvlášť mimo běžné zprávy, kdy začíná další akce, odhlášení ze skupiny.
+  zprávy skupiny zvlášť mimo běžné zprávy (přeposílání z ANSRVR se do Zpráv nikdy nedostane), kdy začíná
+  další akce, odhlášení ze skupiny; rádiem, internetem nebo obojím, zapamatované.
 - **Stanice** slyšené rádiem nebo viděné na APRS-IS: vzdálenost, směr, komentář, počasí, cesta;
-  filtr a legenda. Objeví se i stanice, které iGate pošle z internetu do rádia (pakety třetí strany).
+  filtr a legenda; počítadlo ukazuje zobrazené z celkového počtu a prázdný seznam řekne proč. Detail stanice
+  nabízí mapu, zprávu a její profil na **QRZ.com** (značka bez SSID). Objeví se i stanice, které iGate pošle z internetu do rádia (pakety třetí strany).
 - **Maják polohy** každých N minut a tlačítko *Poslat polohu teď* v horní liště; status a unproto.
   Ikona (APRS symbol), komentář, SSID a cesta v Nastavení.
 - **Digipeater**: fill-in (WIDE1-1, pro domácí stanici) nebo plný (WIDEn-N s omezením počtu hopů),
@@ -140,8 +153,13 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
   a celé červené, když rámec odchází do éteru (IS na vteřinu zčervená, když něco jde do APRS-IS). Na počítači
   jsou kontrolky větší a po najetí myší řeknou svůj stav; na telefonu jsou TNC, IS a GPS v jednom malém
   bloku, aby se vešla celá značka.
-- **KISS přes TCP** (Direwolf, síťový most) nebo **sériový/USB port** (seznam portů, na Linuxu se
-  stálými názvy `/dev/serial/by-id`); TX delay pro TNC; po výpadku se připojí sama.
+- **Čtyři cesty k TNC**: **KISS přes TCP/IP** (Direwolf, síťový most, Wi-Fi TNC), **sériový/USB port**
+  (seznam portů, na Linuxu se stálými názvy `/dev/serial/by-id`; na telefonu USB port přes OTG kabel),
+  **Bluetooth** (spárované TNC nebo rádio, profil sériového portu) a **Bluetooth LE** (KISS přes BLE);
+  TX delay pro TNC; po výpadku se připojí sama.
+- **Ladění rádia z aplikace**: rádia s vestavěným KISS TNC přes Bluetooth – **VGC VR-N76, BTECH UV-PRO,
+  Radioddity GA-5WB** (firmware 0.7.11 a novější) – se naladí v *Nastavení › Připojení k TNC* (*Naladit*,
+  a *Vlastní* je vrátí), příkazem KISS SetHardware. Výkon se takhle nastavit nedá.
 - **16 jazyků**: brazilská portugalština, čeština, dánština, angličtina, francouzština, chorvatština,
   italština, němčina, norština (bokmål), polština, slovenština, slovinština, srbština (cyrilice),
   španělština, švédština a ukrajinština; řídí se jazykem systému, nebo si ho vyberete v Nastavení.
@@ -155,6 +173,9 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
   potřeba přijmout: vysílat smí jen držitel radioamatérské licence.
 - Dá vědět, když vyjde nová verze: nejvýš jednou denně se zeptá GitHubu na poslední vydání,
   nic o vás neposílá; v Nastavení se dá vypnout. Na Androidu *Stáhnout* rovnou stáhne nové .apk.
+- **Protokol pro hledání chyb**: *O aplikaci › Zkopírovat protokol* dá konec malého protokolu do schránky
+  (co se dělo před zaseknutím; hlídač zapíše, co aplikaci blokuje). Když Android na telefonu na pozadí
+  restartuje zobrazovací část aplikace, vrátí se aplikace na obrazovku, kterou jste měli otevřenou.
 
 ### Na telefonu (Android)
 
@@ -183,15 +204,23 @@ zvětší. Řídí se motivem GitHubu, stejně jako aplikace: používá světl�
 <td colspan="2"><a href="assets/cs/map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/map-light.png"><img src="assets/cs/map.png" alt="Mapa: symboly, převaděče s kmitočtem, nehoda, ocásky"></picture></a><br><sub>Mapa: symboly, převaděče s kmitočtem, nehoda, ocásky</sub></td>
 </tr>
 <tr>
-<td colspan="2"><a href="assets/cs/phone-map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-map-light.png"><img src="assets/cs/phone-map.png" width="13%" alt="mapa"></picture></a> <a href="assets/cs/phone-filter.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-filter-light.png"><img src="assets/cs/phone-filter.png" width="13%" alt="filtry"></picture></a> <a href="assets/cs/phone-profiles.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-profiles-light.png"><img src="assets/cs/phone-profiles.png" width="13%" alt="profily"></picture></a> <a href="assets/cs/phone-menu.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-menu-light.png"><img src="assets/cs/phone-menu.png" width="13%" alt="nabídka"></picture></a> <a href="assets/cs/phone-settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-settings-light.png"><img src="assets/cs/phone-settings.png" width="13%" alt="nastavení"></picture></a> <a href="assets/cs/phone-tak.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-tak-light.png"><img src="assets/cs/phone-tak.png" width="13%" alt="mapa TAK"></picture></a> <a href="assets/cs/phone-tak-chat.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-tak-chat-light.png"><img src="assets/cs/phone-tak-chat.png" width="13%" alt="TAK GeoChat"></picture></a><br><sub>Na telefonu: mapa, filtry, profily, nabídka, nastavení, mapa TAK, TAK GeoChat</sub></td>
+<td colspan="2"><a href="assets/cs/phone-map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-map-light.png"><img src="assets/cs/phone-map.png" width="13%" alt="mapa"></picture></a> <a href="assets/cs/phone-filter.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-filter-light.png"><img src="assets/cs/phone-filter.png" width="13%" alt="filtry"></picture></a> <a href="assets/cs/phone-profiles.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-profiles-light.png"><img src="assets/cs/phone-profiles.png" width="13%" alt="profily"></picture></a> <a href="assets/cs/phone-menu.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-menu-light.png"><img src="assets/cs/phone-menu.png" width="13%" alt="nabídka"></picture></a> <a href="assets/cs/phone-messages.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-messages-light.png"><img src="assets/cs/phone-messages.png" width="13%" alt="zprávy"></picture></a> <a href="assets/cs/phone-tnc.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-tnc-light.png"><img src="assets/cs/phone-tnc.png" width="13%" alt="TNC: TCP/IP, USB, Bluetooth, Bluetooth LE"></picture></a> <a href="assets/cs/phone-settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-settings-light.png"><img src="assets/cs/phone-settings.png" width="13%" alt="nastavení"></picture></a> <a href="assets/cs/phone-tak.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-tak-light.png"><img src="assets/cs/phone-tak.png" width="13%" alt="mapa TAK"></picture></a> <a href="assets/cs/phone-tak-chat.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-tak-chat-light.png"><img src="assets/cs/phone-tak-chat.png" width="13%" alt="TAK GeoChat"></picture></a><br><sub>Na telefonu: mapa, filtry, profily, nabídka, zprávy, TNC (TCP/IP, USB, Bluetooth, Bluetooth LE), nastavení, mapa TAK, TAK GeoChat</sub></td>
 </tr>
 <tr>
-<td width="50%"><a href="assets/cs/map-filter.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/map-filter-light.png"><img src="assets/cs/map-filter.png" alt="Filtry mapy"></picture></a><br><sub>Filtry mapy</sub></td>
+<td width="50%"><a href="assets/cs/map-filter.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/map-filter-light.png"><img src="assets/cs/map-filter.png" alt="Filtry mapy: nabídka zůstává při zaškrtávání otevřená"></picture></a><br><sub>Filtry mapy: nabídka zůstává při zaškrtávání otevřená</sub></td>
 <td width="50%"><a href="assets/cs/map-repeaters.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/map-repeaters-light.png"><img src="assets/cs/map-repeaters.png" alt="Jen převaděče s kmitočtem, pásmem a druhem provozu"></picture></a><br><sub>Jen převaděče s kmitočtem, pásmem a druhem provozu</sub></td>
 </tr>
 <tr>
+<td width="50%"><a href="assets/cs/map-source.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/map-source-light.png"><img src="assets/cs/map-source.png" alt="Volba mapy: online, stažená, základní offline"></picture></a><br><sub>Volba mapy: online, stažená, základní offline</sub></td>
 <td width="50%"><a href="assets/cs/map-offline.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/map-offline-light.png"><img src="assets/cs/map-offline.png" alt="Základní offline mapa (bez internetu)"></picture></a><br><sub>Základní offline mapa (bez internetu)</sub></td>
-<td width="50%"><a href="assets/cs/messages.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/messages-light.png"><img src="assets/cs/messages.png" alt="Zprávy jako konverzace"></picture></a><br><sub>Zprávy jako konverzace</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="assets/cs/messages.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/messages-light.png"><img src="assets/cs/messages.png" alt="Zprávy: konverzace s počty nepřečtených, filtry a hledáním"></picture></a><br><sub>Zprávy: konverzace s počty nepřečtených, filtry a hledáním</sub></td>
+<td width="50%"><a href="assets/cs/messages-unread.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/messages-unread-light.png"><img src="assets/cs/messages-unread.png" alt="Jen nepřečtené konverzace"></picture></a><br><sub>Jen nepřečtené konverzace</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="assets/cs/tracker-menu.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/tracker-menu-light.png"><img src="assets/cs/tracker-menu.png" alt="Nabídka polohy a trackeru"></picture></a><br><sub>Nabídka polohy a trackeru</sub></td>
+<td width="50%"><a href="assets/cs/station.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/station-light.png"><img src="assets/cs/station.png" alt="Detail stanice: mapa, zpráva, QRZ.com"></picture></a><br><sub>Detail stanice: mapa, zpráva, QRZ.com</sub></td>
 </tr>
 <tr>
 <td width="50%"><a href="assets/cs/thursday.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/thursday-light.png"><img src="assets/cs/thursday.png" alt="#APRSThursday"></picture></a><br><sub>#APRSThursday</sub></td>
@@ -218,7 +247,10 @@ zvětší. Řídí se motivem GitHubu, stejně jako aplikace: používá světl�
 </tr>
 <tr>
 <td width="50%"><a href="assets/cs/settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/settings-light.png"><img src="assets/cs/settings.png" alt="Nastavení: stanice a profily"></picture></a><br><sub>Nastavení: stanice a profily</sub></td>
-<td width="50%"><a href="assets/cs/settings-more.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/settings-more-light.png"><img src="assets/cs/settings-more.png" alt="Nastavení: pozadí a obrazovka, zvuky"></picture></a><br><sub>Nastavení: pozadí a obrazovka, zvuky</sub></td>
+<td width="50%"><a href="assets/cs/settings-tnc.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/settings-tnc-light.png"><img src="assets/cs/settings-tnc.png" alt="TNC přes Bluetooth LE a frekvence rádia (VR-N76, UV-PRO, GA-5WB)"></picture></a><br><sub>TNC přes Bluetooth LE a frekvence rádia (VR-N76, UV-PRO, GA-5WB)</sub></td>
+</tr>
+<tr>
+<td colspan="2"><a href="assets/cs/settings-more.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/settings-more-light.png"><img src="assets/cs/settings-more.png" width="50%" alt="Nastavení: pozadí a obrazovka, zvuky"></picture></a><br><sub>Nastavení: pozadí a obrazovka, zvuky</sub></td>
 </tr>
 </table>
 
