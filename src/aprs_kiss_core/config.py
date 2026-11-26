@@ -109,6 +109,7 @@ class Config:
     keep_screen_on: str = "never"  # "never", "tak" (while TAK runs) or "always": the screen does not go dark
     sound_tx: bool = False  # a short beep whenever the radio transmits
     sound_messages: bool = True  # a sound for a new APRS message
+    thursday_via: str = ""  # the same for APRS Thursday; "" = internet
     message_via: str = ""  # how messages go: "radio", "internet", "both"; "" = by the APRS-IS switch (beacon_is)
     sound_chat: bool = True  # … for a new packet chat line
     sound_tak: bool = True  # … for a new TAK GeoChat message

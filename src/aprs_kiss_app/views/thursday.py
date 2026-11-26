@@ -8,7 +8,7 @@ import flet as ft
 
 from aprs_kiss_core import thursday
 
-from .base import View, clock
+from .base import View, ViaPicker, clock
 from .messages import STATE_ICONS
 
 
@@ -43,10 +43,8 @@ class ThursdayView(View):
         self.text = ft.TextField(hint_text=self.t("th_placeholder"), expand=True, dense=True,
                                  max_length=thursday.MAX_TEXT, on_submit=self._send)
         compact = self.app.compact
-        self.via = ft.Dropdown(
-            width=130 if compact else 200, dense=True, value="internet",
-            options=[ft.DropdownOption(key=k, text=self.t(f"via_{k}")) for k in ("radio", "internet", "both")],
-        )
+        self.via_picker = ViaPicker(self.app, "thursday_via", lambda: "internet")  # remembered, as in Messages
+        self.via = self.via_picker.control
         self.send_btn = (ft.IconButton(ft.Icons.SEND, tooltip=self.t("th_send"), on_click=self._send,
                                        style=ft.ButtonStyle(bgcolor=ft.Colors.PRIMARY, color=ft.Colors.ON_PRIMARY))
                          if compact else ft.FilledButton(self.t("th_send"), icon=ft.Icons.SEND, on_click=self._send))
@@ -97,7 +95,7 @@ class ThursdayView(View):
         self.wait.visible = bool(wait)
         self.wait.value = self.t("th_wait", t=duration(wait)) if wait else ""
         self.send_btn.disabled = bool(wait)
-        self.via.visible = eng.aprsis is not None
+        self.via_picker.sync()
         self.feed.controls = [self._bubble(e) for e in eng.thursday] or [
             ft.Text(self.t("th_empty"), color=ft.Colors.ON_SURFACE_VARIANT)]
 
@@ -126,7 +124,7 @@ class ThursdayView(View):
         return ft.Row([bubble], alignment=ft.MainAxisAlignment.END if out else ft.MainAxisAlignment.START)
 
     def _via(self) -> str:
-        return self.via.value if self.via.visible else "radio"
+        return self.via_picker.value()
 
     async def _send(self, _e) -> None:
         text = (self.text.value or "").strip()

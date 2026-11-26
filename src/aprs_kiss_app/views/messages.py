@@ -13,7 +13,7 @@ from aprs_kiss_core.geotext import find_positions, write_position
 from aprs_kiss_core.services import SERVICES
 from aprs_kiss_core.spotting import CAMILLA, GATEWAY_NAMES, MODES, PROGRAMS, Spot, SpotError, build as build_spot, default_gateway, gateways_for
 
-from .base import View, bearing, clock, distance_km, toggle
+from .base import View, ViaPicker, bearing, clock, distance_km
 
 MAX_TEXT = 67  # APRS message text limit
 STATE_ICONS = {
@@ -62,16 +62,10 @@ class MessagesView(View):
                                  multiline=True, min_lines=1, max_lines=3, shift_enter=True,
                                  on_change=self._count)
         self.count = ft.Text(f"0/{MAX_TEXT}", size=12, color=ft.Colors.ON_SURFACE_VARIANT)
-        # How a message goes: two on/off icons, the radio and the internet (one or both); remembered
-        via = self._saved_via()
-        self.via_radio = toggle(ft.Icons.SETTINGS_INPUT_ANTENNA, ft.Icons.SETTINGS_INPUT_ANTENNA,
-                                via in ("radio", "both"), self.t("via_radio"), lambda _e: self._flip_via("radio"))
-        self.via_net = toggle(ft.Icons.PUBLIC, ft.Icons.PUBLIC, via in ("internet", "both"), self.t("via_internet"),
-                              lambda _e: self._flip_via("internet"))
-        for b in (self.via_radio, self.via_net):  # off: faint; on: the accent colour on a tint
-            b.icon_color = ft.Colors.with_opacity(0.35, ft.Colors.ON_SURFACE)
-            b.selected_icon_color = ft.Colors.PRIMARY
-        self.via = ft.Row([self.via_radio, self.via_net], spacing=2, tight=True)
+        # How a message goes: the radio and/or the internet, two icons, remembered
+        self.via_picker = ViaPicker(self.app, "message_via",
+                                    lambda: "both" if self.engine.config.beacon_is else "radio")
+        self.via = self.via_picker.control
         # On a phone one side at a time: the conversations, or one conversation with a back button.
         self.back = ft.IconButton(ft.Icons.ARROW_BACK, tooltip=self.t("back"), on_click=self._back, visible=False)
         # where the other station is: how far from us, and a button to see it on the map
@@ -229,10 +223,7 @@ class MessagesView(View):
         if signature == self._signature:
             return
         self._signature = signature
-        self.via.visible = self.engine.aprsis is not None
-        if not self.engine.config.message_via:  # not chosen yet: follows the APRS-IS switch in Settings
-            via = self._saved_via()
-            self.via_radio.selected, self.via_net.selected = via in ("radio", "both"), via in ("internet", "both")
+        self.via_picker.sync()  # not chosen yet: follows the APRS-IS switch in Settings
         self.conversations.controls = [self._conversation_tile(call, msgs) for call, msgs in groups.items()]
         if not groups:
             self.conversations.controls = [ft.Text(self.t("no_messages"), color=ft.Colors.ON_SURFACE_VARIANT)]
@@ -391,28 +382,8 @@ class MessagesView(View):
         self.text.value = f"{old} {text}".strip()
         self._count()
 
-    def _saved_via(self) -> str:
-        via = self.engine.config.message_via
-        if via in ("radio", "internet", "both"):
-            return via
-        return "both" if self.engine.config.beacon_is else "radio"
-
     def _via_value(self) -> str:
-        """The way chosen by the two icons; only the radio without APRS-IS."""
-        if not self.via.visible:
-            return "radio"
-        radio, net = self.via_radio.selected, self.via_net.selected
-        return "both" if radio and net else "internet" if net else "radio"
-
-    def _flip_via(self, which: str) -> None:
-        button, other = (self.via_radio, self.via_net) if which == "radio" else (self.via_net, self.via_radio)
-        if button.selected and not other.selected:  # one of them stays on: a message must go somewhere
-            self.app.toast(self.t("via_one_needed"))
-            return
-        button.selected = not button.selected
-        self.engine.config.message_via = self._via_value()
-        self.app.save_config_soon()  # remembered until changed
-        self.app.page.update()
+        return self.via_picker.value()
 
     async def _new(self, _e) -> None:
         # Show the empty form at once (only what changes on screen), then put the cursor in "to"; the list of

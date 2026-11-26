@@ -214,3 +214,48 @@ def check_item(text: str, icon, value: bool, on_change) -> tuple[ft.PopupMenuIte
                      ft.ControlState.SELECTED: ft.BorderSide(0, ft.Colors.TRANSPARENT)},
     )
     return ft.PopupMenuItem(content=box), box
+
+
+class ViaPicker:
+    """How a message goes: two on/off icons, the radio and the internet (one or both, never none), remembered
+    in a config field until changed. Only the radio while APRS-IS is off (then the icons are hidden)."""
+
+    WAYS = ("radio", "internet", "both")
+
+    def __init__(self, app, field: str, default) -> None:
+        self.app, self.field, self.default = app, field, default  # default(): the way while none was chosen
+        t = app.t
+        self.radio = toggle(ft.Icons.SETTINGS_INPUT_ANTENNA, ft.Icons.SETTINGS_INPUT_ANTENNA, False, t("via_radio"),
+                            lambda _e: self._flip(self.radio, self.net))
+        self.net = toggle(ft.Icons.PUBLIC, ft.Icons.PUBLIC, False, t("via_internet"),
+                          lambda _e: self._flip(self.net, self.radio))
+        for b in (self.radio, self.net):  # off: faint; on: the accent colour on a tint
+            b.icon_color = ft.Colors.with_opacity(0.35, ft.Colors.ON_SURFACE)
+            b.selected_icon_color = ft.Colors.PRIMARY
+        self.control = ft.Row([self.radio, self.net], spacing=2, tight=True)
+        self.sync()
+
+    def saved(self) -> str:
+        way = getattr(self.app.engine.config, self.field, "")
+        return way if way in self.WAYS else self.default()
+
+    def sync(self) -> None:
+        """Show the saved way (and the icons only with APRS-IS)."""
+        way = self.saved()
+        self.radio.selected, self.net.selected = way in ("radio", "both"), way in ("internet", "both")
+        self.control.visible = self.app.engine.aprsis is not None
+
+    def value(self) -> str:
+        if not self.control.visible:
+            return "radio"
+        radio, net = self.radio.selected, self.net.selected
+        return "both" if radio and net else "internet" if net else "radio"
+
+    def _flip(self, button, other) -> None:
+        if button.selected and not other.selected:  # one of them stays on: a message must go somewhere
+            self.app.toast(self.app.t("via_one_needed"))
+            return
+        button.selected = not button.selected
+        setattr(self.app.engine.config, self.field, self.value())
+        self.app.save_config_soon()  # remembered until changed
+        self.app.page.update()
