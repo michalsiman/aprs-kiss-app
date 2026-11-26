@@ -22,6 +22,13 @@ def _label(text: str) -> ft.Control:
     return ft.Text(text)
 
 
+def _choice_icon(icon, on: bool) -> ft.Control:
+    """One of several, only one chosen: a round mark (an empty faint ring when not chosen) and the icon."""
+    mark = ft.Icon(ft.Icons.RADIO_BUTTON_CHECKED if on else ft.Icons.RADIO_BUTTON_UNCHECKED, size=22,
+                   color=ft.Colors.PRIMARY if on else ft.Colors.with_opacity(0.4, ft.Colors.ON_SURFACE))
+    return ft.Row([mark, ft.Icon(icon)], spacing=12, tight=True)
+
+
 class MapSourceButton:
     def __init__(self, app, extra: list | None = None) -> None:
         self.app = app
@@ -46,7 +53,7 @@ class MapSourceButton:
         mode = self.app.map_mode()
         has_imported = self.app.has_imported_maps()
         for key, item in self.items.items():
-            item.checked = key == self.app.wanted_map_mode()
+            item.icon = _choice_icon(ICONS[key], key == self.app.wanted_map_mode())
         self.items["imported"].disabled = not has_imported
         self.items["imported"].content = _label(self.app.t("map_src_imported" if has_imported else "map_src_none"))
         self.icon.icon = ICONS[mode]
