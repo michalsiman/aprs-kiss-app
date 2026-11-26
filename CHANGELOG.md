@@ -4,6 +4,17 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## 1.4.0 – 2026-11-26
+
+- **Radio frequency from the app** for radios with a built-in KISS TNC over Bluetooth (VGC VR-N76, BTECH
+  UV-PRO, Radioddity GA-5WB, firmware 0.7.11+): *Settings › TNC connection*, *Tune* and *Its own* (KISS
+  SetHardware). The power cannot be set this way.
+- **QRZ.com** in a station's details (the base callsign, without SSID or /P).
+- **The profile's symbol** next to the callsign in the top bar.
+- **Menus stay open** after a choice (the map, Show all stations, the tracker's send and start/stop); back or a
+  tap outside closes them.
+- APRS Thursday back in the main menu.
+
 ## 1.3.0 – 2026-11-26
 
 The betas 1.2.1–1.2.4 as a stable version:
