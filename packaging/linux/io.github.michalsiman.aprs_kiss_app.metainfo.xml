@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="1.2.1" date="2026-11-26" type="development">
+      <description>
+        <p>Beta: coloured circles with a letter in Messages and an unread count on each; the total of unread messages in notifications; a menu with Mark all as read; unread messages stay unread after a restart or an update.</p>
+      </description>
+    </release>
     <release version="1.2.0" date="2026-11-26">
       <description>
         <p>Notifications of new messages and chat lines (Android in the background; Linux, Windows and macOS when the window is not in front); in Messages back goes to the list first, a round + for a new message, unread conversations marked, the REPEAT service works, accented letters read right; each profile with its own comment and tracker way; clearer menus and serial errors.</p>

@@ -4,6 +4,18 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## 1.2.1 beta – 2026-11-26
+
+- **Messages look nicer**: each conversation has a coloured circle with a letter – the suffix's first
+  (OK1TNT → T; the prefix is the same for a whole country), the first one for a service (REPEAT → R); the same
+  letter always the same colour. An unread conversation shows how many messages are unread in a red count on
+  the circle, its callsign and text in bold. On a computer the list is wider so callsigns don't break.
+- **The total in a notification**: a message notification says how many messages are unread in all
+  (Android in the notification's header, with the number on the app's icon where the launcher shows it).
+  The count on Messages and ☰ is now messages, not conversations.
+- **A ⋮ menu in Messages** with *Mark all as read*.
+- **Unread stays unread** after a restart or an update (it was kept only in memory before).
+
 ## 1.2.0 – 2026-11-26
 
 The betas 1.1.1–1.1.3 as a stable version:
