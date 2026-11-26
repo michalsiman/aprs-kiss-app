@@ -4,6 +4,18 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## 1.2.0 – 2026-11-26
+
+The betas 1.1.1–1.1.3 as a stable version:
+
+- **Notifications of new messages and chat lines**: Android while the app is in the background (a tap opens
+  the conversation), Linux, Windows and macOS while the window is not in front.
+- **Messages**: back from an open conversation goes to the list first; a round + for a new message; unread
+  conversations marked with a red dot and counted until read; the REPEAT service works; accented letters
+  read right.
+- **Profiles**: each with its own position comment and tracker way (fixed interval or SmartBeaconing).
+- **Menus stand out** with a frame and a shadow; serial TNC errors said plainly.
+
 ## 1.1.3 beta – 2026-11-26
 
 - **A notification for a new message or chat line** when you are not looking at the app: on Android while
