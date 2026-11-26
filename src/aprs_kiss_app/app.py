@@ -57,7 +57,8 @@ TICK_SECONDS = 5.0
 THEME_EVERY = 6  # ticks: the desktop theme is looked at every 30 s
 
 
-_LIVE_APPS: "weakref.WeakSet[App]" = weakref.WeakSet()  # the app's sessions still running (normally one)
+_LIVE_APPS: "weakref.WeakSet[App]" = weakref.WeakSet()
+_LAST_SCREEN: list[str] = []  # the screen on show, for a new session in the same process (Android restarts)  # the app's sessions still running (normally one)
 
 COMPACT_WIDTH = 700  # narrower than this (a phone): the compact layout
 
@@ -515,7 +516,8 @@ class App:
     def build(self) -> None:
         self.t = Translator(self.engine.config.language)
         self.compact = self._is_compact()
-        key = self.current_key if self.views else "map"
+        # a new session after Android restarted the screen part: back on the screen the user had open
+        key = self.current_key if self.views else (_LAST_SCREEN[0] if self.mobile and _LAST_SCREEN else "map")
         mode = self.engine.exclusive_mode
         classes = BBS_VIEWS if mode == "bbs" else TAK_VIEWS if mode == "tak" else VIEWS
         if self.mobile:  # BBS SERVER is for computers only
@@ -686,6 +688,7 @@ class App:
                 self.toast(self.t("call_required"), error=True)
                 self.page.run_task(self.view("settings").require_call)
         index = next(i for i, v in enumerate(self.views) if v.key == key)
+        _LAST_SCREEN[:] = [key]
         self.current = index
         self.rail.selected_index = self.drawer.selected_index = self._menu_index(self.views[index])
         if self.holders[index].content is not self.views[index].control:
