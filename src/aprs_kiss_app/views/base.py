@@ -204,11 +204,16 @@ def toggle(icon: str, selected_icon: str, selected: bool, tooltip: str, on_click
 
 
 
+CHECK_TEXT_WIDTH = 170  # the box, the icon and this fit a pop-up menu (Flutter: at most 280 wide)
+
+
 def check_item(text: str, icon, value: bool, on_change) -> tuple[ft.PopupMenuItem, ft.Checkbox]:
     """An on/off line in a menu: a box (an empty faint frame when off) with the icon and text as its label.
     The tap belongs to the box, so the menu stays open; it closes with back or a tap outside it."""
     box = ft.Checkbox(
-        label=ft.Row([ft.Icon(icon), ft.Text(text)], spacing=12, tight=True),
+        # a long text (French, Spanish, Ukrainian…) wraps to a second line instead of running out of the menu,
+        # which Flutter keeps at most 280 wide
+        label=ft.Row([ft.Icon(icon), ft.Text(text, max_width=CHECK_TEXT_WIDTH)], spacing=12, tight=True),
         value=value, on_change=on_change,
         border_side={ft.ControlState.DEFAULT: ft.BorderSide(1.5, ft.Colors.with_opacity(0.4, ft.Colors.ON_SURFACE)),
                      ft.ControlState.SELECTED: ft.BorderSide(0, ft.Colors.TRANSPARENT)},
