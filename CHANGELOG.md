@@ -4,6 +4,11 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## 1.5.0 – 2026-11-26
+
+- **Phone: back on the same screen** after Android restarts the app's screen part in the background (it did
+  that after a few minutes away; the app came back on the map).
+
 ## 1.4.0 – 2026-11-26
 
 - **Radio frequency from the app** for radios with a built-in KISS TNC over Bluetooth (VGC VR-N76, BTECH

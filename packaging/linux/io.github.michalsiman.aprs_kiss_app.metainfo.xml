@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="1.5.0" date="2026-11-26">
+      <description>
+        <p>On a phone the app comes back on the screen that was open after Android restarted it in the background.</p>
+      </description>
+    </release>
     <release version="1.4.0" date="2026-11-26">
       <description>
         <p>Tune a VGC VR-N76 / BTECH UV-PRO / Radioddity GA-5WB from the app over its KISS TNC; QRZ.com in station details; the profile's symbol in the top bar; menus stay open after a choice.</p>
