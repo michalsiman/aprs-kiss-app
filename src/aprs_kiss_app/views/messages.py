@@ -13,7 +13,7 @@ from aprs_kiss_core.geotext import find_positions, write_position
 from aprs_kiss_core.services import SERVICES
 from aprs_kiss_core.spotting import CAMILLA, GATEWAY_NAMES, MODES, PROGRAMS, Spot, SpotError, build as build_spot, default_gateway, gateways_for
 
-from .base import View, bearing, clock, distance_km
+from .base import View, bearing, clock, distance_km, toggle
 
 MAX_TEXT = 67  # APRS message text limit
 STATE_ICONS = {
@@ -62,11 +62,16 @@ class MessagesView(View):
                                  multiline=True, min_lines=1, max_lines=3, shift_enter=True,
                                  on_change=self._count)
         self.count = ft.Text(f"0/{MAX_TEXT}", size=12, color=ft.Colors.ON_SURFACE_VARIANT)
-        self.via = ft.Dropdown(
-            width=170 if compact else 220, dense=True,  # "Internetem" fits on a phone
-            value="both" if self.engine.config.beacon_is else "radio",  # the APRS-IS switch in Settings
-            options=[ft.DropdownOption(key=k, text=self.t(f"via_{k}")) for k in ("radio", "internet", "both")],
-        )
+        # How a message goes: two on/off icons, the radio and the internet (one or both); remembered
+        via = self._saved_via()
+        self.via_radio = toggle(ft.Icons.SETTINGS_INPUT_ANTENNA, ft.Icons.SETTINGS_INPUT_ANTENNA,
+                                via in ("radio", "both"), self.t("via_radio"), lambda _e: self._flip_via("radio"))
+        self.via_net = toggle(ft.Icons.PUBLIC, ft.Icons.PUBLIC, via in ("internet", "both"), self.t("via_internet"),
+                              lambda _e: self._flip_via("internet"))
+        for b in (self.via_radio, self.via_net):  # off: faint; on: the accent colour on a tint
+            b.icon_color = ft.Colors.with_opacity(0.35, ft.Colors.ON_SURFACE)
+            b.selected_icon_color = ft.Colors.PRIMARY
+        self.via = ft.Row([self.via_radio, self.via_net], spacing=2, tight=True)
         # On a phone one side at a time: the conversations, or one conversation with a back button.
         self.back = ft.IconButton(ft.Icons.ARROW_BACK, tooltip=self.t("back"), on_click=self._back, visible=False)
         # where the other station is: how far from us, and a button to see it on the map
@@ -225,10 +230,9 @@ class MessagesView(View):
             return
         self._signature = signature
         self.via.visible = self.engine.aprsis is not None
-        wanted = self.engine.config.beacon_is
-        if wanted != getattr(self, "_via_for", wanted):  # the switch in Settings changed: a new default
-            self.via.value = "both" if wanted else "radio"
-        self._via_for = wanted
+        if not self.engine.config.message_via:  # not chosen yet: follows the APRS-IS switch in Settings
+            via = self._saved_via()
+            self.via_radio.selected, self.via_net.selected = via in ("radio", "both"), via in ("internet", "both")
         self.conversations.controls = [self._conversation_tile(call, msgs) for call, msgs in groups.items()]
         if not groups:
             self.conversations.controls = [ft.Text(self.t("no_messages"), color=ft.Colors.ON_SURFACE_VARIANT)]
@@ -387,6 +391,29 @@ class MessagesView(View):
         self.text.value = f"{old} {text}".strip()
         self._count()
 
+    def _saved_via(self) -> str:
+        via = self.engine.config.message_via
+        if via in ("radio", "internet", "both"):
+            return via
+        return "both" if self.engine.config.beacon_is else "radio"
+
+    def _via_value(self) -> str:
+        """The way chosen by the two icons; only the radio without APRS-IS."""
+        if not self.via.visible:
+            return "radio"
+        radio, net = self.via_radio.selected, self.via_net.selected
+        return "both" if radio and net else "internet" if net else "radio"
+
+    def _flip_via(self, which: str) -> None:
+        button, other = (self.via_radio, self.via_net) if which == "radio" else (self.via_net, self.via_radio)
+        if button.selected and not other.selected:  # one of them stays on: a message must go somewhere
+            self.app.toast(self.t("via_one_needed"))
+            return
+        button.selected = not button.selected
+        self.engine.config.message_via = self._via_value()
+        self.app.save_config_soon()  # remembered until changed
+        self.app.page.update()
+
     async def _new(self, _e) -> None:
         # Show the empty form at once (only what changes on screen), then put the cursor in "to"; the list of
         # conversations is rebuilt by the next refresh, unseen. Before, the whole list was rebuilt first and
@@ -472,7 +499,7 @@ class MessagesView(View):
                 self.app.page.update()
                 return
             # by radio over APRS (an iGate in range takes it to the gateway); internet too only when chosen
-            via = (self.via.value if self.via.visible else "radio") or "radio"
+            via = self._via_value()
             if not await self.app.guard(self.engine.send_aprs_message(to, text, via)):
                 return
             self.engine.config.spot_last = json.dumps({
@@ -543,7 +570,7 @@ class MessagesView(View):
         text = (self.text.value or "").strip()
         if not to or not text:
             return
-        via = self.via.value if self.via.visible else "radio"
+        via = self._via_value()
         sent = True
         for part in message_parts(text):  # one, or several numbered "1/3", "2/3", "3/3"
             if not await self.app.guard(self.engine.send_aprs_message(to, part, via)):

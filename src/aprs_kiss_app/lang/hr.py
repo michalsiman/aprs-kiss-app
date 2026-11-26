@@ -8,7 +8,7 @@ TEXTS = {
     "transmit": "Odašiljanje", "tx_on": "Odašiljanje je UKLJUČENO", "tx_off": "Odašiljanje je isključeno (samo prijem)",
     "tx_refused": "Nije poslano: odašiljanje je isključeno",
     "not_sent": "Nije poslano", "send": "Pošalji", "to": "Za", "text": "Tekst", "via": "Preko",
-    "via_radio": "Radio", "via_internet": "Internet", "via_both": "Radio + internet",
+    "via_radio": "Radio", "via_internet": "Internet", "via_both": "Radio + internet", "via_one_needed": "Poruka mora ići barem jednim putem: radiom ili internetom.",
     "new_message": "Nova poruka", "message_from": "Poruka od {call}",
     "state_pending": "čeka potvrdu", "state_acked": "isporučeno", "state_rejected": "odbijeno",
     "state_failed": "nije isporučeno",

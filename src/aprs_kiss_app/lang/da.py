@@ -8,7 +8,7 @@ TEXTS = {
     "transmit": "Sending", "tx_on": "Sending er TIL", "tx_off": "Sending er fra (kun modtagelse)",
     "tx_refused": "Ikke sendt: sending er slået fra",
     "not_sent": "Ikke sendt", "send": "Send", "to": "Til", "text": "Tekst", "via": "Via",
-    "via_radio": "Radio", "via_internet": "Internet", "via_both": "Radio + internet",
+    "via_radio": "Radio", "via_internet": "Internet", "via_both": "Radio + internet", "via_one_needed": "En besked skal gå mindst én vej: radio eller internet.",
     "new_message": "Ny besked", "message_from": "Besked fra {call}",
     "state_pending": "venter på kvittering", "state_acked": "leveret", "state_rejected": "afvist",
     "state_failed": "ikke leveret",

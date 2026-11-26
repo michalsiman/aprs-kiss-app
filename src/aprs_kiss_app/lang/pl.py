@@ -8,7 +8,7 @@ TEXTS = {
     "transmit": "Nadawanie", "tx_on": "Nadawanie jest WŁĄCZONE", "tx_off": "Nadawanie wyłączone (tylko odbiór)",
     "tx_refused": "Nie wysłano: nadawanie jest wyłączone",
     "not_sent": "Nie wysłano", "send": "Wyślij", "to": "Do", "text": "Tekst", "via": "Przez",
-    "via_radio": "Radio", "via_internet": "Internet", "via_both": "Radio + internet",
+    "via_radio": "Radio", "via_internet": "Internet", "via_both": "Radio + internet", "via_one_needed": "Wiadomość musi iść co najmniej jedną drogą: radiem lub internetem.",
     "new_message": "Nowa wiadomość", "message_from": "Wiadomość od {call}",
     "state_pending": "czeka na potwierdzenie", "state_acked": "doręczona", "state_rejected": "odrzucona",
     "state_failed": "niedoręczona",

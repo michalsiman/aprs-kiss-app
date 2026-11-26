@@ -8,7 +8,7 @@ TEXTS = {
     "transmit": "Sändning", "tx_on": "Sändning är PÅ", "tx_off": "Sändning är av (endast mottagning)",
     "tx_refused": "Inte skickat: sändning är avstängd",
     "not_sent": "Inte skickat", "send": "Skicka", "to": "Till", "text": "Text", "via": "Via",
-    "via_radio": "Radio", "via_internet": "Internet", "via_both": "Radio + internet",
+    "via_radio": "Radio", "via_internet": "Internet", "via_both": "Radio + internet", "via_one_needed": "Ett meddelande måste gå minst en väg: radio eller internet.",
     "new_message": "Nytt meddelande", "message_from": "Meddelande från {call}",
     "state_pending": "väntar på kvittens", "state_acked": "levererat", "state_rejected": "avvisat",
     "state_failed": "inte levererat",
