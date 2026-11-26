@@ -330,6 +330,16 @@ class StationTest(unittest.IsolatedAsyncioTestCase):
             await st.send_status("test")
 
 
+
+class RadioFrequencyTest(unittest.TestCase):
+    def test_set_and_restore_frames(self):
+        from aprs_kiss_core.ax25 import CMD_HARDWARE, frequency_command, kiss_frame
+        # 146.520 MHz = 0x08BBB7C0: the C0 inside is escaped (DB DC) like any KISS byte
+        self.assertEqual(kiss_frame(frequency_command(146_520_000), CMD_HARDWARE),
+                         bytes.fromhex("C006EA08BBB7DBDCC0"))
+        self.assertEqual(kiss_frame(frequency_command(None), CMD_HARDWARE), bytes.fromhex("C006EBC0"))
+
+
 if __name__ == "__main__":
     unittest.main()
 

@@ -117,7 +117,7 @@ TEXTS = {
     "zoom_in": "Zoom avant", "zoom_out": "Zoom arrière", "north_up": "Nord en haut",
     "gps_phone": "GPS du téléphone", "gps_phone_hint": "La carte et la balise utilisent la position du téléphone. Android demande l'autorisation la première fois ; la localisation doit être activée.", "gps_phone_denied": "Localisation non autorisée : autorisez-la dans les réglages du téléphone pour cette application", "gps_phone_off": "La localisation du téléphone est désactivée", "no_position": "Pas encore de position : saisissez-la dans les Réglages, utilisez le GPS ou appuyez longuement sur la carte",
     "baudrate": "Vitesse (bauds)", "refresh_ports": "Chercher les ports série",
-    "no_ports": "Aucun port série trouvé", "txdelay": "TX delay envoyé au TNC (ms, 0 = ne pas changer)",
+    "no_ports": "Aucun port série trouvé", "txdelay": "TX delay envoyé au TNC (ms, 0 = ne pas changer)", "radio_freq": "Fréquence radio", "radio_freq_set": "Accorder", "radio_freq_own": "Sienne", "radio_freq_hint": "Pour les radios avec TNC KISS intégré (VGC VR-N76, BTECH UV-PRO, Radioddity GA-5WB, firmware 0.7.11 ou plus récent) : accorde la radio, Sienne la ramène à sa fréquence. Les autres TNC l’ignorent. La puissance ne se règle pas ainsi.", "radio_freq_bad": "Saisis une fréquence en MHz, p. ex. 144,800.", "radio_freq_sent": "Envoyé à la radio : {f} MHz", "radio_freq_back": "La radio revient à sa fréquence.",
     "station": "Station", "callsign": "Indicatif", "ssid": "SSID", "symbol": "Icône (symbole APRS)",
     "comment": "Commentaire de position", "digipath": "Chemin des digipeaters",
     "latitude": "Latitude", "longitude": "Longitude",

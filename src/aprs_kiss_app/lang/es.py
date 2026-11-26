@@ -116,7 +116,7 @@ TEXTS = {
     "zoom_in": "Acercar", "zoom_out": "Alejar", "north_up": "Norte arriba",
     "gps_phone": "GPS del teléfono", "gps_phone_hint": "El mapa y la baliza usan la ubicación del teléfono. Android pide el permiso la primera vez; la ubicación debe estar activada.", "gps_phone_denied": "Sin permiso de ubicación: permítelo en los ajustes del teléfono para esta aplicación", "gps_phone_off": "La ubicación del teléfono está desactivada", "no_position": "Aún no hay posición: escríbela en Ajustes, usa el GPS o mantén pulsado el mapa",
     "baudrate": "Velocidad (baudios)", "refresh_ports": "Buscar puertos serie",
-    "no_ports": "No se encontraron puertos serie", "txdelay": "TX delay enviado al TNC (ms, 0 = no cambiar)",
+    "no_ports": "No se encontraron puertos serie", "txdelay": "TX delay enviado al TNC (ms, 0 = no cambiar)", "radio_freq": "Frecuencia de la radio", "radio_freq_set": "Sintonizar", "radio_freq_own": "Propia", "radio_freq_hint": "Para radios con TNC KISS integrado (VGC VR-N76, BTECH UV-PRO, Radioddity GA-5WB, firmware 0.7.11 o posterior): sintoniza la radio, Propia la devuelve a su frecuencia. Otros TNC lo ignoran. La potencia no se puede ajustar así.", "radio_freq_bad": "Escribe una frecuencia en MHz, p. ej. 144,800.", "radio_freq_sent": "Enviado a la radio: {f} MHz", "radio_freq_back": "La radio vuelve a su frecuencia.",
     "station": "Estación", "callsign": "Indicativo", "ssid": "SSID", "symbol": "Icono (símbolo APRS)",
     "comment": "Comentario de posición", "digipath": "Ruta de digipeaters",
     "latitude": "Latitud", "longitude": "Longitud",

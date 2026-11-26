@@ -116,7 +116,7 @@ TEXTS = {
     "zoom_in": "Zooma in", "zoom_out": "Zooma ut", "north_up": "Norr uppåt",
     "gps_phone": "Telefonens GPS", "gps_phone_hint": "Kartan och fyren använder telefonens position. Android frågar om tillstånd första gången; platstjänster måste vara på.", "gps_phone_denied": "Ingen åtkomst till platsen: tillåt den i telefonens inställningar för den här appen", "gps_phone_off": "Telefonens plats är avstängd", "no_position": "Ingen position än: skriv in den i Inställningar, använd GPS eller håll fingret på kartan",
     "baudrate": "Hastighet (baud)", "refresh_ports": "Sök efter serieportar",
-    "no_ports": "Inga serieportar hittades", "txdelay": "TX delay till TNC:n (ms, 0 = ändra inte)",
+    "no_ports": "Inga serieportar hittades", "txdelay": "TX delay till TNC:n (ms, 0 = ändra inte)", "radio_freq": "Radiofrekvens", "radio_freq_set": "Ställ in", "radio_freq_own": "Egen", "radio_freq_hint": "För radioapparater med inbyggd KISS-TNC (VGC VR-N76, BTECH UV-PRO, Radioddity GA-5WB, firmware 0.7.11 eller nyare): ställer in radion, Egen går tillbaka till dess frekvens. Andra TNC:er ignorerar det. Effekten kan inte ställas in så.", "radio_freq_bad": "Skriv en frekvens i MHz, t.ex. 144,800.", "radio_freq_sent": "Skickat till radion: {f} MHz", "radio_freq_back": "Radion går tillbaka till sin frekvens.",
     "station": "Station", "callsign": "Anropssignal", "ssid": "SSID", "symbol": "Ikon (APRS-symbol)",
     "comment": "Positionskommentar", "digipath": "Digipeater-väg",
     "latitude": "Latitud", "longitude": "Longitud",

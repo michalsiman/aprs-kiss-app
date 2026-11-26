@@ -116,7 +116,7 @@ TEXTS = {
     "zoom_in": "Vergrößern", "zoom_out": "Verkleinern", "north_up": "Norden oben",
     "gps_phone": "GPS des Telefons", "gps_phone_hint": "Karte und Bake nutzen den Standort des Telefons. Android fragt beim ersten Mal nach der Berechtigung; der Standort muss eingeschaltet sein.", "gps_phone_denied": "Standort nicht erlaubt: in den Telefoneinstellungen für diese App erlauben", "gps_phone_off": "Der Standort des Telefons ist ausgeschaltet", "no_position": "Noch keine Position: in den Einstellungen eingeben, GPS nutzen oder lange auf die Karte drücken",
     "baudrate": "Geschwindigkeit (Baud)", "refresh_ports": "Serielle Schnittstellen suchen",
-    "no_ports": "Keine seriellen Schnittstellen gefunden", "txdelay": "TX-Delay für den TNC (ms, 0 = nicht ändern)",
+    "no_ports": "Keine seriellen Schnittstellen gefunden", "txdelay": "TX-Delay für den TNC (ms, 0 = nicht ändern)", "radio_freq": "Funkfrequenz", "radio_freq_set": "Abstimmen", "radio_freq_own": "Eigene", "radio_freq_hint": "Für Funkgeräte mit eingebautem KISS-TNC (VGC VR-N76, BTECH UV-PRO, Radioddity GA-5WB, Firmware 0.7.11 oder neuer): stimmt das Gerät ab, Eigene kehrt zu seiner Frequenz zurück. Andere TNCs ignorieren es. Die Leistung lässt sich so nicht einstellen.", "radio_freq_bad": "Frequenz in MHz eingeben, z. B. 144,800.", "radio_freq_sent": "An das Funkgerät gesendet: {f} MHz", "radio_freq_back": "Das Funkgerät kehrt zu seiner Frequenz zurück.",
     "station": "Station", "callsign": "Rufzeichen", "ssid": "SSID", "symbol": "Symbol (APRS)",
     "comment": "Positionskommentar", "digipath": "Digipeater-Pfad",
     "latitude": "Breitengrad", "longitude": "Längengrad",

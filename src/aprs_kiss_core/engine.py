@@ -31,7 +31,7 @@ from typing import Any
 from . import aprs as aprs_build
 from . import thursday
 from .aprsis import AprsIsClient, gate_to_is, passcode, third_party
-from .ax25 import PF, U_DM, Address, Frame
+from .ax25 import PF, U_DM, Address, Frame, frequency_command
 from .bbs import BbsConfigError, BbsServer
 from . import digipeater, tak, yapp
 from .tracker import Tracker, course_speed, distance_m
@@ -857,6 +857,17 @@ class Engine:
             comment = self._position_comment(self.config.comment if comment is None else comment)
         # over the internet too only when chosen (Settings › APRS-IS), like the beacon and the tracker
         await self.station.send_position(lat, lon, comment, to_is=self.config.beacon_is)
+
+    async def set_radio_frequency(self, mhz: float | None) -> None:
+        """Tune a radio with a built-in KISS TNC (VR-N76, UV-PRO, GA-5WB, firmware 0.7.11+) to `mhz`, or (None)
+        back to its own frequency. Radios without the command ignore it."""
+        self._not_in_bbs_mode()
+        hz = None
+        if mhz is not None:
+            if not 30 <= mhz <= 1300:
+                raise ValueError("frequency out of range")
+            hz = round(mhz * 1_000_000)
+        await self.connection.send_hardware(frequency_command(hz))
 
     async def send_status(self, text: str) -> None:
         self._not_in_bbs_mode()

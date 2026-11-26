@@ -116,7 +116,7 @@ TEXTS = {
     "zoom_in": "Priblížiť", "zoom_out": "Oddialiť", "north_up": "Sever hore",
     "gps_phone": "GPS telefónu", "gps_phone_hint": "Mapa aj maják používajú polohu telefónu. Android sa prvýkrát opýta na povolenie; poloha musí byť zapnutá.", "gps_phone_denied": "Aplikácia nesmie používať polohu: povoľ ju v nastaveniach telefónu pre túto aplikáciu", "gps_phone_off": "Poloha v telefóne je vypnutá", "no_position": "Zatiaľ žiadna poloha: zadaj ju v Nastaveniach, použi GPS, alebo podrž prst na mape",
     "baudrate": "Rýchlosť (baud)", "refresh_ports": "Hľadať sériové porty",
-    "no_ports": "Nenašiel sa žiadny sériový port", "txdelay": "TX delay pre TNC (ms, 0 = nemeniť)",
+    "no_ports": "Nenašiel sa žiadny sériový port", "txdelay": "TX delay pre TNC (ms, 0 = nemeniť)", "radio_freq": "Frekvencia rádia", "radio_freq_set": "Naladiť", "radio_freq_own": "Vlastná", "radio_freq_hint": "Pre rádiá so vstavaným KISS TNC (VGC VR-N76, BTECH UV-PRO, Radioddity GA-5WB, firmvér 0.7.11 a novší): naladí rádio, Vlastná ho vráti na jeho frekvenciu. Iné TNC to ignorujú. Výkon sa takto nastaviť nedá.", "radio_freq_bad": "Zadaj frekvenciu v MHz, napr. 144,800.", "radio_freq_sent": "Poslané do rádia: {f} MHz", "radio_freq_back": "Rádio sa vracia na svoju frekvenciu.",
     "station": "Stanica", "callsign": "Značka", "ssid": "SSID", "symbol": "Ikona (APRS symbol)",
     "comment": "Komentár k polohe", "digipath": "Cesta cez digipeatery",
     "latitude": "Zemepisná šírka", "longitude": "Zemepisná dĺžka",

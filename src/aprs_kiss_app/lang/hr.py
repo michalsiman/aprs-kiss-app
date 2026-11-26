@@ -116,7 +116,7 @@ TEXTS = {
     "zoom_in": "Približi", "zoom_out": "Udalji", "north_up": "Sjever gore",
     "gps_phone": "GPS telefona", "gps_phone_hint": "Karta i beacon koriste lokaciju telefona. Android prvi put traži dopuštenje; lokacija mora biti uključena.", "gps_phone_denied": "Lokacija nije dopuštena: dopusti je u postavkama telefona za ovu aplikaciju", "gps_phone_off": "Lokacija telefona je isključena", "no_position": "Još nema položaja: upiši ga u Postavkama, koristi GPS ili zadrži prst na karti",
     "baudrate": "Brzina (baud)", "refresh_ports": "Traži serijske portove",
-    "no_ports": "Nije pronađen nijedan serijski port", "txdelay": "TX delay za TNC (ms, 0 = ne mijenjaj)",
+    "no_ports": "Nije pronađen nijedan serijski port", "txdelay": "TX delay za TNC (ms, 0 = ne mijenjaj)", "radio_freq": "Frekvencija radija", "radio_freq_set": "Ugodi", "radio_freq_own": "Vlastita", "radio_freq_hint": "Za radije s ugrađenim KISS TNC-om (VGC VR-N76, BTECH UV-PRO, Radioddity GA-5WB, firmware 0.7.11 ili noviji): ugađa radio, Vlastita ga vraća na njegovu frekvenciju. Drugi TNC-ovi to zanemaruju. Snaga se ovako ne može postaviti.", "radio_freq_bad": "Upiši frekvenciju u MHz, npr. 144,800.", "radio_freq_sent": "Poslano radiju: {f} MHz", "radio_freq_back": "Radio se vraća na svoju frekvenciju.",
     "station": "Stanica", "callsign": "Pozivni znak", "ssid": "SSID", "symbol": "Ikona (APRS simbol)",
     "comment": "Komentar uz poziciju", "digipath": "Putanja preko digipeatera",
     "latitude": "Geografska širina", "longitude": "Geografska dužina",

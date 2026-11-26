@@ -135,6 +135,18 @@ class SettingsView(View):
         self.serial_row = ft.Row([self.device, ft.IconButton(ft.Icons.REFRESH, tooltip=t("refresh_ports"),
                                                              on_click=self._refresh_ports), self.baudrate])
         self.txdelay = ft.TextField(label=t("txdelay"), value=str(c.txdelay_ms or 0), width=320, input_filter=num)
+        # A radio with a built-in KISS TNC over Bluetooth (VR-N76, UV-PRO, GA-5WB): its frequency from here.
+        # Not a setting to save: sent at once, the radio keeps it until "its own" or until it is retuned.
+        self.radio_freq = ft.TextField(label=t("radio_freq"), value="144.800", width=150, dense=True,
+                                       keyboard_type=ft.KeyboardType.NUMBER, suffix=ft.Text("MHz"),
+                                       input_filter=ft.InputFilter(r"^[0-9]*[.,]?[0-9]*$"))
+        self.radio_freq_row = ft.Column([
+            ft.Row([self.radio_freq,
+                    ft.FilledTonalButton(t("radio_freq_set"), icon=ft.Icons.TUNE, on_click=self._radio_freq_set),
+                    ft.TextButton(t("radio_freq_own"), icon=ft.Icons.UNDO, on_click=self._radio_freq_own)],
+                   wrap=True, spacing=8, vertical_alignment=ft.CrossAxisAlignment.CENTER),
+            ft.Text(t("radio_freq_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
+        ], spacing=4, tight=True)
 
         # Station
         self.call = ft.TextField(label=t("callsign"), value=call, width=160,
@@ -310,7 +322,7 @@ class SettingsView(View):
         form = ft.Column(
             [
                 self.intro,
-                _section(t("tnc_section"), ft.Icons.CABLE, self.connection, self.tcp_row, self.serial_row, self.txdelay, expanded=first),
+                _section(t("tnc_section"), ft.Icons.CABLE, self.connection, self.tcp_row, self.serial_row, self.txdelay, self.radio_freq_row, expanded=first),
                 station := _section(t("station"), ft.Icons.PERSON_PIN_CIRCLE, ft.Row([self.call]), self.profile_rows,
                          ft.Row([self.comment]), self.path,
                          ft.Row([self.lat, self.lon], wrap=True), self.gps_now,
@@ -437,6 +449,7 @@ class SettingsView(View):
         self.tcp_row.visible = not serial
         self.serial_row.visible = serial
         self.baudrate.visible = kind not in ("bt", "ble")  # a Bluetooth link has no line speed
+        self.radio_freq_row.visible = kind in ("bt", "ble")  # the radios with a KISS TNC talk Bluetooth
         self.device.label = {"bt": self.t("bt_device"), "ble": self.t("ble_device")}.get(kind, self.t("device"))
         if update:
             self.device.options = self._port_options(self.device.value or "")
@@ -445,6 +458,21 @@ class SettingsView(View):
             if kind == "ble" and not ble.found:
                 self.app.page.run_task(self._scan_ble)
             self.app.page.update()
+
+    async def _radio_freq_set(self, _e) -> None:
+        try:
+            mhz = float((self.radio_freq.value or "").replace(",", "."))
+            if not 30 <= mhz <= 1300:
+                raise ValueError
+        except ValueError:
+            self.app.toast(self.t("radio_freq_bad"), error=True)
+            return
+        if await self.app.guard(self.engine.set_radio_frequency(mhz)):
+            self.app.toast(self.t("radio_freq_sent", f=f"{mhz:.4f}".rstrip("0").rstrip(".")))
+
+    async def _radio_freq_own(self, _e) -> None:
+        if await self.app.guard(self.engine.set_radio_frequency(None)):
+            self.app.toast(self.t("radio_freq_back"))
 
     def _digi_changed(self, update: bool = True) -> None:
         self.digi_hops.visible = self.digi_mode.value == "wide"  # WIDE1-1 is always one hop
