@@ -13,7 +13,7 @@ TEXTS = {
     "state_pending": "čaka na potrditev", "state_acked": "dostavljeno", "state_rejected": "zavrnjeno",
     "state_failed": "ni dostavljeno",
     "no_messages": "Še ni sporočil.", "pick_conversation": "Izberite pogovor ali začnite novega.",
-    "no_stations": "Še ni slišanih postaj.", "filter": "Filter", "last_heard": "slišana", "ago": "pred {t}",
+    "no_stations": "Še ni slišanih postaj.", "stations_count": "Prikazano / vse slišane (radio in internet)", "no_stations_filter": "Nobena postaja ne ustreza filtru.", "no_stations_internet": "Vseh {n} postaj je samo z interneta (APRS-IS). Gumb z globusom jih prikaže.", "filter": "Filter", "last_heard": "slišana", "ago": "pred {t}",
     "show_on_map": "Pokaži na zemljevidu", "send_message": "Pošlji sporočilo", "close": "Zapri",
     "my_position": "Moj položaj", "centre_me": "Usredini na moj položaj",
     "remote": "Postaja", "path": "Prek digipeaterjev", "connect": "Poveži",

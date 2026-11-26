@@ -13,7 +13,7 @@ TEXTS = {
     "state_pending": "aguardando confirmação", "state_acked": "entregue", "state_rejected": "rejeitada",
     "state_failed": "não entregue",
     "no_messages": "Ainda não há mensagens.", "pick_conversation": "Escolha uma conversa ou comece uma nova.",
-    "no_stations": "Nenhuma estação ouvida ainda.", "filter": "Filtrar", "last_heard": "ouvida", "ago": "há {t}",
+    "no_stations": "Nenhuma estação ouvida ainda.", "stations_count": "Mostradas / todas ouvidas (rádio e internet)", "no_stations_filter": "Nenhuma estação corresponde ao filtro.", "no_stations_internet": "Todas as {n} estações são só da internet (APRS-IS). O botão do globo as mostra.", "filter": "Filtrar", "last_heard": "ouvida", "ago": "há {t}",
     "show_on_map": "Mostrar no mapa", "send_message": "Enviar uma mensagem", "close": "Fechar",
     "my_position": "Minha posição", "centre_me": "Centralizar na minha posição",
     "remote": "Estação", "path": "Via digipeaters", "connect": "Conectar",

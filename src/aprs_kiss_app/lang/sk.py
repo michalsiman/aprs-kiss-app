@@ -13,7 +13,7 @@ TEXTS = {
     "state_pending": "čaká na potvrdenie", "state_acked": "doručené", "state_rejected": "odmietnuté",
     "state_failed": "nedoručené",
     "no_messages": "Zatiaľ žiadne správy.", "pick_conversation": "Vyber konverzáciu alebo začni novú.",
-    "no_stations": "Zatiaľ žiadne počuté stanice.", "filter": "Filter", "last_heard": "počutá", "ago": "pred {t}",
+    "no_stations": "Zatiaľ žiadne počuté stanice.", "stations_count": "Zobrazené / všetky počuté (rádiom aj z internetu)", "no_stations_filter": "Filtru nevyhovuje žiadna stanica.", "no_stations_internet": "Všetkých {n} staníc je len z internetu (APRS-IS). Zobrazíš ich tlačidlom so zemeguľou.", "filter": "Filter", "last_heard": "počutá", "ago": "pred {t}",
     "show_on_map": "Ukázať na mape", "send_message": "Poslať správu", "close": "Zavrieť",
     "my_position": "Moja poloha", "centre_me": "Vycentrovať na moju polohu",
     "remote": "Stanica", "path": "Cez digipeatery", "connect": "Pripojiť",

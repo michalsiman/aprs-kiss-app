@@ -45,7 +45,7 @@ class StationsView(View):
         self.internet = toggle(ft.Icons.PUBLIC_OFF, ft.Icons.PUBLIC, self.engine.config.show_internet,
                                self.t("show_internet"),
                                lambda _e: self.app.set_show_internet(not self.engine.config.show_internet))
-        self.count = ft.Text(color=ft.Colors.ON_SURFACE_VARIANT)
+        self.count = ft.Text(color=ft.Colors.ON_SURFACE_VARIANT, tooltip=self.t("stations_count"))
         self.list = ft.ListView(expand=True, spacing=0)
         return ft.Column(
             [
@@ -77,7 +77,14 @@ class StationsView(View):
                    if (not needle or needle in e["call"].upper()) and visible(self.app, e)]
         self.count.value = f"{len(entries)} / {len(heard)}"
         if not entries:
-            self.list.controls = [ft.Text(self.t("no_stations"), color=ft.Colors.ON_SURFACE_VARIANT)]
+            # say why the list is empty: nothing heard, the filter, or only stations from the internet (hidden)
+            if not heard:
+                why = self.t("no_stations")
+            elif needle:
+                why = self.t("no_stations_filter")
+            else:
+                why = self.t("no_stations_internet", n=len(heard))
+            self.list.controls = [ft.Text(why, color=ft.Colors.ON_SURFACE_VARIANT)]
             return
         lang = self.t.language
         self.list.controls = []

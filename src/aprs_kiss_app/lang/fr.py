@@ -13,7 +13,7 @@ TEXTS = {
     "state_pending": "en attente d'accusé", "state_acked": "remis", "state_rejected": "refusé",
     "state_failed": "non remis",
     "no_messages": "Pas encore de messages.", "pick_conversation": "Choisissez une conversation ou commencez-en une.",
-    "no_stations": "Aucune station entendue pour l'instant.", "filter": "Filtrer", "last_heard": "entendue",
+    "no_stations": "Aucune station entendue pour l'instant.", "stations_count": "Affichées / toutes entendues (radio et internet)", "no_stations_filter": "Aucune station ne correspond au filtre.", "no_stations_internet": "Les {n} stations viennent toutes d'internet (APRS-IS). Le bouton globe les affiche.", "filter": "Filtrer", "last_heard": "entendue",
     "ago": "il y a {t}",
     "show_on_map": "Voir sur la carte", "send_message": "Envoyer un message", "close": "Fermer",
     "my_position": "Ma position", "centre_me": "Centrer sur ma position",

@@ -13,7 +13,7 @@ TEXTS = {
     "state_pending": "wartet auf Bestätigung", "state_acked": "zugestellt", "state_rejected": "abgelehnt",
     "state_failed": "nicht zugestellt",
     "no_messages": "Noch keine Nachrichten.", "pick_conversation": "Wähle eine Unterhaltung oder beginne eine neue.",
-    "no_stations": "Noch keine Stationen gehört.", "filter": "Filter", "last_heard": "gehört", "ago": "vor {t}",
+    "no_stations": "Noch keine Stationen gehört.", "stations_count": "Angezeigt / alle gehörten (Funk und Internet)", "no_stations_filter": "Keine Station passt zum Filter.", "no_stations_internet": "Alle {n} Stationen kamen nur über das Internet (APRS-IS). Die Globus-Taste zeigt sie.", "filter": "Filter", "last_heard": "gehört", "ago": "vor {t}",
     "show_on_map": "Auf der Karte zeigen", "send_message": "Nachricht senden", "close": "Schließen",
     "my_position": "Meine Position", "centre_me": "Auf meine Position zentrieren",
     "remote": "Station", "path": "Über Digipeater", "connect": "Verbinden",

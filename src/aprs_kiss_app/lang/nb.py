@@ -13,7 +13,7 @@ TEXTS = {
     "state_pending": "venter på kvittering", "state_acked": "levert", "state_rejected": "avvist",
     "state_failed": "ikke levert",
     "no_messages": "Ingen meldinger ennå.", "pick_conversation": "Velg en samtale eller start en ny.",
-    "no_stations": "Ingen stasjoner hørt ennå.", "filter": "Filter", "last_heard": "hørt", "ago": "for {t} siden",
+    "no_stations": "Ingen stasjoner hørt ennå.", "stations_count": "Vist / alle hørte (radio og internett)", "no_stations_filter": "Ingen stasjon passer filteret.", "no_stations_internet": "Alle {n} stasjoner er bare fra internett (APRS-IS). Globusknappen viser dem.", "filter": "Filter", "last_heard": "hørt", "ago": "for {t} siden",
     "show_on_map": "Vis på kartet", "send_message": "Send en melding", "close": "Lukk",
     "my_position": "Min posisjon", "centre_me": "Sentrer på min posisjon",
     "remote": "Stasjon", "path": "Via digipeatere", "connect": "Koble til",
