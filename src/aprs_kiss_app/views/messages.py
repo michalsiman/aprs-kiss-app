@@ -86,6 +86,7 @@ class MessagesView(View):
                             ft.PopupMenuItem(self.t("mark_all_read"), icon=ft.Icons.MARK_EMAIL_READ,
                                              on_click=self._mark_all_read)])],
                        wrap=True, spacing=6),  # one line: a round + for a new message, Spot, Services, ⋮
+                self._filter_row(),
                 self.conversations,
             ],
             width=None if compact else 330,
@@ -218,13 +219,17 @@ class MessagesView(View):
             self._save_unread()
         states = tuple(self.engine.message_state(m.get("msg_no")) for m in self.engine.messages
                        if m["direction"] == "out")
-        signature = (len(self.engine.messages), self.selected, states, tuple(sorted(self.unread.items())),
+        signature = (len(self.engine.messages), self.selected, states, tuple(sorted(self.unread.items())), self.only_unread,
                      self.engine.aprsis is not None, self.engine.config.beacon_is)
         if signature == self._signature:
             return
         self._signature = signature
         self.via_picker.sync()  # not chosen yet: follows the APRS-IS switch in Settings
-        self.conversations.controls = [self._conversation_tile(call, msgs) for call, msgs in groups.items()]
+        self._show_filter()
+        shown = {c: m for c, m in groups.items() if c in self.unread} if self.only_unread else groups
+        self.conversations.controls = [self._conversation_tile(call, msgs) for call, msgs in shown.items()]
+        if groups and not shown:
+            self.conversations.controls = [ft.Text(self.t("no_unread"), color=ft.Colors.ON_SURFACE_VARIANT)]
         if not groups:
             self.conversations.controls = [ft.Text(self.t("no_messages"), color=ft.Colors.ON_SURFACE_VARIANT)]
         self._where()
@@ -255,6 +260,44 @@ class MessagesView(View):
     def _back(self, _e) -> None:
         self.selected = None
         self.to.visible = False
+        self._signature = None
+        self.refresh()
+        self.app.page.update()
+
+    # ─── the filter: all conversations, or only the unread ones; each with its count of messages ───
+
+    only_unread = False
+
+    def _filter_row(self) -> ft.Control:
+        self.filter_pills = {
+            False: self._pill(self.t("filter_all_msgs"), lambda _e: self._set_only_unread(False)),
+            True: self._pill(self.t("filter_unread"), lambda _e: self._set_only_unread(True)),
+        }
+        return ft.Row([self.filter_pills[False][0], self.filter_pills[True][0]], spacing=8)
+
+    @staticmethod
+    def _pill(text: str, on_click) -> tuple[ft.Container, ft.Text, ft.Container]:
+        label = ft.Text(text, size=13, weight=ft.FontWeight.W_500)
+        count = ft.Text("0", size=11, weight=ft.FontWeight.BOLD)
+        circle = ft.Container(count, border_radius=10, padding=ft.Padding.symmetric(horizontal=6, vertical=1),
+                              alignment=ft.Alignment.CENTER)
+        pill = ft.Container(ft.Row([label, circle], spacing=6, tight=True), on_click=on_click, border_radius=18,
+                            padding=ft.Padding.only(left=14, right=8, top=6, bottom=6), ink=True)
+        return pill, count, circle
+
+    def _show_filter(self) -> None:
+        counts = {False: len(self.engine.messages), True: self.unread_total}
+        for which, (pill, count, circle) in self.filter_pills.items():
+            on = which == self.only_unread
+            count.value = str(counts[which]) if counts[which] < 1000 else "999+"
+            pill.bgcolor = ft.Colors.with_opacity(0.18, ft.Colors.PRIMARY) if on else None
+            pill.border = ft.Border.all(1, ft.Colors.PRIMARY if on else ft.Colors.OUTLINE_VARIANT)
+            red = which and counts[which]  # unread messages: the count in red, as on the circles below
+            circle.bgcolor = ft.Colors.RED if red else ft.Colors.PRIMARY if on else ft.Colors.SURFACE_CONTAINER_HIGHEST
+            count.color = ft.Colors.WHITE if red else ft.Colors.ON_PRIMARY if on else ft.Colors.ON_SURFACE_VARIANT
+
+    def _set_only_unread(self, value: bool) -> None:
+        self.only_unread = value
         self._signature = None
         self.refresh()
         self.app.page.update()
