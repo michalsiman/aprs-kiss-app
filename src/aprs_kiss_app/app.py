@@ -7,6 +7,7 @@ import contextlib
 import logging
 import logging.handlers
 import os
+import re
 import sys
 import threading
 import time
@@ -1367,12 +1368,26 @@ class App:
         actions = [ft.TextButton(self.t("send_message"), icon=ft.Icons.MAIL, on_click=message)]
         if entry.get("latitude") is not None:
             actions.insert(0, ft.TextButton(self.t("show_on_map"), icon=ft.Icons.MAP, on_click=on_map))
+        qrz = qrz_url(call)
+        if qrz:  # the operator's page on QRZ.com (the callsign without its SSID or /P)
+            actions.append(ft.TextButton("QRZ.com", icon=ft.Icons.PERSON_SEARCH, url=qrz, tooltip=qrz))
         actions.append(ft.TextButton(self.t("close"), on_click=lambda _e: self.page.pop_dialog()))
         self.show_dialog(ft.AlertDialog(
             title=ft.Text(f"{pic}  {call}"),
             content=ft.Column(rows, tight=True, spacing=6, width=420),
             actions=actions,
         ))
+
+
+_CALLSIGN = re.compile(r"^(?:[A-Z]{1,2}[0-9]|[0-9][A-Z])[A-Z0-9]?[0-9]?[A-Z]{1,4}$")  # OK1SIM, 9A2XY, S57AB, DL1ABC
+
+
+def qrz_url(call: str) -> str | None:
+    """QRZ.com's page for a station: the base callsign (no -SSID, no /P), or None for an object, an item or a
+    name that is not a callsign (REPEAT, 438.725BR)."""
+    parts = [p for p in call.upper().split("-")[0].split("/") if p]
+    base = max(parts, key=len, default="")  # OK1SIM/P, F/OK1SIM: the longest part is the callsign
+    return f"https://www.qrz.com/db/{base}" if _CALLSIGN.match(base) else None
 
 
 LOG_FILE = "app.log"
