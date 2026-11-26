@@ -5,7 +5,12 @@ import unittest
 from pathlib import Path
 from types import SimpleNamespace
 
-from aprs_kiss_app.views.messages import MessagesView, avatar_color, avatar_letter
+try:
+    import flet  # noqa: F401
+except ImportError:
+    raise unittest.SkipTest("flet is not installed")
+
+from aprs_kiss_app.views.messages import MessagesView, avatar_color, avatar_letter  # noqa: E402
 
 
 class UnreadTest(unittest.TestCase):

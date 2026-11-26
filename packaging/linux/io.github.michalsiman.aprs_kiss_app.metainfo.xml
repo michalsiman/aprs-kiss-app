@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="1.2.2" date="2026-11-26" type="development">
+      <description>
+        <p>Beta: the station list says why it is empty (filter, or only internet stations hidden); the TAK explanation is shown whole.</p>
+      </description>
+    </release>
     <release version="1.2.1" date="2026-11-26" type="development">
       <description>
         <p>Beta: coloured circles with a letter in Messages and an unread count on each; the total of unread messages in notifications; a menu with Mark all as read; unread messages stay unread after a restart or an update.</p>

@@ -4,6 +4,13 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## 1.2.2 beta – 2026-11-26
+
+- **Stations: why the list is empty** – "No station matches the filter", or "All 13 stations were heard only
+  on the internet (APRS-IS); the globe button shows them" instead of "No stations heard yet". The count
+  (shown / all heard) has a tooltip.
+- **TAK switched off**: the whole explanation is shown, wrapped, not cut off.
+
 ## 1.2.1 beta – 2026-11-26
 
 - **Messages look nicer**: each conversation has a coloured circle with a letter – the suffix's first
