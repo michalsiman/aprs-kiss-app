@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import flet as ft
 
+from .views.base import check_item
+
 
 def _mmss(seconds: float) -> str:
     seconds = max(0, round(seconds))
@@ -32,8 +34,11 @@ class PositionButton:
         self.state_item = ft.PopupMenuItem(t("trk_off"), disabled=True)
         settings = ft.PopupMenuItem(t("trk_settings"), icon=ft.Icons.TUNE, on_click=lambda _e: app.select("settings"))
         # warnings while the tracker runs (both off until switched on here or in Settings › Tracker)
-        self.road_item = ft.PopupMenuItem(t("trk_menu_road"), on_click=lambda _e: self._flip("road_alerts"))
-        self.meet_item = ft.PopupMenuItem(t("trk_menu_meet"), on_click=lambda _e: self._flip("meet_alerts"))
+        conf = app.engine.config
+        self.road_item, self.road_box = check_item(t("trk_menu_road"), ft.Icons.CAR_CRASH_OUTLINED, conf.road_alerts,
+                                                   lambda _e: self._flip("road_alerts"))
+        self.meet_item, self.meet_box = check_item(t("trk_menu_meet"), ft.Icons.PEOPLE_OUTLINE, conf.meet_alerts,
+                                                   lambda _e: self._flip("meet_alerts"))
         self.control = ft.PopupMenuButton(content=self.face, tooltip=t("beacon_now"),
                                           items=[self.send_item, self.toggle_item, ft.PopupMenuItem(),
                                                  self.state_item, self.road_item, self.meet_item, settings],
@@ -63,8 +68,8 @@ class PositionButton:
         self.toggle_item.content = self.app.t("trk_stop" if on else "trk_start")
         self.toggle_item.icon = ft.Icons.PAUSE if on else ft.Icons.PLAY_ARROW
         self.state_item.content = text
-        self.road_item.checked = self.app.engine.config.road_alerts
-        self.meet_item.checked = self.app.engine.config.meet_alerts
+        self.road_box.value = self.app.engine.config.road_alerts
+        self.meet_box.value = self.app.engine.config.meet_alerts
         self.control.tooltip = text if on else self.app.t("beacon_now")
 
     async def _send_now(self, e) -> None:

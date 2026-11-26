@@ -15,7 +15,7 @@ from ..offline_map import MIN_ZOOM, BaseMap, Region, ScaleBar, gestures
 from ..symbols import emoji
 from ..declutter import from_px, spread, to_px
 from .map_source import MapSourceButton, _label
-from .base import View, bearing_deg, distance_km, distance_text, toggle
+from .base import View, bearing_deg, check_item, distance_km, distance_text, toggle
 
 DEFAULT_CENTER = (49.8, 15.5)  # Czechia
 REBUILD_SECONDS = 2.0
@@ -170,12 +170,11 @@ class MapView(View):
                     "repeater": ft.Icons.CELL_TOWER, "road": ft.Icons.CAR_CRASH_OUTLINED}
 
     def _filter_btn(self) -> ft.Control:
-        self.filter_items = {
-            # one line each: the explanation in brackets does not fit a phone's menu
-            kind: ft.PopupMenuItem(self.t(f"filter_{kind}").split(" (")[0], icon=icon,
-                                   on_click=lambda _e, k=kind: self._toggle_filter(k))
-            for kind, icon in self.FILTER_ICONS.items()
-        }
+        # one line each (the explanation in brackets does not fit a phone's menu); a box each, the menu stays open
+        self.filter_items, self.filter_boxes = {}, {}
+        for kind, icon in self.FILTER_ICONS.items():
+            self.filter_items[kind], self.filter_boxes[kind] = check_item(
+                self.t(f"filter_{kind}").split(" (")[0], icon, False, lambda _e, k=kind: self._toggle_filter(k))
         self.filter_all = ft.PopupMenuItem(self.t("filter_all"), icon=ft.Icons.FILTER_ALT_OFF_OUTLINED,
                                            on_click=lambda _e: self._set_filters(set()))
         self.filter_icon = ft.Icon(ft.Icons.FILTER_ALT_OUTLINED)
@@ -187,9 +186,8 @@ class MapView(View):
 
     def _show_filters(self) -> None:
         kinds = mapfilter.parse(self.engine.config.map_filters)
-        for kind, item in self.filter_items.items():
-            item.checked = kind in kinds
-        self.filter_all.disabled = not kinds
+        for kind, box in self.filter_boxes.items():
+            box.value = kind in kinds
         self.filter_icon.icon = ft.Icons.FILTER_ALT if kinds else ft.Icons.FILTER_ALT_OUTLINED
         self.filter_icon.color = ft.Colors.PRIMARY if kinds else None
         self.filter_face.bgcolor = ft.Colors.with_opacity(0.18, ft.Colors.PRIMARY) if kinds else None
@@ -210,7 +208,7 @@ class MapView(View):
         """Saved like the other view choices; only the tiles change, the markers keep their colours."""
         conf = self.engine.config
         conf.map_muted = not conf.map_muted
-        self.muted.checked = conf.map_muted
+        self.muted_box.value = conf.map_muted
         self.tiles.opacity = MUTED_OPACITY if conf.map_muted else 1.0
         self.app.save_config_soon()
         self.app.page.update()
@@ -225,8 +223,8 @@ class MapView(View):
             self.source_btn.refresh()
 
     def _offline_btn(self) -> ft.Control:
-        self.muted = ft.PopupMenuItem(self.t("map_muted"), icon=ft.Icons.FILTER_B_AND_W,
-                                      checked=self.engine.config.map_muted, on_click=self._toggle_muted)
+        self.muted, self.muted_box = check_item(self.t("map_muted"), ft.Icons.FILTER_B_AND_W,
+                                                self.engine.config.map_muted, self._toggle_muted)
         self.muted.disabled = self.app.offline_map()
         legend = ft.PopupMenuItem(self.t("legend"), icon=ft.Icons.HELP_OUTLINE,
                                   on_click=lambda _e: show_legend(self.app))
