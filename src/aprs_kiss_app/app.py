@@ -242,8 +242,8 @@ class App:
 
     @staticmethod
     def _menus() -> dict:
-        """Pop-up menus (map tools, filters, ⋮) and drop-down lists: a lighter background, a thin grey
-        frame and a shadow, so they stand out from the bars and the map under them."""
+        """Pop-up menus (map tools, filters, ⋮), drop-down lists, dialogs and bottom sheets: the same thin
+        grey frame and a shadow everywhere, so they stand out from the bars and the map under them."""
         frame = ft.BorderSide(1, ft.Colors.with_opacity(0.7, ft.Colors.OUTLINE))
         return {
             "popup_menu_theme": ft.PopupMenuTheme(
@@ -252,6 +252,11 @@ class App:
             "dropdown_theme": ft.DropdownTheme(menu_style=ft.MenuStyle(
                 bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST, elevation=10, shadow_color=ft.Colors.BLACK, side=frame,
                 shape=ft.RoundedRectangleBorder(radius=10))),
+            "dialog_theme": ft.DialogTheme(
+                elevation=10, shadow_color=ft.Colors.BLACK, shape=ft.RoundedRectangleBorder(radius=24, side=frame)),
+            "bottom_sheet_theme": ft.BottomSheetTheme(
+                elevation=10, shadow_color=ft.Colors.BLACK,
+                shape=ft.RoundedRectangleBorder(radius=ft.BorderRadius.only(top_left=24, top_right=24), side=frame)),
         }
 
     def _theme(self) -> ft.Theme:
