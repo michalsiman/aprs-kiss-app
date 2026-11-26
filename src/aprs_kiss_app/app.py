@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import asyncio
-import os
 import contextlib
 import logging
 import logging.handlers
+import os
+import sys
+import threading
 import time
+import traceback
 from collections.abc import Awaitable
 from typing import Any
 
@@ -744,9 +747,12 @@ class App:
         while not self._closing:
             await asyncio.sleep(TICK_SECONDS)
             n += 1
-            if n % THEME_EVERY == 0 and self.engine.config.theme == "auto":
-                await self.apply_theme()
-            self.refresh_now()
+            try:  # the app's clock must never stop: an error is logged, the next tick comes anyway
+                if n % THEME_EVERY == 0 and self.engine.config.theme == "auto":
+                    await self.apply_theme()
+                self.refresh_now()
+            except Exception:  # noqa: BLE001
+                _LOGGER.exception("Tick")
             try:
                 if not self._notify_asked and self.android and self._foreground and self.engine.config.configured:
                     self._notify_asked = True  # Android 13+: notifications (new messages) need a yes
@@ -855,6 +861,8 @@ class App:
         if value in ("resume", "show"):
             if not self._foreground:
                 self._resumed_at = time.monotonic()
+                with contextlib.suppress(Exception):  # back on screen: the whole screen sent again, fresh
+                    self.refresh_now()
             self._foreground = True
             with contextlib.suppress(Exception):  # a radio plugged in meanwhile: connect it now
                 self.engine.connection.retry_now()
@@ -1364,7 +1372,34 @@ def _log_to_file() -> None:
         loop.default_exception_handler(context)
 
     with contextlib.suppress(RuntimeError):
-        asyncio.get_running_loop().set_exception_handler(on_error)
+        loop = asyncio.get_running_loop()
+        loop.set_exception_handler(on_error)
+        threading.Thread(target=_watch_loop, args=(loop,), daemon=True, name="loop-watch").start()
+
+
+def _watch_loop(loop: asyncio.AbstractEventLoop, every: float = 5, stuck: float = 10) -> None:
+    """Is the app's event loop alive? Every few seconds it is asked to tick; when it has not for a while
+    (something blocks it: then no tap, no back, no menu works), what every thread is doing goes to the log."""
+    last = [time.monotonic()]
+    reported = False
+
+    def beat() -> None:
+        last[0] = time.monotonic()
+
+    while not loop.is_closed():
+        with contextlib.suppress(RuntimeError):
+            loop.call_soon_threadsafe(beat)
+        time.sleep(every)
+        late = time.monotonic() - last[0]
+        if late > stuck and not reported:
+            reported = True
+            frames = sys._current_frames()  # noqa: SLF001 - the only way to see a blocked thread
+            stacks = "\n".join(f"--- {t.name}\n" + "".join(traceback.format_stack(frames[t.ident]))
+                               for t in threading.enumerate() if t.ident in frames)
+            _LOGGER.error("The app is stuck for %.0f s; threads:\n%s", late, stacks)
+        elif late <= stuck and reported:
+            reported = False
+            _LOGGER.warning("The app runs again")
 
 
 async def main(page: ft.Page) -> None:
