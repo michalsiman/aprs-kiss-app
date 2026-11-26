@@ -11,6 +11,7 @@ import sys
 import threading
 import time
 import traceback
+import weakref
 from collections.abc import Awaitable
 from typing import Any
 
@@ -55,6 +56,8 @@ TICK_SECONDS = 5.0
 THEME_EVERY = 6  # ticks: the desktop theme is looked at every 30 s
 
 
+_LIVE_APPS: "weakref.WeakSet[App]" = weakref.WeakSet()  # the app's sessions still running (normally one)
+
 COMPACT_WIDTH = 700  # narrower than this (a phone): the compact layout
 
 class App:
@@ -76,6 +79,14 @@ class App:
 
     async def start(self) -> None:
         page = self.page
+        if self.mobile:
+            # Android may restart the screen part of the app (the "Dart VM") while Python keeps running:
+            # a new session starts, and the old one's engine would go on holding the radio's connection,
+            # the GPS and the timers next to the new one. One app on a phone: the old one is stopped first.
+            for old in [a for a in _LIVE_APPS if a is not self and not a._closing]:
+                _LOGGER.warning("A new session while an old one still runs: stopping the old one")
+                await old.shutdown()
+        _LIVE_APPS.add(self)
         page.title = "APRS & Packet"
         page.theme_mode = ft.ThemeMode.SYSTEM
         page.theme = self._theme()
@@ -187,6 +198,7 @@ class App:
     async def shutdown(self) -> None:
         if self._closing:
             return
+        _LOGGER.info("Session ends: stopping the engine")
         self._closing = True
         if self.engine:
             with contextlib.suppress(Exception):
