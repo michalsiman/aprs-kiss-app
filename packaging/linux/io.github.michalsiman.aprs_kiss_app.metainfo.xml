@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="1.1.3" date="2026-11-26" type="development">
+      <description>
+        <p>Beta: notifications of new messages and chat lines (Android in the background, Linux, Windows, macOS when the window is not in front); back from a conversation goes to the list first; a round + for a new message; the REPEAT service works; accented letters read right; a garbled reject is not shown as a message.</p>
+      </description>
+    </release>
     <release version="1.1.2" date="2026-11-25" type="development">
       <description>
         <p>Beta: each profile has its own position comment and tracker way (fixed interval or SmartBeaconing); the active profile is marked; menus stand out with a frame and a shadow.</p>
