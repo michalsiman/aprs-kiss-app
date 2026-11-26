@@ -271,3 +271,21 @@ class ViaPicker:
         setattr(self.app.engine.config, self.field, self.value())
         self.app.save_config_soon()  # remembered until changed
         self.app.page.update()
+
+
+STAY_WIDTH = 250  # the tappable width of a menu line that keeps the menu open
+
+
+def stay_item(content: ft.Control, on_click, disabled: bool = False) -> tuple[ft.PopupMenuItem, ft.Container]:
+    """A menu line whose tap does its thing and leaves the menu open (the tap belongs to the inner box, not to
+    the menu item, which would close the menu); back or a tap outside closes it. The box's content can be
+    replaced later (refresh)."""
+    box = ft.Container(content, on_click=on_click, disabled=disabled, width=STAY_WIDTH,
+                       padding=ft.Padding.symmetric(vertical=10), alignment=ft.Alignment.CENTER_LEFT)
+    return ft.PopupMenuItem(content=box, disabled=disabled), box
+
+
+def menu_line(icon, text: str, color=None) -> ft.Control:
+    """An icon and a text as a menu item shows them (for stay_item)."""
+    return ft.Row([ft.Icon(icon, color=color), ft.Text(text, color=color, max_width=STAY_WIDTH - 40)],
+                  spacing=12, tight=True)

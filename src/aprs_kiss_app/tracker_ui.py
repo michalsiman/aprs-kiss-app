@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import flet as ft
 
-from .views.base import check_item
+from .views.base import check_item, menu_line, stay_item
 
 
 def _mmss(seconds: float) -> str:
@@ -29,8 +29,9 @@ class PositionButton:
                                  padding=ft.Padding.symmetric(horizontal=6 if compact else 10),
                                  border_radius=5 if compact else 7,
                                  border=ft.Border.all(1.5 if compact else 2.0, ft.Colors.OUTLINE))
-        self.send_item = ft.PopupMenuItem(t("pos_send_now"), icon=ft.Icons.SEND, on_click=self._send_now)
-        self.toggle_item = ft.PopupMenuItem(t("trk_start"), icon=ft.Icons.PLAY_ARROW, on_click=self._toggle)
+        # sending and starting/stopping leave the menu open (the state line below shows what happened)
+        self.send_item, _ = stay_item(menu_line(ft.Icons.SEND, t("pos_send_now")), self._send_now)
+        self.toggle_item, self.toggle_box = stay_item(menu_line(ft.Icons.PLAY_ARROW, t("trk_start")), self._toggle)
         self.state_item = ft.PopupMenuItem(t("trk_off"), disabled=True)
         settings = ft.PopupMenuItem(t("trk_settings"), icon=ft.Icons.TUNE, on_click=lambda _e: app.select("settings"))
         # warnings while the tracker runs (both off until switched on here or in Settings › Tracker)
@@ -65,8 +66,8 @@ class PositionButton:
         self.pin.color = self.play.color = color or ft.Colors.ON_SURFACE
         if isinstance(self.face.border, ft.Border):
             self.face.border = ft.Border.all(self.face.border.top.width, color or ft.Colors.OUTLINE)
-        self.toggle_item.content = self.app.t("trk_stop" if on else "trk_start")
-        self.toggle_item.icon = ft.Icons.PAUSE if on else ft.Icons.PLAY_ARROW
+        self.toggle_box.content = menu_line(ft.Icons.PAUSE if on else ft.Icons.PLAY_ARROW,
+                                            self.app.t("trk_stop" if on else "trk_start"))
         self.state_item.content = text
         self.road_box.value = self.app.engine.config.road_alerts
         self.meet_box.value = self.app.engine.config.meet_alerts

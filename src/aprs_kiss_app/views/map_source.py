@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import flet as ft
 
+from .base import stay_item
+
 ICONS = {"online": ft.Icons.CLOUD_OUTLINED, "imported": ft.Icons.TERRAIN, "basic": ft.Icons.CLOUD_OFF}
 
 
@@ -37,14 +39,10 @@ class MapSourceButton:
     def __init__(self, app, extra: list | None = None) -> None:
         self.app = app
         t = app.t
-        self.items = {
-            "online": ft.PopupMenuItem(_label(t("map_src_online")), icon=ICONS["online"],
-                                       on_click=lambda _e: self._pick("online")),
-            "imported": ft.PopupMenuItem(_label(t("map_src_imported")), icon=ICONS["imported"],
-                                         on_click=lambda _e: self._pick("imported")),
-            "basic": ft.PopupMenuItem(_label(t("map_src_basic")), icon=ICONS["basic"],
-                                      on_click=lambda _e: self._pick("basic")),
-        }
+        # a choice leaves the menu open (the mark moves); back or a tap outside closes it
+        self.items, self.boxes = {}, {}
+        for key in ("online", "imported", "basic"):
+            self.items[key], self.boxes[key] = stay_item(ft.Text(""), lambda _e, k=key: self._pick(k))
         manage = ft.PopupMenuItem(t("map_src_manage"), icon=ft.Icons.FOLDER_OPEN,
                                   on_click=lambda _e: app.select("settings"))
         self.icon = ft.Icon(ICONS["online"])
@@ -56,10 +54,13 @@ class MapSourceButton:
     def refresh(self) -> None:
         mode = self.app.map_mode()
         has_imported = self.app.has_imported_maps()
-        for key, item in self.items.items():
-            item.icon = _choice_icon(ICONS[key], key == self.app.wanted_map_mode())
-        self.items["imported"].disabled = not has_imported
-        self.items["imported"].content = _label(self.app.t("map_src_imported" if has_imported else "map_src_none"))
+        texts = {"online": "map_src_online", "imported": "map_src_imported" if has_imported else "map_src_none",
+                 "basic": "map_src_basic"}
+        for key, box in self.boxes.items():
+            box.content = ft.Row([_choice_icon(ICONS[key], key == self.app.wanted_map_mode()),
+                                  _label(self.app.t(texts[key]))], spacing=12, tight=True,
+                                 vertical_alignment=ft.CrossAxisAlignment.CENTER)
+        self.items["imported"].disabled = self.boxes["imported"].disabled = not has_imported
         self.icon.icon = ICONS[mode]
         self.icon.color = ft.Colors.PRIMARY if mode != "online" else None
         self.face.bgcolor = ft.Colors.with_opacity(0.18, ft.Colors.PRIMARY) if mode != "online" else None

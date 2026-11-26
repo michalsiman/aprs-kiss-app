@@ -15,7 +15,7 @@ from ..offline_map import LAND, MIN_ZOOM, BaseMap, Region, ScaleBar, gestures
 from ..symbols import emoji
 from ..declutter import from_px, spread, to_px
 from .map_source import MapSourceButton, _label
-from .base import View, bearing_deg, check_item, distance_km, distance_text, toggle
+from .base import View, bearing_deg, check_item, distance_km, distance_text, menu_line, stay_item, toggle
 
 DEFAULT_CENTER = (49.8, 15.5)  # Czechia
 REBUILD_SECONDS = 2.0
@@ -175,8 +175,8 @@ class MapView(View):
         for kind, icon in self.FILTER_ICONS.items():
             self.filter_items[kind], self.filter_boxes[kind] = check_item(
                 self.t(f"filter_{kind}").split(" (")[0], icon, False, lambda _e, k=kind: self._toggle_filter(k))
-        self.filter_all = ft.PopupMenuItem(self.t("filter_all"), icon=ft.Icons.FILTER_ALT_OFF_OUTLINED,
-                                           on_click=lambda _e: self._set_filters(set()))
+        self.filter_all, _ = stay_item(menu_line(ft.Icons.FILTER_ALT_OFF_OUTLINED, self.t("filter_all")),
+                                       lambda _e: self._set_filters(set()))  # the boxes clear, the menu stays
         self.filter_icon = ft.Icon(ft.Icons.FILTER_ALT_OUTLINED)
         self.filter_face = ft.Container(self.filter_icon, padding=8, shape=ft.BoxShape.CIRCLE)
         self.filter_btn = ft.PopupMenuButton(content=self.filter_face, tooltip=self.t("filter"),
