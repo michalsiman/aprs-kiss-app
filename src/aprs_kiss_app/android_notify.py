@@ -89,8 +89,9 @@ CHAT_ID = 4251
 
 
 def notify(title: str, text: str, channel_name: str, channel: str = CHANNEL, nid: int = NOTIFICATION_ID,
-           silent: bool = False) -> bool:
-    """Show a notification that opens the app when tapped; False when it could not."""
+           silent: bool = False, sub: str | None = None, number: int = 0) -> bool:
+    """Show a notification that opens the app when tapped; False when it could not.
+    `sub`: a short line in the header (e.g. how many unread), `number`: the count on the app's icon."""
     try:
         jnius, activity = _activity()
         Context = jnius.autoclass("android.content.Context")
@@ -116,6 +117,10 @@ def notify(title: str, text: str, channel_name: str, channel: str = CHANNEL, nid
         style = jnius.autoclass("android.app.Notification$BigTextStyle")()
         style.bigText(text)
         builder.setStyle(style)  # a long message whole when pulled down
+        if sub:
+            builder.setSubText(sub)
+        if number:
+            builder.setNumber(number)
         builder.setAutoCancel(True)
         builder.setContentIntent(pending)
         manager.notify(nid, builder.build())

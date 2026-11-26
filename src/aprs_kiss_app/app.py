@@ -809,7 +809,7 @@ class App:
             self.position_btn.refresh()
         if self.has_view("messages"):
             messages = self.view("messages")
-            badge = str(len(messages.unread)) if messages.unread else None
+            badge = str(messages.unread_total) if messages.unread else None
             # on the plain and the selected icon: the count stays while Messages is open, until they are read
             for dest in (self.rail.destinations[self.views.index(messages)],
                          self.drawer.controls[1 + self.views.index(messages)]):
@@ -1196,14 +1196,17 @@ class App:
         """Nobody is looking: the phone app in the background, or the computer's window not in front."""
         return not self._foreground or self._window_away
 
-    def _system_notify(self, title: str, text: str, nid: int) -> bool:
-        """The system's own notification (Android, Linux, Windows, macOS); False where there is none."""
+    def _system_notify(self, title: str, text: str, nid: int, unread: int = 0) -> bool:
+        """The system's own notification (Android, Linux, Windows, macOS); False where there is none.
+        `unread`: all unread messages, said under the message (Android: in the notification's header)."""
+        sub = self.t("unread_total", n=unread) if unread > 1 else None
         if self.android:
             return android_notify.notify(title, text, self.t("messages"), channel=android_notify.MESSAGES_CHANNEL,
-                                         nid=nid, silent=True)  # the app beeps itself
+                                         nid=nid, silent=True, sub=sub, number=unread)  # the app beeps itself
         if self.mobile or getattr(self.page, "web", False):
             return False  # iOS: the app does not run in the background; a browser: no system of ours
-        return desktop_notify.notify(title, text, "chat" if nid == android_notify.CHAT_ID else "message")
+        return desktop_notify.notify(title, f"{text}\n{sub}" if sub else text,
+                                     "chat" if nid == android_notify.CHAT_ID else "message")
 
     def _notify_chat(self, entry: dict[str, Any]) -> None:
         """A chat line while nobody looks: a notification (on screen the chat shows it)."""
@@ -1232,7 +1235,7 @@ class App:
             return
         if self._away():  # the system's notification; on a phone a tap on it opens the conversation
             if self._system_notify(self.t("message_from", call=message["from"]), message["text"],
-                                   android_notify.MESSAGE_ID) and self.android:
+                                   android_notify.MESSAGE_ID, self.view("messages").unread_total) and self.android:
                 self._open_pending = ("messages", message["from"])
                 return  # a computer: the bar below waits in the window too
         if self.current_key == "messages" and self.view("messages").selected == message["from"].upper():

@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 from types import SimpleNamespace
 
-from aprs_kiss_app.views.messages import MessagesView
+from aprs_kiss_app.views.messages import MessagesView, avatar_color, avatar_letter
 
 
 class UnreadTest(unittest.TestCase):
@@ -19,15 +19,36 @@ class UnreadTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             v = self._view(d)
             v._set_unread("OK1ABC", True)
+            v._set_unread("OK1ABC", True)
             v._set_unread("OK2XYZ", True)
             v._set_unread("OK2XYZ", False)
-            self.assertEqual(self._view(d).unread, {"OK1ABC"})
+            again = self._view(d)
+            self.assertEqual(again.unread, {"OK1ABC": 2})
+            self.assertEqual(again.unread_total, 2)
+
+    def test_first_form_of_the_file(self):
+        with tempfile.TemporaryDirectory() as d:
+            (Path(d) / "unread.json").write_text('["OK1ABC", "ok2xyz"]', encoding="utf-8")
+            self.assertEqual(self._view(d).unread, {"OK1ABC": 1, "OK2XYZ": 1})
 
     def test_no_file_or_broken_file(self):
         with tempfile.TemporaryDirectory() as d:
-            self.assertEqual(self._view(d).unread, set())
+            self.assertEqual(self._view(d).unread, {})
             (Path(d) / "unread.json").write_text("{bad", encoding="utf-8")
-            self.assertEqual(self._view(d).unread, set())
+            self.assertEqual(self._view(d).unread, {})
+
+
+class AvatarTest(unittest.TestCase):
+    def test_letter_from_the_suffix(self):
+        self.assertEqual(avatar_letter("OK1TNT-14"), "T")
+        self.assertEqual(avatar_letter("ok1sim"), "S")
+        self.assertEqual(avatar_letter("9A2XY"), "X")
+        self.assertEqual(avatar_letter("REPEAT"), "R")
+        self.assertEqual(avatar_letter(""), "?")
+
+    def test_same_letter_same_colour(self):
+        self.assertEqual(avatar_color("T"), avatar_color("T"))
+        self.assertNotEqual(avatar_color("A"), avatar_color("B"))
 
 
 if __name__ == "__main__":

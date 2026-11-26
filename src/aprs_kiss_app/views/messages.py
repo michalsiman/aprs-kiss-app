@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import time
 
 import flet as ft
@@ -21,6 +22,23 @@ STATE_ICONS = {
     "rejected": (ft.Icons.BLOCK, ft.Colors.RED),
     "failed": (ft.Icons.ERROR_OUTLINE, ft.Colors.RED),
 }
+# the colour of a conversation's circle, chosen by its letter (white letter on each)
+AVATAR_COLORS = (ft.Colors.RED_700, ft.Colors.INDIGO_500, ft.Colors.GREEN_700, ft.Colors.PURPLE_600,
+                 ft.Colors.ORANGE_800, ft.Colors.TEAL_700, ft.Colors.PINK_600, ft.Colors.BLUE_700,
+                 ft.Colors.BROWN_500, ft.Colors.DEEP_PURPLE_400, ft.Colors.CYAN_800, ft.Colors.DEEP_ORANGE_700,
+                 ft.Colors.LIGHT_GREEN_800, ft.Colors.BLUE_GREY_600)
+
+
+def avatar_letter(call: str) -> str:
+    """The letter in the circle: the suffix's first (OK1TNT → T: the prefix is the same for a whole
+    country), the first character for a name without a number (REPEAT → R)."""
+    base = call.split("-")[0].upper()
+    m = re.search(r"\d([A-Z])[A-Z]*$", base)
+    return m.group(1) if m else (base[:1] or "?")
+
+
+def avatar_color(letter: str) -> str:
+    return AVATAR_COLORS[ord(letter[:1] or "?") % len(AVATAR_COLORS)]
 
 
 class MessagesView(View):
@@ -30,7 +48,7 @@ class MessagesView(View):
 
     def build(self) -> ft.Control:
         self.selected: str | None = None
-        self.unread: set[str] = self._load_unread()
+        self.unread: dict[str, int] = self._load_unread()  # callsign → how many messages unread
         self._signature = None
         self.conversations = ft.ListView(expand=True, spacing=2)
         self.thread = ft.ListView(expand=True, spacing=8, auto_scroll=True, padding=ft.Padding.all(12))
@@ -71,7 +89,7 @@ class MessagesView(View):
                        wrap=True, spacing=6),  # one line: a round + for a new message, Spot, Services, ⋮
                 self.conversations,
             ],
-            width=None if compact else 250,
+            width=None if compact else 330,
             expand=compact,
         )
         self.right = right = ft.Column(
@@ -130,26 +148,38 @@ class MessagesView(View):
     def _unread_file(self):
         return self.app.folder / "unread.json"
 
-    def _load_unread(self) -> set[str]:
+    def _load_unread(self) -> dict[str, int]:
         try:
             data = json.loads(self._unread_file().read_text(encoding="utf-8"))
-            return {str(c).upper() for c in data} if isinstance(data, list) else set()
         except (OSError, ValueError, AttributeError):
-            return set()
+            return {}
+        if isinstance(data, list):  # the first form: only the callsigns
+            return {str(c).upper(): 1 for c in data}
+        if isinstance(data, dict):
+            return {str(c).upper(): max(1, int(n)) for c, n in data.items() if isinstance(n, int)}
+        return {}
+
+    @property
+    def unread_total(self) -> int:
+        """All unread messages together."""
+        return sum(self.unread.values())
 
     def _save_unread(self) -> None:
         try:
             path = self._unread_file()
             tmp = path.with_suffix(".tmp")
-            tmp.write_text(json.dumps(sorted(self.unread)), encoding="utf-8")
+            tmp.write_text(json.dumps(dict(sorted(self.unread.items()))), encoding="utf-8")
             tmp.replace(path)
         except (OSError, AttributeError):
             pass
 
     def _set_unread(self, call: str, unread: bool) -> None:
-        if (call in self.unread) != unread:
-            (self.unread.add if unread else self.unread.discard)(call)
-            self._save_unread()
+        """One more unread message from the station, or its conversation read."""
+        if unread:
+            self.unread[call] = self.unread.get(call, 0) + 1
+        elif self.unread.pop(call, None) is None:
+            return
+        self._save_unread()
 
     def _mark_all_read(self, _e=None) -> None:
         if self.unread:
@@ -164,8 +194,13 @@ class MessagesView(View):
     def on_event(self, kind, data) -> None:
         if kind == "message":
             sender = data["from"].upper()
-            if not (self.app.current_key == self.key and self.selected == sender):
+            if not self._reading(sender):
                 self._set_unread(sender, True)
+
+    def _reading(self, call: str) -> bool:
+        """The conversation is on screen and somebody looks (not in the background, not minimised)."""
+        away = getattr(self.app, "_away", None)
+        return self.app.current_key == self.key and self.selected == call and not (away and away())
 
     def open_conversation(self, call: str) -> None:
         self.selected = call.upper()
@@ -175,16 +210,16 @@ class MessagesView(View):
         self.refresh()
 
     def refresh(self) -> None:
-        if self.app.current_key == self.key and self.selected:
+        if self.selected and self._reading(self.selected):
             self._set_unread(self.selected, False)
             self.app.message_read(self.selected)
         groups = self._grouped()
-        if getattr(self.engine, "_loaded", False) and self.unread - groups.keys():  # conversations gone meanwhile
-            self.unread &= groups.keys()
+        if getattr(self.engine, "_loaded", False) and self.unread.keys() - groups.keys():  # conversations gone
+            self.unread = {c: n for c, n in self.unread.items() if c in groups}
             self._save_unread()
         states = tuple(self.engine.message_state(m.get("msg_no")) for m in self.engine.messages
                        if m["direction"] == "out")
-        signature = (len(self.engine.messages), self.selected, states, tuple(sorted(self.unread)),
+        signature = (len(self.engine.messages), self.selected, states, tuple(sorted(self.unread.items())),
                      self.engine.aprsis is not None, self.engine.config.beacon_is)
         if signature == self._signature:
             return
@@ -231,22 +266,27 @@ class MessagesView(View):
 
     def _conversation_tile(self, call: str, msgs: list[dict]) -> ft.Control:
         last = msgs[-1]
-        unread = call in self.unread
+        unread = self.unread.get(call, 0)
+        letter = avatar_letter(call)
         return ft.ListTile(
-            # unread: a red dot on the envelope on the left, and the callsign in bold
-            leading=ft.Icon(ft.Icons.MARK_EMAIL_UNREAD if unread else ft.Icons.PERSON,
-                            color=ft.Colors.PRIMARY if unread else None,
-                            badge=ft.Badge(small_size=11, bgcolor=ft.Colors.RED) if unread else None),
-            title=ft.Text(call, weight=ft.FontWeight.BOLD if unread else None),
-            subtitle=ft.Text(last["text"], max_lines=1, overflow=ft.TextOverflow.ELLIPSIS),
+            # a coloured circle with the letter; unread: a red count on it, the callsign and the text in bold
+            leading=ft.CircleAvatar(
+                content=ft.Text(letter, size=18, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
+                bgcolor=avatar_color(letter), radius=20,
+                badge=ft.Badge(label=str(unread) if unread < 100 else "99+", bgcolor=ft.Colors.RED,
+                               text_color=ft.Colors.WHITE) if unread else None),
+            title=ft.Text(call, weight=ft.FontWeight.BOLD if unread else None, no_wrap=True,
+                          overflow=ft.TextOverflow.ELLIPSIS),
+            subtitle=ft.Text(last["text"], max_lines=1, overflow=ft.TextOverflow.ELLIPSIS,
+                             weight=ft.FontWeight.W_600 if unread else None,
+                             color=None if unread else ft.Colors.ON_SURFACE_VARIANT),
             trailing=ft.Row([
-                ft.Text(clock(last["time"]), size=11),
+                ft.Text(clock(last["time"]), size=11, color=ft.Colors.ON_SURFACE_VARIANT),
                 ft.PopupMenuButton(icon=ft.Icons.MORE_VERT, tooltip=self.t("more"), items=[
                     ft.PopupMenuItem(self.t("conv_delete"), icon=ft.Icons.DELETE_OUTLINE,
                                      on_click=lambda _e, c=call: self._ask_delete(c))]),
             ], tight=True, spacing=0, vertical_alignment=ft.CrossAxisAlignment.CENTER),
             selected=call == self.selected,
-            dense=True,
             on_click=lambda _e, c=call: self.open_conversation(c),
         )
 
