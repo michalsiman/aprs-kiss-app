@@ -216,6 +216,12 @@ def check_item(text: str, icon, value: bool, on_change) -> tuple[ft.PopupMenuIte
     return ft.PopupMenuItem(content=box), box
 
 
+def walkie_talkie(color, size: float = 24) -> ft.Control:
+    """A handheld radio (Material has no such icon): our own drawing, tinted like an icon."""
+    return ft.Image(src="walkie_talkie.svg", width=size, height=size, color=color,
+                    color_blend_mode=ft.BlendMode.SRC_IN)
+
+
 class ViaPicker:
     """How a message goes: two on/off icons, the radio and the internet (one or both, never none), remembered
     in a config field until changed. Only the radio while APRS-IS is off (then the icons are hidden)."""
@@ -225,7 +231,8 @@ class ViaPicker:
     def __init__(self, app, field: str, default) -> None:
         self.app, self.field, self.default = app, field, default  # default(): the way while none was chosen
         t = app.t
-        self.radio = toggle(ft.Icons.SETTINGS_INPUT_ANTENNA, ft.Icons.SETTINGS_INPUT_ANTENNA, False, t("via_radio"),
+        self.radio = toggle(walkie_talkie(ft.Colors.with_opacity(0.35, ft.Colors.ON_SURFACE)),
+                            walkie_talkie(ft.Colors.PRIMARY), False, t("via_radio"),
                             lambda _e: self._flip(self.radio, self.net))
         self.net = toggle(ft.Icons.PUBLIC, ft.Icons.PUBLIC, False, t("via_internet"),
                           lambda _e: self._flip(self.net, self.radio))
