@@ -4,7 +4,7 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
-## Unreleased
+## 1.5.1 beta – 2026-11-27
 
 - **Messages, APRS Thursday, Monitor, chat, terminal and BBS open straight on the last line** – no more slow
   scrolling down through the whole history.
