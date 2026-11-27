@@ -8,10 +8,24 @@ import flet as ft
 
 ROW_HEIGHT = 48
 
+# Each screen's icon in a colour of its own (one colour each, calm shades that read on light and dark),
+# in the phone's menu and on the computer's rail alike.
+COLORS = {
+    "map": ft.Colors.GREEN_600, "messages": ft.Colors.BLUE_600, "bulletins": ft.Colors.ORANGE_700,
+    "thursday": ft.Colors.PURPLE_400, "stations": ft.Colors.TEAL_600, "terminal": ft.Colors.BLUE_GREY_500,
+    "chat": ft.Colors.INDIGO_400, "files": ft.Colors.AMBER_700, "monitor": ft.Colors.CYAN_700,
+    "bbs": ft.Colors.BROWN_400, "tak": ft.Colors.RED_400, "settings": ft.Colors.GREY_600, "about": ft.Colors.GREY_500,
+}
+
+
+def color(key: str):
+    return COLORS.get(key, ft.Colors.ON_SURFACE_VARIANT)
+
 
 class MenuRow:
-    def __init__(self, icon, selected_icon, label: str, on_click) -> None:
+    def __init__(self, icon, selected_icon, label: str, on_click, tint=None) -> None:
         self.plain, self.chosen_icon = icon, selected_icon or icon
+        self.tint = tint  # the icon's own colour (None: grey, the accent colour when chosen)
         self.icon = ft.Icon(icon, size=22)
         self.text = ft.Text(label, size=15, no_wrap=True, overflow=ft.TextOverflow.ELLIPSIS, expand=True)
         self.badge_text = ft.Text("", size=11, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE)
@@ -28,7 +42,7 @@ class MenuRow:
         self.bar.bgcolor = ft.Colors.PRIMARY if on else ft.Colors.TRANSPARENT
         self.control.bgcolor = ft.Colors.with_opacity(0.10, ft.Colors.PRIMARY) if on else None
         self.icon.icon = self.chosen_icon if on else self.plain
-        self.icon.color = ft.Colors.PRIMARY if on else ft.Colors.ON_SURFACE_VARIANT
+        self.icon.color = self.tint or (ft.Colors.PRIMARY if on else ft.Colors.ON_SURFACE_VARIANT)
         self.text.color = ft.Colors.PRIMARY if on else ft.Colors.ON_SURFACE
         self.text.weight = ft.FontWeight.W_600 if on else ft.FontWeight.NORMAL
 

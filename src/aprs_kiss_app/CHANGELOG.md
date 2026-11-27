@@ -4,6 +4,19 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## 1.9.0 – 2026-11-27
+
+- **Raspberry Pi as a station with a touch screen** – one command installs it on Raspberry Pi OS
+  (`curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh | bash`, a guide step by step at
+  https://michalsiman.github.io/aprs-kiss-app/raspberry.html and in docs/RASPBERRY.md): the station runs from
+  power-on (TNC, APRS-IS, iGate, digipeater, beacon; Transmit is remembered), the whole app on the Pi's touch
+  screen, and over the web from a phone or a computer behind a password. `--touch-5inch` for the cheap 5" HDMI
+  touch displays, `--dashboard` for a plain monitor, `--no-display` for a Pi without a screen.
+- **Coloured icons in the menu** – each screen in a colour of its own (the map green, messages blue, bulletins
+  orange…), in the phone's menu and on the computer's rail.
+- **The menu hidden behind ☰ on a computer too** when chosen (Settings › App); low screens (a Raspberry Pi's
+  800×480 or 1024×600) get the phone's menu by themselves.
+
 ## 1.8.1 beta – 2026-11-27
 
 - **Raspberry Pi as a station server with a display**: `aprs-kiss-server` runs one engine for as long as the

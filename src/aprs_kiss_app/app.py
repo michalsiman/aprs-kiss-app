@@ -616,7 +616,8 @@ class App:
             label_type=ft.NavigationRailLabelType.ALL,
             min_width=88,
             destinations=[ft.NavigationRailDestination(
-                icon=ft.Icon(v.icon), selected_icon=ft.Icon(v.selected_icon or v.icon), label=self.t(v.key),
+                icon=ft.Icon(v.icon, color=drawer.color(v.key)),
+                selected_icon=ft.Icon(v.selected_icon or v.icon, color=drawer.color(v.key)), label=self.t(v.key),
                 # a new section: a gap above it
                 padding=ft.Padding.only(top=14) if i and SECTIONS.get(v.key) != SECTIONS.get(self.menu_views[i - 1].key)
                 else None)
@@ -625,7 +626,7 @@ class App:
         )
         # a phone: About is at the end of the menu (no room for its button in the top bar)
         about = drawer.MenuRow(ft.Icons.INFO_OUTLINE, None, self.t("about"),
-                               lambda _e: self.page.run_task(self._menu_about))
+                               lambda _e: self.page.run_task(self._menu_about), drawer.color("about"))
         self.about_note = ft.Text(size=12, color=ft.Colors.PRIMARY, visible=False)  # a new version, when there is one
         self.about_item = ft.Column([about.control, ft.Container(self.about_note, padding=ft.Padding.only(left=58))],
                                     spacing=0)
@@ -641,7 +642,8 @@ class App:
                 elif section:
                     drawer_items.append(drawer.heading(self.t(f"menu_{section}")))
             self.drawer_rows[v.key] = drawer.MenuRow(v.icon, v.selected_icon, self.t(v.key),
-                                                     lambda _e, k=v.key: self.page.run_task(self._menu_selected, k))
+                                                     lambda _e, k=v.key: self.page.run_task(self._menu_selected, k),
+                                                     drawer.color(v.key))
             drawer_items.append(self.drawer_rows[v.key].control)
         self.drawer = ft.NavigationDrawer(
             controls=drawer_items + [drawer.divider(), self.about_item],
