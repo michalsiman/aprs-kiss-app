@@ -10,7 +10,7 @@ import flet as ft
 import flet_map as fm
 from aprs_kiss_core import localwx, mapfilter, repeater, units
 
-from ..legend import COLOR_ME, map_label, show_legend, station_color, visible
+from ..legend import COLOR_ME, emergency, map_label, show_legend, station_color, visible
 from ..offline_map import LAND, MIN_ZOOM, BaseMap, Region, ScaleBar, gestures
 from ..symbols import emoji
 from ..declutter import from_px, spread, to_px
@@ -636,7 +636,7 @@ class MapView(View):
                 continue
             wanted.append((e["call"], lat, lon, emoji(e.get("symbol_table"), e.get("symbol")),
                            station_color(self.app, e), bool(e.get("last_rf")),
-                           repeater.label(e) or self._temperature(e)))
+                           "🆘 EMERGENCY" if emergency(e) else repeater.label(e) or self._temperature(e)))
             if conf.map_trails:
                 points = tuple((p[1], p[2]) for p in e.get("track", ()) if now - p[0] <= TRAIL_SECONDS)
                 if len(points) >= 2:

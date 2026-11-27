@@ -14,16 +14,16 @@ from typing import Any
 
 from .aprsis import DEFAULT_PORT as DEFAULT_APRSIS_PORT
 from .aprsis import DEFAULT_SERVER as DEFAULT_APRSIS_HOST
-from . import mapfilter, profiles, roadalert
+from . import aprs, mapfilter, profiles, roadalert
 from .ax25 import Address
 
 _LOGGER = logging.getLogger(__name__)
 
 APP_NAME = "aprs-kiss"
-VERSION = "1.7.0"
+VERSION = "1.7.1"
 # A beta (a pre-release on GitHub, tag vX.Y.Z-beta): betas take the next patch numbers (1.0.1, 1.0.2 …),
 # the next stable release a higher minor one (1.1.0), so updating always goes up.
-BETA = False
+BETA = True
 VERSION_LABEL = f"{VERSION} beta" if BETA else VERSION
 MIN_BEACON_MINUTES = 10
 
@@ -88,6 +88,8 @@ class Config:
     units_distance: str = ""  # "km", "mi"; "" = as the phone / computer is set (miles in the US and the UK)
     units_temperature: str = ""  # "C", "F"; "" = as the phone / computer is set (Fahrenheit in the US)
     units_pressure: str = ""  # "hPa", "inHg"; "" = as the phone / computer is set (inHg in the US)
+    mic_e: bool = False  # our position as Mic-E (shorter on air, with a status)
+    mic_e_status: str = "en_route"  # the Mic-E status: off_duty … priority, "emergency" (always sent as Mic-E)
     winlink_password: str = ""  # Winlink (APRSLink, WLNK-1): only characters of it go on air, never the password
     stations_sort: str = "time"  # the Stations list: "time" (last heard first), "distance" (nearest first), "call"
     map_count: bool = True  # under the map's buttons: how many stations are on the map
@@ -171,6 +173,8 @@ class Config:
         self.map_rf_km = max(0, int(self.map_rf_km or 0))
         if self.map_online not in ("osm", "otm"):
             self.map_online = "osm"
+        if self.mic_e_status not in aprs.MIC_E_STATUS:
+            self.mic_e_status = "en_route"
         if self.stations_sort not in ("time", "distance", "call"):
             self.stations_sort = "time"
         if self.units_distance not in ("", "km", "mi"):

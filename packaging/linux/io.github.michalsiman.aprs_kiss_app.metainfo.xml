@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="1.7.1" date="2026-11-27" type="development">
+      <description>
+        <p>Beta: Mic-E with EMERGENCY; Winlink e-mail over APRS (WLNK-1); OpenTopoMap; stations sorted by time, distance or callsign; navigate to or share a place; road incidents are now warnings.</p>
+      </description>
+    </release>
     <release version="1.7.0" date="2026-11-27">
       <description>
         <p>The menu in sections (APRS, packet radio, settings); stations a message mentions with their distance and a tap to the map; clickable web links with a warning; callbooks (QRZ.com, HamQTH, QRZCQ, aprs.fi) in the station details; a tap on the temperature around you lists its weather stations; a tap on the number of points tells the callsigns and the nearest and furthest station; the map's grey lines no longer cross.</p>

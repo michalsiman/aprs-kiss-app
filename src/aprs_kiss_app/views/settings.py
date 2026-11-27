@@ -12,6 +12,7 @@ from pathlib import Path
 import flet as ft
 
 from aprs_kiss_core import android_bt, android_usb, ble, profiles, roadalert, tilemaps, tracker, units
+from aprs_kiss_core.aprs import MIC_E_STATUS
 from aprs_kiss_core.aprsis import licence_confirmed
 from aprs_kiss_core.bbs import BbsConfigError
 from aprs_kiss_core.bbs.storage import (
@@ -334,6 +335,12 @@ class SettingsView(View):
             options=[ft.DropdownOption(key="", text=f"{t('units_system')} ({sys_p})"),
                      ft.DropdownOption(key="hPa", text="hPa (mbar)"), ft.DropdownOption(key="inHg", text="inHg")])
 
+        # Mic-E: the position shorter on air, with a status; EMERGENCY asks first (and always goes as Mic-E)
+        self.mic_e = ft.Checkbox(label=t("mice_on"), value=c.mic_e)
+        self.mic_e_status = ft.Dropdown(label=t("mice_status"), value=c.mic_e_status, width=300,
+                                        options=[ft.DropdownOption(key=k, text=t(f"mice_{k}")) for k in MIC_E_STATUS],
+                                        on_select=self._mic_e_status_picked)
+        self._mic_e_last = c.mic_e_status
         self.wl_password = ft.TextField(label=self.t("wl_password"), value=c.winlink_password, width=420, password=True,
                                         can_reveal_password=True, helper=self.t("wl_password_help"))
 
@@ -350,7 +357,9 @@ class SettingsView(View):
                          ft.Row([self.comment]), self.path,
                          ft.Row([self.lat, self.lon], wrap=True), self.gps_now,
                          ft.Text(t("position_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
-                         self.beacon, self.tracked, self.incoming, self.wl_password, expanded=first),
+                         self.beacon, self.mic_e, self.mic_e_status,
+                         ft.Text(t("mice_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
+                         self.tracked, self.incoming, self.wl_password, expanded=first),
                 _section("GPS", ft.Icons.GPS_FIXED, self.gps_source, self.gps_phone_hint) if self.app.mobile else
                 _section("GPS", ft.Icons.GPS_FIXED, self.gps_source, self.gps_row, self.gps_hint),
                 _section(t("trk_section"), ft.Icons.ROUTE, self.trk_still, self.trk_hint,
@@ -722,6 +731,7 @@ class SettingsView(View):
             "units_distance": self.units_distance.value or "", "units_temperature": self.units_temperature.value or "",
             "units_pressure": self.units_pressure.value or "",
             "winlink_password": (self.wl_password.value or "").strip(),
+            "mic_e": bool(self.mic_e.value), "mic_e_status": self.mic_e_status.value or "en_route",
             "check_updates": self.check_updates.value, "update_beta": bool(self.update_beta.value),
             **{key: box.value for key, box in self.sound_boxes.items()},
             "tracker_mode": items[active]["tracker_mode"], "tracker_minutes": items[active]["tracker_minutes"],
@@ -734,6 +744,26 @@ class SettingsView(View):
             "theme": self.theme.value or "auto",
         }
         return call, data
+
+    def _mic_e_status_picked(self, e) -> None:
+        """EMERGENCY only after a clear yes: everybody sees it, digipeaters spread it."""
+        if e.control.value != "emergency":
+            self._mic_e_last = e.control.value
+            return
+
+        def answer(yes: bool) -> None:
+            self.app.page.pop_dialog()
+            self.mic_e_status.value = "emergency" if yes else self._mic_e_last
+            if yes:
+                self._mic_e_last = "emergency"
+            self.app.page.update()
+
+        self.app.show_dialog(ft.AlertDialog(
+            icon=ft.Icon(ft.Icons.EMERGENCY, color=ft.Colors.ERROR),
+            title=ft.Text(self.t("mice_sos_title")), content=ft.Text(self.t("mice_sos_text")),
+            actions=[ft.TextButton(self.t("cancel"), on_click=lambda _e: answer(False)),
+                     ft.FilledButton(self.t("mice_sos_yes"), on_click=lambda _e: answer(True),
+                                     style=ft.ButtonStyle(bgcolor=ft.Colors.ERROR, color=ft.Colors.ON_ERROR))]))
 
     def _radius_km(self) -> str:
         """The APRS-IS radius typed in km or miles, as whole km (as it is saved). Left as it was shown: the

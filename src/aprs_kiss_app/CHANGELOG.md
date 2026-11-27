@@ -4,8 +4,12 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
-## Unreleased
+## 1.7.1 beta – 2026-11-27
 
+- **Mic-E** (Settings › Station): the position goes shorter on air, with speed, course and altitude packed in and
+  a status – Off duty, En route, In service … and **EMERGENCY**. EMERGENCY asks first, always goes as Mic-E and
+  stays on with a red SOS in the top bar until a tap ends it. Received Mic-E stations show their status in the
+  details; one in EMERGENCY is red with 🆘 EMERGENCY on the map.
 - **Winlink e-mail over APRS (APRSLink, WLNK-1)** – in Messages › Services or a conversation with WLNK-1: *Log in*
   answers the gateway's challenge by itself (only three characters of your Winlink password go on air, with three
   random ones; the password is kept in Settings › Station), then buttons for the list, read, reply, forward,

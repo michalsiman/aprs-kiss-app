@@ -730,10 +730,10 @@ class Engine:
 
     # ─── APRS-IS ──────────────────────────────────────────────────────────
 
-    async def _send_own_to_is(self, info: str) -> bool:
+    async def _send_own_to_is(self, info: str, dest: str | None = None) -> bool:
         if not self.aprsis or not self.aprsis.verified:
             return False
-        line = f"{self.me}>{aprs_build.TOCALL},TCPIP*:{info}"
+        line = f"{self.me}>{dest or aprs_build.TOCALL},TCPIP*:{info}"
         sent = await self.aprsis.send(line)
         if sent:
             self._monitor(f"[IS] {line}", outgoing=True)
@@ -794,8 +794,7 @@ class Engine:
             _LOGGER.debug("Beacon not sent: no position set")
             return False
         try:
-            await self.station.send_position(*position, self._position_comment(self.config.comment),
-                                             to_is=self.config.beacon_is)
+            await self._send_own_position(*position)
         except (TransmitRefused, ConnectionError) as err:
             _LOGGER.debug("Beacon not sent: %s", err)
             return False
@@ -859,10 +858,25 @@ class Engine:
         if lat is None or lon is None:
             if not position:
                 raise ValueError("No position set")
-            lat, lon = position
-            comment = self._position_comment(self.config.comment if comment is None else comment)
+            await self._send_own_position(*position, comment)
+            return
         # over the internet too only when chosen (Settings › APRS-IS), like the beacon and the tracker
         await self.station.send_position(lat, lon, comment, to_is=self.config.beacon_is)
+
+    async def _send_own_position(self, lat: float, lon: float, comment: str | None = None) -> None:
+        """Our position, as the settings say: plain, or Mic-E (shorter; with a status – EMERGENCY among them –
+        speed, course and altitude packed in). EMERGENCY always goes as Mic-E: that is where it lives."""
+        conf = self.config
+        text = conf.comment if comment is None else comment
+        if conf.mic_e or conf.mic_e_status == "emergency":
+            fix = self.gps_fix()
+            dest, info = aprs_build.mic_e(
+                lat, lon, conf.symbol, conf.mic_e_status,
+                course=fix.course if fix else None, speed_kmh=fix.speed_kmh if fix else None,
+                altitude_m=fix.altitude_m if fix else None, comment=text)
+            await self.station.send_info(info, dest=dest, to_is=conf.beacon_is)
+            return
+        await self.station.send_position(lat, lon, self._position_comment(text), to_is=conf.beacon_is)
 
     async def set_radio_frequency(self, mhz: float | None) -> None:
         """Tune a radio with a built-in KISS TNC (VR-N76, UV-PRO, GA-5WB, firmware 0.7.11+) to `mhz`, or (None)

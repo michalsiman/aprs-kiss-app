@@ -50,7 +50,16 @@ def map_label(text: str, color=None, bold: bool = False, opacity: float = 1.0, s
     )
 
 
+COLOR_EMERGENCY = "#D32F2F"  # a station in Mic-E EMERGENCY
+
+
+def emergency(entry: dict) -> bool:
+    return entry.get("mic_e") == "000"
+
+
 def station_color(app: App, entry: dict) -> str:
+    if emergency(entry):
+        return COLOR_EMERGENCY
     if entry["call"].upper() in app.tracked():
         return COLOR_TRACKED
     return COLOR_RF if entry.get("last_rf") else COLOR_IS

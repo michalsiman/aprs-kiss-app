@@ -88,6 +88,8 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
   position, messages, terminal, everything goes under it.
 - **APRS-IS**: one switch sends your position (now, regular, tracker) and messages over the internet too;
   with transmitting off it all goes over the internet only.
+- **Mic-E**: the position shorter on air, with a status – and **EMERGENCY** (asked first, a red SOS in the top
+  bar until ended); stations in emergency stand out in red on the map.
 - **Tracker**: the position button in the top bar sends your position once, or starts the tracker (▶) –
   your GPS position then goes out by itself, at a fixed interval or **smart (SmartBeaconing)** like the APRS
   and LoRa APRS trackers: rarely when standing, more often the faster you go, at once on a turn; course and

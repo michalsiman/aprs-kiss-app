@@ -21,6 +21,7 @@ from typing import Any
 import flet as ft
 
 from aprs_kiss_core import android_bt, android_usb, ble, drivedetect, profiles, roadalert, units, winlink
+from aprs_kiss_core.aprs import MIC_E_STATUS
 from . import android_notify, ble_flet, desktop_notify
 from aprs_kiss_core.config import VERSION, Config, data_dir, load_config, save_config
 
@@ -215,7 +216,8 @@ class App:
                 await self.engine.stop()
 
     async def apply_config(self, config: Config) -> None:
-        shown = ("language", "units_distance", "units_temperature", "units_pressure")  # the screens are built again
+        shown = ("language", "units_distance", "units_temperature", "units_pressure",  # the screens are built again
+                 "mic_e_status")  # the EMERGENCY chip in the top bar
         language_changed = any(getattr(config, k) != getattr(self.engine.config, k) for k in shown)
         old = self.engine.config
         mode_changed = (config.bbs_enabled, config.tak_enabled) != (old.bbs_enabled, old.tak_enabled)
@@ -675,6 +677,12 @@ class App:
             ("tx", "TX", self._tx_tap))}
         # "send my position" (once, or again and again: the tracker), a lamp in the same frame on a phone
         self.position_btn = PositionButton(self, self.compact)
+        # Mic-E EMERGENCY on: red in the top bar, a tap ends it
+        self.sos_chip = ft.Container(
+            ft.Text("SOS" if self.compact else "🆘 EMERGENCY", size=12, weight=ft.FontWeight.BOLD, color=ft.Colors.WHITE),
+            bgcolor=ft.Colors.RED, border_radius=6, padding=ft.Padding.symmetric(horizontal=6, vertical=4),
+            tooltip=self.t("mice_sos_on"), on_click=self._end_emergency,
+            visible=self.engine.config.mic_e_status == "emergency")
         if self.compact:
             self.callsign_btn.expand = True
             self.callsign.no_wrap = True
@@ -686,7 +694,8 @@ class App:
             for lamp in ("is", "gps"):
                 self.lamps[lamp].width = 20
             self.lamps["tnc"].width = 42
-            row = [self.menu_btn, self.callsign_btn, links, self.update_btn, self.position_btn.control, self.lamps["tx"]]
+            row = [self.menu_btn, self.callsign_btn, links, self.sos_chip, self.update_btn, self.position_btn.control,
+                   self.lamps["tx"]]
         status = ft.Container(
             ft.Row(
                 row if self.compact else [
@@ -694,6 +703,7 @@ class App:
                     self.callsign_btn,
                     ft.Container(expand=True),  # all the lamps on the right
                     self.lamps["tnc"], self.lamps["is"], self.lamps["gps"],
+                    self.sos_chip,
                     self.update_btn,
                     self.position_btn.control,
                     self.lamps["tx"],
@@ -1367,6 +1377,18 @@ class App:
             self.view("messages").open_conversation(call)
         self.select(key)
 
+    def _end_emergency(self, _e=None) -> None:
+        """EMERGENCY is on: a tap on the red chip ends it (the status goes back to En route)."""
+        async def end(_e) -> None:
+            self.page.pop_dialog()
+            conf = Config.from_dict({**self.engine.config.to_dict(), "mic_e_status": "en_route"}).validate()
+            await self.apply_config(conf)
+
+        self.show_dialog(ft.AlertDialog(
+            title=ft.Text(self.t("mice_sos_end_title")), content=ft.Text(self.t("mice_sos_end_text")),
+            actions=[ft.TextButton(self.t("cancel"), on_click=lambda _e: self.page.pop_dialog()),
+                     ft.FilledButton(self.t("mice_sos_end"), on_click=end)]))
+
     # ─── Winlink (APRSLink, WLNK-1) ──────────────────────────────────────
 
     winlink_session = winlink.Session()
@@ -1483,6 +1505,11 @@ class App:
                                 size=12, color=ft.Colors.ON_SURFACE_VARIANT))
         now = time.time()
         rows.append(ft.Text(f"{self.t('last_heard')}: {clock(entry['last_heard'])} ({self.t.age(now - entry['last_heard'])})"))
+        status = {bits: key for key, bits in MIC_E_STATUS.items()}.get(entry.get("mic_e") or "")
+        if status:  # Mic-E: the status it sends (EMERGENCY in red)
+            sos = status == "emergency"
+            rows.append(ft.Text(f"{'🆘 ' if sos else ''}Mic-E: {self.t('mice_' + status)}",
+                                color=ft.Colors.ERROR if sos else None, weight=ft.FontWeight.BOLD if sos else None))
         weather = entry.get("weather")
         if isinstance(weather, dict) and weather:
             u = units.current

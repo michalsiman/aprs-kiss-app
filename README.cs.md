@@ -87,6 +87,8 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
   terminál, vše jde pod ním.
 - **APRS-IS**: jedním přepínačem se poloha (teď, pravidelně, tracker) i zprávy posílají i přes internet;
   s vypnutým vysíláním jde vše jen přes internet.
+- **Mic-E**: poloha kratší ve vysílání, se stavem – i **NOUZE (EMERGENCY)** (s potvrzením, červené SOS v horní
+  liště, dokud ji neukončíte); stanice v nouzi jsou na mapě červeně.
 - **Tracker**: tlačítko polohy v horní liště pošle polohu jednou, nebo spustí tracker (▶) – poloha z GPS
   se pak posílá sama, v pevném intervalu nebo **chytře (SmartBeaconing)** jako APRS a LoRa APRS trackery:
   když stojíte zřídka, čím rychleji jedete tím častěji, hned v zatáčce; s kurzem a rychlostí. Rádiem jde,

@@ -101,6 +101,29 @@ class EngineTest(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(TransmitRefused):
             await self.engine.send_aprs_message("OK1ABC-9", "hello")
 
+    async def test_mic_e_beacon(self):
+        """Mic-E: the position in the destination address, read back by the parser; EMERGENCY too."""
+        import aprslib
+
+        self.engine.set_tx(True)
+        sent = []
+        real = self.engine.station._send_frame
+
+        async def keep(raw):
+            sent.append(raw)
+            await real(raw)
+        self.engine.station._send_frame = keep
+        self.engine.config.mic_e = True
+        self.engine.config.mic_e_status = "emergency"
+        self.assertTrue(await self.engine.beacon())
+        from aprs_kiss_core.ax25 import Frame
+        frame = Frame.decode(sent[-1])
+        p = aprslib.parse(frame.tnc2())
+        self.assertEqual(p["format"], "mic-e")
+        self.assertIn("Emergency", p["mtype"])
+        self.assertAlmostEqual(p["latitude"], 49.7, places=3)
+        self.assertAlmostEqual(p["longitude"], 13.4, places=3)
+
     async def test_message_is_acked(self):
         self.engine.set_tx(True)
         result = await self.engine.send_aprs_message("OK1ABC-9", "hello", via="radio")
