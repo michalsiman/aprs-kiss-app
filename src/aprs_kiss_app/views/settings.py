@@ -11,7 +11,7 @@ from pathlib import Path
 
 import flet as ft
 
-from aprs_kiss_core import android_bt, android_usb, ble, profiles, roadalert, tilemaps, tracker
+from aprs_kiss_core import android_bt, android_usb, ble, profiles, roadalert, tilemaps, tracker, units
 from aprs_kiss_core.aprsis import licence_confirmed
 from aprs_kiss_core.bbs import BbsConfigError
 from aprs_kiss_core.bbs.storage import (
@@ -24,7 +24,7 @@ from aprs_kiss_core.bbs.storage import (
 )
 from aprs_kiss_core.config import Config
 
-from .. import distribution, offline_map
+from .. import distribution, i18n, offline_map
 from ..i18n import LANGUAGES, TEXTS, ssid_labels
 from ..symbols import SYMBOLS
 from .base import View, short_path, walkie_talkie
@@ -263,7 +263,9 @@ class SettingsView(View):
         self.is_port = ft.TextField(label=t("port"), value=str(c.aprsis_port), width=110, input_filter=num)
         self.passcode = ft.TextField(label=t("passcode"), value=c.aprsis_passcode, width=240, password=True,
                                      can_reveal_password=True, helper=t("pass_hint"), input_filter=num)
-        self.radius = ft.TextField(label=t("radius"), value=str(c.aprsis_radius_km), width=420, input_filter=num)
+        # in the user's unit (km or mi); kept in km
+        self.radius = ft.TextField(label=t("radius", unit=units.current.unit),
+                                   value=f"{units.current.from_km(c.aprsis_radius_km):.0f}", width=420, input_filter=num)
         self.igate_rx = ft.Checkbox(label=t("igate_rx"), value=c.igate_rx)
         self.igate_tx = ft.Checkbox(label=t("igate_tx"), value=c.igate_tx)
         self.is_state = ft.Text(color=ft.Colors.ON_SURFACE_VARIANT)
@@ -281,7 +283,8 @@ class SettingsView(View):
                                          visible=self.app.mobile)  # a phone in a car; not a computer
         self.meet_alerts = ft.Checkbox(label=t("meet_alerts"), value=c.meet_alerts)
         self.road_km = ft.Dropdown(label=t("road_alert_km"), value=str(c.road_alert_km), width=200,
-                                   options=[ft.DropdownOption(key=str(n), text=f"{n} km") for n in roadalert.DISTANCES_KM])
+                                   options=[ft.DropdownOption(key=str(n), text=units.current.distance_short(n))
+                                            for n in roadalert.DISTANCES_KM])
         self._trk_changed(update=False)
         self.digi_mode = ft.Dropdown(label=t("digi_mode"), value=c.digi_mode if c.digi_mode in ("off", "fillin", "wide")
                                      else "off", width=340, on_select=lambda _e: self._digi_changed(),
@@ -313,6 +316,18 @@ class SettingsView(View):
                                     options=[ft.DropdownOption(key="", text=t("lang_auto")),
                                              *[ft.DropdownOption(key=code, text=name)
                                                for code, name in LANGUAGES.items()]])
+
+        # units: as the phone / computer is set (what that is, in brackets), or chosen
+        country = i18n.system_country()
+        sys_d, sys_t = units.system_distance(country), units.system_temperature(country)
+        self.units_distance = ft.Dropdown(
+            label=t("units_distance"), value=c.units_distance, width=240,
+            options=[ft.DropdownOption(key="", text=f"{t('units_system')} ({sys_d})"),
+                     ft.DropdownOption(key="km", text=t("units_km")), ft.DropdownOption(key="mi", text=t("units_mi"))])
+        self.units_temperature = ft.Dropdown(
+            label=t("units_temperature"), value=c.units_temperature, width=240,
+            options=[ft.DropdownOption(key="", text=f"{t('units_system')} (°{sys_t})"),
+                     ft.DropdownOption(key="C", text="°C Celsius"), ft.DropdownOption(key="F", text="°F Fahrenheit")])
 
         self.error = ft.Text(color=ft.Colors.ERROR)
         self.intro = ft.Text(t("first_run"), color=ft.Colors.PRIMARY, visible=not c.configured)
@@ -353,6 +368,7 @@ class SettingsView(View):
                          ft.Row([ft.OutlinedButton(t("sound_test"), icon=ft.Icons.PLAY_ARROW,
                                                    on_click=self._test_sounds)])),
                 _section(t("app_section"), ft.Icons.TUNE, ft.Row([self.language, self.theme], wrap=True),
+                         ft.Row([self.units_distance, self.units_temperature], wrap=True),
                          self.check_updates, self.update_beta,
                          ft.Row([ft.OutlinedButton(t("about"), icon=ft.Icons.INFO_OUTLINE,
                                                    on_click=lambda _e: self._about())])),
@@ -492,7 +508,7 @@ class SettingsView(View):
         source = self.t("gps_phone") if self.gps_source.value == "phone" else self.t("gps_usb")
         fix = self.engine.gps_fix()
         if fix and self.gps_source.value == self.engine.config.gps_source:
-            accuracy = f" (±{fix.accuracy_m:.0f} m)" if fix.accuracy_m else ""
+            accuracy = f" (±{units.current.length(fix.accuracy_m)})" if fix.accuracy_m else ""
             self.gps_now.value = f"{source}: {fix.latitude:.5f}, {fix.longitude:.5f}{accuracy}"
         else:
             self.gps_now.value = f"{source}: {self.t('gps_nofix')}"
@@ -692,9 +708,10 @@ class SettingsView(View):
             "tak_callsign": (self.tak_callsign.value or "").strip().upper(), "tak_team": self.tak_team.value or "Cyan",
             "tak_role": self.tak_role.value or "Team Member", "tak_interval_min": self.tak_interval.value or "0",
             "aprsis_enabled": self.aprsis.value, "aprsis_host": self.is_host.value, "aprsis_port": self.is_port.value,
-            "aprsis_passcode": self.passcode.value, "aprsis_radius_km": self.radius.value,
+            "aprsis_passcode": self.passcode.value, "aprsis_radius_km": self._radius_km(),
             "igate_rx": self.igate_rx.value, "igate_tx": self.igate_tx.value,
             "language": self.language.value or "",
+            "units_distance": self.units_distance.value or "", "units_temperature": self.units_temperature.value or "",
             "check_updates": self.check_updates.value, "update_beta": bool(self.update_beta.value),
             **{key: box.value for key, box in self.sound_boxes.items()},
             "tracker_mode": items[active]["tracker_mode"], "tracker_minutes": items[active]["tracker_minutes"],
@@ -707,6 +724,17 @@ class SettingsView(View):
             "theme": self.theme.value or "auto",
         }
         return call, data
+
+    def _radius_km(self) -> str:
+        """The APRS-IS radius typed in km or miles, as whole km (as it is saved). Left as it was shown: the
+        saved number itself (20 km shows as 12 mi, and 12 mi would come back as 19 km)."""
+        saved = self.engine.config.aprsis_radius_km
+        if (self.radius.value or "").strip() == f"{units.current.from_km(saved):.0f}":
+            return str(saved)
+        try:
+            return str(round(units.current.to_km(float(self.radius.value or 0))))
+        except ValueError:
+            return self.radius.value or "0"
 
     def discard(self) -> None:
         """Forget what was typed: the form is built again from the saved settings next time."""

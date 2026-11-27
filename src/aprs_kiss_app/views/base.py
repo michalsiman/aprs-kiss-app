@@ -7,6 +7,7 @@ import time
 from typing import TYPE_CHECKING, Any
 
 import flet as ft
+from aprs_kiss_core import units
 
 if TYPE_CHECKING:
     from ..app import App
@@ -109,9 +110,13 @@ def bearing(lat1: float, lon1: float, lat2: float, lon2: float) -> str:
 
 
 def distance_text(km: float) -> str:
-    if km < 1:
-        return f"{km * 1000:.0f} m"
-    return f"{km:.2f} km" if km < 10 else f"{km:.1f} km" if km < 100 else f"{km:.0f} km"
+    """A distance in the units the user has chosen ("4.25 km", "2.64 mi")."""
+    return units.current.distance_text(km)
+
+
+def distance_short(km: float) -> str:
+    """A distance for a list ("3.4 km", "12 km", "350 m"; or mi / ft)."""
+    return units.current.distance_short(km)
 
 
 def capped_append(lv: ft.ListView, control: ft.Control, limit: int) -> None:

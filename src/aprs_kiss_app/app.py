@@ -19,7 +19,7 @@ from typing import Any
 
 import flet as ft
 
-from aprs_kiss_core import android_bt, android_usb, ble, drivedetect, profiles, roadalert
+from aprs_kiss_core import android_bt, android_usb, ble, drivedetect, profiles, roadalert, units
 from . import android_notify, ble_flet, desktop_notify
 from aprs_kiss_core.config import VERSION, Config, data_dir, load_config, save_config
 
@@ -27,7 +27,7 @@ from . import theme
 from aprs_kiss_core.engine import Engine, TransmitRefused
 
 from .about import show_about
-from . import disclaimer, distribution, language, offline_map, updates, whatsnew
+from . import disclaimer, distribution, i18n, language, offline_map, updates, whatsnew
 from .sounds import Sounds
 from .i18n import Translator
 from .phone_gps import PhoneGps
@@ -210,7 +210,8 @@ class App:
                 await self.engine.stop()
 
     async def apply_config(self, config: Config) -> None:
-        language_changed = config.language != self.engine.config.language
+        language_changed = (config.language, config.units_distance, config.units_temperature) != (
+            self.engine.config.language, self.engine.config.units_distance, self.engine.config.units_temperature)
         old = self.engine.config
         mode_changed = (config.bbs_enabled, config.tak_enabled) != (old.bbs_enabled, old.tak_enabled)
         t0 = time.monotonic()
@@ -521,6 +522,9 @@ class App:
 
     def build(self) -> None:
         self.t = Translator(self.engine.config.language)
+        conf = self.engine.config
+        units.current = units.Units.choose(conf.units_distance, conf.units_temperature, i18n.system_country(),
+                                           comma=self.t.language != "en")
         self.compact = self._is_compact()
         # a new session after Android restarted the screen part: back on the screen the user had open
         key = self.current_key if self.views else (_LAST_SCREEN[0] if self.mobile and _LAST_SCREEN else "map")
@@ -1218,7 +1222,7 @@ class App:
             where += f" ({t('road_right' if side > 0 else 'road_left')})"
         pic, name, _known = symbol_info(entry.get("symbol_table"), entry.get("symbol"), t.language)
         speed = entry.get("speed")
-        extra = f"{speed:.0f} km/h" if kind == "meet" and speed else (entry.get("comment") or "").strip()
+        extra = units.current.speed(speed) if kind == "meet" and speed else (entry.get("comment") or "").strip()
         what = " · ".join(x for x in (entry["call"], name, extra) if x)
         lines = [ft.Text(where, weight=ft.FontWeight.BOLD, color=ft.Colors.BLACK_87),
                  ft.Text(what, max_lines=3, overflow=ft.TextOverflow.ELLIPSIS, color=ft.Colors.BLACK_87)]
@@ -1358,20 +1362,25 @@ class App:
         rows.append(ft.Text(f"{self.t('last_heard')}: {clock(entry['last_heard'])} ({self.t.age(now - entry['last_heard'])})"))
         weather = entry.get("weather")
         if isinstance(weather, dict) and weather:
+            u = units.current
             wx = []
-            if weather.get("temperature") is not None:
-                wx.append(f"{weather['temperature']:.1f} °C")
+            if isinstance(weather.get("temperature"), (int, float)):
+                wx.append(u.temperature_text(weather["temperature"]))
             if weather.get("humidity") is not None:
                 wx.append(f"{weather['humidity']} %")
             if weather.get("pressure") is not None:
                 wx.append(f"{weather['pressure']} hPa")
-            if weather.get("wind_speed") is not None:
-                wx.append(f"{weather['wind_speed']} m/s")
+            if isinstance(weather.get("wind_speed"), (int, float)):
+                wx.append(u.wind(weather["wind_speed"]))
             if wx:
                 rows.append(ft.Text("🌦️ " + ", ".join(wx)))
-        for key in ("altitude", "speed", "course"):
-            if entry.get(key) is not None:
-                rows.append(ft.Text(f"{key}: {entry[key]}"))
+        # aprslib: altitude in metres, speed in km/h
+        shown = {"altitude": lambda v: units.current.length(v), "speed": lambda v: units.current.speed(v),
+                 "course": lambda v: f"{v:.0f}°"}
+        for key, show in shown.items():
+            value = entry.get(key)
+            if isinstance(value, (int, float)):
+                rows.append(ft.Text(f"{key}: {show(value)}"))
         if entry.get("path"):
             rows.append(ft.Text(", ".join(entry["path"]), size=12, color=ft.Colors.ON_SURFACE_VARIANT))
         if entry.get("last_raw"):

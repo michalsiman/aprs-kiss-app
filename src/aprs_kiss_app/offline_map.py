@@ -15,7 +15,7 @@ from dataclasses import dataclass
 import flet as ft
 import flet_map as fm
 
-from aprs_kiss_core import tilemaps
+from aprs_kiss_core import tilemaps, units
 
 DATA = pathlib.Path(__file__).with_name("offline") / "world.json"
 ATTRIBUTION = "Natural Earth, GeoNames"
@@ -352,6 +352,16 @@ class ScaleBar:
 
     def show(self, lat: float, zoom: float) -> None:
         per_px = 156543.03392 * math.cos(math.radians(max(-85.0, min(85.0, lat)))) / 2 ** zoom
+        if units.current.miles:  # "500 ft", "2 mi"
+            mi_per_px = per_px / 1000 / units.KM_PER_MI
+            if mi_per_px * self.MAX_PX >= 1:
+                miles, px = self.pick(mi_per_px, self.MAX_PX)
+                self.label.value = f"{miles:g} mi"
+            else:
+                feet, px = self.pick(per_px * units.FT_PER_M, self.MAX_PX)
+                self.label.value = f"{feet:g} ft"
+            self.bar.width = px
+            return
         metres, px = self.pick(per_px, self.MAX_PX)
         self.bar.width = px
         self.label.value = f"{metres / 1000:g} km" if metres >= 1000 else f"{metres:g} m"

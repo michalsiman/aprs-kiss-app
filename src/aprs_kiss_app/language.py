@@ -26,7 +26,12 @@ async def detect(page: ft.Page) -> None:
     """Read the device's preferred languages (Android and iOS tell no environment variables)."""
     try:
         info = await page.get_device_info()
-        for loc in getattr(info, "locales", None) or []:
+        locales = getattr(info, "locales", None) or []
+        for loc in locales:  # the first with a country: the default units (km or miles, °C or °F)
+            if getattr(loc, "country_code", None):
+                i18n.DEVICE_COUNTRY = loc.country_code.upper()
+                break
+        for loc in locales:
             code = i18n.match_language(f"{loc.language_code}_{loc.country_code or ''}".rstrip("_"))
             if code:
                 i18n.DEVICE_LANGUAGE = code

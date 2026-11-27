@@ -11,12 +11,13 @@ import time
 import flet as ft
 import flet_map as fm
 
+from aprs_kiss_core import units
 from aprs_kiss_core.config import Config
 
 from ..i18n import TEXTS
 from ..legend import map_label
 from .map_source import MapSourceButton
-from .base import View, clock, distance_km
+from .base import View, clock, distance_km, distance_short
 from .bbs import _plain
 from ..offline_map import LAND, MIN_ZOOM, BaseMap, ScaleBar, gestures
 from .base import toggle
@@ -219,7 +220,7 @@ class TakView(View):
             leading=ft.Icon(ft.Icons.CIRCLE, color=self._color(s), size=14),
             title=ft.Text(s["callsign"], weight=ft.FontWeight.BOLD),
             subtitle=ft.Text(" · ".join(x for x in (s["team"], s["role"], clock(s["received"]),
-                                                     f"{s['speed'] * 3.6:.0f} km/h" if s["speed"] else "") if x),
+                                                     units.current.speed(s["speed"] * 3.6) if s["speed"] else "") if x),
                              size=12),
             dense=True, on_click=lambda _e, st=s: self.app.page.run_task(
                 self.map.center_on, fm.MapLatitudeLongitude(st["lat"], st["lon"]), 14),
@@ -247,7 +248,7 @@ class TakView(View):
             elif (now - before[2] >= self.MOVE_EVERY
                   and distance_km(*before[:2], *where) * 1000 >= self.MOVE_M):
                 metres = distance_km(*before[:2], *where) * 1000
-                far = f"{metres / 1000:.1f} km" if metres >= 1000 else f"{metres:.0f} m"
+                far = distance_short(metres / 1000)
                 self.moves.append({"time": now, "move": self.t("tak_moved", call=st["callsign"], far=far)})
             else:
                 continue

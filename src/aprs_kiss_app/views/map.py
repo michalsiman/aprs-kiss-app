@@ -8,7 +8,7 @@ import time
 
 import flet as ft
 import flet_map as fm
-from aprs_kiss_core import localwx, mapfilter, repeater
+from aprs_kiss_core import localwx, mapfilter, repeater, units
 
 from ..legend import COLOR_ME, map_label, show_legend, station_color, visible
 from ..offline_map import LAND, MIN_ZOOM, BaseMap, Region, ScaleBar, gestures
@@ -209,19 +209,14 @@ class MapView(View):
         self.wx_box.visible = wx is not None
         if wx is None:
             return
-        comma = self.t.language not in ("en",)
-
-        def num(value: float, digits: int) -> str:
-            text = f"{value:.{digits}f}"
-            return text.replace(".", ",") if comma else text
-
-        parts = [f"{num(wx['temperature'], 1)} °C"]
+        u = units.current
+        parts = [u.temperature_text(wx["temperature"])]
         if "humidity" in wx:
-            parts.append(f"{num(wx['humidity'], 0)} %")
+            parts.append(f"{wx['humidity']:.0f} %")
         if "pressure" in wx:
-            parts.append(f"{num(wx['pressure'], 0)} hPa")
+            parts.append(f"{wx['pressure']:.0f} hPa")
         self.wx_text.value = " · ".join(parts)
-        self.wx_box.tooltip = self.t("wx_near_tip", n=wx["stations"], km=localwx.RADIUS_KM,
+        self.wx_box.tooltip = self.t("wx_near_tip", n=wx["stations"], dist=u.whole(localwx.RADIUS_KM),
                                      minutes=max(1, round(wx["oldest"] / 60)))
 
     def _toggle_weather(self, _e) -> None:
@@ -267,9 +262,11 @@ class MapView(View):
                                        lambda _e: self._set_filters(set(), rf_km=0))  # the boxes clear, the menu stays
         # how far: internet stations (the APRS-IS area asked from the server) and radio ones
         self.reach_is, self.reach_is_chips = self._reach_item(
-            ft.Icon(ft.Icons.PUBLIC, size=20), self.t("reach_is"), mapfilter.IS_KM, self._set_is_km)
+            ft.Icon(ft.Icons.PUBLIC, size=20), self.t("reach_is", unit=units.current.unit),
+            units.current.reach_choices(), self._set_is_km)
         self.reach_rf, self.reach_rf_chips = self._reach_item(
-            walkie_talkie(ft.Colors.ON_SURFACE, 20), self.t("reach_rf"), mapfilter.RF_KM,
+            walkie_talkie(ft.Colors.ON_SURFACE, 20), self.t("reach_rf", unit=units.current.unit),
+            (*units.current.reach_choices(), (0, "∞")),
             lambda km: self._set_filters(mapfilter.parse(self.engine.config.map_filters), rf_km=km))
         self.filter_icon = ft.Icon(ft.Icons.FILTER_ALT_OUTLINED)
         self.filter_face = ft.Container(self.filter_icon, padding=8, shape=ft.BoxShape.CIRCLE)
@@ -280,13 +277,15 @@ class MapView(View):
         return self.filter_btn
 
     def _reach_item(self, icon, label: str, choices: tuple, pick) -> tuple[ft.PopupMenuItem, dict]:
-        """A menu line with a label and a chip per distance (0 = no limit); a chip's tap keeps the menu open."""
+        """A menu line with a label and a chip per distance ((km, label); 0 = no limit); a chip's tap keeps the
+        menu open. In miles the chips say 10 / 30 / 60 and keep the kilometres underneath."""
         chips = {}
-        for km in choices:
+        for km, text in choices:
             chips[km] = ft.Container(
-                ft.Text(f"{km}" if km else "∞", size=13), border_radius=14, alignment=ft.Alignment.CENTER,
+                ft.Text(text, size=13), border_radius=14, alignment=ft.Alignment.CENTER,
                 padding=ft.Padding.symmetric(horizontal=10, vertical=5), width=50,
-                tooltip=f"{km} km" if km else self.t("reach_any"), on_click=lambda _e, k=km: pick(k))
+                tooltip=f"{text} {units.current.unit}" if km else self.t("reach_any"),
+                on_click=lambda _e, k=km: pick(k))
         box = ft.Container(
             ft.Column([ft.Row([icon, ft.Text(label, size=13, max_width=STAY_WIDTH - 40)], spacing=10),
                        ft.Row(list(chips.values()), spacing=6)], spacing=6, tight=True),
@@ -296,6 +295,8 @@ class MapView(View):
 
     @staticmethod
     def _mark_chips(chips: dict, chosen: int) -> None:
+        if chosen and chosen not in chips:  # e.g. 50 km saved, the chips in miles (16 / 48 / 97 km): the nearest
+            chosen = min((km for km in chips if km), key=lambda km: abs(km - chosen), default=chosen)
         for km, chip in chips.items():
             on = km == chosen
             chip.bgcolor = ft.Colors.with_opacity(0.22, ft.Colors.PRIMARY) if on else None
@@ -316,7 +317,7 @@ class MapView(View):
         self.filter_face.bgcolor = ft.Colors.with_opacity(0.18, ft.Colors.PRIMARY) if active else None
         names = [self.t(f"filter_{k}_short") for k in mapfilter.KINDS if k in kinds]
         if conf.map_rf_km:
-            names.append(f"{self.t('reach_rf')} {conf.map_rf_km} km")
+            names.append(f"{self.t('reach_rf', unit=units.current.unit)} {units.current.from_km(conf.map_rf_km):.0f}")
         self.filter_btn.tooltip = self.t("filter_on", what=", ".join(names)) if names else self.t("filter")
 
     def _toggle_filter(self, kind: str) -> None:
@@ -328,7 +329,7 @@ class MapView(View):
         if self.app.has_view("settings"):
             form = self.app.view("settings")
             if getattr(form, "radius", None) is not None:
-                form.radius.value = str(km)
+                form.radius.value = f"{units.current.from_km(km):.0f}"
         self._set_filters(mapfilter.parse(self.engine.config.map_filters))
 
     def _set_filters(self, kinds: set[str], rf_km: int | None = None) -> None:
@@ -466,7 +467,7 @@ class MapView(View):
                                      shadow=ft.BoxShadow(blur_radius=3, offset=ft.Offset(0, 1),
                                                          color=ft.Colors.with_opacity(0.25, ft.Colors.BLACK))),
                         map_label(label, color, bold, sub=freq,
-                                  band="°C" if freq and freq.endswith("°C")
+                                  band="°C" if freq and freq.endswith(("°C", "°F"))
                                   else freq.split(" · ")[1] if freq and " · " in freq else None),
                     ],
                     spacing=1, tight=True, horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -476,15 +477,13 @@ class MapView(View):
         )
 
     def _temperature(self, entry: dict) -> str | None:
-        """A weather station's temperature for the second line of its tag ("4.8 °C"; "4,8 °C" in Czech…)."""
+        """A weather station's temperature for the second line of its tag ("4.8 °C"; "4,8 °C" in Czech;
+        "40.6 °F" when the settings say Fahrenheit)."""
         wx = entry.get("weather")
         temp = wx.get("temperature") if isinstance(wx, dict) else None
         if not isinstance(temp, (int, float)):
             return None
-        text = f"{temp:.1f}"
-        if self.t.language not in ("en",):
-            text = text.replace(".", ",")  # most of the app's languages write a decimal comma
-        return f"{text} °C"
+        return units.current.temperature_text(temp)
 
     @staticmethod
     def _dot(lat: float, lon: float) -> fm.Marker:

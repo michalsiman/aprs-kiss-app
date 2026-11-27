@@ -85,6 +85,8 @@ class Config:
     map_imported: bool = True  # offline: the imported map (when there is one) over the bundled one
     spot_last: str = ""  # Messages › Spot: the last spot (JSON: program, reference, frequency, mode, gateway)
     map_rf_km: int = 0  # the map shows stations heard on the radio this far (0 = no limit)
+    units_distance: str = ""  # "km", "mi"; "" = as the phone / computer is set (miles in the US and the UK)
+    units_temperature: str = ""  # "C", "F"; "" = as the phone / computer is set (Fahrenheit in the US)
     map_weather: bool = True  # the map's corner shows the temperature from the weather stations around us
     map_filters: str = ""  # the map shows only these kinds of stations ("weather,moving,road"); empty = all
     map_tools_hidden: bool = False  # the map's button bar folded into one gear button
@@ -162,6 +164,10 @@ class Config:
             self.tracker_mode = "fixed"
         self.map_filters = mapfilter.join(mapfilter.parse(self.map_filters))
         self.map_rf_km = max(0, int(self.map_rf_km or 0))
+        if self.units_distance not in ("", "km", "mi"):
+            self.units_distance = ""
+        if self.units_temperature not in ("", "C", "F"):
+            self.units_temperature = ""
         profiles.normalize(self)
         if self.tracker_profile not in ("walk", "bike", "car"):
             self.tracker_profile = "car"

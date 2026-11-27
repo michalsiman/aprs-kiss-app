@@ -14,7 +14,7 @@ from aprs_kiss_core.geotext import find_positions, write_position
 from aprs_kiss_core.services import SERVICES
 from aprs_kiss_core.spotting import CAMILLA, GATEWAY_NAMES, MODES, PROGRAMS, Spot, SpotError, build as build_spot, default_gateway, gateways_for
 
-from .base import View, ViaPicker, bearing, clock, distance_km
+from .base import View, ViaPicker, bearing, clock, distance_km, distance_short
 
 MAX_TEXT = 67  # APRS message text limit
 STATE_ICONS = {
@@ -389,7 +389,7 @@ class MessagesView(View):
         self.where.visible = bool(entry and here)
         if entry and here:
             km = distance_km(*here, entry["latitude"], entry["longitude"])
-            dist = f"{km * 1000:.0f} m" if km < 1 else f"{km:.1f} km" if km < 10 else f"{km:.0f} km"
+            dist = distance_short(km)
             self.where.value = self.t("msg_where", d=dist, dir=bearing(*here, entry["latitude"], entry["longitude"]),
                                       age=self.t.age(time.time() - entry["last_heard"]))
 
@@ -405,7 +405,7 @@ class MessagesView(View):
         if m.get("km") is not None:  # how far the sender was when the message came
             km = m["km"]
             dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
-            dist = f"{km * 1000:.0f} m" if km < 1 else f"{km:.1f} km" if km < 10 else f"{km:.0f} km"
+            dist = distance_short(km)
             meta.append(ft.Text(f"📍 {dist} {dirs[round(m.get('bearing', 0) / 45) % 8]}", size=11,
                                 color=ft.Colors.ON_SURFACE_VARIANT, tooltip=self.t("msg_distance_then")))
         if m.get("via"):
