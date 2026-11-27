@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="1.9.1" date="2026-11-27">
+      <description>
+        <p>Map tags no longer cover each other: markers are spread by the real size of their tags (a repeater's long frequency line too). Bulletins: the New bulletin button at the top, off the phone's gesture bar.</p>
+      </description>
+    </release>
     <release version="1.9.0" date="2026-11-27">
       <description>
         <p>A Raspberry Pi as a station with a touch screen, installed with one command: the station runs from power-on, the whole app on the Pi's screen and over the web from a phone behind a password. Coloured icons in the menu. The menu can hide behind ☰ on a computer too; low screens get the phone's menu by themselves.</p>
