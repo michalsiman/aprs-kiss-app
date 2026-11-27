@@ -4,7 +4,7 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
-## Unreleased
+## 1.7.2 beta – 2026-11-27
 
 - **Files: pictures made smaller before they go** – a picked picture is offered in several sizes (1280, 800, 480,
   320 px, 160 px grey) with the size and the time each takes at 1200 Bd, and a preview; a big photo starts at

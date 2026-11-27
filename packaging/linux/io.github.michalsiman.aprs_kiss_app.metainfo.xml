@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="1.7.2" date="2026-11-27" type="development">
+      <description>
+        <p>Beta: pictures made smaller before they go over packet radio, a photo from the phone's camera, other files zipped; Direwolf as a sound-card modem on computers; the phone's menu redrawn.</p>
+      </description>
+    </release>
     <release version="1.7.1" date="2026-11-27" type="development">
       <description>
         <p>Beta: Mic-E with EMERGENCY; Winlink e-mail over APRS (WLNK-1); OpenTopoMap; stations sorted by time, distance or callsign; navigate to or share a place; road incidents are now warnings.</p>
