@@ -137,6 +137,7 @@ class Config:
     sound_tak: bool = True  # … for a new TAK GeoChat message
     sound_road: bool = True  # … for a road incident ahead (tracker)
     sound_meet: bool = True  # … for a moving station ahead (tracker)
+    menu_hidden: bool = False  # a computer: the menu hidden behind ☰, sliding in from the side as on a phone
     theme: str = "auto"  # auto (as the desktop), light, dark
 
     @property

@@ -18,6 +18,8 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
   release now also carries a Python wheel.
 - **Low screens get the phone's layout** (the ☰ menu): below 640 px of height too, not only when narrow – a
   Raspberry Pi's 5" or 7" display (800×480, 1024×600).
+- **The menu hidden behind ☰ on a computer too** (Settings › App, when wanted): it slides in from the side as
+  on a phone, and the map gets the whole width.
 
 ## 1.8.0 – 2026-11-27
 

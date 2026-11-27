@@ -343,6 +343,8 @@ class SettingsView(View):
                                           ft.DropdownOption(key="light", text=t("theme_light")),
                                           ft.DropdownOption(key="dark", text=t("theme_dark"))],
                                  on_select=lambda e: self.app.set_theme(e.control.value or "auto"))
+        self.menu_hidden = ft.Checkbox(label=t("menu_hidden"), value=c.menu_hidden, visible=not self.app.mobile,
+                                       on_change=lambda e: self.app.set_menu_hidden(bool(e.control.value)))
         self.language = ft.Dropdown(label=t("language"), value=c.language or "", width=240,
                                     options=[ft.DropdownOption(key="", text=t("lang_auto")),
                                              *[ft.DropdownOption(key=code, text=name)
@@ -424,7 +426,7 @@ class SettingsView(View):
                 _section(t("sounds"), ft.Icons.VOLUME_UP, *self.sound_boxes.values(),
                          ft.Row([ft.OutlinedButton(t("sound_test"), icon=ft.Icons.PLAY_ARROW,
                                                    on_click=self._test_sounds)])),
-                _section(t("app_section"), ft.Icons.TUNE, ft.Row([self.language, self.theme], wrap=True),
+                _section(t("app_section"), ft.Icons.TUNE, ft.Row([self.language, self.theme], wrap=True), self.menu_hidden,
                          ft.Row([self.units_distance, self.units_temperature, self.units_pressure], wrap=True),
                          self.check_updates, self.update_beta,
                          ft.Row([ft.OutlinedButton(t("about"), icon=ft.Icons.INFO_OUTLINE,
@@ -794,7 +796,7 @@ class SettingsView(View):
             "digi_mode": self.digi_mode.value or "off", "digi_max_hops": self.digi_hops.value or "2",
             "digi_aliases": (self.digi_aliases.value or "").strip().upper(),
             "run_background": bool(self.run_bg.value), "keep_screen_on": self.keep_screen.value or "never",
-            "theme": self.theme.value or "auto",
+            "theme": self.theme.value or "auto", "menu_hidden": bool(self.menu_hidden.value),
         }
         return call, data
 

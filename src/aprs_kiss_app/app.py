@@ -649,9 +649,11 @@ class App:
             # very slightly see-through: the map shows faintly under the menu
             bgcolor=ft.Colors.with_opacity(0.94, ft.Colors.SURFACE_CONTAINER_LOW),
         )
-        self.page.drawer = self.drawer if self.compact else None
+        # the menu slides in from the side (☰): on a phone or a small screen, or on a computer when chosen
+        self.side_menu = self.compact or bool(self.engine.config.menu_hidden)
+        self.page.drawer = self.drawer if self.side_menu else None
         self.menu_btn = ft.IconButton(ft.Icons.MENU, tooltip=self.t("menu"), on_click=self._open_menu,
-                                      visible=self.compact)
+                                      visible=self.side_menu)
         pad = 6 if self.compact else 12
         # The map stays on screen under the other screens (they are opaque): hiding it would make
         # Flutter throw it away and build it again, tiles and all, at every return to it.
@@ -748,7 +750,7 @@ class App:
         self.page.add(
             ft.SafeArea(
                 ft.Row(
-                    ([] if self.compact else [self.rail, ft.VerticalDivider(width=1)])
+                    ([] if self.side_menu else [self.rail, ft.VerticalDivider(width=1)])
                     + [ft.Column([status, ft.Stack([self.holders[i] for i in stacked], expand=True)],
                                  expand=True, spacing=0)],
                     expand=True,
@@ -911,6 +913,13 @@ class App:
         if mode != self.page.theme_mode:
             self.page.theme_mode = mode
             self.page.update()
+
+    def set_menu_hidden(self, hidden: bool) -> None:
+        """From Settings (a computer): the menu behind ☰ or the rail, at once and saved."""
+        self.engine.config.menu_hidden = bool(hidden)
+        self.page.run_task(asyncio.to_thread, save_config, self.engine.config, self.folder)
+        self.build()
+        self.refresh_now()
 
     def set_theme(self, choice: str) -> None:
         """From Settings: applied at once and saved."""
@@ -1170,7 +1179,7 @@ class App:
         if isinstance(self.update_btn, ft.FilledTonalButton):
             self.update_btn.content = self.t("update_button", version=st.latest)
         self.update_btn.tooltip = self.t("update_button", version=st.latest)
-        if self.compact:  # the menu's About item says it too
+        if getattr(self, "side_menu", self.compact):  # the menu's About item says it too
             self.about_note.value = self.t("update_button", version=st.latest) if st.available else ""
             self.about_note.visible = st.available
 
