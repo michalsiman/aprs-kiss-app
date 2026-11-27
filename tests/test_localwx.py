@@ -20,6 +20,10 @@ class LocalWeatherTest(unittest.TestCase):
         self.assertEqual(wx["humidity"], 80)
         self.assertAlmostEqual(wx["pressure"], 1012.0)
         self.assertEqual(wx["stations"], 2)
+        self.assertEqual([s["call"] for s in wx["list"]], ["A", "B"])  # nearest first
+        self.assertAlmostEqual(wx["list"][0]["km"], 5.56, places=1)
+        self.assertEqual(wx["list"][0]["humidity"], 80)
+        self.assertNotIn("humidity", wx["list"][1])
 
     def test_old_reports_do_not_count(self):
         heard = {"A": station(50.0, 14.0, at=NOW - 3 * 3600, temperature=10.0)}

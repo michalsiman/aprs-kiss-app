@@ -69,7 +69,8 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
   how-far, speeds, altitudes, temperatures and pressure all follow it.
 - **Temperature around you** in the map's corner: the average of the weather stations within 20 km
   (reports up to 2 hours old), with humidity and pressure when they send them; updated every 5 minutes,
-  moves under the map buttons while they are open, switched off in the map menu.
+  moves under the map buttons while they are open, switched off in the map menu. A tap on it lists the stations
+  it comes from: their values, how far and in which direction, how old.
 - **Markers never cover each other**: stations at one place or close together move apart, a thin grey line
   leads from the middle of the symbol to a dot where the station really is. **Trails** (the last half hour,
   also your own from the GPS), APRS **objects** as places of their own, impossible jumps ignored.

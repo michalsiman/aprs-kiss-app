@@ -23,13 +23,15 @@ def _number(value: Any) -> float | None:
 def around(heard: dict[str, dict[str, Any]], here: tuple[float, float] | None, now: float,
            radius_km: float = RADIUS_KM, max_age: float = MAX_AGE_SECONDS) -> dict[str, Any] | None:
     """{"temperature": °C, "humidity": %, "pressure": hPa (each only when some station sends it),
-    "stations": how many stations, "oldest": seconds since the oldest report used}; None when no station
+    "stations": how many stations, "oldest": seconds since the oldest report used, "list": each station used,
+    nearest first ({"call", "km", "age", "temperature", "humidity", "pressure"})}; None when no station
     near enough has sent a temperature recently (or we do not know where we are)."""
     if not here:
         return None
     sums: dict[str, list[float]] = {k: [] for k in FIELDS}
     stations, oldest = 0, 0.0
-    for entry in heard.values():
+    used: list[dict[str, Any]] = []
+    for call, entry in heard.items():
         wx = entry.get("weather")
         if not isinstance(wx, dict) or _number(wx.get("temperature")) is None:
             continue
@@ -37,18 +39,25 @@ def around(heard: dict[str, dict[str, Any]], here: tuple[float, float] | None, n
         if now - at > max_age:
             continue
         lat, lon = entry.get("latitude"), entry.get("longitude")
-        if lat is None or lon is None or distance_m(here[0], here[1], lat, lon) > radius_km * 1000:
+        if lat is None or lon is None:
+            continue
+        metres = distance_m(here[0], here[1], lat, lon)
+        if metres > radius_km * 1000:
             continue
         stations += 1
         oldest = max(oldest, now - at)
+        one: dict[str, Any] = {"call": entry.get("call") or call, "km": metres / 1000, "age": now - at}
         for k in FIELDS:
             value = _number(wx.get(k))
             if value is not None and not (k == "humidity" and not 0 < value <= 100) \
                     and not (k == "pressure" and not 800 <= value <= 1100):
                 sums[k].append(value)
+                one[k] = value
+        used.append(one)
     if not stations:
         return None
     result: dict[str, Any] = {k: sum(v) / len(v) for k, v in sums.items() if v}
     result["stations"] = stations
     result["oldest"] = oldest
+    result["list"] = sorted(used, key=lambda s: s["km"])
     return result

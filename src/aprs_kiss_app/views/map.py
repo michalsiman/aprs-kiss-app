@@ -15,7 +15,7 @@ from ..offline_map import LAND, MIN_ZOOM, BaseMap, Region, ScaleBar, gestures
 from ..symbols import emoji
 from ..declutter import from_px, spread, to_px
 from .map_source import MapSourceButton, _label
-from .base import (STAY_WIDTH, View, bearing_deg, check_item, distance_km, distance_text, menu_line, stay_item, toggle,
+from .base import (STAY_WIDTH, View, bearing, bearing_deg, check_item, distance_km, distance_text, menu_line, stay_item, toggle,
                    walkie_talkie)
 
 DEFAULT_CENTER = (49.8, 15.5)  # Czechia
@@ -118,7 +118,8 @@ class MapView(View):
             ft.Row([ft.Icon(ft.Icons.THERMOSTAT, size=16, color=ft.Colors.PRIMARY), self.wx_text],
                    tight=True, spacing=4, vertical_alignment=ft.CrossAxisAlignment.CENTER),
             bgcolor=ft.Colors.with_opacity(0.6, ft.Colors.SURFACE), border_radius=8,
-            padding=ft.Padding.symmetric(horizontal=8, vertical=3), visible=False)
+            padding=ft.Padding.symmetric(horizontal=8, vertical=3), visible=False,
+            on_click=self._wx_details)  # a tap: which stations, their values, how far and how old
         self._wx_at = 0.0  # when the weather was last worked out (monotonic)
         self._wx: dict | None = None
         self._wx_news: tuple | None = None
@@ -210,14 +211,63 @@ class MapView(View):
         if wx is None:
             return
         u = units.current
-        parts = [u.temperature_text(wx["temperature"])]
-        if "humidity" in wx:
-            parts.append(f"{wx['humidity']:.0f} %")
-        if "pressure" in wx:
-            parts.append(u.pressure_text(wx["pressure"]))
-        self.wx_text.value = " · ".join(parts)
+        self.wx_text.value = self._wx_parts(wx)
         self.wx_box.tooltip = self.t("wx_near_tip", n=wx["stations"], dist=u.whole(localwx.RADIUS_KM),
                                      minutes=max(1, round(wx["oldest"] / 60)))
+
+    def _wx_parts(self, values: dict) -> str:
+        u = units.current
+        parts = [u.temperature_text(values["temperature"])] if "temperature" in values else []
+        if "humidity" in values:
+            parts.append(f"{values['humidity']:.0f} %")
+        if "pressure" in values:
+            parts.append(u.pressure_text(values["pressure"]))
+        return " · ".join(parts)
+
+    def _wx_details(self, _e=None) -> None:
+        """The weather stations the average is made of: nearest first, each with its values, distance,
+        direction and how old its report is; a tap on one opens the station."""
+        self._show_weather(force=True)  # as it is now: the ages from this moment, the box the same
+        wx = self._wx
+        if not wx:
+            self.app.page.update()
+            return
+        heard = self.engine.station.heard
+        here = self.engine.my_position()
+
+        def open_station(call: str):
+            def go(_e) -> None:
+                self.app.page.pop_dialog()
+                self.app.show_station(call)
+            return go
+
+        rows: list[ft.Control] = [
+            ft.Text(self._wx_parts(wx), size=18, weight=ft.FontWeight.BOLD),
+            ft.Text(self.t("wx_near_tip", n=wx["stations"], dist=units.current.whole(localwx.RADIUS_KM),
+                           minutes=max(1, round(wx["oldest"] / 60))), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
+            ft.Divider(height=8),
+        ]
+        for st in wx["list"]:
+            entry = heard.get(st["call"]) or {}
+            where = distance_text(st["km"])
+            if here and entry.get("latitude") is not None:
+                where += " " + bearing(*here, entry["latitude"], entry["longitude"])
+            rows.append(ft.Container(
+                ft.Column([
+                    ft.Row([ft.Text(st["call"], weight=ft.FontWeight.BOLD, expand=True),
+                            ft.Text(where, color=ft.Colors.ON_SURFACE_VARIANT)]),
+                    ft.Row([ft.Text(self._wx_parts(st), expand=True),
+                            ft.Text(self.t.age(st["age"]), size=12, color=ft.Colors.ON_SURFACE_VARIANT)]),
+                ], spacing=2, tight=True),
+                padding=ft.Padding.symmetric(horizontal=8, vertical=6), border_radius=8, ink=True,
+                on_click=open_station(st["call"])))
+        self.app.show_dialog(ft.AlertDialog(
+            title=ft.Row([ft.Icon(ft.Icons.THERMOSTAT, color=ft.Colors.PRIMARY), ft.Text(self.t("wx_near"))], spacing=8),
+            # as tall as the stations need, scrolling when there are many
+            content=ft.Column(rows, spacing=4, width=420, scroll=ft.ScrollMode.AUTO,
+                              height=min(110 + 56 * len(wx["list"]), 460)),
+            actions=[ft.TextButton(self.t("close"), on_click=lambda _e: self.app.page.pop_dialog())],
+        ))
 
     def _toggle_weather(self, _e) -> None:
         conf = self.engine.config

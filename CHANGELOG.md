@@ -4,6 +4,11 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## Unreleased
+
+- **A tap on the temperature around you** lists the weather stations it is the average of – nearest first, each
+  with its temperature, humidity and pressure, how far and in which direction, how old; a tap on one opens it.
+
 ## 1.6.0 – 2026-11-27
 
 - **Kilometres or miles, °C or °F, hPa or inHg** – Settings › App; by default as the phone or computer is set

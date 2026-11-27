@@ -68,7 +68,8 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
   poloměry ve filtru, rychlosti, výšky, teploty i tlak.
 - **Teplota z okolí** v rohu mapy: průměr z meteostanic do 20 km (údaje nejvýš 2 hodiny staré), i s vlhkostí
   a tlakem, pokud je posílají; obnovuje se každých 5 minut, při otevřených tlačítkách mapy se posune pod ně,
-  vypíná se v nabídce mapy.
+  vypíná se v nabídce mapy. Klepnutím na ni se ukážou stanice, ze kterých je spočítaná: jejich hodnoty,
+  vzdálenost a směr, stáří údaje.
 - **Značky se nepřekrývají**: stanice na jednom místě nebo blízko sebe se rozestoupí, tenká šedá čára vede
   ze středu symbolu k tečce, kde stanice opravdu je. **Ocásky** (poslední půlhodina, i vaše vlastní z GPS),
   APRS **objekty** jako samostatná místa, nesmyslné skoky se ignorují. **Měření vzdálenosti** podržením
