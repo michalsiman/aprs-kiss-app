@@ -6,6 +6,10 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 
 ## Unreleased
 
+- **Files: pictures made smaller before they go** – a picked picture is offered in several sizes (1280, 800, 480,
+  320 px, 160 px grey) with the size and the time each takes at 1200 Bd, and a preview; a big photo starts at
+  480 px. EXIF (the camera's GPS position too) is left out. **On a phone: Take a photo** straight from the
+  camera. Any other file can go **zipped** when that makes it smaller.
 - **Sound-card modem (Direwolf)** – a new TNC connection on computers: pick the sound card (an AIOC cable, a
   DigiRig, a SignaLink…) and the PTT (VOX, the sound card's CM108 GPIO, RTS or DTR of a serial port); the app
   writes Direwolf's configuration, starts it with the connection and stops it with the app; *Direwolf's log*

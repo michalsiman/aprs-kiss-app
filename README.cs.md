@@ -162,6 +162,8 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
 - **Soubory**: posílání a příjem souborů přes packet radio – YAPP (standard BPQ, WinPacku, Paxonu) přes
   spojení AX.25 s potvrzováním; před odesláním odhad času, během přenosu průběh, rychlost a zbývající čas;
   každý příchozí soubor se nejdřív nabídne; přerušený přenos naváže.
+- **Obrázky zmenšené pro vysílání**: fotka (vybraná, nebo vyfocená telefonem) nabídnutá v několika velikostech
+  s velikostí a časem každé – z 4 MB na hodinu je 12 kB na dvě minuty; ostatní soubory zabalené do ZIP.
 - **Chat**: prostý text na CQ, QST, ALL nebo vám, slyší ho všichni na kmitočtu; automatické rámce jako
   DX hlášení digipeaterů do chatu nepatří. Jak ho použít v jiném softwaru popisuje
   **[specifikace chatu](docs/CHAT.cs.md)**.

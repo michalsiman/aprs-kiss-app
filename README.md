@@ -167,6 +167,8 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
 - **Files**: send a file to another station and receive files over packet radio – YAPP (the standard of
   BPQ, WinPack, Paxon) over a connected AX.25 link; a time estimate before sending, progress, speed and the
   time left while it runs; every incoming file is offered first; an interrupted transfer resumes.
+- **Pictures made smaller for the air**: a photo (picked, or taken with the phone's camera) offered at several
+  sizes with the size and time of each – 4 MB in an hour becomes 12 kB in two minutes; other files zipped.
 - **Chat**: plain text to CQ, QST, ALL or you, heard by everybody on the frequency; automatic frames
   such as digipeater DX reports stay out. See the **[chat specification](docs/CHAT.md)** to use it
   from other software.

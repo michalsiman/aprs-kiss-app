@@ -14,6 +14,7 @@ from pathlib import Path
 
 import flet as ft
 
+from .. import shrink
 from .base import View, clock
 
 _LOGGER = logging.getLogger(__name__)
@@ -54,6 +55,8 @@ class FilesView(View):
                                  capitalization=ft.TextCapitalization.CHARACTERS)
         # the file picked, shown with the estimated time before it goes
         self.picked: tuple[str, bytes] | None = None
+        self.variants: list[shrink.Variant] = []  # a picture: the original and smaller ones; any file: zipped
+        self.choice = "original"
         self.picked_box = ft.Container(visible=False, padding=10, border_radius=8,
                                        bgcolor=ft.Colors.SECONDARY_CONTAINER)
         self.accept = ft.Switch(value=conf.files_accept, on_change=self._accept_changed)
@@ -68,7 +71,10 @@ class FilesView(View):
         return ft.Column([
             ft.Text(t("files_about"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
             ft.Row([self.remote, self.path,
-                    ft.FilledTonalButton(t("files_pick"), icon=ft.Icons.ATTACH_FILE, on_click=self._pick)],
+                    ft.FilledTonalButton(t("files_pick"), icon=ft.Icons.ATTACH_FILE, on_click=self._pick),
+                    # a phone: a photo straight from the camera, then made as small as wanted
+                    *([ft.FilledTonalButton(t("files_camera"), icon=ft.Icons.PHOTO_CAMERA, on_click=self._camera)]
+                      if self.app.mobile else [])],
                    wrap=True, vertical_alignment=ft.CrossAxisAlignment.CENTER),
             self.picked_box,
             accept_row, self.hint,
@@ -174,8 +180,57 @@ class FilesView(View):
         except OSError as err:
             self.app.toast(str(err), error=True)
             return
-        self.picked = (f.name, data)
+        await self._take(f.name, data)
+
+    async def _take(self, name: str, data: bytes) -> None:
+        """A file to send: a picture gets its smaller versions (the smallest that still shows something chosen
+        when the original would take long), any other file a zipped one when that helps."""
+        self.picked = (name, data)
+        self.variants, self.choice = [], "original"
+        self.picked_box.content = ft.Row([ft.ProgressRing(width=18, height=18), ft.Text(self.t("files_shrinking"))])
+        self.picked_box.visible = True
+        self.app.page.update()
+        variants = await asyncio.to_thread(shrink.picture_variants, name, data)
+        if not variants:
+            z = await asyncio.to_thread(shrink.zipped, name, data)
+            variants = [shrink.Variant("original", name, data)] + ([z] if z else [])
+        elif estimate(len(data))[0] > 10 * 60:  # a big picture: offered at 480 px (some minutes) at first
+            self.choice = next((v.key for v in variants if v.key == "480"), variants[-1].key)
+        self.variants = variants
         self._show_picked()
+
+    async def _camera(self, _e) -> None:
+        """A photo from the phone's camera (the back one), then the same as a picked file."""
+        try:
+            import flet_camera as fc  # noqa: PLC0415 - phones only
+        except ImportError:
+            self.app.toast(self.t("files_camera_none"), error=True)
+            return
+        cam = fc.Camera(expand=True, preview_enabled=True)
+
+        async def shoot(_e) -> None:
+            try:
+                data = await cam.take_picture()
+            except Exception as err:  # noqa: BLE001
+                self.app.toast(str(err), error=True)
+                return
+            self.app.page.pop_dialog()
+            await self._take(time.strftime("photo_%Y%m%d_%H%M%S.jpg"), bytes(data))
+
+        dialog = ft.AlertDialog(
+            content=ft.Container(cam, width=360, height=480),
+            actions=[ft.TextButton(self.t("cancel"), on_click=lambda _e: self.app.page.pop_dialog()),
+                     ft.FilledButton(self.t("files_shoot"), icon=ft.Icons.CAMERA, on_click=shoot)])
+        self.app.show_dialog(dialog)
+        try:
+            cams = await cam.get_available_cameras()
+            back = next((c for c in cams if c.lens_direction == fc.CameraLensDirection.BACK), cams[0] if cams else None)
+            if back is None:
+                raise OSError(self.t("files_camera_none"))
+            await cam.initialize(back, fc.ResolutionPreset.HIGH, enable_audio=False)
+        except Exception as err:  # noqa: BLE001 - no camera, no permission
+            self.app.page.pop_dialog()
+            self.app.toast(f"{self.t('files_camera_none')} ({err})", error=True)
 
     def _show_picked(self) -> None:
         """The picked file: its size, how long it will take, and Send."""
@@ -183,16 +238,38 @@ class FilesView(View):
             self.picked_box.visible = False
             self.app.page.update()
             return
-        name, data = self.picked
+        chosen = self._chosen()
+        name, data = chosen.name, chosen.data
         hops = len([p for p in (self.path.value or "").replace(" ", ",").split(",") if p.strip()])
         short, long = estimate(len(data), hops)  # in excellent conditions: the shorter one
-        est = f"{max(1, round(short))} s" if short < 60 else f"{round(short / 60)} min" if short < 3600 \
-            else f"{int(short // 3600)} h {round(short % 3600 / 60)} min"
+        est = self._time(short)
         t = self.t
+        picture = any(v.width for v in self.variants)
+        options: list[ft.Control] = []
+        if len(self.variants) > 1:  # the choice: smaller pictures, or the file zipped
+            options.append(ft.Text(t("files_shrink_pick" if picture else "files_zip_pick"), size=12,
+                                   color=ft.Colors.ON_SURFACE_VARIANT))
+            for v in self.variants:
+                on = v.key == chosen.key
+                what = (t("files_original") if v.key == "original" else
+                        "ZIP" if v.key == "zip" else f"{v.width} × {v.height}{' · ' + t('files_grey') if v.grey else ''}")
+                if v.key == "original" and v.width:
+                    what = f"{what} ({v.width} × {v.height})"
+                options.append(ft.Container(
+                    ft.Row([ft.Icon(ft.Icons.RADIO_BUTTON_CHECKED if on else ft.Icons.RADIO_BUTTON_UNCHECKED, size=18,
+                                    color=ft.Colors.PRIMARY if on else None),
+                            ft.Text(what, expand=True, weight=ft.FontWeight.BOLD if on else None),
+                            ft.Text(f"{size_text(len(v.data))} · {self._time(estimate(len(v.data), hops)[0])}",
+                                    color=ft.Colors.ERROR if estimate(len(v.data), hops)[0] > 30 * 60 else None)],
+                           vertical_alignment=ft.CrossAxisAlignment.CENTER),
+                    padding=ft.Padding.symmetric(horizontal=6, vertical=4), border_radius=6, ink=True,
+                    on_click=lambda _e, k=v.key: self._choose(k)))
+        preview = [ft.Image(src=data, height=160, fit=ft.BoxFit.CONTAIN, border_radius=6)] if chosen.width else []
         self.picked_box.content = ft.Column([
-            ft.Row([ft.Icon(ft.Icons.INSERT_DRIVE_FILE, size=20),
+            ft.Row([ft.Icon(ft.Icons.IMAGE if picture else ft.Icons.INSERT_DRIVE_FILE, size=20),
                     ft.Text(name, weight=ft.FontWeight.BOLD, expand=True, overflow=ft.TextOverflow.ELLIPSIS),
                     ft.Text(size_text(len(data)))], vertical_alignment=ft.CrossAxisAlignment.CENTER),
+            *preview, *options,
             ft.Text(t("files_estimate", t=est), weight=ft.FontWeight.BOLD,
                     color=ft.Colors.ERROR if short > 30 * 60 else None),
             ft.Text(t("files_estimate_hops", n=hops), size=12, color=ft.Colors.ON_SURFACE_VARIANT, visible=hops > 0),
@@ -202,8 +279,22 @@ class FilesView(View):
         self.picked_box.visible = True
         self.app.page.update()
 
+    @staticmethod
+    def _time(seconds: float) -> str:
+        return (f"{max(1, round(seconds))} s" if seconds < 60 else f"{round(seconds / 60)} min" if seconds < 3600
+                else f"{int(seconds // 3600)} h {round(seconds % 3600 / 60)} min")
+
+    def _chosen(self) -> shrink.Variant:
+        name, data = self.picked
+        return next((v for v in self.variants if v.key == self.choice), shrink.Variant("original", name, data))
+
+    def _choose(self, key: str) -> None:
+        self.choice = key
+        self._show_picked()
+
     def _forget(self) -> None:
         self.picked = None
+        self.variants = []
         self._show_picked()
 
     def _send_picked(self, _e) -> None:
@@ -213,7 +304,8 @@ class FilesView(View):
             return
         if not self.picked:
             return
-        name, data = self.picked
+        chosen = self._chosen()
+        name, data = chosen.name, chosen.data
         try:
             self.engine.send_file(remote, name, data, (self.path.value or "").strip())
         except Exception as err:  # noqa: BLE001 - not connected, TX off, already sending

@@ -14,6 +14,7 @@ dependencies = [
     "aprslib>=0.7.2",
     "platformdirs>=4",
     "certifi",  # HTTPS certificates for the update check on Android and iOS
+    "pillow",  # pictures made smaller before they go over packet radio (Files)
     "tomli>=2; python_version < '3.11'",
     "pyserial-asyncio-fast>=0.16; sys_platform == 'linux' or sys_platform == 'win32' or sys_platform == 'darwin'",
 ]
@@ -74,10 +75,11 @@ NSBluetoothAlwaysUsageDescription = "A TNC or radio over Bluetooth LE (Settings 
 "com.apple.security.device.bluetooth" = true
 
 [tool.flet.ios]
-dependencies = ["flet-ble-kiss"]
+dependencies = ["flet-ble-kiss", "flet-camera==1.1.2"]  # the camera: a photo to send (Files)
 
 [tool.flet.android.permission]
 "android.permission.INTERNET" = true
+"android.permission.CAMERA" = true  # Files › Take a photo
 # Settings › GPS › "The phone's GPS" (asked for only when chosen)
 "android.permission.ACCESS_FINE_LOCATION" = true
 "android.permission.ACCESS_COARSE_LOCATION" = true
@@ -103,12 +105,13 @@ dependencies = ["flet-ble-kiss"]
 actions = ["android.hardware.usb.action.USB_DEVICE_ATTACHED"]
 
 [tool.flet.ios.info]
+NSCameraUsageDescription = "A photo to send over packet radio (Files)."
 NSLocationWhenInUseUsageDescription = "Your position for the map and the APRS beacon, when Settings › GPS uses the phone's GPS."
 NSBluetoothAlwaysUsageDescription = "A TNC or radio over Bluetooth LE (Settings › Connection)."
 
 # Android: pyjnius reaches the USB host API for a TNC on the phone's USB port (aprs_kiss_core/android_usb.py)
 [tool.flet.android]
-dependencies = ["pyjnius", "flet-ble-kiss"]
+dependencies = ["pyjnius", "flet-ble-kiss", "flet-camera==1.1.2"]  # the camera: a photo to send (Files)
 # Android resources of our own (src/android_res, relative to the project): the USB devices we offer to handle when plugged in
 res_dir = "src/android_res"
 # The launcher icon: assets/icon_android.png is the icon blue to the edges (Android masks it to its own
@@ -121,3 +124,4 @@ target_sdk_version = 36
 "android.hardware.usb.host" = false  # used when present, not required
 "android.hardware.location.gps" = false  # the phone GPS is optional too
 "android.hardware.bluetooth" = false  # and Bluetooth
+"android.hardware.camera" = false  # and the camera
