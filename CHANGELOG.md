@@ -4,11 +4,12 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
-## Unreleased
+## 1.6.0 – 2026-11-27
 
 - **Kilometres or miles, °C or °F, hPa or inHg** – Settings › App; by default as the phone or computer is set
-  (miles in the US and the UK, Fahrenheit and inches of mercury in the US). Distances everywhere, the map scale, the filter's how-far (10 / 30 / 60 mi),
-  the APRS-IS radius, the look-ahead of road alerts, speeds, altitudes, temperatures and pressure follow it.
+  (miles in the US and the UK, Fahrenheit and inches of mercury in the US). Distances everywhere, the map scale,
+  the filter's how-far (10 / 30 / 60 mi), the APRS-IS radius, the look-ahead of road alerts, speeds, altitudes,
+  temperatures and pressure follow it.
 - **Temperature around you on the map** – top right corner: the average of the weather stations within 20 km
   (reports at most 2 hours old), humidity and pressure too when sent; every 5 minutes; under the map buttons
   while they are open; *Temperature around me* in the map menu switches it off.

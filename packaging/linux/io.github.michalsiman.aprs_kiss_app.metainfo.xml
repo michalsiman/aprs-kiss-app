@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="1.6.0" date="2026-11-27">
+      <description>
+        <p>Kilometres or miles, °C or °F, hPa or inHg (as the system, or chosen); the temperature around you on the map from the weather stations within 20 km; the map filter with how far (internet and radio) and a count of stations on the map; what is new after an update; the tracker offer at most once an hour with Not today; lists open on their last line at once; Messages All / Unread count conversations; framed bars at the bottom; the handheld radio icon wherever the radio is meant.</p>
+      </description>
+    </release>
     <release version="1.5.2" date="2026-11-27" type="development">
       <description>
         <p>Beta: Messages All / Unread count conversations, not every message.</p>
