@@ -13,7 +13,7 @@ from aprs_kiss_core import localwx, mapfilter, repeater, units
 from ..legend import COLOR_ME, emergency, map_label, show_legend, station_color, visible
 from ..offline_map import LAND, MIN_ZOOM, BaseMap, Region, ScaleBar, gestures
 from ..symbols import emoji
-from ..declutter import from_px, spread, to_px
+from ..declutter import label_size, from_px, spread, to_px
 from .map_source import MapSourceButton, _label
 from .base import (STAY_WIDTH, View, bearing, bearing_deg, check_item, distance_km, distance_text, menu_line, stay_item, toggle,
                    walkie_talkie)
@@ -656,7 +656,8 @@ class MapView(View):
         # stations whose markers would cover each other are spread in a circle, at this zoom
         self._layout_zoom = self._zoom
         me = len(wanted) - 1 if here else None  # our own station stays where it is
-        shown = spread([(k[1], k[2]) for k in wanted], self._zoom, fixed=me)
+        shown = spread([(k[1], k[2]) for k in wanted], self._zoom, fixed=me,
+                       sizes=[label_size(k[0], k[6]) for k in wanted])
         cache, markers, leaders, dots = {}, [], [], []
         for key, (slat, slon) in zip(wanted, shown):
             moved = (slat, slon) != (key[1], key[2])

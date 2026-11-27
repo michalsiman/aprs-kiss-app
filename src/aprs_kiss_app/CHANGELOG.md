@@ -4,6 +4,12 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## Unreleased
+
+- **Map tags no longer cover each other**: markers are spread by the real size of their tags – a repeater's
+  long second line ("438.525 · 70 cm · D-Star") is two or three times a callsign's width, and was counted as
+  one (four DL6MDX repeaters on one mast covered their neighbours).
+
 ## 1.9.0 – 2026-11-27
 
 - **Raspberry Pi as a station with a touch screen** – one command installs it on Raspberry Pi OS

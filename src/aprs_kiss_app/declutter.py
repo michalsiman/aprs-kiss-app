@@ -24,6 +24,7 @@ SWAP_SHIFT = MAX_SHIFT * 1.5  # untangling crossed lines may take a marker this 
 # dot would look like the first station's; so neither stays.
 SAME_X = 34
 SAME_Y = 32
+GAP = 4  # pixels: at least this much air between two markers' boxes
 MIN_ZOOM = 9.0  # further out (a whole region) the markers stay where they are: spreading would be a web of lines
 
 
@@ -55,26 +56,39 @@ def _offsets() -> list[tuple[float, float]]:
 OFFSETS = _offsets()
 
 
-def spread(points: list[tuple[float, float]], zoom: float, fixed: int | None = None) -> list[tuple[float, float]]:
+def label_size(name: str, sub: str | None = None) -> tuple[float, float]:
+    """How much of the screen a marker covers (pixels): the symbol's disc over a tag as wide as its text – a
+    long repeater line ("438.525 · 70 cm · D-Star") makes it two or three times a callsign's width."""
+    width = max(len(name) * 7.0, len(sub) * 6.0 if sub else 0) + 12
+    return max(40.0, width), 64.0 if sub else 50.0
+
+
+def spread(points: list[tuple[float, float]], zoom: float, fixed: int | None = None,
+           sizes: list[tuple[float, float]] | None = None) -> list[tuple[float, float]]:
     """Where to draw each point: its own place, or a free spot close to it.
 
-    fixed: a point placed first and never moved (our own station)."""
+    fixed: a point placed first and never moved (our own station).
+    sizes: each marker's (width, height) on screen (label_size); without them every marker counts as
+    CLOSE_X × CLOSE_Y. Two markers are free of each other when their boxes do not touch."""
     shown = list(points)
     if zoom < MIN_ZOOM:
         return shown
-    grid: dict[tuple[int, int], list[tuple[float, float]]] = {}
+    box = sizes or [(CLOSE_X - GAP, CLOSE_Y - GAP)] * len(points)
+    cw = max((w for w, _h in box), default=CLOSE_X) + GAP  # a grid cell: as big as the biggest box
+    ch = max((h for _w, h in box), default=CLOSE_Y) + GAP
+    grid: dict[tuple[int, int], list[tuple[float, float, float, float]]] = {}
 
-    def free(x: float, y: float) -> bool:
-        cx, cy = int(x // CLOSE_X), int(y // CLOSE_Y)
+    def free(x: float, y: float, w: float, h: float) -> bool:
+        cx, cy = int(x // cw), int(y // ch)
         for dx in (-1, 0, 1):
             for dy in (-1, 0, 1):
-                for px, py in grid.get((cx + dx, cy + dy), ()):
-                    if abs(px - x) < CLOSE_X and abs(py - y) < CLOSE_Y:
+                for px, py, pw, ph in grid.get((cx + dx, cy + dy), ()):
+                    if abs(px - x) < (pw + w) / 2 + GAP and abs(py - y) < (ph + h) / 2 + GAP:
                         return False
         return True
 
-    def take(x: float, y: float) -> None:
-        grid.setdefault((int(x // CLOSE_X), int(y // CLOSE_Y)), []).append((x, y))
+    def take(x: float, y: float, w: float, h: float) -> None:
+        grid.setdefault((int(x // cw), int(y // ch)), []).append((x, y, w, h))
 
     px = [to_px(*pt, zoom) for pt in points]
     # Several stations at one place (or nearly, see SAME_X / SAME_Y): none of them stays on it. The place itself is kept free for the dot
@@ -93,7 +107,7 @@ def spread(points: list[tuple[float, float]], zoom: float, fixed: int | None = N
     if fixed in shared:
         shared.discard(fixed)  # our own station stays; the others go round it
     for i in shared:
-        take(*px[i])  # the place is taken (by its dot)
+        take(*px[i], CLOSE_X - GAP, CLOSE_Y - GAP)  # the place is taken (by its dot), kept clear around it
 
     order = list(range(len(points)))
     if fixed is not None and 0 <= fixed < len(points):
@@ -101,18 +115,19 @@ def spread(points: list[tuple[float, float]], zoom: float, fixed: int | None = N
         order.insert(0, fixed)
     for i in order:
         x, y = to_px(*points[i], zoom)
+        w, h = box[i]
         if i == fixed:
-            take(x, y)
+            take(x, y, w, h)
             continue
         for ox, oy in OFFSETS[1:] if i in shared else OFFSETS:  # sharing a place: never on it
-            if free(x + ox, y + oy):
+            if free(x + ox, y + oy, w, h):
                 if ox or oy:
                     shown[i] = from_px(x + ox, y + oy, zoom)
-                take(x + ox, y + oy)
+                take(x + ox, y + oy, w, h)
                 break
         else:
-            take(x, y)  # no room anywhere near: it stays on its place, under the others
-    return untangle(points, shown, zoom, fixed)
+            take(x, y, w, h)  # no room anywhere near: it stays on its place, under the others
+    return untangle(points, shown, zoom, fixed, sizes)
 
 
 DISC_UP = 13  # pixels: a line starts at the symbol's disc, this far above the marker's point
@@ -127,7 +142,7 @@ def _crosses(a: tuple, b: tuple, c: tuple, d: tuple) -> bool:
 
 
 def untangle(points: list[tuple[float, float]], shown: list[tuple[float, float]], zoom: float,
-             fixed: int | None = None) -> list[tuple[float, float]]:
+             fixed: int | None = None, sizes: list[tuple[float, float]] | None = None) -> list[tuple[float, float]]:
     """No two lines (from a moved marker to where its station is) cross: when two do, the two markers swap
     their spots. Both spots were free, the lines get shorter in sum, so it ends; a swap that would take a
     marker further than SWAP_SHIFT from its station is not made."""
@@ -138,6 +153,19 @@ def untangle(points: list[tuple[float, float]], shown: list[tuple[float, float]]
     def line(i: int):
         return (at[i][0], at[i][1] - DISC_UP), real[i]
 
+    def fits(i: int, spot: tuple[float, float], other: int) -> bool:
+        """Marker i at `spot` covers nobody (other than `other`, which leaves that spot)."""
+        if not sizes:
+            return True
+        w, h = sizes[i]
+        for k, (kx, ky) in enumerate(at):
+            if k in (i, other):
+                continue
+            kw, kh = sizes[k]
+            if abs(kx - spot[0]) < (kw + w) / 2 + GAP and abs(ky - spot[1]) < (kh + h) / 2 + GAP:
+                return False
+        return True
+
     for _ in range(500):
         moved = [i for i in range(len(points)) if i != fixed and shown[i] != points[i]]
         swapped = False
@@ -147,6 +175,8 @@ def untangle(points: list[tuple[float, float]], shown: list[tuple[float, float]]
                     continue
                 if math.dist(at[j], real[i]) > SWAP_SHIFT or math.dist(at[i], real[j]) > SWAP_SHIFT:
                     continue
+                if not (fits(i, at[j], j) and fits(j, at[i], i)):
+                    continue  # a wide tag in a narrow one's spot would cover a neighbour
                 at[i], at[j] = at[j], at[i]
                 shown[i], shown[j] = shown[j], shown[i]
                 swapped = True

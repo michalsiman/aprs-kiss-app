@@ -133,3 +133,38 @@ class SharedPlaceTest(unittest.TestCase):
         points = [(49.03, 14.0)] * 3
         shown = spread(points, 13, fixed=2)
         self.assertEqual(shown[2], points[2])
+
+
+class WideTagsTest(unittest.TestCase):
+    """Repeaters with a long second line ("438.525 · 70 cm · D-Star") are much wider than a callsign: their
+    tags must not cover each other or a neighbour's (Furth im Wald: four DL6MDX objects on one mast)."""
+
+    def test_no_tag_covers_another(self):
+        from aprs_kiss_app.declutter import GAP, label_size
+
+        stations = [
+            ("DL6MDX-R", 49.3000, 12.8800, "438.525 · 70 cm · C4FM"),
+            ("DL6MDX B", 49.3000, 12.8801, "438.525 · 70 cm · D-Star"),
+            ("DL6MDX-D", 49.3001, 12.8800, "438.525 · 70 cm · DMR"),
+            ("DL6MDX-B", 49.2999, 12.8800, "438.525 · 70 cm · D-Star"),
+            ("DB0ZMM-1", 49.2985, 12.9050, None),
+            ("DB0ZMM-3", 49.2930, 12.9050, None),
+        ]
+        for zoom in (11.0, 11.5, 12.0, 13.0):
+            sizes = [label_size(c, f) for c, _a, _o, f in stations]
+            shown = spread([(a, o) for _c, a, o, _f in stations], zoom, sizes=sizes)
+            at = [to_px(*p, zoom) for p in shown]
+            for i in range(len(at)):
+                for j in range(i + 1, len(at)):
+                    (xi, yi), (xj, yj) = at[i], at[j]
+                    (wi, hi), (wj, hj) = sizes[i], sizes[j]
+                    with self.subTest(zoom=zoom, a=stations[i][0], b=stations[j][0]):
+                        self.assertFalse(abs(xi - xj) < (wi + wj) / 2 + GAP - 0.01
+                                         and abs(yi - yj) < (hi + hj) / 2 + GAP - 0.01)
+
+    def test_size(self):
+        from aprs_kiss_app.declutter import label_size
+
+        short, wide = label_size("OK1ABC"), label_size("DL6MDX B", "438.525 · 70 cm · D-Star")
+        self.assertGreater(wide[0], 2 * short[0] - 20)
+        self.assertGreater(wide[1], short[1])
