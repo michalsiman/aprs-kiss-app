@@ -4,6 +4,10 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## Unreleased
+
+- **Phone: IS and GPS lamps together exactly as wide as TNC below them.**
+
 ## 1.5.2 beta – 2026-11-27
 
 - **Messages: All / Unread count conversations** – the lines of the list – not every message sent and received

@@ -614,7 +614,10 @@ class App:
             links = ft.Column([ft.Row([self.lamps["is"], self.lamps["gps"]], spacing=2, tight=True),
                                self.lamps["tnc"]], spacing=2, tight=True,
                               horizontal_alignment=ft.CrossAxisAlignment.CENTER)
-            self.lamps["tnc"].width = 42  # as wide as IS and GPS above it
+            # IS and GPS side by side exactly as wide as TNC below them: 20 + 2 + 20 = 42
+            for lamp in ("is", "gps"):
+                self.lamps[lamp].width = 20
+            self.lamps["tnc"].width = 42
             row = [self.menu_btn, self.callsign_btn, links, self.update_btn, self.position_btn.control, self.lamps["tx"]]
         status = ft.Container(
             ft.Row(
