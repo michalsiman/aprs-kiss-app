@@ -58,7 +58,10 @@ Comment=APRS and packet radio with a KISS TNC
 Icon=$URL/icon.png
 GPGKey=$B64
 EOF
-cp "$HERE/site/index.html" site/index.html
+cp "$HERE/site/index.html" site/index.html  # the app's web page
+cp "$HERE/site/flatpak.html" site/flatpak.html  # installing the Flatpak
+# our own domain (aprs.ok1sim.cz), when set: GitHub Pages keeps it in this file
+[ -f "$HERE/site/CNAME" ] && cp "$HERE/site/CNAME" site/CNAME
 cp "$HERE/site/privacy.html" site/privacy.html  # the privacy policy Google Play links to
 cp "$HERE/../linux/icons/128.png" site/icon.png
 cp "$HERE/aprs-kiss.gpg" site/aprs-kiss.gpg
