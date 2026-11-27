@@ -13,6 +13,8 @@ import flet as ft
 
 from aprs_kiss_core.config import save_config
 
+from .views.base import walkie_talkie
+
 if TYPE_CHECKING:
     from .app import App
 
@@ -34,7 +36,7 @@ def show(app: App) -> None:
     )
     dialog = ft.AlertDialog(
         modal=True,  # no way around it: tapping outside or Back does not close it
-        icon=ft.Icon(ft.Icons.CELL_TOWER, color=ft.Colors.ERROR, size=40),
+        icon=walkie_talkie(ft.Colors.ERROR, 40),  # transmitting on the radio
         title=ft.Text(t("disc_title"), text_align=ft.TextAlign.CENTER),
         content=ft.Container(body, width=560),
         actions=[

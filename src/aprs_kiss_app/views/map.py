@@ -15,7 +15,8 @@ from ..offline_map import LAND, MIN_ZOOM, BaseMap, Region, ScaleBar, gestures
 from ..symbols import emoji
 from ..declutter import from_px, spread, to_px
 from .map_source import MapSourceButton, _label
-from .base import STAY_WIDTH, View, bearing_deg, check_item, distance_km, distance_text, menu_line, stay_item, toggle
+from .base import (STAY_WIDTH, View, bearing_deg, check_item, distance_km, distance_text, menu_line, stay_item, toggle,
+                   walkie_talkie)
 
 DEFAULT_CENTER = (49.8, 15.5)  # Czechia
 REBUILD_SECONDS = 2.0
@@ -206,9 +207,9 @@ class MapView(View):
                                        lambda _e: self._set_filters(set(), rf_km=0))  # the boxes clear, the menu stays
         # how far: internet stations (the APRS-IS area asked from the server) and radio ones
         self.reach_is, self.reach_is_chips = self._reach_item(
-            ft.Icons.PUBLIC, self.t("reach_is"), mapfilter.IS_KM, self._set_is_km)
+            ft.Icon(ft.Icons.PUBLIC, size=20), self.t("reach_is"), mapfilter.IS_KM, self._set_is_km)
         self.reach_rf, self.reach_rf_chips = self._reach_item(
-            ft.Icons.SETTINGS_INPUT_ANTENNA, self.t("reach_rf"), mapfilter.RF_KM,
+            walkie_talkie(ft.Colors.ON_SURFACE, 20), self.t("reach_rf"), mapfilter.RF_KM,
             lambda km: self._set_filters(mapfilter.parse(self.engine.config.map_filters), rf_km=km))
         self.filter_icon = ft.Icon(ft.Icons.FILTER_ALT_OUTLINED)
         self.filter_face = ft.Container(self.filter_icon, padding=8, shape=ft.BoxShape.CIRCLE)
@@ -227,7 +228,7 @@ class MapView(View):
                 padding=ft.Padding.symmetric(horizontal=10, vertical=5), width=50,
                 tooltip=f"{km} km" if km else self.t("reach_any"), on_click=lambda _e, k=km: pick(k))
         box = ft.Container(
-            ft.Column([ft.Row([ft.Icon(icon, size=20), ft.Text(label, size=13, max_width=STAY_WIDTH - 40)], spacing=10),
+            ft.Column([ft.Row([icon, ft.Text(label, size=13, max_width=STAY_WIDTH - 40)], spacing=10),
                        ft.Row(list(chips.values()), spacing=6)], spacing=6, tight=True),
             width=STAY_WIDTH, padding=ft.Padding.symmetric(vertical=6),
             on_click=lambda _e: None)  # a tap between the chips does not close the menu either

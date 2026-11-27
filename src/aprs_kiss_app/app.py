@@ -27,7 +27,7 @@ from . import theme
 from aprs_kiss_core.engine import Engine, TransmitRefused
 
 from .about import show_about
-from . import disclaimer, distribution, language, offline_map, updates
+from . import disclaimer, distribution, language, offline_map, updates, whatsnew
 from .sounds import Sounds
 from .i18n import Translator
 from .phone_gps import PhoneGps
@@ -140,11 +140,13 @@ class App:
         if language.needed(self) and config.disclaimer_accepted:
             config.language_asked = True  # an existing install: its language is set already
             self.save_config_soon()
+        first_start = language.needed(self) or disclaimer.needed(self)
         first_warning = lambda: disclaimer.show(self) if disclaimer.needed(self) else None  # noqa: E731
         if language.needed(self):
             language.show(self, then=first_warning)  # the very first start: the language, then the warning
         else:
             first_warning()
+        whatsnew.check(self, first_start)  # after an update: what changed (a first start only remembers the version)
         self.phone_gps.sync()
         await self.apply_screen()
         page.run_task(self._tick)

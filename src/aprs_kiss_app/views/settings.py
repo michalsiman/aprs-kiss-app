@@ -27,7 +27,7 @@ from aprs_kiss_core.config import Config
 from .. import distribution, offline_map
 from ..i18n import LANGUAGES, TEXTS, ssid_labels
 from ..symbols import SYMBOLS
-from .base import View, short_path
+from .base import View, short_path, walkie_talkie
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -63,7 +63,7 @@ def _section(title: str, icon: str, *controls: ft.Control, expanded: bool = Fals
     return ft.Card(
         ft.ExpansionTile(
             title=ft.Text(title, size=15, weight=ft.FontWeight.BOLD),
-            leading=ft.Icon(icon, color=ft.Colors.PRIMARY),
+            leading=icon if isinstance(icon, ft.Control) else ft.Icon(icon, color=ft.Colors.PRIMARY),
             controls=[ft.Container(ft.Column(list(controls), spacing=8),
                                    # top: room for the first field's label, which sits on the field's edge
                                    padding=ft.Padding.only(left=14, right=14, top=8, bottom=12))],
@@ -335,7 +335,7 @@ class SettingsView(View):
                          ft.Text(t("road_alerts_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT)),
                 _section(t("digi"), ft.Icons.REPEAT, self.digi_mode, self.digi_hops, self.digi_aliases, self.digi_hint),
                 _section(t("aprsis"), ft.Icons.PUBLIC, self.aprsis, self.licence_box, self.is_fields, self.is_state),
-                _section("VARA FM", ft.Icons.SETTINGS_INPUT_ANTENNA, ft.Row([self.vara_host, self.vara_port], wrap=True),
+                _section("VARA FM", walkie_talkie(ft.Colors.PRIMARY), ft.Row([self.vara_host, self.vara_port], wrap=True),
                          ft.Text(t("vara_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT)),
                 _section(t("tak"), ft.Icons.RADAR, ft.Row([self.tak_callsign, self.tak_team, self.tak_role], wrap=True),
                          self.tak_interval),

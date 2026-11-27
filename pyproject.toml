@@ -38,7 +38,7 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.setuptools.package-data]
-aprs_kiss_app = ["icon.png", "offline/world.json"]
+aprs_kiss_app = ["icon.png", "offline/world.json", "CHANGELOG.md"]
 
 # ─── flet build (Linux now; Windows, macOS, Android, iOS from the same code) ───
 [tool.flet]

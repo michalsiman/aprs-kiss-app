@@ -17,6 +17,10 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
   no limit (the default).
 - **"On the map: 17"** – a small line under the map buttons: how many stations are in the part of the map on
   screen; it follows the panning, zooming and filters.
+- **What is new**: after an update to a new stable version, the first start shows the changes since the
+  version used before (once; a Close button). Betas do not; the next stable version lists their changes too.
+- **The handheld radio icon** wherever the radio is meant (map filter, VARA FM, the first-start warning, About).
+- **About**: the thanks now say what for – support in amateur radio – and include the OK1RPL radio club.
 
 ## 1.5.0 – 2026-11-26
 

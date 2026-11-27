@@ -51,6 +51,7 @@ def config(lang: str, theme: str, **extra) -> dict:
         "language": lang, "language_asked": True, "disclaimer_accepted": True, "theme": theme,
         "gps_source": "manual", "map_trails": True, "map_tools_hidden": False, "check_updates": False,
         "aprsis_radius_km": 50, "tracked_callsigns": "OK1CAR-9", "bbs_sentence_ok": True, "tak_sentence_ok": True,
+        "seen_version": "9.9.9",  # no "what is new" after an update over the screens
         "tak_callsign": "OK1SIM", "tak_team": "Cyan", "vara_host": "", "beacon_minutes": 30,
         **extra, "_now": now,
     }
@@ -186,7 +187,7 @@ class Run:
         if self.usb:  # the phone's TNC choices: USB and Bluetooth too
             app_env["APRS_KISS_USB"] = "1"
         self.app = subprocess.Popen([PY, "-c", "import flet as ft; from aprs_kiss_app.app import main; "
-                                     f"ft.run(main, port={APP_PORT}, view=ft.AppView.WEB_BROWSER)"],
+                                     f"ft.run(main, port={APP_PORT}, view=ft.AppView.WEB_BROWSER, assets_dir={str(ROOT / 'src' / 'assets')!r})"],
                                     env=app_env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         for _ in range(100):
             try:

@@ -10,7 +10,7 @@ import flet as ft
 from aprs_kiss_core.config import VERSION_LABEL
 
 from . import distribution
-from .views.base import clock
+from .views.base import clock, walkie_talkie
 
 if TYPE_CHECKING:
     from .app import App
@@ -22,7 +22,7 @@ LINKS = [
     ("about_issues", ft.Icons.BUG_REPORT_OUTLINED, f"{REPO}/issues"),
     ("about_releases", ft.Icons.NEW_RELEASES_OUTLINED, f"{REPO}/releases"),
     ("about_firmware", ft.Icons.MEMORY, "https://github.com/armel/uv-k1-k5v3-firmware-custom"),
-    ("about_kiss_app", ft.Icons.SETTINGS_INPUT_ANTENNA,
+    ("about_kiss_app", "walkie",
      "https://github.com/armel/uv-k1-k5v3-firmware-custom/wiki/App-KISS-TNC"),
     ("about_ha", ft.Icons.HOME_OUTLINED, "https://github.com/michalsiman/aprs-kiss-ha"),
 ]
@@ -38,6 +38,9 @@ def _icon() -> ft.Control:
 
 
 def _link(text: str, icon, url: str) -> ft.Control:
+    if icon == "walkie":  # a radio: our handheld drawing (Material has none)
+        return ft.TextButton(content=ft.Row([walkie_talkie(ft.Colors.PRIMARY, 18), ft.Text(text)], spacing=8, tight=True),
+                             url=url, tooltip=url, style=ft.ButtonStyle(alignment=ft.Alignment.CENTER_LEFT))
     return ft.TextButton(text, icon=icon, url=url, tooltip=url,
                          style=ft.ButtonStyle(alignment=ft.Alignment.CENTER_LEFT))
 

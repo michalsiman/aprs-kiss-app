@@ -103,6 +103,7 @@ class Config:
     bbs_list: str = ""  # saved BBSes and nodes for the terminal: JSON [{"call": ..., "path": ...}]
     check_updates: bool = True
     update_beta: bool = False  # also offer beta versions (pre-releases on GitHub): for testers  # ask GitHub once a day whether a newer version is out
+    seen_version: str = ""  # the version whose changes were last shown (after an update: what is new)
     disclaimer_accepted: bool = False  # the first-start warning (transmitting needs a licence) was accepted
     language_asked: bool = False
     bbs_sentence_ok: bool = False  # the BBS SERVER sentence was typed once: not asked again
