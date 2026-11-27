@@ -11,6 +11,7 @@ import flet as ft
 
 from aprs_kiss_core.aprs import MAX_MESSAGE_PARTS, message_parts
 from aprs_kiss_core.geotext import find_callsigns, find_positions, resolve_callsign, write_position
+from aprs_kiss_core import winlink
 from aprs_kiss_core.services import SERVICES
 from aprs_kiss_core.spotting import CAMILLA, GATEWAY_NAMES, MODES, PROGRAMS, Spot, SpotError, build as build_spot, default_gateway, gateways_for
 
@@ -74,6 +75,23 @@ class MessagesView(View):
                              overflow=ft.TextOverflow.ELLIPSIS)
         self.on_map = ft.IconButton(ft.Icons.MAP_OUTLINED, tooltip=self.t("show_on_map"), on_click=self._show_on_map,
                                     visible=False)
+        # Winlink (WLNK-1): log in, then the commands as buttons; L, /EX, P and ? go at once, the others are put
+        # into the text for the number or address
+        self.wl_state = ft.Text(size=12, color=ft.Colors.ON_SURFACE_VARIANT)
+        self.wl_login = ft.FilledTonalButton(self.t("wl_login"), icon=ft.Icons.LOGIN,
+                                             on_click=lambda _e: self._wl_login())
+        chips = [(cmd, self.t(f"wl_{key}"), now) for cmd, key, now in (
+            ("L", "list", True), ("R", "read", False), ("Y", "reply", False), ("F", "forward", False),
+            ("K", "kill", False), ("SP ", "new", False), ("SMS ", "sms", False), ("/EX", "send", True),
+            ("P", "playback", True), ("?", "help", True))]
+        self.wl_bar = ft.Container(ft.Column([
+            ft.Row([self.wl_login, self.wl_state], spacing=10, wrap=True,
+                   vertical_alignment=ft.CrossAxisAlignment.CENTER),
+            ft.Row([ft.OutlinedButton(label, tooltip=cmd.strip(),
+                                      style=ft.ButtonStyle(padding=ft.Padding.symmetric(horizontal=10)),
+                                      on_click=lambda _e, c=cmd, n=now: self.app.page.run_task(self._wl_command, c, n))
+                    for cmd, label, now in chips], spacing=6, run_spacing=6, wrap=True),
+        ], spacing=6, tight=True), visible=False, padding=ft.Padding.only(bottom=4))
         self.left = left = ft.Column(
             [
                 ft.Row([ft.IconButton(ft.Icons.ADD, tooltip=self.t("new_message"), on_click=self._new,
@@ -97,6 +115,7 @@ class MessagesView(View):
             [
                 ft.Row([self.back, ft.Column([self.title, self.where], spacing=0, tight=True, expand=True),
                         self.on_map], spacing=4, vertical_alignment=ft.CrossAxisAlignment.CENTER),
+                self.wl_bar,
                 ft.Container(ft.SelectionArea(self.thread), expand=True, border_radius=8,
                              bgcolor=ft.Colors.SURFACE_CONTAINER_LOWEST),
                 self.to,
@@ -243,6 +262,7 @@ class MessagesView(View):
         if not groups:
             self.conversations.controls = [ft.Text(self.t("no_messages"), color=ft.Colors.ON_SURFACE_VARIANT)]
         self._where()
+        self._wl_show()
         if self.selected:
             self.title.value = self.selected
             self.thread.controls = [self._bubble(m) for m in groups.get(self.selected, [])]
@@ -640,6 +660,35 @@ class MessagesView(View):
         self._signature = None
         self.refresh()
 
+    # ─── Winlink ─────
+
+    def _wl_show(self) -> None:
+        on = winlink.is_gateway(self.selected or "")
+        self.wl_bar.visible = on
+        if not on:
+            return
+        now = time.time()
+        session = self.app.winlink_session
+        if session.logged_in(now):
+            self.wl_state.value = self.t("wl_logged", until=time.strftime("%H:%M", time.localtime(session.logged_until)))
+        elif session.waiting(now):
+            self.wl_state.value = self.t("wl_waiting")
+        else:
+            self.wl_state.value = self.t("wl_not_logged")
+
+    def _wl_login(self) -> None:
+        self.app.winlink_login(self._via_value())
+        self._wl_show()
+        self.app.page.update()
+
+    async def _wl_command(self, command: str, at_once: bool) -> None:
+        if at_once:
+            await self.app.guard(self.engine.send_aprs_message(winlink.GATEWAY, command, self._via_value()))
+            return
+        self.text.value = command
+        self.text.update()
+        await self.text.focus()
+
     async def _send(self, _e) -> None:
         to = (self.to.value if self.to.visible else self.selected or "").strip().upper()
         text = (self.text.value or "").strip()
@@ -647,7 +696,8 @@ class MessagesView(View):
             return
         via = self._via_value()
         sent = True
-        for part in message_parts(text):  # one, or several numbered "1/3", "2/3", "3/3"
+        # one, or several numbered "1/3", "2/3", "3/3"; to Winlink each line a message, not numbered (e-mail lines)
+        for part in (winlink.body_lines(text) if winlink.is_gateway(to) else message_parts(text)):
             if not await self.app.guard(self.engine.send_aprs_message(to, part, via)):
                 sent = False
                 break

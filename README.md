@@ -120,6 +120,8 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
 - **Spotting an activation** (Messages › Spot): SOTA, POTA, WWFF, SIOTA, GMA, WCA castles, IOTA and
   lighthouses – a self-spot goes by radio as an APRS message to APRS2SOTA, Camilla (GMA) or APSPOT, checked
   and shortened to fit, with the gateway's answer in its conversation.
+- **Winlink e-mail** (APRSLink, WLNK-1): log in with one button (only three characters of the Winlink password
+  go on air), list, read, reply, forward and delete e-mails, write a new one line by line – all as APRS messages.
 - **Services on APRS** (Messages › Services): FIND (where a station was last heard), REPEAT (the nearest
   repeaters), WXNOW (the nearest weather), UTC, satellite passes and sunrise (9M2PJU-4), e-mail (MAILMY) –
   a tap puts the command in a message, the answer comes back as one.

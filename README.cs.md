@@ -117,6 +117,8 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
 - **Ohlášení aktivace** (Zprávy › Spot): SOTA, POTA, WWFF, SIOTA, GMA, hrady WCA, IOTA a majáky –
   self-spot jde rádiem jako APRS zpráva na APRS2SOTA, Camillu (GMA) nebo APSPOT, zkontrolovaný a zkrácený,
   aby se vešel, s odpovědí brány v její konverzaci.
+- **Winlink e-mail** (APRSLink, WLNK-1): přihlášení jedním tlačítkem (do éteru jdou jen tři znaky hesla
+  Winlink), seznam, čtení, odpověď, přeposlání a mazání e-mailů, psaní nového po řádcích – vše jako APRS zprávy.
 - **Služby na APRS** (Zprávy › Služby): FIND (kde byla stanice naposledy slyšet), REPEAT (nejbližší
   převaděče), WXNOW (počasí z nejbližší meteostanice), UTC, přelety satelitů a východ slunce (9M2PJU-4),
   e-mail (MAILMY) – klepnutím se příkaz vloží do zprávy, odpověď přijde zprávou.

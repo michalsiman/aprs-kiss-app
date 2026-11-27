@@ -20,7 +20,7 @@ from typing import Any
 
 import flet as ft
 
-from aprs_kiss_core import android_bt, android_usb, ble, drivedetect, profiles, roadalert, units
+from aprs_kiss_core import android_bt, android_usb, ble, drivedetect, profiles, roadalert, units, winlink
 from . import android_notify, ble_flet, desktop_notify
 from aprs_kiss_core.config import VERSION, Config, data_dir, load_config, save_config
 
@@ -787,6 +787,7 @@ class App:
             if v.built:
                 v.on_event(kind, data)
         if kind == "message":
+            self._winlink_answer(data)
             self._notify_message(data)
         elif kind == "chat" and not data.get("entry", {}).get("out"):
             self._notify_chat(data["entry"])
@@ -1365,6 +1366,62 @@ class App:
         if key == "messages":
             self.view("messages").open_conversation(call)
         self.select(key)
+
+    # ─── Winlink (APRSLink, WLNK-1) ──────────────────────────────────────
+
+    winlink_session = winlink.Session()
+
+    def winlink_login(self, via: str) -> None:
+        """Ask WLNK-1 for a login; its challenge is answered by itself (_winlink_answer). No password yet:
+        asked for first (and remembered)."""
+        if not self.engine.config.winlink_password:
+            self._ask_winlink_password(lambda: self.winlink_login(via))
+            return
+        self._winlink_via = via
+        self.winlink_session.ask(time.time())
+
+        async def send() -> None:
+            await self.guard(self.engine.send_aprs_message(winlink.GATEWAY, winlink.LOGIN_TEXT, via))
+        self.page.run_task(send)
+
+    def _ask_winlink_password(self, then) -> None:
+        field = ft.TextField(label=self.t("wl_password"), password=True, can_reveal_password=True, autofocus=True)
+
+        async def save(_e) -> None:
+            if not (field.value or "").strip():
+                return
+            self.page.pop_dialog()
+            self.engine.config.winlink_password = field.value.strip()
+            self.save_config_soon()
+            then()
+
+        self.show_dialog(ft.AlertDialog(
+            title=ft.Text("Winlink"),
+            content=ft.Column([ft.Text(self.t("wl_password_hint")), field], tight=True, spacing=12, width=420),
+            actions=[ft.TextButton(self.t("cancel"), on_click=lambda _e: self.page.pop_dialog()),
+                     ft.FilledButton(self.t("save"), on_click=save)]))
+
+    def _winlink_answer(self, message: dict[str, Any]) -> None:
+        """WLNK-1's challenge after our login request: answered at once with the password's characters."""
+        if not winlink.is_gateway(message.get("from", "")):
+            return
+        now = time.time()
+        challenge = self.winlink_session.challenge_in(message.get("text", ""), now)
+        if not challenge:
+            return
+        try:
+            reply = winlink.answer(challenge, self.engine.config.winlink_password)
+        except ValueError:
+            self.winlink_session.logout()
+            self.toast(self.t("wl_password_short"), error=True)
+            return
+        self.winlink_session.answered(now)
+        via = getattr(self, "_winlink_via", "both")
+
+        async def send() -> None:
+            await self.guard(self.engine.send_aprs_message(winlink.GATEWAY, reply, via))
+        self.page.run_task(send)
+        self.toast(self.t("wl_answered"))
 
     def _notify_message(self, message: dict[str, Any]) -> None:
         if not self.has_view("messages"):

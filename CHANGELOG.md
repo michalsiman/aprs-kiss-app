@@ -6,6 +6,11 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 
 ## Unreleased
 
+- **Winlink e-mail over APRS (APRSLink, WLNK-1)** – in Messages › Services or a conversation with WLNK-1: *Log in*
+  answers the gateway's challenge by itself (only three characters of your Winlink password go on air, with three
+  random ones; the password is kept in Settings › Station), then buttons for the list, read, reply, forward,
+  delete, a new e-mail (each further message a line, *Send e-mail* = /EX), a short one, play back and help. Lines
+  to WLNK-1 are not numbered "1/3" (they would end up in the e-mail). Needs a Winlink account (Winlink Express, Pat).
 - **Topographic map (OpenTopoMap)** as another online map in the map menu: contour lines and hill shading, to
   zoom 17 (also on the TAK map).
 - **Stations in order**: last heard first, nearest first or by callsign – the sort button above the list,

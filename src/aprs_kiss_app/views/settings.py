@@ -334,6 +334,9 @@ class SettingsView(View):
             options=[ft.DropdownOption(key="", text=f"{t('units_system')} ({sys_p})"),
                      ft.DropdownOption(key="hPa", text="hPa (mbar)"), ft.DropdownOption(key="inHg", text="inHg")])
 
+        self.wl_password = ft.TextField(label=self.t("wl_password"), value=c.winlink_password, width=420, password=True,
+                                        can_reveal_password=True, helper=self.t("wl_password_help"))
+
         self.error = ft.Text(color=ft.Colors.ERROR)
         self.intro = ft.Text(t("first_run"), color=ft.Colors.PRIMARY, visible=not c.configured)
         self._connection_changed(update=False)
@@ -347,7 +350,7 @@ class SettingsView(View):
                          ft.Row([self.comment]), self.path,
                          ft.Row([self.lat, self.lon], wrap=True), self.gps_now,
                          ft.Text(t("position_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
-                         self.beacon, self.tracked, self.incoming, expanded=first),
+                         self.beacon, self.tracked, self.incoming, self.wl_password, expanded=first),
                 _section("GPS", ft.Icons.GPS_FIXED, self.gps_source, self.gps_phone_hint) if self.app.mobile else
                 _section("GPS", ft.Icons.GPS_FIXED, self.gps_source, self.gps_row, self.gps_hint),
                 _section(t("trk_section"), ft.Icons.ROUTE, self.trk_still, self.trk_hint,
@@ -718,6 +721,7 @@ class SettingsView(View):
             "language": self.language.value or "",
             "units_distance": self.units_distance.value or "", "units_temperature": self.units_temperature.value or "",
             "units_pressure": self.units_pressure.value or "",
+            "winlink_password": (self.wl_password.value or "").strip(),
             "check_updates": self.check_updates.value, "update_beta": bool(self.update_beta.value),
             **{key: box.value for key, box in self.sound_boxes.items()},
             "tracker_mode": items[active]["tracker_mode"], "tracker_minutes": items[active]["tracker_minutes"],

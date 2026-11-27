@@ -88,6 +88,7 @@ class Config:
     units_distance: str = ""  # "km", "mi"; "" = as the phone / computer is set (miles in the US and the UK)
     units_temperature: str = ""  # "C", "F"; "" = as the phone / computer is set (Fahrenheit in the US)
     units_pressure: str = ""  # "hPa", "inHg"; "" = as the phone / computer is set (inHg in the US)
+    winlink_password: str = ""  # Winlink (APRSLink, WLNK-1): only characters of it go on air, never the password
     stations_sort: str = "time"  # the Stations list: "time" (last heard first), "distance" (nearest first), "call"
     map_count: bool = True  # under the map's buttons: how many stations are on the map
     map_weather: bool = True  # the map's corner shows the temperature from the weather stations around us
