@@ -275,6 +275,9 @@ class App:
             "bottom_sheet_theme": ft.BottomSheetTheme(
                 elevation=10, shadow_color=ft.Colors.BLACK,
                 shape=ft.RoundedRectangleBorder(radius=ft.BorderRadius.only(top_left=24, top_right=24), side=frame)),
+            # the bars at the bottom (TX sent, TNC not connected, a new message, a hazard on the road)
+            "snackbar_theme": ft.SnackBarTheme(
+                elevation=10, shape=ft.RoundedRectangleBorder(radius=10, side=frame)),
         }
 
     def _theme(self) -> ft.Theme:

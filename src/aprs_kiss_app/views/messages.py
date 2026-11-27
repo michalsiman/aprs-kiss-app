@@ -52,7 +52,7 @@ class MessagesView(View):
         self.unread: dict[str, int] = self._load_unread()  # callsign → how many messages unread
         self._signature = None
         self.conversations = ft.ListView(expand=True, spacing=2)
-        self.thread = ft.ListView(expand=True, spacing=8, auto_scroll=True, padding=ft.Padding.all(12))
+        self.thread = ft.ListView(expand=True, spacing=8, auto_scroll=True, auto_scroll_animation=0, padding=ft.Padding.all(12))
         self.title = ft.Text(self.t("pick_conversation"), size=16, weight=ft.FontWeight.BOLD)
         compact = self.app.compact
         # Writing: who to (a new message only), the text, then the way, the characters left and Send -

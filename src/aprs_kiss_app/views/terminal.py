@@ -41,7 +41,7 @@ class TerminalView(View):
         self.new_row = ft.Row([self.remote, self.path, self.save_btn], wrap=True, run_spacing=4)
         self._fill_saved()
         self.state = ft.Text(self.t("not_connected_session"), color=ft.Colors.ON_SURFACE_VARIANT)
-        self.lines = ft.ListView(expand=True, spacing=0, auto_scroll=True, padding=ft.Padding.all(8))
+        self.lines = ft.ListView(expand=True, spacing=0, auto_scroll=True, auto_scroll_animation=0, padding=ft.Padding.all(8))
         self._open: ft.Text | None = None  # the received line still waiting for its end
         self.input = ft.TextField(hint_text=self.t("type_here"), expand=True, dense=True, on_submit=self._send,
                                   text_style=ft.TextStyle(font_family=MONO))

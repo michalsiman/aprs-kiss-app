@@ -4,6 +4,13 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## Unreleased
+
+- **Messages, APRS Thursday, Monitor, chat, terminal and BBS open straight on the last line** – no more slow
+  scrolling down through the whole history.
+- **The bars at the bottom** (sent, TNC not connected, new message, hazard on the road) have the same thin grey
+  frame and shadow as the menus and dialogs.
+
 ## 1.5.0 – 2026-11-26
 
 - **Phone: back on the same screen** after Android restarts the app's screen part in the background (it did

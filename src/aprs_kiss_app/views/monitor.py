@@ -21,7 +21,7 @@ class MonitorView(View):
 
     def build(self) -> ft.Control:
         self.paused = False
-        self.lines = ft.ListView(expand=True, spacing=0, auto_scroll=True, padding=ft.Padding.all(8))
+        self.lines = ft.ListView(expand=True, spacing=0, auto_scroll=True, auto_scroll_animation=0, padding=ft.Padding.all(8))
         self.lines.controls = self._all_lines()
         # The same lit / crossed-out icons as on the map: little room taken, the state seen at a glance.
         self.internet = toggle(ft.Icons.PUBLIC_OFF, ft.Icons.PUBLIC, self.engine.config.monitor_internet,

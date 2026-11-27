@@ -51,7 +51,7 @@ class BbsView(View):
                                    else GUIDE_EN)
         self.users = ft.Column(spacing=2)
         self.messages = ft.ListView(expand=True, spacing=0)
-        self.log = ft.ListView(expand=True, spacing=0, auto_scroll=True)
+        self.log = ft.ListView(expand=True, spacing=0, auto_scroll=True, auto_scroll_animation=0)
         header = ft.Container(
             ft.Column([ft.Row([ft.Icon(ft.Icons.DNS, color=ft.Colors.PRIMARY), self.switch, self.guide]), self.state,
                        self.hint,

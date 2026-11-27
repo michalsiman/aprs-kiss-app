@@ -17,7 +17,7 @@ class ChatView(View):
     selected_icon = ft.Icons.FORUM
 
     def build(self) -> ft.Control:
-        self.lines = ft.ListView(expand=True, spacing=6, auto_scroll=True, padding=ft.Padding.all(8))
+        self.lines = ft.ListView(expand=True, spacing=6, auto_scroll=True, auto_scroll_animation=0, padding=ft.Padding.all(8))
         for entry in self.engine.chat:
             self.lines.controls.append(self._entry(entry))
         self.input = ft.TextField(hint_text=self.t("type_here"), expand=True, on_submit=self._send, dense=True)

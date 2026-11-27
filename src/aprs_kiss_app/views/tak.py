@@ -106,7 +106,7 @@ class TakView(View):
                                          self.base.credit], expand=True),
                                expand=True, border_radius=8)
         self.stations = ft.ListView(spacing=0, height=170)
-        self.chat = ft.ListView(expand=True, spacing=6, auto_scroll=True, padding=ft.Padding.all(6))
+        self.chat = ft.ListView(expand=True, spacing=6, auto_scroll=True, auto_scroll_animation=0, padding=ft.Padding.all(6))
         self.to = ft.Dropdown(dense=True, width=130 if compact else 150, value="",
                               options=[ft.DropdownOption(key="", text=self.t("tak_everybody"))])
         self.text = ft.TextField(hint_text=self.t("type_here"), expand=True, dense=True, on_submit=self._send)
