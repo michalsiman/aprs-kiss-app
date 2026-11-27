@@ -252,6 +252,50 @@ class App:
         await self.view("map").show_point(lat, lon, label)
         self.page.update()
 
+    @property
+    def can_share(self) -> bool:
+        """A phone has the system's share sheet and navigation apps; a computer copies and opens a web map."""
+        return self.page.platform in (ft.PagePlatform.ANDROID, ft.PagePlatform.IOS)
+
+    async def navigate_to(self, lat: float, lon: float, label: str = "") -> None:
+        """A place (a station, a point on the map) in a navigation or map app: Android asks which one (Google
+        Maps, Mapy.com, Waze, OsmAnd…), an iPhone opens Apple Maps on the way there, a computer a web map."""
+        from aprs_kiss_core.geotext import place_links  # noqa: PLC0415
+
+        links = place_links(lat, lon, label)
+        url = (links["geo"] if self.page.platform == ft.PagePlatform.ANDROID
+               else links["apple"] if self.page.platform == ft.PagePlatform.IOS else links["osm"])
+        try:
+            await ft.UrlLauncher().launch_url(url, mode=ft.LaunchMode.EXTERNAL_APPLICATION if self.can_share
+                                              else ft.LaunchMode.PLATFORM_DEFAULT)
+        except Exception as err:  # noqa: BLE001 - no app for it
+            _LOGGER.info("Navigate to %s: %s", url, err)
+            self.toast(self.t("nav_none"), error=True)
+
+    async def share_place(self, lat: float, lon: float, label: str = "") -> None:
+        """This place (not ours: a station's, a point on the map) to another app: the phone's share sheet with
+        the name, coordinates, locator and a map link; a computer copies that text."""
+        from aprs_kiss_core.geotext import place_links  # noqa: PLC0415
+
+        text = place_links(lat, lon, label)["text"]
+        if self.can_share:
+            try:
+                await ft.Share().share_text(text, subject=label or None)
+                return
+            except Exception as err:  # noqa: BLE001 - then copied, as on a computer
+                _LOGGER.info("Share: %s", err)
+        await ft.Clipboard().set(text)
+        self.toast(self.t("place_copied"))
+
+    def place_buttons(self, lat: float, lon: float, label: str = "") -> ft.Control:
+        """Navigate here / Share this place: for a station's details and the like."""
+        return ft.Row([
+            ft.OutlinedButton(self.t("nav_here") if self.can_share else self.t("nav_web"), icon=ft.Icons.NAVIGATION,
+                              on_click=lambda _e: self.page.run_task(self.navigate_to, lat, lon, label)),
+            ft.OutlinedButton(self.t("share_place"), icon=ft.Icons.SHARE,
+                              on_click=lambda _e: self.page.run_task(self.share_place, lat, lon, label)),
+        ], wrap=True, spacing=8, run_spacing=6)
+
     async def set_position(self, lat: float, lon: float) -> None:
         """From the map: becomes my position, saved at once and shown in Settings."""
         conf = Config.from_dict({**self.engine.config.to_dict(), "latitude": lat, "longitude": lon}).validate()
@@ -1401,6 +1445,8 @@ class App:
             value = entry.get(key)
             if isinstance(value, (int, float)):
                 rows.append(ft.Text(f"{self.t('st_' + key)}: {show(value)}"))
+        if entry.get("latitude") is not None and entry.get("longitude") is not None:
+            rows.append(self.place_buttons(entry["latitude"], entry["longitude"], call))
         if entry.get("path"):
             rows.append(ft.Text(", ".join(entry["path"]), size=12, color=ft.Colors.ON_SURFACE_VARIANT))
         if entry.get("last_raw"):

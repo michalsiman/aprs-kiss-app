@@ -22,5 +22,17 @@ class MentionsTest(unittest.TestCase):
         self.assertIsNone(resolve_callsign("OK1XX", heard))  # no position
 
 
+
+class PlaceLinksTest(unittest.TestCase):
+    def test_links(self):
+        from aprs_kiss_core.geotext import place_links
+        links = place_links(49.89049, 13.38598, "WARN3166")
+        self.assertEqual(links["geo"], "geo:49.89049,13.38598?q=49.89049,13.38598(WARN3166)")
+        self.assertTrue(links["apple"].startswith("https://maps.apple.com/?daddr=49.89049,13.38598"))
+        self.assertIn("mlat=49.89049&mlon=13.38598", links["osm"])
+        self.assertTrue(links["text"].startswith("WARN3166: 49.89049, 13.38598 (JN69QV)"))
+        self.assertEqual(place_links(50, 14)["geo"], "geo:50.00000,14.00000?q=50.00000,14.00000")
+
+
 if __name__ == "__main__":
     unittest.main()

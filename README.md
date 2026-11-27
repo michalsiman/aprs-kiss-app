@@ -111,6 +111,8 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
   message lists those heard with a position, how far and which way they are; a tap shows one on the map.
 - **Web links** in messages, APRS Thursday and the chat are clickable; a tap first shows where the link leads
   and warns that nobody vouches for the page (it may be harmful).
+- **Navigate here / Share this place** for a station or any point on the map: a navigation or map app on the
+  phone (Android asks which one), or the share sheet to send it on; a web map and a copied text on a computer.
 - **Positions in messages and the chat**: send yours, or any place picked on the map – as coordinates or as
   a Maidenhead locator (the map's menu shows the locator of every place); a position written in a message
   or a chat line (decimal degrees, degrees and minutes, APRS's own, a locator) opens on the map with a pin.

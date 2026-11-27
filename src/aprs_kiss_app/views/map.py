@@ -718,6 +718,9 @@ class MapView(View):
             ft.PopupMenuItem(content=self.t("measure_from"), icon=ft.Icons.STRAIGHTEN, data="measure"),
             *([ft.PopupMenuItem(content=self.t("measure_from_me"), icon=ft.Icons.NEAR_ME, data="measure_me")]
               if here else []),
+            ft.PopupMenuItem(content=self.t("nav_here") if self.app.can_share else self.t("nav_web"),
+                             icon=ft.Icons.NAVIGATION, data="navigate"),
+            ft.PopupMenuItem(content=self.t("share_place"), icon=ft.Icons.SHARE, data="share"),
             ft.PopupMenuItem(content=self.t("pos_to_chat"), icon=ft.Icons.FORUM_OUTLINED, data="chat"),
             ft.PopupMenuItem(content=self.t("pos_to_message"), icon=ft.Icons.MAIL_OUTLINE, data="message"),
             ft.PopupMenuItem(content=self.t("loc_to_chat", loc=loc), icon=ft.Icons.FORUM_OUTLINED, data="loc_chat"),
@@ -743,6 +746,10 @@ class MapView(View):
                 self._draw_measure()
         elif e.item.data == "me":
             await self.app.set_position(lat, lon)
+        elif e.item.data == "navigate":
+            await self.app.navigate_to(lat, lon)
+        elif e.item.data == "share":
+            await self.app.share_place(lat, lon)
         elif e.item.data == "chat":
             await self.app.send_position_text(lat, lon, "chat")
         elif e.item.data in ("loc_chat", "loc_message"):

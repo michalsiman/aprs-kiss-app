@@ -108,6 +108,8 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
   nabídne ty, které známe s polohou, i se vzdáleností a směrem; klepnutím se ukáže na mapě.
 - **Odkazy na web** ve zprávách, v APRS Thursday a v chatu jdou otevřít; klepnutí nejdřív ukáže, kam odkaz
   vede, a upozorní, že za obsah stránky nikdo neručí (může být škodlivá).
+- **Navigovat sem / Sdílet tuto polohu** u stanice i u libovolného bodu na mapě: navigační nebo mapová aplikace
+  v telefonu (Android se zeptá, která), nebo sdílení do jiné aplikace; na počítači webová mapa a zkopírovaný text.
 - **Poloha ve zprávách a v chatu**: pošlete svoji, nebo libovolné místo vybrané na mapě – jako souřadnice
   nebo jako lokátor (nabídka mapy ukazuje lokátor každého místa); poloha napsaná ve zprávě nebo v chatu
   (desetinné stupně, stupně a minuty, APRS zápis, lokátor) se otevře na mapě se špendlíkem.
