@@ -57,7 +57,10 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
   switches to it by itself** and tells you so, and goes back to OpenStreetMap when the internet returns.
 - **Map filters** (the funnel): only **weather stations**, only **moving** stations (moved in the last
   10 minutes; a station just heard stays until it is clear it stands still), only **repeaters**, only
-  **road incidents** (crashes, work zones, floods, fog, snow) – any mix, remembered.
+  **road incidents** (crashes, work zones, floods, fog, snow) – any mix, remembered. In the same menu,
+  **how far**: internet stations up to 25, 50 or 100 km (the APRS-IS server is asked for that area at once)
+  and radio stations up to 20, 50, 100 km or with no limit. Under the map buttons a small line says how
+  many stations are **on the map** right now.
 - **Repeaters show their frequency** right in their tag – band in colour (2 m green, 70 cm magenta) and the
   digital mode when the comment says it (DMR, D-Star, C4FM, NXDN, TETRA). **Weather stations show their
   temperature** in the same way.

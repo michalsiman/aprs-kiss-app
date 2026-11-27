@@ -339,6 +339,19 @@ class RadioFrequencyTest(unittest.TestCase):
                          bytes.fromhex("C006EA08BBB7DBDCC0"))
         self.assertEqual(kiss_frame(frequency_command(None), CMD_HARDWARE), bytes.fromhex("C006EBC0"))
 
+class MapReachTest(unittest.TestCase):
+    def test_radio_and_internet_limits(self):
+        from aprs_kiss_core.mapfilter import in_reach
+        here = (50.0, 14.0)
+        near = {"latitude": 50.1, "longitude": 14.0}  # ~11 km
+        far = {"latitude": 50.6, "longitude": 14.0}  # ~67 km
+        self.assertTrue(in_reach({**far, "last_rf": 1}, here, 25, 0))  # radio: no limit
+        self.assertFalse(in_reach({**far, "last_rf": 1}, here, 100, 50))
+        self.assertTrue(in_reach({**near, "last_rf": 1}, here, 25, 20))
+        self.assertFalse(in_reach(far, here, 50, 0))  # internet only: the APRS-IS radius
+        self.assertTrue(in_reach(far, here, 100, 0))
+        self.assertTrue(in_reach(far, None, 25, 20))  # where we are not known: all
+
 
 if __name__ == "__main__":
     unittest.main()
@@ -392,3 +405,4 @@ class AprsIsTest(unittest.TestCase):
     def test_third_party(self):
         self.assertEqual(aprsis.third_party("OK1ABC", "APRS", ":OK1DEF   :hi{1", "OK1SIM-7"),
                          "}OK1ABC>APRS,TCPIP,OK1SIM-7*::OK1DEF   :hi{1")
+

@@ -12,6 +12,11 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
   frame and shadow as the menus and dialogs.
 - **"You seem to be driving"** comes at most once an hour (stops on the way do not bring it back sooner), and has a
   new **Not today** button. It also says where to switch the offer off for good (Settings › Tracker).
+- **Map filter: how far.** Internet stations up to 25, 50 or 100 km – the APRS-IS server is asked for the new
+  area at once (the same setting as in Settings › APRS-IS) – and radio stations up to 20, 50, 100 km or with
+  no limit (the default).
+- **"On the map: 17"** – a small line under the map buttons: how many stations are in the part of the map on
+  screen; it follows the panning, zooming and filters.
 
 ## 1.5.0 – 2026-11-26
 

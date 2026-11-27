@@ -15,7 +15,7 @@ from ..offline_map import LAND, MIN_ZOOM, BaseMap, Region, ScaleBar, gestures
 from ..symbols import emoji
 from ..declutter import from_px, spread, to_px
 from .map_source import MapSourceButton, _label
-from .base import View, bearing_deg, check_item, distance_km, distance_text, menu_line, stay_item, toggle
+from .base import STAY_WIDTH, View, bearing_deg, check_item, distance_km, distance_text, menu_line, stay_item, toggle
 
 DEFAULT_CENTER = (49.8, 15.5)  # Czechia
 REBUILD_SECONDS = 2.0
@@ -106,11 +106,17 @@ class MapView(View):
         self.fold_btn = ft.IconButton(on_click=self._toggle_tools)
         bar = ft.Row([self.fold_btn, *self.tools], tight=True, spacing=0, wrap=True, run_spacing=0)
         self._show_tools(not conf.map_tools_hidden)
-        overlay = ft.Container(
-            bar,
-            bgcolor=ft.Colors.with_opacity(0.85, ft.Colors.SURFACE),
-            border_radius=8, padding=ft.Padding.symmetric(horizontal=2), left=8, top=8,
-        )
+        # under the bar, small: how many stations the map shows now
+        self.count_text = ft.Text(size=11, color=ft.Colors.ON_SURFACE_VARIANT)
+        self._count_points: list[tuple[float, float]] = []
+        self._view_at = (*center, self._zoom)
+        self._map_size: tuple[float, float] | None = None
+        overlay = ft.Column([
+            ft.Container(bar, bgcolor=ft.Colors.with_opacity(0.85, ft.Colors.SURFACE),
+                         border_radius=8, padding=ft.Padding.symmetric(horizontal=2)),
+            ft.Container(self.count_text, bgcolor=ft.Colors.with_opacity(0.75, ft.Colors.SURFACE),
+                         border_radius=6, padding=ft.Padding.symmetric(horizontal=6, vertical=1)),
+        ], spacing=3, tight=True, left=8, top=8)
         self.controls = MapControls(self.map, self.t, lambda: self.app.page.run_task(self._ask_camera, 0.7))
         self.scale = ScaleBar()
         self.scale.show(center[0], self._zoom)
@@ -136,7 +142,28 @@ class MapView(View):
             left=8, bottom=40, visible=False, tooltip=self.t("follow_back_tip"), on_click=self._centre_me,  # above the scale
         )
         return ft.Stack([self.menu, overlay, self.controls.control, self.scale.control, self.base.credit,
-                         self.measure_box, self.back_btn], expand=True)
+                         self.measure_box, self.back_btn], expand=True, on_size_change=self._sized)
+
+    def _sized(self, e) -> None:
+        self._map_size = (e.width, e.height)
+        self._show_count()
+        self.app.page.update()
+
+    def _show_count(self) -> None:
+        """The stations inside the part of the map on screen (our own position not counted)."""
+        points = self._count_points
+        if self._map_size:
+            lat, lon, zoom = self._view_at
+            cx, cy = to_px(lat, lon, zoom)
+            half_w, half_h = self._map_size[0] / 2, self._map_size[1] / 2
+            n = 0
+            for plat, plon in points:
+                x, y = to_px(plat, plon, zoom)
+                if abs(x - cx) <= half_w and abs(y - cy) <= half_h:
+                    n += 1
+        else:
+            n = len(points)
+        self.count_text.value = self.t("map_count", n=n)
 
     def _show_tools(self, shown: bool) -> None:
         for button in self.tools:
@@ -176,28 +203,76 @@ class MapView(View):
             self.filter_items[kind], self.filter_boxes[kind] = check_item(
                 self.t(f"filter_{kind}").split(" (")[0], icon, False, lambda _e, k=kind: self._toggle_filter(k))
         self.filter_all, _ = stay_item(menu_line(ft.Icons.FILTER_ALT_OFF_OUTLINED, self.t("filter_all")),
-                                       lambda _e: self._set_filters(set()))  # the boxes clear, the menu stays
+                                       lambda _e: self._set_filters(set(), rf_km=0))  # the boxes clear, the menu stays
+        # how far: internet stations (the APRS-IS area asked from the server) and radio ones
+        self.reach_is, self.reach_is_chips = self._reach_item(
+            ft.Icons.PUBLIC, self.t("reach_is"), mapfilter.IS_KM, self._set_is_km)
+        self.reach_rf, self.reach_rf_chips = self._reach_item(
+            ft.Icons.SETTINGS_INPUT_ANTENNA, self.t("reach_rf"), mapfilter.RF_KM,
+            lambda km: self._set_filters(mapfilter.parse(self.engine.config.map_filters), rf_km=km))
         self.filter_icon = ft.Icon(ft.Icons.FILTER_ALT_OUTLINED)
         self.filter_face = ft.Container(self.filter_icon, padding=8, shape=ft.BoxShape.CIRCLE)
         self.filter_btn = ft.PopupMenuButton(content=self.filter_face, tooltip=self.t("filter"),
-                                             items=[*self.filter_items.values(), ft.PopupMenuItem(), self.filter_all])
+                                             items=[*self.filter_items.values(), ft.PopupMenuItem(),
+                                                    self.reach_is, self.reach_rf, ft.PopupMenuItem(), self.filter_all])
         self._show_filters()
         return self.filter_btn
 
+    def _reach_item(self, icon, label: str, choices: tuple, pick) -> tuple[ft.PopupMenuItem, dict]:
+        """A menu line with a label and a chip per distance (0 = no limit); a chip's tap keeps the menu open."""
+        chips = {}
+        for km in choices:
+            chips[km] = ft.Container(
+                ft.Text(f"{km}" if km else "∞", size=13), border_radius=14, alignment=ft.Alignment.CENTER,
+                padding=ft.Padding.symmetric(horizontal=10, vertical=5), width=50,
+                tooltip=f"{km} km" if km else self.t("reach_any"), on_click=lambda _e, k=km: pick(k))
+        box = ft.Container(
+            ft.Column([ft.Row([ft.Icon(icon, size=20), ft.Text(label, size=13, max_width=STAY_WIDTH - 40)], spacing=10),
+                       ft.Row(list(chips.values()), spacing=6)], spacing=6, tight=True),
+            width=STAY_WIDTH, padding=ft.Padding.symmetric(vertical=6),
+            on_click=lambda _e: None)  # a tap between the chips does not close the menu either
+        return ft.PopupMenuItem(content=box), chips
+
+    @staticmethod
+    def _mark_chips(chips: dict, chosen: int) -> None:
+        for km, chip in chips.items():
+            on = km == chosen
+            chip.bgcolor = ft.Colors.with_opacity(0.22, ft.Colors.PRIMARY) if on else None
+            chip.border = ft.Border.all(1, ft.Colors.PRIMARY if on else ft.Colors.with_opacity(0.4, ft.Colors.OUTLINE))
+            chip.content.weight = ft.FontWeight.BOLD if on else None
+            chip.content.color = ft.Colors.PRIMARY if on else None
+
     def _show_filters(self) -> None:
-        kinds = mapfilter.parse(self.engine.config.map_filters)
+        conf = self.engine.config
+        kinds = mapfilter.parse(conf.map_filters)
         for kind, box in self.filter_boxes.items():
             box.value = kind in kinds
-        self.filter_icon.icon = ft.Icons.FILTER_ALT if kinds else ft.Icons.FILTER_ALT_OUTLINED
-        self.filter_icon.color = ft.Colors.PRIMARY if kinds else None
-        self.filter_face.bgcolor = ft.Colors.with_opacity(0.18, ft.Colors.PRIMARY) if kinds else None
-        names = ", ".join(self.t(f"filter_{k}_short") for k in mapfilter.KINDS if k in kinds)
-        self.filter_btn.tooltip = self.t("filter_on", what=names) if kinds else self.t("filter")
+        self._mark_chips(self.reach_is_chips, conf.aprsis_radius_km)
+        self._mark_chips(self.reach_rf_chips, conf.map_rf_km)
+        active = bool(kinds) or bool(conf.map_rf_km)
+        self.filter_icon.icon = ft.Icons.FILTER_ALT if active else ft.Icons.FILTER_ALT_OUTLINED
+        self.filter_icon.color = ft.Colors.PRIMARY if active else None
+        self.filter_face.bgcolor = ft.Colors.with_opacity(0.18, ft.Colors.PRIMARY) if active else None
+        names = [self.t(f"filter_{k}_short") for k in mapfilter.KINDS if k in kinds]
+        if conf.map_rf_km:
+            names.append(f"{self.t('reach_rf')} {conf.map_rf_km} km")
+        self.filter_btn.tooltip = self.t("filter_on", what=", ".join(names)) if names else self.t("filter")
 
     def _toggle_filter(self, kind: str) -> None:
         self._set_filters(mapfilter.parse(self.engine.config.map_filters) ^ {kind})
 
-    def _set_filters(self, kinds: set[str]) -> None:
+    def _set_is_km(self, km: int) -> None:
+        """The APRS-IS area: the server is asked for it at once; the settings form shows it too."""
+        self.engine.set_is_radius(km)
+        if self.app.has_view("settings"):
+            form = self.app.view("settings")
+            if getattr(form, "radius", None) is not None:
+                form.radius.value = str(km)
+        self._set_filters(mapfilter.parse(self.engine.config.map_filters))
+
+    def _set_filters(self, kinds: set[str], rf_km: int | None = None) -> None:
+        if rf_km is not None:
+            self.engine.config.map_rf_km = rf_km
         self.engine.config.map_filters = mapfilter.join(kinds)
         self._show_filters()
         self.app.save_config_soon()
@@ -277,6 +352,8 @@ class MapView(View):
             self._camera_busy = False
 
     def _look(self, lat: float, lon: float, zoom: float) -> None:
+        self._view_at = (lat, lon, zoom)
+        self._show_count()
         self.base.moved(lat, lon, zoom, self.app.offline_map())
         self.scale.show(lat, zoom)
         changed = True  # at least the scale follows the zoom (the update sends only what changed)
@@ -362,14 +439,16 @@ class MapView(View):
         now = time.time()
         heard = self.engine.station.heard
         kinds = mapfilter.parse(self.engine.config.map_filters)
+        conf = self.engine.config
         signature = (len(heard), next(reversed(heard), None),
                      heard[next(reversed(heard))]["count"] if heard else 0, self.engine.my_position(),
-                     int(now // 60) if "moving" in kinds else 0)  # standing stations drop out as time goes
+                     int(now // 60) if "moving" in kinds else 0,  # standing stations drop out as time goes
+                     conf.aprsis_radius_km, conf.map_rf_km)
         if signature == self._signature or now - self._last_build < REBUILD_SECONDS:
             return
         self._signature = signature
         self._last_build = now
-        conf = self.engine.config
+        here = self.engine.my_position()
         recent = 7200 if self.only_recent.selected else None
         area = self._area
         limit = MAX_MARKERS_PHONE if self.app.mobile else MAX_MARKERS
@@ -383,6 +462,8 @@ class MapView(View):
                 continue
             if not visible(self.app, e) or not mapfilter.shown(e, kinds, now):
                 continue
+            if not mapfilter.in_reach(e, here, conf.aprsis_radius_km, conf.map_rf_km):
+                continue
             wanted.append((e["call"], lat, lon, emoji(e.get("symbol_table"), e.get("symbol")),
                            station_color(self.app, e), bool(e.get("last_rf")),
                            repeater.label(e) or self._temperature(e)))
@@ -393,7 +474,8 @@ class MapView(View):
             if len(wanted) >= limit:
                 break
         wanted.sort()  # a steady order: the list changes only where stations come, go or move
-        here = self.engine.my_position()
+        self._count_points = [(k[1], k[2]) for k in wanted]
+        self._show_count()
         if conf.map_trails:  # our own trail too, from the GPS
             points = tuple((p[1], p[2]) for p in self.engine.my_track.get("track", ()) if now - p[0] <= TRAIL_SECONDS)
             if len(points) >= 2:

@@ -233,6 +233,12 @@ class Engine:
         self._is_center = here
         return f"r/{here[0]:.3f}/{here[1]:.3f}/{radius}"
 
+    def set_is_radius(self, km: int) -> None:
+        """Chosen on the map: the server is asked for the new area at once (no reconnecting)."""
+        self.config.aprsis_radius_km = int(km)
+        if self.aprsis:
+            self.aprsis.set_filter(self._is_area())
+
     def _follow_is_area(self) -> None:
         """The GPS moved (or got its first fix): the APRS-IS area follows, past a tenth of its radius."""
         if not self.aprsis:
