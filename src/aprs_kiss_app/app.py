@@ -70,6 +70,7 @@ _LIVE_APPS: "weakref.WeakSet[App]" = weakref.WeakSet()
 _LAST_SCREEN: list[str] = []  # the screen on show, for a new session in the same process (Android restarts)  # the app's sessions still running (normally one)
 
 COMPACT_WIDTH = 700  # narrower than this (a phone): the compact layout
+COMPACT_HEIGHT = 640  # … or lower than this (a small screen on a Raspberry Pi)
 
 class App:
     def __init__(self, page: ft.Page) -> None:
@@ -470,18 +471,21 @@ class App:
             adapt(dialog)
         self.page.show_dialog(dialog)
 
-    def _is_compact(self, width: float | None = None) -> bool:
+    def _is_compact(self, width: float | None = None, height: float | None = None) -> bool:
         page = self.page
         if page.platform in (ft.PagePlatform.ANDROID, ft.PagePlatform.IOS):
             return True
         width = width or getattr(page, "width", None) or 0
-        return bool(width) and width < COMPACT_WIDTH
+        height = height or getattr(page, "height", None) or 0
+        # a low screen too (a Raspberry Pi's 5" or 7" display, 800×480, 1024×600): the rail's twelve
+        # screens do not fit on it, the phone's menu does
+        return bool(width) and width < COMPACT_WIDTH or bool(height) and height < COMPACT_HEIGHT
 
     async def _check_ble(self) -> None:
         self.ble_ok = await ble.available()
 
     def _on_resize(self, e) -> None:
-        if self.views and self._is_compact(getattr(e, "width", None)) != self.compact:
+        if self.views and self._is_compact(getattr(e, "width", None), getattr(e, "height", None)) != self.compact:
             self.build()
 
     async def _open_menu(self, _e=None) -> None:

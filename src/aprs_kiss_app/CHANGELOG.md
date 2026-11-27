@@ -10,10 +10,14 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
   computer runs (the TNC, APRS-IS, iGate, digipeater and beacon need no window; Transmit is remembered over a
   restart) and serves the whole app as a web page – set everything from a phone or a computer in the same
   network, behind a password (`--set-password`; the Pi's own screen needs none). `/display` is a dashboard
-  for a 5" or 7" screen (800×480 and up): TNC, APRS-IS, DIGI and TX lamps, counters (received, sent, to
+  for a plain monitor: TNC, APRS-IS, DIGI and TX lamps, counters (received, sent, to
   APRS-IS, digipeated, stations) and the last frames, stations, messages or bulletins by a tap; hold TX to
   switch transmitting. `packaging/raspberry/install.sh` sets it all up on Raspberry Pi OS: the app, a systemd
-  service, a kiosk browser on the screen. Each release now also carries a Python wheel.
+  service, a kiosk browser that shows **the whole app on the Pi's touch screen** (or `--dashboard`),
+  `--touch-5inch` for the touch of the cheap 5" HDMI displays (XPT2046), a keyboard on the screen. Each
+  release now also carries a Python wheel.
+- **Low screens get the phone's layout** (the ☰ menu): below 640 px of height too, not only when narrow – a
+  Raspberry Pi's 5" or 7" display (800×480, 1024×600).
 
 ## 1.8.0 – 2026-11-27
 

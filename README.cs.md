@@ -439,13 +439,13 @@ Workflow *Release packages* jednou spustí `flet build linux` a z výsledku udě
 Raspberry Pi 3B, 4 nebo 5 vedle rádia spustí aplikaci samo: TNC, APRS-IS, iGate, digipeater i maják běží bez
 otevřeného okna a po výpadku proudu naběhnou znovu (i se zapnutým vysíláním). **Všechno se nastavuje přes web**:
 na telefonu nebo počítači ve stejné síti otevřete `http://<adresa Pi>:8080` a máte celou aplikaci – mapu,
-zprávy, nástěnku, nastavení. **Malý displej** na Pi (5" nebo 7", HDMI nebo DSI, od 800×480, dotykový i bez
-dotyku) ukazuje přehled: kontrolky, počítadla a poslední rámce, stanice, zprávy nebo nástěnku (přepíná se
-klepnutím; vysílání se přepne podržením TX).
+zprávy, nástěnku, nastavení. Na **dotykovém displeji** Pi (5" nebo 7", HDMI nebo DSI, od 800×480) běží celá aplikace přes celou
+obrazovku – na malé výšce s menu ☰ jako na telefonu, s klávesnicí na obrazovce. Kdo chce jen „monitor“,
+zvolí přehled (`--dashboard`): kontrolky, počítadla a poslední rámce, stanice, zprávy nebo nástěnka.
 
 <table><tr>
+<td width="50%"><img src="assets/cs/pi-app.png" alt="Celá aplikace na 5palcovém displeji (800×480)"><br><sub>Celá aplikace na 5" displeji (800×480)</sub></td>
 <td width="50%"><img src="assets/cs/display.png" alt="Přehled na 5palcovém displeji (800×480)"><br><sub>Přehled na 5" displeji (800×480)</sub></td>
-<td width="50%"><img src="assets/cs/display-stations.png" alt="Slyšené stanice se vzdáleností"><br><sub>Slyšené stanice se vzdáleností</sub></td>
 </tr></table>
 
 Na Raspberry Pi OS (Bookworm nebo novějším), pod běžným uživatelem:
@@ -458,7 +458,8 @@ sudo reboot
 
 Skript nainstaluje aplikaci do `/opt/aprs-kiss`, službu systemd `aprs-kiss` (spustí se po zapnutí a při pádu
 se restartuje) a prohlížeč v režimu kiosku, který po startu plochy ukáže na displeji Pi
-`http://localhost:8080/display` (`--no-display` ho vynechá pro Pi bez displeje; `--port` zvolí jiný port).
+aplikaci (`--dashboard` jen přehled, `--no-display` nic – Pi bez displeje; `--touch-5inch` zapne dotyk levných
+5" HDMI displejů typu Waveshare 5inch HDMI LCD s dotykem XPT2046; `--port` zvolí jiný port).
 **Heslo k webu** chce každý prohlížeč kromě displeje na samotném Pi – nastavte ho, přes web se dá vysílat.
 TNC na USB (`/dev/ttyACM0`, `/dev/ttyUSB0`), přes TCP/IP i Direwolf se zvukovou kartou (AIOC, DigiRig) fungují
 stejně jako na počítači. Aktualizace = spustit skript znovu; log ukáže `journalctl -u aprs-kiss -f`. Na jiném

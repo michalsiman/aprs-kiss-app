@@ -444,13 +444,14 @@ The *Release packages* workflow runs `flet build linux` once and makes the tarba
 A Raspberry Pi 3B, 4 or 5 next to the radio runs the app by itself – the TNC, APRS-IS, the iGate, the
 digipeater and the beacon go on with no window open, and come back after a power cut (Transmit too).
 **Everything is set over the web**: open `http://<the Pi>:8080` on a phone or a computer in the same network
-and you get the whole app – map, messages, bulletins, settings. A **small screen** on the Pi (5" or 7", HDMI or
-DSI, 800×480 and up, touch or not) shows a dashboard: the lamps, the counters and the last frames, stations,
-messages or bulletins (a tap switches; hold TX to switch transmitting).
+and you get the whole app – map, messages, bulletins, settings. On the Pi's **touch screen** (5" or 7", HDMI or
+DSI, 800×480 and up) the whole app runs on the whole screen – on a low screen with the phone's ☰ menu, with a
+keyboard on the screen. For a plain monitor pick the dashboard (`--dashboard`): the lamps, the counters and
+the last frames, stations, messages or bulletins.
 
 <table><tr>
+<td width="50%"><img src="assets/pi-app.png" alt="The whole app on a 5-inch screen (800×480)"><br><sub>The whole app on a 5" screen (800×480)</sub></td>
 <td width="50%"><img src="assets/display.png" alt="The dashboard on a 5-inch screen (800×480)"><br><sub>The dashboard on a 5" screen (800×480)</sub></td>
-<td width="50%"><img src="assets/display-stations.png" alt="The stations heard, with distance"><br><sub>The stations heard, with distance</sub></td>
 </tr></table>
 
 On Raspberry Pi OS (Bookworm or newer), as the normal user:
@@ -462,8 +463,9 @@ sudo reboot
 ```
 
 The script installs the app into `/opt/aprs-kiss`, a systemd service `aprs-kiss` (starts at boot, restarts
-by itself) and a kiosk browser that shows `http://localhost:8080/display` on the Pi's screen after the desktop
-starts (`--no-display` leaves that out for a Pi without a screen; `--port` picks another port). The **web
+by itself) and a kiosk browser that shows the app on the Pi's screen once the desktop starts (`--dashboard` only the dashboard, `--no-display` nothing – a Pi without a
+screen; `--touch-5inch` the touch of the cheap 5" HDMI displays like the Waveshare 5inch HDMI LCD with an
+XPT2046; `--port` picks another port). The **web
 password** is asked by every browser but the Pi's own screen – set one, the web can transmit. A TNC on USB
 (`/dev/ttyACM0`, `/dev/ttyUSB0`), over TCP/IP, Direwolf with a sound card (AIOC, DigiRig) all work as on a
 computer. Run the script again to update; `journalctl -u aprs-kiss -f` shows the log. On any other Linux
