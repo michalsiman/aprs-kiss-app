@@ -283,7 +283,7 @@ class SettingsView(View):
                                          visible=self.app.mobile)  # a phone in a car; not a computer
         self.meet_alerts = ft.Checkbox(label=t("meet_alerts"), value=c.meet_alerts)
         self.road_km = ft.Dropdown(label=t("road_alert_km"), value=str(c.road_alert_km), width=200,
-                                   options=[ft.DropdownOption(key=str(n), text=units.current.distance_short(n))
+                                   options=[ft.DropdownOption(key=str(n), text=units.current.choice(n))
                                             for n in roadalert.DISTANCES_KM])
         self._trk_changed(update=False)
         self.digi_mode = ft.Dropdown(label=t("digi_mode"), value=c.digi_mode if c.digi_mode in ("off", "fillin", "wide")

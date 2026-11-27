@@ -97,6 +97,10 @@ class Units:
             return f"{km * 1000:.0f} m"
         return f"{self._num(km, 1)} km" if km < 10 else f"{km:.0f} km"
 
+    def choice(self, km: float) -> str:
+        """A distance offered in a list of choices: "5 km" as it is; in miles "3.1 mi"."""
+        return self.distance_short(km) if self.miles else f"{km:g} km"
+
     def whole(self, km: float) -> str:
         """A whole number of the user's unit: "20 km", "12 mi"."""
         return f"{self.from_km(km):.0f} {self.unit}"

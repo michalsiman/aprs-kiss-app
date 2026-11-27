@@ -15,6 +15,8 @@ class UnitsTest(unittest.TestCase):
         self.assertEqual(u.speed(90), "90 km/h")
         self.assertEqual(u.temperature_text(4.8), "4,8 °C")
         self.assertEqual(u.reach_choices(), ((20, "20"), (50, "50"), (100, "100")))
+        self.assertEqual(u.choice(5), "5 km")
+        self.assertEqual(Units("mi").choice(5), "3.1 mi")
 
     def test_imperial(self):
         u = Units("mi", "F")

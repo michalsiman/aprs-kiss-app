@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="1.7.0" date="2026-11-27">
+      <description>
+        <p>The menu in sections (APRS, packet radio, settings); stations a message mentions with their distance and a tap to the map; clickable web links with a warning; callbooks (QRZ.com, HamQTH, QRZCQ, aprs.fi) in the station details; a tap on the temperature around you lists its weather stations; a tap on the number of points tells the callsigns and the nearest and furthest station; the map's grey lines no longer cross.</p>
+      </description>
+    </release>
     <release version="1.6.0" date="2026-11-27">
       <description>
         <p>Kilometres or miles, °C or °F, hPa or inHg (as the system, or chosen); the temperature around you on the map from the weather stations within 20 km; the map filter with how far (internet and radio) and a count of stations on the map; what is new after an update; the tracker offer at most once an hour with Not today; lists open on their last line at once; Messages All / Unread count conversations; framed bars at the bottom; the handheld radio icon wherever the radio is meant.</p>

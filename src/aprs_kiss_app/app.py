@@ -8,6 +8,7 @@ import logging
 import logging.handlers
 import os
 import re
+from urllib.parse import quote
 import sys
 import threading
 import time
@@ -53,6 +54,10 @@ VIEWS = [MapView, MessagesView, ThursdayView, StationsView, TerminalView, ChatVi
 # With BBS SERVER on the app is only the BBS; the monitor stays to see what the radio hears.
 BBS_VIEWS = [BbsView, MonitorView, SettingsView]
 TAK_VIEWS = [TakView, MonitorView, SettingsView]
+# The menu in sections: APRS, packet radio, then the settings (a heading each on a phone, a gap on a computer).
+SECTIONS = {"map": "aprs", "messages": "aprs", "thursday": "aprs", "stations": "aprs",
+            "terminal": "packet", "chat": "packet", "files": "packet", "monitor": "packet", "bbs": "packet",
+            "tak": "packet", "settings": "app"}
 FLUSH_DELAY = 0.25
 TICK_SECONDS = 5.0
 THEME_EVERY = 6  # ticks: the desktop theme is looked at every 30 s
@@ -540,21 +545,36 @@ class App:
             selected_index=0,
             label_type=ft.NavigationRailLabelType.ALL,
             min_width=88,
-            destinations=[ft.NavigationRailDestination(icon=ft.Icon(v.icon), selected_icon=ft.Icon(v.selected_icon or v.icon),
-                                                       label=self.t(v.key)) for v in self.menu_views],
+            destinations=[ft.NavigationRailDestination(
+                icon=ft.Icon(v.icon), selected_icon=ft.Icon(v.selected_icon or v.icon), label=self.t(v.key),
+                # a new section: a gap above it
+                padding=ft.Padding.only(top=14) if i and SECTIONS.get(v.key) != SECTIONS.get(self.menu_views[i - 1].key)
+                else None)
+                for i, v in enumerate(self.menu_views)],
             on_change=lambda e: self.select(self.menu_views[e.control.selected_index].key),
         )
         # a phone: About is at the end of the menu (no room for its button in the top bar)
         self.about_item = ft.ListTile(leading=ft.Icon(ft.Icons.INFO_OUTLINE), title=ft.Text(self.t("about")),
                                       on_click=self._menu_about, content_padding=ft.Padding.only(left=28, right=12))
         # a phone: the screens in a menu that slides in from the left (the ☰ button) and hides again
+        drawer_items: list[ft.Control] = [ft.Container(ft.Text("APRS & Packet", weight=ft.FontWeight.BOLD, size=16),
+                                                       padding=ft.Padding.only(left=28, top=20, bottom=4))]
+        self.drawer_dests: dict[str, ft.NavigationDrawerDestination] = {}
+        section = None
+        for v in self.menu_views:
+            if SECTIONS.get(v.key) != section:
+                section = SECTIONS.get(v.key)
+                if section == "app":
+                    drawer_items.append(ft.Divider(height=12))
+                elif section:
+                    drawer_items.append(ft.Container(
+                        ft.Text(self.t(f"menu_{section}"), size=13, weight=ft.FontWeight.BOLD, color=ft.Colors.PRIMARY),
+                        padding=ft.Padding.only(left=28, top=14, bottom=4)))
+            self.drawer_dests[v.key] = ft.NavigationDrawerDestination(
+                icon=ft.Icon(v.icon), selected_icon=ft.Icon(v.selected_icon or v.icon), label=self.t(v.key))
+            drawer_items.append(self.drawer_dests[v.key])
         self.drawer = ft.NavigationDrawer(
-            controls=[ft.Container(ft.Text("APRS & Packet", weight=ft.FontWeight.BOLD, size=16),
-                                   padding=ft.Padding.only(left=28, top=20, bottom=12))]
-            + [ft.NavigationDrawerDestination(icon=ft.Icon(v.icon), selected_icon=ft.Icon(v.selected_icon or v.icon),
-                                              label=self.t(v.key))
-               for v in self.menu_views]
-            + [ft.Divider(), self.about_item],
+            controls=drawer_items + [ft.Divider(), self.about_item],
             on_change=self._menu_selected, on_dismiss=self._menu_dismissed,
         )
         self.page.drawer = self.drawer if self.compact else None
@@ -868,7 +888,7 @@ class App:
             badge = str(messages.unread_total) if messages.unread else None
             # on the plain and the selected icon: the count stays while Messages is open, until they are read
             for dest in (self.rail.destinations[self.menu_views.index(messages)],
-                         self.drawer.controls[1 + self.menu_views.index(messages)]):
+                         self.drawer_dests["messages"]):
                 dest.icon.badge = dest.selected_icon.badge = badge
             self.menu_btn.badge = badge  # the menu is closed on a phone: unread messages show on ☰
 
@@ -1380,7 +1400,7 @@ class App:
         for key, show in shown.items():
             value = entry.get(key)
             if isinstance(value, (int, float)):
-                rows.append(ft.Text(f"{key}: {show(value)}"))
+                rows.append(ft.Text(f"{self.t('st_' + key)}: {show(value)}"))
         if entry.get("path"):
             rows.append(ft.Text(", ".join(entry["path"]), size=12, color=ft.Colors.ON_SURFACE_VARIANT))
         if entry.get("last_raw"):
@@ -1400,9 +1420,15 @@ class App:
         actions = [ft.TextButton(self.t("send_message"), icon=ft.Icons.MAIL, on_click=message)]
         if entry.get("latitude") is not None:
             actions.insert(0, ft.TextButton(self.t("show_on_map"), icon=ft.Icons.MAP, on_click=on_map))
-        qrz = qrz_url(call)
-        if qrz:  # the operator's page on QRZ.com (the callsign without its SSID or /P)
-            actions.append(ft.TextButton("QRZ.com", icon=ft.Icons.PERSON_SEARCH, url=qrz, tooltip=qrz))
+        books = callbook_links(call)
+        if books:  # the operator in the public callbooks (the callsign without its SSID or /P), the station on aprs.fi
+            actions.append(ft.PopupMenuButton(
+                content=ft.Row([ft.Icon(ft.Icons.PERSON_SEARCH, color=ft.Colors.PRIMARY, size=18),
+                                ft.Text(self.t("callbooks"), color=ft.Colors.PRIMARY)], spacing=6, tight=True),
+                tooltip=self.t("callbooks"),
+                items=[ft.PopupMenuItem(name, icon=ft.Icons.OPEN_IN_NEW,
+                                        on_click=lambda _e, url=url: self.page.run_task(ft.UrlLauncher().launch_url, url))
+                       for name, url in books]))
         actions.append(ft.TextButton(self.t("close"), on_click=lambda _e: self.page.pop_dialog()))
         self.show_dialog(ft.AlertDialog(
             title=ft.Text(f"{pic}  {call}"),
@@ -1420,6 +1446,21 @@ def qrz_url(call: str) -> str | None:
     parts = [p for p in call.upper().split("-")[0].split("/") if p]
     base = max(parts, key=len, default="")  # OK1SIM/P, F/OK1SIM: the longest part is the callsign
     return f"https://www.qrz.com/db/{base}" if _CALLSIGN.match(base) else None
+
+
+def callbook_links(call: str) -> list[tuple[str, str]]:
+    """Public pages about a station, free to open: the callbooks (QRZ.com, HamQTH, QRZCQ: the operator, by the
+    base callsign) and aprs.fi (this very station, with its SSID: its track and packets). Empty for an
+    object, an item or a service name."""
+    qrz = qrz_url(call)
+    if not qrz:
+        return []
+    base = qrz.rsplit("/", 1)[1]
+    station = call.upper().strip()
+    return [("QRZ.com", qrz),
+            ("HamQTH", f"https://www.hamqth.com/{base}"),
+            ("QRZCQ", f"https://www.qrzcq.com/call/{base}"),
+            ("aprs.fi", f"https://aprs.fi/#!call=a%2F{quote(station, safe='')}")]
 
 
 LOG_FILE = "app.log"

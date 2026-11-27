@@ -294,3 +294,37 @@ def menu_line(icon, text: str, color=None) -> ft.Control:
     """An icon and a text as a menu item shows them (for stay_item)."""
     return ft.Row([ft.Icon(icon, color=color), ft.Text(text, color=color, max_width=STAY_WIDTH - 40)],
                   spacing=12, tight=True)
+
+
+def message_text(app, text: str, **kwargs) -> ft.Text:
+    """A received or sent text; web links in it underlined and clickable, opening after a warning (anybody can
+    send anything: the page may be harmful). Without links the text stays selectable."""
+    from aprs_kiss_core.links import split_links  # noqa: PLC0415
+
+    parts = split_links(text)
+    if not any(url for _piece, url in parts):
+        return ft.Text(text, selectable=True, **kwargs)
+    spans = [ft.TextSpan(piece, style=ft.TextStyle(color=ft.Colors.PRIMARY, decoration=ft.TextDecoration.UNDERLINE),
+                         on_click=lambda _e, url=url: confirm_link(app, url)) if url else ft.TextSpan(piece)
+             for piece, url in parts]
+    return ft.Text(spans=spans, **kwargs)
+
+
+def confirm_link(app, url: str) -> None:
+    """Before a link from a message opens: where it leads, and that nobody vouches for it."""
+    t = app.t
+
+    async def go(_e) -> None:
+        app.page.pop_dialog()
+        await ft.UrlLauncher().launch_url(url)
+
+    app.show_dialog(ft.AlertDialog(
+        icon=ft.Icon(ft.Icons.WARNING_AMBER_ROUNDED, color=ft.Colors.ERROR),
+        title=ft.Text(t("link_title")),
+        content=ft.Column([
+            ft.Text(url, selectable=True, size=13, font_family="monospace", color=ft.Colors.PRIMARY),
+            ft.Text(t("link_warning")),
+        ], tight=True, spacing=12, width=420),
+        actions=[ft.TextButton(t("cancel"), on_click=lambda _e: app.page.pop_dialog()),
+                 ft.FilledButton(t("link_open"), icon=ft.Icons.OPEN_IN_NEW, on_click=go)],
+    ))

@@ -59,7 +59,8 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
   problémy** (nehody, práce na silnici, povodně, mlha, sníh) – libovolně kombinovatelné, pamatují se. Ve stejné
   nabídce i **jak daleko**: stanice z internetu do 20, 50 nebo 100 km (server APRS-IS dostane novou oblast
   hned) a stanice z rádia do 20, 50, 100 km nebo bez omezení. Pod tlačítky mapy malý řádek ukazuje, kolik
-  stanic je právě **na mapě**.
+  stanic je právě **na mapě**; klepnutím se ukáže, kolik je různých značek a která stanice je nejblíž
+  a nejdál (*Počet bodů na mapě* v nabídce mapy řádek schová).
 - **Převaděče ukazují kmitočet** přímo ve štítku – pásmo barevně (2 m zeleně, 70 cm purpurově) a druh
   provozu, pokud je v komentáři (DMR, D-Star, C4FM, NXDN, TETRA). Stejně tak **meteostanice ukazují
   teplotu**.
@@ -71,7 +72,8 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
   vypíná se v nabídce mapy. Klepnutím na ni se ukážou stanice, ze kterých je spočítaná: jejich hodnoty,
   vzdálenost a směr, stáří údaje.
 - **Značky se nepřekrývají**: stanice na jednom místě nebo blízko sebe se rozestoupí, tenká šedá čára vede
-  ze středu symbolu k tečce, kde stanice opravdu je. **Ocásky** (poslední půlhodina, i vaše vlastní z GPS),
+  ze středu symbolu k tečce, kde stanice opravdu je – čáry se nekříží a žádná tečka se neschová pod symbol
+  jiné stanice. **Ocásky** (poslední půlhodina, i vaše vlastní z GPS),
   APRS **objekty** jako samostatná místa, nesmyslné skoky se ignorují. **Měření vzdálenosti** podržením
   prstu na dvou bodech.
 - **Mapa jako navigace, když běží tracker**: jste uprostřed s přiblížením na ulice; posunete-li mapou,
@@ -102,6 +104,10 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
   přišla) s tlačítkem na mapu; zpět z konverzace vede nejdřív na seznam; konverzace jde smazat.
 - **Notifikace** nové zprávy nebo řádku chatu, když se zrovna nedíváte: na Androidu na pozadí (klepnutí
   otevře konverzaci; uvádí, kolik je celkem nepřečtených), na Linuxu, Windows a macOS, když okno není vepředu.
+- **Stanice zmíněné ve zprávě** (OK6DJ-6 v odpovědi WXNOW, „pozdravuj OK1ABC“): malé tlačítko u zprávy
+  nabídne ty, které známe s polohou, i se vzdáleností a směrem; klepnutím se ukáže na mapě.
+- **Odkazy na web** ve zprávách, v APRS Thursday a v chatu jdou otevřít; klepnutí nejdřív ukáže, kam odkaz
+  vede, a upozorní, že za obsah stránky nikdo neručí (může být škodlivá).
 - **Poloha ve zprávách a v chatu**: pošlete svoji, nebo libovolné místo vybrané na mapě – jako souřadnice
   nebo jako lokátor (nabídka mapy ukazuje lokátor každého místa); poloha napsaná ve zprávě nebo v chatu
   (desetinné stupně, stupně a minuty, APRS zápis, lokátor) se otevře na mapě se špendlíkem.
@@ -116,7 +122,7 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
   další akce, odhlášení ze skupiny; rádiem, internetem nebo obojím, zapamatované.
 - **Stanice** slyšené rádiem nebo viděné na APRS-IS: vzdálenost, směr, komentář, počasí, cesta;
   filtr a legenda; počítadlo ukazuje zobrazené z celkového počtu a prázdný seznam řekne proč. Detail stanice
-  nabízí mapu, zprávu a její profil na **QRZ.com** (značka bez SSID). Objeví se i stanice, které iGate pošle z internetu do rádia (pakety třetí strany).
+  nabízí mapu, zprávu a **katalogy značek** (QRZ.com, HamQTH, QRZCQ – značka bez SSID – a aprs.fi). Objeví se i stanice, které iGate pošle z internetu do rádia (pakety třetí strany).
 - **Maják polohy** každých N minut a tlačítko *Poslat polohu teď* v horní liště; status a unproto.
   Ikona (APRS symbol), komentář, SSID a cesta v Nastavení.
 - **Digipeater**: fill-in (WIDE1-1, pro domácí stanici) nebo plný (WIDEn-N s omezením počtu hopů),
@@ -158,6 +164,8 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
 
 ### Aplikace
 
+- **Menu v sekcích**: APRS (mapa, zprávy, APRS Thursday, stanice), packet radio (terminál, chat, soubory,
+  monitor, BBS, TAK) a nastavení – nadpisy v menu telefonu, mezery na počítači.
 - **Horní lišta jako přístrojová deska**, na počítači i na telefonu: kontrolky **TNC**, **IS** a **GPS**
   svítí zeleně, když fungují, tlačítko polohy / trackeru, **TX** s červeným rámečkem při zapnutém vysílání
   a celé červené, když rámec odchází do éteru (IS na vteřinu zčervená, když něco jde do APRS-IS). Na počítači
@@ -230,7 +238,7 @@ zvětší. Řídí se motivem GitHubu, stejně jako aplikace: používá světl�
 </tr>
 <tr>
 <td width="50%"><a href="assets/cs/tracker-menu.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/tracker-menu-light.png"><img src="assets/cs/tracker-menu.png" alt="Nabídka polohy a trackeru"></picture></a><br><sub>Nabídka polohy a trackeru</sub></td>
-<td width="50%"><a href="assets/cs/station.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/station-light.png"><img src="assets/cs/station.png" alt="Detail stanice: mapa, zpráva, QRZ.com"></picture></a><br><sub>Detail stanice: mapa, zpráva, QRZ.com</sub></td>
+<td width="50%"><a href="assets/cs/station.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/station-light.png"><img src="assets/cs/station.png" alt="Detail stanice: mapa, zpráva, katalogy značek"></picture></a><br><sub>Detail stanice: mapa, zpráva, katalogy značek</sub></td>
 </tr>
 <tr>
 <td width="50%"><a href="assets/cs/thursday.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/thursday-light.png"><img src="assets/cs/thursday.png" alt="#APRSThursday"></picture></a><br><sub>#APRSThursday</sub></td>

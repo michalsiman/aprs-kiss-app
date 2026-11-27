@@ -67,7 +67,7 @@ def state(lang: str) -> dict:
         ("in", "OK2XYZ-7", "OK1SIM-7", "Díky za spojení, 73!" if cs else "Thanks for the QSO, 73!", 5400),
         ("in", "OK1ABC-9", "OK1SIM-7", "Ahoj, jsem na D5 u Rokycan, slyšíš mě?" if cs else "Hi, I am on the D5 near Rokycany, copy?", 1500),
         ("out", "OK1SIM-7", "OK1ABC-9", "Slyším 5/9, šťastnou cestu!" if cs else "Copy 5/9, safe trip!", 1380),
-        ("in", "OK1MNO-7", "OK1SIM-7", "Jsem na Krkavci, výhled je super" if cs else "On top of Krkavec, great view", 600),
+        ("in", "OK1MNO-7", "OK1SIM-7", "Jsem na Krkavci s OK1LOR-7, výhled je super" if cs else "On top of Krkavec with OK1LOR-7, great view", 600),
         ("out", "OK1SIM-7", "OK1MNO-7", "Pošli fotku :-)" if cs else "Send a photo :-)", 540),
         ("in", "OK1MNO-7", "OK1SIM-7", "Za chvíli, ještě vybaluju anténu" if cs else "In a moment, unpacking the antenna", 420),
         ("in", "OK1ABC-9", "OK1SIM-7", ("Stojím tady: " if cs else "Parked here: ") + "QTH 49.69500, 13.42000", 240),
@@ -78,7 +78,7 @@ def state(lang: str) -> dict:
         ("DL1ABC-9", "Happy Thursday from Munich, mobile with FTM-400", "in", 2700),
         ("OK1SIM-7", "Zdravím z Plzně, Quansheng + APRS & Packet" if cs else "Greetings from Plzen, Quansheng + APRS & Packet", "out", 2400),
         ("G4XYZ", "Good evening from Kent, IC-705 portable", "in", 2000),
-        ("W1AW-10", "73 from Newington, CT", "in", 1500),
+        ("W1AW-10", "73 from Newington, CT – www.arrl.org", "in", 1500),
     ]
     return {
         "msg_counter": 12,
@@ -216,8 +216,9 @@ def out(name, lang, theme) -> Path:
 
 # ─── what to photograph (desktop 1300×820) ────────────────────────────────
 
-RAIL = {"map": 35, "messages": 100, "thursday": 165, "stations": 228, "terminal": 292, "chat": 356,
-        "files": 420, "monitor": 484, "bbs": 548, "tak": 612, "settings": 676}
+# the rail has a gap above each section (packet radio, settings)
+RAIL = {"map": 35, "messages": 100, "thursday": 165, "stations": 228, "terminal": 306, "chat": 370,
+        "files": 434, "monitor": 498, "bbs": 562, "tak": 626, "settings": 704}
 SECTION = {"tnc": 92, "station": 154, "gps": 219, "tracker": 283, "digi": 347, "aprsis": 411, "vara": 475,
            "tak": 540, "bbs": 604, "maps": 668, "background": 732, "sounds": 796}
 
@@ -344,8 +345,9 @@ async def desktop(lang, theme, only):
 
 # ─── the phone (412×870 css px) ────────────────────────────────────────────
 
-DRAWER = {"messages": 139, "thursday": 195, "stations": 251, "terminal": 307, "chat": 363, "files": 419,
-          "monitor": 475, "tak": 530, "settings": 587}
+# the menu has headings (APRS, Packet radio) and a line above the settings
+DRAWER = {"messages": 167, "thursday": 224, "stations": 280, "terminal": 373, "chat": 429, "files": 485,
+          "monitor": 541, "tak": 597, "settings": 665}
 
 
 async def phone(lang, theme, only):

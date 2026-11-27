@@ -108,7 +108,7 @@ class MapView(View):
         bar = ft.Row([self.fold_btn, *self.tools], tight=True, spacing=0, wrap=True, run_spacing=0)
         # under the bar, small: how many stations the map shows now
         self.count_text = ft.Text(size=11, color=ft.Colors.ON_SURFACE_VARIANT)
-        self._count_points: list[tuple[float, float]] = []
+        self._count_points: list[tuple[float, float, str]] = []  # (lat, lon, call) of the stations put on the map
         self._view_at = (*center, self._zoom)
         self._map_size: tuple[float, float] | None = None
         # the weather around us: in the top right corner; under the bar while the bar is open (on a phone
@@ -124,11 +124,13 @@ class MapView(View):
         self._wx: dict | None = None
         self._wx_news: tuple | None = None
         self.wx_corner = ft.Container(right=8, top=8)
+        self.count_box = ft.Container(self.count_text, bgcolor=ft.Colors.with_opacity(0.75, ft.Colors.SURFACE),
+                                      border_radius=6, padding=ft.Padding.symmetric(horizontal=6, vertical=1),
+                                      visible=conf.map_count, on_click=self._count_details)  # a tap: more
         self.overlay = ft.Column([
             ft.Container(bar, bgcolor=ft.Colors.with_opacity(0.85, ft.Colors.SURFACE),
                          border_radius=8, padding=ft.Padding.symmetric(horizontal=2)),
-            ft.Container(self.count_text, bgcolor=ft.Colors.with_opacity(0.75, ft.Colors.SURFACE),
-                         border_radius=6, padding=ft.Padding.symmetric(horizontal=6, vertical=1)),
+            self.count_box,
         ], spacing=3, tight=True, left=8, top=8)
         self._show_tools(not conf.map_tools_hidden)
         self.controls = MapControls(self.map, self.t, lambda: self.app.page.run_task(self._ask_camera, 0.7))
@@ -163,21 +165,74 @@ class MapView(View):
         self._show_count()
         self.app.page.update()
 
-    def _show_count(self) -> None:
+    def _on_screen(self) -> list[tuple[float, float, str]]:
         """The stations inside the part of the map on screen (our own position not counted)."""
         points = self._count_points
-        if self._map_size:
-            lat, lon, zoom = self._view_at
-            cx, cy = to_px(lat, lon, zoom)
-            half_w, half_h = self._map_size[0] / 2, self._map_size[1] / 2
-            n = 0
-            for plat, plon in points:
-                x, y = to_px(plat, plon, zoom)
-                if abs(x - cx) <= half_w and abs(y - cy) <= half_h:
-                    n += 1
-        else:
-            n = len(points)
-        self.count_text.value = self.t("map_count", n=n)
+        if not self._map_size:
+            return list(points)
+        lat, lon, zoom = self._view_at
+        cx, cy = to_px(lat, lon, zoom)
+        half_w, half_h = self._map_size[0] / 2, self._map_size[1] / 2
+        shown = []
+        for point in points:
+            x, y = to_px(point[0], point[1], zoom)
+            if abs(x - cx) <= half_w and abs(y - cy) <= half_h:
+                shown.append(point)
+        return shown
+
+    def _show_count(self) -> None:
+        self.count_text.value = self.t("map_count", n=len(self._on_screen()))
+
+    def _count_details(self, _e=None) -> None:
+        """What is on the map now: how many points, how many callsigns (with and without the SSID; an object
+        counts as its owner's), the nearest and the furthest one from us (a tap opens it)."""
+        points = self._on_screen()
+        heard = self.engine.station.heard
+        calls = set()
+        for _lat, _lon, call in points:
+            entry = heard.get(call) or {}
+            calls.add((entry.get("object_of") or call).upper())
+        bases = {c.split("-")[0] for c in calls}
+        here = self.engine.my_position()
+
+        def line(label: str, value: str, call: str | None = None) -> ft.Control:
+            row = ft.Row([ft.Text(label, expand=True, color=ft.Colors.ON_SURFACE_VARIANT),
+                          ft.Text(value, weight=ft.FontWeight.BOLD)], spacing=12)
+            if not call:
+                return ft.Container(row, padding=ft.Padding.symmetric(horizontal=8, vertical=6))
+
+            def go(_e) -> None:
+                self.app.page.pop_dialog()
+                self.app.show_station(call)
+            return ft.Container(row, padding=ft.Padding.symmetric(horizontal=8, vertical=6), border_radius=8,
+                                ink=True, on_click=go)
+
+        rows = [line(self.t("count_points"), str(len(points))),
+                line(self.t("count_calls"), f"{len(calls)} ({self.t('count_no_ssid', n=len(bases))})")]
+        if here and points:
+            far = sorted(((distance_km(*here, p[0], p[1]), p) for p in points), key=lambda d: d[0])
+
+            def where(item) -> str:
+                km, (plat, plon, call) = item
+                return f"{call} · {distance_text(km)} {bearing(*here, plat, plon)}"
+
+            rows.append(line(self.t("count_nearest"), where(far[0]), far[0][1][2]))
+            rows.append(line(self.t("count_farthest"), where(far[-1]), far[-1][1][2]))
+        elif points:
+            rows.append(ft.Text(self.t("count_no_pos"), size=12, color=ft.Colors.ON_SURFACE_VARIANT))
+        self.app.show_dialog(ft.AlertDialog(
+            title=ft.Row([ft.Icon(ft.Icons.PLACE, color=ft.Colors.PRIMARY), ft.Text(self.t("count_title"))], spacing=8),
+            content=ft.Column(rows, tight=True, spacing=2, width=420),
+            actions=[ft.TextButton(self.t("close"), on_click=lambda _e: self.app.page.pop_dialog())],
+        ))
+
+    def _toggle_count(self, _e) -> None:
+        conf = self.engine.config
+        conf.map_count = not conf.map_count
+        self.count_check.value = conf.map_count
+        self.count_box.visible = conf.map_count
+        self.app.save_config_soon()
+        self.app.page.update()
 
     def _show_tools(self, shown: bool) -> None:
         for button in self.tools:
@@ -415,9 +470,11 @@ class MapView(View):
         self.muted.disabled = self.app.offline_map()
         weather, self.wx_check = check_item(self.t("wx_near"), ft.Icons.THERMOSTAT, self.engine.config.map_weather,
                                             self._toggle_weather)
+        count, self.count_check = check_item(self.t("map_count_show"), ft.Icons.PLACE, self.engine.config.map_count,
+                                             self._toggle_count)
         legend = ft.PopupMenuItem(self.t("legend"), icon=ft.Icons.HELP_OUTLINE,
                                   on_click=lambda _e: show_legend(self.app))
-        self.source_btn = MapSourceButton(self.app, [self.muted, weather, legend])
+        self.source_btn = MapSourceButton(self.app, [self.muted, weather, count, legend])
         return self.source_btn.control
 
     def _gesture_end(self, _e=None) -> None:
@@ -587,7 +644,7 @@ class MapView(View):
             if len(wanted) >= limit:
                 break
         wanted.sort()  # a steady order: the list changes only where stations come, go or move
-        self._count_points = [(k[1], k[2]) for k in wanted]
+        self._count_points = [(k[1], k[2], k[0]) for k in wanted]
         self._show_count()
         if conf.map_trails:  # our own trail too, from the GPS
             points = tuple((p[1], p[2]) for p in self.engine.my_track.get("track", ()) if now - p[0] <= TRAIL_SECONDS)

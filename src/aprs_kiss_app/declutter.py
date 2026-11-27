@@ -5,7 +5,7 @@ apart would otherwise be one unreadable heap. At the map's zoom each station get
 Mercator pixels). The markers are placed one by one: each at its own place when that is free, otherwise at
 the nearest free spot on small rings around its own place (never further than MAX_SHIFT pixels, so a
 station never wanders off to somebody else's town). A thin line on the map joins a moved marker to where
-the station really is. Zooming in, the markers no longer overlap and all stay at their places.
+the station really is; where two lines would cross, the two markers swap places (then up to SWAP_SHIFT). Zooming in, the markers no longer overlap and all stay at their places.
 """
 
 from __future__ import annotations
@@ -18,6 +18,7 @@ CLOSE_Y = 48  # …and this one above the other cover each other's label
 RINGS = (54, 78, 104, 132, 160)  # pixels: the circles tried around a station's own place
 DIRECTIONS = 12
 MAX_SHIFT = RINGS[-1]
+SWAP_SHIFT = MAX_SHIFT * 1.5  # untangling crossed lines may take a marker this far (else crowds stay crossed)
 # Closer than this on screen (side by side, one above the other): as good as one place. One of them staying
 # would cover the other's dot with its symbol (the disc sits above the point) or the top of its tag, and the
 # dot would look like the first station's; so neither stays.
@@ -111,4 +112,47 @@ def spread(points: list[tuple[float, float]], zoom: float, fixed: int | None = N
                 break
         else:
             take(x, y)  # no room anywhere near: it stays on its place, under the others
+    return untangle(points, shown, zoom, fixed)
+
+
+DISC_UP = 13  # pixels: a line starts at the symbol's disc, this far above the marker's point
+
+
+def _crosses(a: tuple, b: tuple, c: tuple, d: tuple) -> bool:
+    """Segments a–b and c–d cross (touching at an end, e.g. two lines to one dot, is not crossing)."""
+    def side(p, q, r) -> float:
+        return (q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0])
+    d1, d2, d3, d4 = side(c, d, a), side(c, d, b), side(a, b, c), side(a, b, d)
+    return ((d1 > 0 > d2) or (d1 < 0 < d2)) and ((d3 > 0 > d4) or (d3 < 0 < d4))
+
+
+def untangle(points: list[tuple[float, float]], shown: list[tuple[float, float]], zoom: float,
+             fixed: int | None = None) -> list[tuple[float, float]]:
+    """No two lines (from a moved marker to where its station is) cross: when two do, the two markers swap
+    their spots. Both spots were free, the lines get shorter in sum, so it ends; a swap that would take a
+    marker further than SWAP_SHIFT from its station is not made."""
+    shown = list(shown)
+    real = [to_px(*pt, zoom) for pt in points]
+    at = [to_px(*pt, zoom) for pt in shown]
+
+    def line(i: int):
+        return (at[i][0], at[i][1] - DISC_UP), real[i]
+
+    for _ in range(500):
+        moved = [i for i in range(len(points)) if i != fixed and shown[i] != points[i]]
+        swapped = False
+        for n, i in enumerate(moved):
+            for j in moved[n + 1:]:
+                if not _crosses(*line(i), *line(j)):
+                    continue
+                if math.dist(at[j], real[i]) > SWAP_SHIFT or math.dist(at[i], real[j]) > SWAP_SHIFT:
+                    continue
+                at[i], at[j] = at[j], at[i]
+                shown[i], shown[j] = shown[j], shown[i]
+                swapped = True
+                break
+            if swapped:
+                break
+        if not swapped:
+            break
     return shown

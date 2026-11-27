@@ -1,7 +1,9 @@
 import math
 import unittest
 
-from aprs_kiss_app.declutter import CLOSE_X, CLOSE_Y, MAX_SHIFT, from_px, spread, to_px
+import random
+
+from aprs_kiss_app.declutter import CLOSE_X, CLOSE_Y, DISC_UP, MAX_SHIFT, SWAP_SHIFT, _crosses, from_px, spread, to_px
 
 
 def overlap(a, b, zoom):
@@ -44,7 +46,7 @@ class DeclutterTest(unittest.TestCase):
         points = [(49.70 + 0.004 * k, 13.30 + 0.006 * k) for k in range(40)] + [(49.75, 13.37)] * 6
         for zoom in (9, 10, 11, 12):
             for a, b in zip(spread(points, zoom), points):
-                self.assertLessEqual(shift(a, b, zoom), MAX_SHIFT + 0.5)
+                self.assertLessEqual(shift(a, b, zoom), SWAP_SHIFT + 0.5)
 
     def test_own_station_stays_and_others_go_around(self):
         for n in range(2, 10):
@@ -73,6 +75,42 @@ class DeclutterTest(unittest.TestCase):
                     sx, sy = to_px(*at, zoom)
                     disc = (sx, sy - 13)  # the symbol's disc is above the marker's point
                     self.assertGreater(math.hypot(rx - disc[0], ry - disc[1]), 18, (dx, dy, i, j))
+
+
+    def test_the_lines_do_not_cross(self):
+        rnd = random.Random(7)
+        zoom = 13
+        cx, cy = to_px(49.75, 13.38, zoom)
+        for _ in range(60):
+            points = [from_px(cx + rnd.uniform(-90, 90), cy + rnd.uniform(-70, 70), zoom)
+                      for _ in range(rnd.randint(3, 9))]
+            shown = spread(points, zoom)
+            lines = []
+            for real, at in zip(points, shown):
+                if at != real:
+                    x, y = to_px(*at, zoom)
+                    lines.append(((x, y - DISC_UP), to_px(*real, zoom)))
+            for n, a in enumerate(lines):
+                for b in lines[n + 1:]:
+                    self.assertFalse(_crosses(*a, *b))
+            for real, at in zip(points, shown):
+                self.assertLessEqual(shift(real, at, zoom), SWAP_SHIFT + 1)
+
+    def test_a_crowd_round_our_own_station_has_no_crossed_lines(self):
+        rnd = random.Random(1)
+        zoom = 12
+        cx, cy = to_px(49.75, 13.38, zoom)
+        crossed = 0
+        for _ in range(200):
+            n = rnd.randint(8, 20)
+            points = [from_px(cx + rnd.gauss(0, 60), cy + rnd.gauss(0, 60), zoom) for _ in range(n)]
+            points.append((49.75, 13.38))  # us: never moved
+            shown = spread(points, zoom, fixed=n)
+            self.assertEqual(shown[n], points[n])
+            lines = [((to_px(*at, zoom)[0], to_px(*at, zoom)[1] - DISC_UP), to_px(*real, zoom))
+                     for real, at in zip(points, shown) if at != real]
+            crossed += any(_crosses(*a, *b) for k, a in enumerate(lines) for b in lines[k + 1:])
+        self.assertLessEqual(crossed, 2)  # out of 200 crowds of 8 to 20 stations
 
 
 if __name__ == "__main__":

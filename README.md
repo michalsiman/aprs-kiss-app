@@ -60,7 +60,8 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
   **road incidents** (crashes, work zones, floods, fog, snow) – any mix, remembered. In the same menu,
   **how far**: internet stations up to 20, 50 or 100 km (the APRS-IS server is asked for that area at once)
   and radio stations up to 20, 50, 100 km or with no limit. Under the map buttons a small line says how
-  many stations are **on the map** right now.
+  many stations are **on the map** right now; a tap on it tells the different callsigns and the nearest and
+  furthest one (*Number of points on the map* in the map menu hides the line).
 - **Repeaters show their frequency** right in their tag – band in colour (2 m green, 70 cm magenta) and the
   digital mode when the comment says it (DMR, D-Star, C4FM, NXDN, TETRA). **Weather stations show their
   temperature** in the same way.
@@ -72,7 +73,8 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
   moves under the map buttons while they are open, switched off in the map menu. A tap on it lists the stations
   it comes from: their values, how far and in which direction, how old.
 - **Markers never cover each other**: stations at one place or close together move apart, a thin grey line
-  leads from the middle of the symbol to a dot where the station really is. **Trails** (the last half hour,
+  leads from the middle of the symbol to a dot where the station really is – the lines never cross and no
+  dot hides under another station's symbol. **Trails** (the last half hour,
   also your own from the GPS), APRS **objects** as places of their own, impossible jumps ignored.
   **Measure a distance** by a long press on two points.
 - **Navigation-like map while the tracker runs**: you stay in the middle at a street zoom; move the map and
@@ -105,6 +107,10 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
 - **Notifications** of a new message or chat line while you are not looking: on Android in the background (a
   tap opens the conversation; it says how many messages are unread in all), on Linux, Windows and macOS while
   the window is not in front.
+- **Stations a message mentions** (OK6DJ-6 in a WXNOW answer, "say hi to OK1ABC"): a small button at the
+  message lists those heard with a position, how far and which way they are; a tap shows one on the map.
+- **Web links** in messages, APRS Thursday and the chat are clickable; a tap first shows where the link leads
+  and warns that nobody vouches for the page (it may be harmful).
 - **Positions in messages and the chat**: send yours, or any place picked on the map – as coordinates or as
   a Maidenhead locator (the map's menu shows the locator of every place); a position written in a message
   or a chat line (decimal degrees, degrees and minutes, APRS's own, a locator) opens on the map with a pin.
@@ -119,7 +125,7 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
   the next net starts, leave the group; by radio, internet or both, remembered.
 - **Stations** heard on the radio or seen on APRS-IS: distance, direction, comment, weather, the path;
   a filter and a legend; the count says how many are shown of all, and an empty list says why. A station's
-  details offer the map, a message and its **QRZ.com** page (the base callsign). Stations an iGate relays from the internet by radio (third-party packets)
+  details offer the map, a message and the **callbooks** (QRZ.com, HamQTH, QRZCQ – the base callsign – and aprs.fi). Stations an iGate relays from the internet by radio (third-party packets)
   show up too.
 - **Position beacon** every N minutes and a *Send position now* button in the top bar; status and
   unproto. Icon (APRS symbol), comment, SSID and path in Settings.
@@ -162,6 +168,8 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
 
 ### The app
 
+- **The menu in sections**: APRS (map, messages, APRS Thursday, stations), packet radio (terminal, chat,
+  files, monitor, BBS, TAK) and the settings – headings in the phone's menu, gaps on a computer.
 - **Top bar as a dashboard**, on a computer and on a phone: **TNC**, **IS** and **GPS** lamps green when
   working, the position / tracker button, **TX** with a red frame while transmitting is on and all red while
   a frame goes out on air (IS red for a second when something goes to APRS-IS). On a computer the lamps
@@ -233,7 +241,7 @@ full size. They follow your GitHub theme, and so does the app: it uses the syste
 </tr>
 <tr>
 <td width="50%"><a href="assets/tracker-menu.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/tracker-menu-light.png"><img src="assets/tracker-menu.png" alt="The position and tracker menu"></picture></a><br><sub>The position and tracker menu</sub></td>
-<td width="50%"><a href="assets/station.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/station-light.png"><img src="assets/station.png" alt="A station's details: map, message, QRZ.com"></picture></a><br><sub>A station's details: map, message, QRZ.com</sub></td>
+<td width="50%"><a href="assets/station.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/station-light.png"><img src="assets/station.png" alt="A station's details: map, message, callbooks"></picture></a><br><sub>A station's details: map, message, callbooks</sub></td>
 </tr>
 <tr>
 <td width="50%"><a href="assets/thursday.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/thursday-light.png"><img src="assets/thursday.png" alt="#APRSThursday"></picture></a><br><sub>#APRSThursday</sub></td>

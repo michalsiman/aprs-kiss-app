@@ -6,7 +6,7 @@ import flet as ft
 
 from aprs_kiss_core.geotext import find_positions, write_position
 
-from .base import View, capped_append, clock
+from .base import View, capped_append, clock, message_text
 
 LIMIT = 500
 
@@ -38,7 +38,7 @@ class ChatView(View):
                 ft.Text(clock(e["time"]), size=11, color=ft.Colors.ON_SURFACE_VARIANT, width=64),
                 ft.Text(e["from"], weight=ft.FontWeight.BOLD, width=96,
                         color=ft.Colors.ORANGE if e.get("out") else ft.Colors.PRIMARY),
-                ft.Text(e["text"], expand=True),
+                message_text(self.app, e["text"], expand=True),
                 *[ft.IconButton(ft.Icons.MAP_OUTLINED, icon_size=18, tooltip=self.t("pos_on_map"),
                                 on_click=lambda _e, p=p, who=e["from"]: self.app.page.run_task(self.app.show_point, *p, who))
                   for p in find_positions(e["text"])[:1]],

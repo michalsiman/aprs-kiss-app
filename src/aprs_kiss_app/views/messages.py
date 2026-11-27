@@ -10,11 +10,11 @@ import unicodedata
 import flet as ft
 
 from aprs_kiss_core.aprs import MAX_MESSAGE_PARTS, message_parts
-from aprs_kiss_core.geotext import find_positions, write_position
+from aprs_kiss_core.geotext import find_callsigns, find_positions, resolve_callsign, write_position
 from aprs_kiss_core.services import SERVICES
 from aprs_kiss_core.spotting import CAMILLA, GATEWAY_NAMES, MODES, PROGRAMS, Spot, SpotError, build as build_spot, default_gateway, gateways_for
 
-from .base import View, ViaPicker, bearing, clock, distance_km, distance_short
+from .base import View, ViaPicker, bearing, clock, distance_km, distance_short, message_text
 
 MAX_TEXT = 67  # APRS message text limit
 STATE_ICONS = {
@@ -421,8 +421,11 @@ class MessagesView(View):
             meta.append(ft.IconButton(ft.Icons.MAP_OUTLINED, icon_size=16, tooltip=self.t("pos_on_map"),
                                       style=ft.ButtonStyle(padding=0), width=24, height=24,
                                       on_click=lambda _e, p=p, who=who: self.app.page.run_task(self.app.show_point, *p, who)))
+        mentioned = self._mentioned(m)
+        if mentioned:
+            meta.append(mentioned)
         bubble = ft.Container(
-            ft.Column([ft.Text(m["text"], selectable=True),
+            ft.Column([message_text(self.app, m["text"]),
                        ft.Row(meta, spacing=6, tight=True, vertical_alignment=ft.CrossAxisAlignment.CENTER)],
                       spacing=2, tight=True),
             padding=ft.Padding.symmetric(horizontal=12, vertical=8),
@@ -434,6 +437,34 @@ class MessagesView(View):
         gap = ft.Container(width=40)  # the other side stays a little free, like in any messenger
         return ft.Row([gap, bubble] if out else [bubble, gap],
                       alignment=ft.MainAxisAlignment.END if out else ft.MainAxisAlignment.START)
+
+    def _mentioned(self, m: dict) -> ft.Control | None:
+        """Stations the text speaks about (OK6DJ-6 in a WXNOW answer, "say hi to OK1ABC"), those heard with a
+        position: a small button with a menu, each with how far and which way from us; a tap shows it on the map."""
+        heard = self.engine.station.heard
+        me = (self.engine.config.callsign or "").upper().split("-")[0]
+        skip = {m.get("from", "").upper(), m.get("to", "").upper()}
+        here = self.engine.my_position()
+        items = []
+        for said in find_callsigns(m["text"]):
+            if said in skip or said.split("-")[0] == me:
+                continue
+            call = resolve_callsign(said, heard)
+            if not call or any(i.data == call for i in items):
+                continue
+            entry = heard[call]
+            lat, lon = entry["latitude"], entry["longitude"]
+            label = call
+            if here:
+                label += f" · {distance_short(distance_km(*here, lat, lon))} {bearing(*here, lat, lon)}"
+            items.append(ft.PopupMenuItem(label, icon=ft.Icons.MAP_OUTLINED, data=call,
+                                          on_click=lambda _e, lat=lat, lon=lon, call=call:
+                                          self.app.page.run_task(self.app.show_point, lat, lon, call)))
+        if not items:
+            return None
+        return ft.PopupMenuButton(
+            content=ft.Icon(ft.Icons.PERSON_PIN_CIRCLE_OUTLINED, size=16, color=ft.Colors.PRIMARY),
+            tooltip=self.t("msg_mentioned"), items=items, padding=0, width=24, height=24)
 
     # ─── actions ──────────────────────────────────────────────────────────
 

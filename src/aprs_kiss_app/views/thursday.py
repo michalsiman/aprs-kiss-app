@@ -8,7 +8,7 @@ import flet as ft
 
 from aprs_kiss_core import thursday
 
-from .base import View, ViaPicker, clock
+from .base import View, ViaPicker, clock, message_text
 from .messages import STATE_ICONS
 
 
@@ -114,7 +114,7 @@ class ThursdayView(View):
         sender = [] if out else [ft.Text(e["from"], weight=ft.FontWeight.BOLD, size=12,
                                          color=ft.Colors.PRIMARY)]
         bubble = ft.Container(
-            ft.Column([*sender, ft.Text(e["text"], selectable=True), ft.Row(meta, spacing=6, tight=True)],
+            ft.Column([*sender, message_text(self.app, e["text"]), ft.Row(meta, spacing=6, tight=True)],
                       spacing=2, tight=True),
             padding=ft.Padding.symmetric(horizontal=12, vertical=8), border_radius=12,
             bgcolor=ft.Colors.PRIMARY_CONTAINER if out else ft.Colors.SURFACE_CONTAINER_HIGH,

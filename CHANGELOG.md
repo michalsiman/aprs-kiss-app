@@ -4,8 +4,20 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
-## Unreleased
+## 1.7.0 – 2026-11-27
 
+- **Station details** say altitude, speed and course in your language and units (they said `speed: 89`).
+- **Callbooks in the station's details**: besides QRZ.com also HamQTH and QRZCQ (the operator), and aprs.fi
+  (this station's track and packets) – one *Callbooks* menu.
+- **Web links in messages, APRS Thursday and the chat are clickable** – a tap first shows where the link leads and
+  warns that nobody vouches for the page (it may be harmful); then *Open* or *Cancel*.
+- **The menu in sections**: APRS (map, messages, APRS Thursday, stations), packet radio (terminal, chat, files,
+  monitor, BBS, TAK), then the settings – headings on a phone, gaps on a computer.
+- **Stations a message mentions** (e.g. OK6DJ-6 in a WXNOW answer): a small button at the message lists those
+  heard with a position, with how far and which way; a tap shows one on the map.
+- **A tap on "On the map: 18"**: how many points, how many different callsigns (and without the SSID), the
+  nearest and the furthest one (a tap opens it). *Number of points on the map* in the map menu hides the line.
+- **Map: the grey lines no longer cross** – where two would, the two markers swap places.
 - **Map: the grey dot no longer sits inside another station's symbol.** Two stations a little apart (not at
   one place, e.g. OK1KUN-1 and OK1KUN-2) – one stayed, and the other one's dot (where it really is) fell on the
   first one's symbol. Now both move aside, as stations at one place do.

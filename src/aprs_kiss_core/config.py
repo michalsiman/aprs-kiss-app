@@ -20,7 +20,7 @@ from .ax25 import Address
 _LOGGER = logging.getLogger(__name__)
 
 APP_NAME = "aprs-kiss"
-VERSION = "1.6.0"
+VERSION = "1.7.0"
 # A beta (a pre-release on GitHub, tag vX.Y.Z-beta): betas take the next patch numbers (1.0.1, 1.0.2 …),
 # the next stable release a higher minor one (1.1.0), so updating always goes up.
 BETA = False
@@ -88,6 +88,7 @@ class Config:
     units_distance: str = ""  # "km", "mi"; "" = as the phone / computer is set (miles in the US and the UK)
     units_temperature: str = ""  # "C", "F"; "" = as the phone / computer is set (Fahrenheit in the US)
     units_pressure: str = ""  # "hPa", "inHg"; "" = as the phone / computer is set (inHg in the US)
+    map_count: bool = True  # under the map's buttons: how many stations are on the map
     map_weather: bool = True  # the map's corner shows the temperature from the weather stations around us
     map_filters: str = ""  # the map shows only these kinds of stations ("weather,moving,road"); empty = all
     map_tools_hidden: bool = False  # the map's button bar folded into one gear button
