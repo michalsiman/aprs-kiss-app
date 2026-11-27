@@ -57,7 +57,7 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
 - **Filtry mapy** (trychtýř): jen **meteostanice**, jen **jedoucí** stanice (pohnuly se za posledních
   10 minut; nově slyšená stanice zůstane, dokud není jasné, že stojí), jen **převaděče**, jen **dopravní
   problémy** (nehody, práce na silnici, povodně, mlha, sníh) – libovolně kombinovatelné, pamatují se. Ve stejné
-  nabídce i **jak daleko**: stanice z internetu do 25, 50 nebo 100 km (server APRS-IS dostane novou oblast
+  nabídce i **jak daleko**: stanice z internetu do 20, 50 nebo 100 km (server APRS-IS dostane novou oblast
   hned) a stanice z rádia do 20, 50, 100 km nebo bez omezení. Pod tlačítky mapy malý řádek ukazuje, kolik
   stanic je právě **na mapě**.
 - **Převaděče ukazují kmitočet** přímo ve štítku – pásmo barevně (2 m zeleně, 70 cm purpurově) a druh

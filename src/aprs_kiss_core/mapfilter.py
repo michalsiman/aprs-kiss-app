@@ -23,7 +23,7 @@ from .tracker import distance_m
 KINDS = ("weather", "moving", "repeater", "road")
 MOVING_SECONDS = 10 * 60
 MOVING_KMH = 3.0  # a reported speed above this, lately: it moves
-IS_KM = (25, 50, 100)  # the map's choices for the APRS-IS radius
+IS_KM = (20, 50, 100)  # the map's choices for the APRS-IS radius
 RF_KM = (20, 50, 100, 0)  # …and for stations heard on the radio (0 = no limit)
 
 # symbol codes (alternate table, also with an overlay character)
