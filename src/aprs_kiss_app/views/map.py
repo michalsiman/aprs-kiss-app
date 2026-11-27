@@ -355,7 +355,7 @@ class MapView(View):
     # ─── filters: only weather stations, moving stations, road incidents (any mix) ─────
 
     FILTER_ICONS = {"weather": ft.Icons.THUNDERSTORM_OUTLINED, "moving": ft.Icons.DIRECTIONS_CAR_OUTLINED,
-                    "repeater": ft.Icons.CELL_TOWER, "road": ft.Icons.CAR_CRASH_OUTLINED}
+                    "repeater": ft.Icons.CELL_TOWER, "road": ft.Icons.WARNING_AMBER_ROUNDED}
 
     def _filter_btn(self) -> ft.Control:
         # one line each (the explanation in brackets does not fit a phone's menu); a box each, the menu stays open

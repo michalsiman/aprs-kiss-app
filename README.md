@@ -57,7 +57,7 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
   switches to it by itself** and tells you so, and goes back to OpenStreetMap when the internet returns.
 - **Map filters** (the funnel): only **weather stations**, only **moving** stations (moved in the last
   10 minutes; a station just heard stays until it is clear it stands still), only **repeaters**, only
-  **road incidents** (crashes, work zones, floods, fog, snow) – any mix, remembered. In the same menu,
+  **warnings** (crashes, road works, fires, floods, fog, snow – in Czechia, the US, Australia, Portugal…) – any mix, remembered. In the same menu,
   **how far**: internet stations up to 20, 50 or 100 km (the APRS-IS server is asked for that area at once)
   and radio stations up to 20, 50, 100 km or with no limit. Under the map buttons a small line says how
   many stations are **on the map** right now; a tap on it tells the different callsigns and the nearest and
@@ -79,7 +79,7 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
   **Measure a distance** by a long press on two points.
 - **Navigation-like map while the tracker runs**: you stay in the middle at a street zoom; move the map and
   a **Back to me** button counts down 15 s, then the map comes back by itself.
-- **Warnings ahead while the tracker runs** (off until you switch them on): **road incidents** and
+- **Warnings ahead while the tracker runs** (off until you switch them on): **warnings** and
   **other moving stations** (going your way, coming towards you or crossing) in a lobe ahead of you –
   long and narrow when you drive fast, wide in town, never behind; a bubble and a sound.
 - **Profiles**: up to three SSIDs of your callsign, each with its own symbol (car, handheld, home), comment

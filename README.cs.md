@@ -55,8 +55,8 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
   hor každé země (GeoNames) – s přiblížením přibývají další. I v tmavém režimu je světlá, stejně jako mapy online. Přepíná se jedním tlačítkem; **když není internet, mapa se na ni
   přepne sama** a oznámí to, a jakmile se internet vrátí, vrátí se k OpenStreetMap.
 - **Filtry mapy** (trychtýř): jen **meteostanice**, jen **jedoucí** stanice (pohnuly se za posledních
-  10 minut; nově slyšená stanice zůstane, dokud není jasné, že stojí), jen **převaděče**, jen **dopravní
-  problémy** (nehody, práce na silnici, povodně, mlha, sníh) – libovolně kombinovatelné, pamatují se. Ve stejné
+  10 minut; nově slyšená stanice zůstane, dokud není jasné, že stojí), jen **převaděče**, jen **výstrahy**
+  (nehody, práce na silnici, požáry, povodně, mlha, sníh – v Česku, USA, Austrálii, Portugalsku…) – libovolně kombinovatelné, pamatují se. Ve stejné
   nabídce i **jak daleko**: stanice z internetu do 20, 50 nebo 100 km (server APRS-IS dostane novou oblast
   hned) a stanice z rádia do 20, 50, 100 km nebo bez omezení. Pod tlačítky mapy malý řádek ukazuje, kolik
   stanic je právě **na mapě**; klepnutím se ukáže, kolik je různých značek a která stanice je nejblíž
@@ -78,7 +78,7 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
   prstu na dvou bodech.
 - **Mapa jako navigace, když běží tracker**: jste uprostřed s přiblížením na ulice; posunete-li mapou,
   tlačítko **Zpět na mě** odpočítává 15 s a pak se mapa vrátí sama.
-- **Upozornění před vámi, když běží tracker** (vypnutá, dokud je nezapnete): **dopravní hlášení**
+- **Upozornění před vámi, když běží tracker** (vypnutá, dokud je nezapnete): **výstrahy**
   a **jiné jedoucí stanice** (jedou stejným směrem, proti vám, nebo křižují) v laloku před vámi – při
   rychlé jízdě dlouhém a úzkém, ve městě širokém, nikdy za vámi; bublina a zvuk.
 - **Profily**: až tři SSID vaší značky, každé s vlastní ikonou (auto, ručka, domov), komentářem a způsobem

@@ -36,7 +36,7 @@ class PositionButton:
         settings = ft.PopupMenuItem(t("trk_settings"), icon=ft.Icons.TUNE, on_click=lambda _e: app.select("settings"))
         # warnings while the tracker runs (both off until switched on here or in Settings › Tracker)
         conf = app.engine.config
-        self.road_item, self.road_box = check_item(t("trk_menu_road"), ft.Icons.CAR_CRASH_OUTLINED, conf.road_alerts,
+        self.road_item, self.road_box = check_item(t("trk_menu_road"), ft.Icons.WARNING_AMBER_ROUNDED, conf.road_alerts,
                                                    lambda _e: self._flip("road_alerts"))
         self.meet_item, self.meet_box = check_item(t("trk_menu_meet"), ft.Icons.PEOPLE_OUTLINE, conf.meet_alerts,
                                                    lambda _e: self._flip("meet_alerts"))

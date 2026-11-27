@@ -6,6 +6,9 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 
 ## Unreleased
 
+- **"Road incidents" are now "Warnings"** (map filter, tracker alerts, sounds): besides crashes and road works
+  they are fires, floods and fog too, and not only in Czechia – the same objects come from the US, Australia
+  or Portugal.
 - **Navigate here / Share this place** – in a station's details and in the map's long-press menu: on a phone
   the place opens in a navigation or map app (Android asks which: Google Maps, Mapy.com, Waze, OsmAnd…; an
   iPhone opens Apple Maps) or goes to another app through the share sheet (name, coordinates, locator, a map
