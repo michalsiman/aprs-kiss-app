@@ -36,24 +36,28 @@ class BulletinsView(View):
     def build(self) -> ft.Control:
         self._signature = None
         self._fresh: set[tuple[str, str]] = set()  # unread when the screen was opened: marked as new
-        self.title = ft.Text(size=15, weight=ft.FontWeight.BOLD, expand=True)
+        self.title = ft.Text(size=15, weight=ft.FontWeight.BOLD, expand=True, no_wrap=True,
+                             overflow=ft.TextOverflow.ELLIPSIS)
         self.reach = ft.PopupMenuButton(icon=ft.Icons.TUNE, tooltip=self.t("bln_reach"), items=[
             ft.PopupMenuItem(content=ft.Text(self._reach_text(km)), on_click=lambda _e, km=km: self._set_reach(km))
             for km in KM_CHOICES])
+        # a new bulletin: at the top, by the title (at the bottom it sat on a phone's gesture bar)
+        self.new_btn = (ft.IconButton(ft.Icons.ADD, tooltip=self.t("bln_new"), on_click=self._compose,
+                                      style=ft.ButtonStyle(bgcolor=ft.Colors.PRIMARY, color=ft.Colors.ON_PRIMARY))
+                        if self.app.compact else
+                        ft.FilledButton(self.t("bln_new"), icon=ft.Icons.ADD, on_click=self._compose))
         header = ft.Container(
-            ft.Row([ft.Icon(ft.Icons.CAMPAIGN, color=ft.Colors.PRIMARY), self.title, self.reach,
+            ft.Row([ft.Icon(ft.Icons.CAMPAIGN, color=ft.Colors.PRIMARY), self.title, self.new_btn, self.reach,
                     ft.IconButton(ft.Icons.INFO_OUTLINE, tooltip=self.t("about"), on_click=self._info)],
                    spacing=8, vertical_alignment=ft.CrossAxisAlignment.CENTER),
             padding=ft.Padding.only(left=12, right=4, top=4, bottom=4), border_radius=8,
             bgcolor=ft.Colors.SURFACE_CONTAINER,
         )
         self.feed = ft.ListView(expand=True, spacing=8, padding=ft.Padding.all(12))
-        self.new_btn = ft.FilledButton(self.t("bln_new"), icon=ft.Icons.ADD, on_click=self._compose)
         return ft.Column([
             header,
             ft.Container(ft.SelectionArea(self.feed), expand=True, border_radius=8,
                          bgcolor=ft.Colors.SURFACE_CONTAINER_LOWEST),
-            ft.Row([self.new_btn], alignment=ft.MainAxisAlignment.END),
         ], expand=True)
 
     def _reach_text(self, km: int) -> str:

@@ -10,6 +10,9 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
   long second line ("438.525 · 70 cm · D-Star") is two or three times a callsign's width, and was counted as
   one (four DL6MDX repeaters on one mast covered their neighbours).
 
+- **Bulletins: New bulletin at the top**, by the title (a round + on a phone) – at the bottom it sat on the
+  phone's gesture bar.
+
 ## 1.9.0 – 2026-11-27
 
 - **Raspberry Pi as a station with a touch screen** – one command installs it on Raspberry Pi OS

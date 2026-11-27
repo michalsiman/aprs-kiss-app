@@ -292,7 +292,7 @@ async def desktop(lang, theme, only):
             if want("bulletins"):
                 await b.shot(out("bulletins", lang, theme))
             if want("bulletin-new"):
-                await b.click(1180, 795, 2)  # New bulletin
+                await b.click(1080, 88, 2)  # New bulletin (in the header)
                 await b.type("Dnes 19:00 test APRS & Packet na 144.800, hlaste se" if cs
                              else "Tonight 19:00 APRS & Packet test on 144.800, check in", 1.5)
                 await b.shot(out("bulletin-new", lang, theme))
