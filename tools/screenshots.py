@@ -346,8 +346,8 @@ async def desktop(lang, theme, only):
 # ─── the phone (412×870 css px) ────────────────────────────────────────────
 
 # the menu has headings (APRS, Packet radio) and a line above the settings
-DRAWER = {"messages": 167, "thursday": 224, "stations": 280, "terminal": 373, "chat": 429, "files": 485,
-          "monitor": 541, "tak": 597, "settings": 665}
+DRAWER = {"messages": 186, "thursday": 234, "stations": 282, "terminal": 370, "chat": 418, "files": 466,
+          "monitor": 514, "tak": 562, "settings": 627}
 
 
 async def phone(lang, theme, only):

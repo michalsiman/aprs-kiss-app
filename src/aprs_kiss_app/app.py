@@ -23,13 +23,13 @@ import flet as ft
 from aprs_kiss_core import android_bt, android_usb, ble, drivedetect, profiles, roadalert, units, winlink
 from aprs_kiss_core.aprs import MIC_E_STATUS
 from . import android_notify, ble_flet, desktop_notify
-from aprs_kiss_core.config import VERSION, Config, data_dir, load_config, save_config
+from aprs_kiss_core.config import VERSION, VERSION_LABEL, Config, data_dir, load_config, save_config
 
 from . import theme
 from aprs_kiss_core.engine import Engine, TransmitRefused
 
 from .about import show_about
-from . import disclaimer, distribution, i18n, language, offline_map, updates, whatsnew
+from . import disclaimer, distribution, drawer, i18n, language, offline_map, updates, whatsnew
 from .sounds import Sounds
 from .i18n import Translator
 from .phone_gps import PhoneGps
@@ -483,10 +483,10 @@ class App:
         await self._close_menu()
         show_about(self)
 
-    async def _menu_selected(self, e) -> None:
+    async def _menu_selected(self, key: str) -> None:
         """A screen picked in the phone's menu: the menu slides away and the screen opens."""
         await self._close_menu()
-        self.select(self.menu_views[e.control.selected_index].key)
+        self.select(key)
 
     # ─── Android's back gesture ───────────────────────────────────────────
     # It closes the menu when it is open, else goes back to the screen shown before (like a browser),
@@ -600,28 +600,28 @@ class App:
             on_change=lambda e: self.select(self.menu_views[e.control.selected_index].key),
         )
         # a phone: About is at the end of the menu (no room for its button in the top bar)
-        self.about_item = ft.ListTile(leading=ft.Icon(ft.Icons.INFO_OUTLINE), title=ft.Text(self.t("about")),
-                                      on_click=self._menu_about, content_padding=ft.Padding.only(left=28, right=12))
+        about = drawer.MenuRow(ft.Icons.INFO_OUTLINE, None, self.t("about"),
+                               lambda _e: self.page.run_task(self._menu_about))
+        self.about_note = ft.Text(size=12, color=ft.Colors.PRIMARY, visible=False)  # a new version, when there is one
+        self.about_item = ft.Column([about.control, ft.Container(self.about_note, padding=ft.Padding.only(left=58))],
+                                    spacing=0)
         # a phone: the screens in a menu that slides in from the left (the ☰ button) and hides again
-        drawer_items: list[ft.Control] = [ft.Container(ft.Text("APRS & Packet", weight=ft.FontWeight.BOLD, size=16),
-                                                       padding=ft.Padding.only(left=28, top=20, bottom=4))]
-        self.drawer_dests: dict[str, ft.NavigationDrawerDestination] = {}
+        drawer_items: list[ft.Control] = [drawer.header("APRS & Packet", VERSION_LABEL)]
+        self.drawer_rows: dict[str, drawer.MenuRow] = {}
         section = None
         for v in self.menu_views:
             if SECTIONS.get(v.key) != section:
                 section = SECTIONS.get(v.key)
                 if section == "app":
-                    drawer_items.append(ft.Divider(height=12))
+                    drawer_items.append(drawer.divider())
                 elif section:
-                    drawer_items.append(ft.Container(
-                        ft.Text(self.t(f"menu_{section}"), size=13, weight=ft.FontWeight.BOLD, color=ft.Colors.PRIMARY),
-                        padding=ft.Padding.only(left=28, top=14, bottom=4)))
-            self.drawer_dests[v.key] = ft.NavigationDrawerDestination(
-                icon=ft.Icon(v.icon), selected_icon=ft.Icon(v.selected_icon or v.icon), label=self.t(v.key))
-            drawer_items.append(self.drawer_dests[v.key])
+                    drawer_items.append(drawer.heading(self.t(f"menu_{section}")))
+            self.drawer_rows[v.key] = drawer.MenuRow(v.icon, v.selected_icon, self.t(v.key),
+                                                     lambda _e, k=v.key: self.page.run_task(self._menu_selected, k))
+            drawer_items.append(self.drawer_rows[v.key].control)
         self.drawer = ft.NavigationDrawer(
-            controls=drawer_items + [ft.Divider(), self.about_item],
-            on_change=self._menu_selected, on_dismiss=self._menu_dismissed,
+            controls=drawer_items + [drawer.divider(), self.about_item],
+            on_dismiss=self._menu_dismissed,
             # very slightly see-through: the map shows faintly under the menu
             bgcolor=ft.Colors.with_opacity(0.94, ft.Colors.SURFACE_CONTAINER_LOW),
         )
@@ -779,7 +779,9 @@ class App:
         index = next(i for i, v in enumerate(self.views) if v.key == key)
         _LAST_SCREEN[:] = [key]
         self.current = index
-        self.rail.selected_index = self.drawer.selected_index = self._menu_index(self.views[index])
+        self.rail.selected_index = chosen = self._menu_index(self.views[index])
+        for i, v in enumerate(self.menu_views):
+            self.drawer_rows[v.key].set_selected(i == chosen)
         if self.holders[index].content is not self.views[index].control:
             self.holders[index].content = self.views[index].control  # built the first time it is shown
         for i, holder in enumerate(self.holders):
@@ -944,9 +946,9 @@ class App:
             messages = self.view("messages")
             badge = str(messages.unread_total) if messages.unread else None
             # on the plain and the selected icon: the count stays while Messages is open, until they are read
-            for dest in (self.rail.destinations[self.menu_views.index(messages)],
-                         self.drawer_dests["messages"]):
-                dest.icon.badge = dest.selected_icon.badge = badge
+            dest = self.rail.destinations[self.menu_views.index(messages)]
+            dest.icon.badge = dest.selected_icon.badge = badge
+            self.drawer_rows["messages"].set_badge(badge)  # a pill at the right of the row
             self.menu_btn.badge = badge  # the menu is closed on a phone: unread messages show on ☰
 
     # ─── new versions ─────────────────────────────────────────────────────
@@ -1138,8 +1140,8 @@ class App:
             self.update_btn.content = self.t("update_button", version=st.latest)
         self.update_btn.tooltip = self.t("update_button", version=st.latest)
         if self.compact:  # the menu's About item says it too
-            self.about_item.subtitle = ft.Text(self.t("update_button", version=st.latest), color=ft.Colors.PRIMARY,
-                                               size=12) if st.available else None
+            self.about_note.value = self.t("update_button", version=st.latest) if st.available else ""
+            self.about_note.visible = st.available
 
     def _tx_changed(self, e) -> None:
         self.engine.set_tx(bool(e.control.value))

@@ -15,7 +15,9 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
   writes Direwolf's configuration, starts it with the connection and stops it with the app; *Direwolf's log*
   shows its output. Direwolf must be installed (Linux: `sudo apt install direwolf`); in the Flatpak it is
   started by hand and reached over KISS TCP/IP.
-- **The phone's menu is very slightly see-through.**
+- **The phone's menu redrawn**: flat rows, the chosen one with a coloured bar at the left edge and a faint tint
+  (no more rounded pill), small grey section headings, the version under the title, the unread count as a red
+  pill at the right of Messages; very slightly see-through.
 
 ## 1.7.1 beta – 2026-11-27
 
