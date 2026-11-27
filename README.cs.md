@@ -63,6 +63,9 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
 - **Převaděče ukazují kmitočet** přímo ve štítku – pásmo barevně (2 m zeleně, 70 cm purpurově) a druh
   provozu, pokud je v komentáři (DMR, D-Star, C4FM, NXDN, TETRA). Stejně tak **meteostanice ukazují
   teplotu**.
+- **Teplota z okolí** v rohu mapy: průměr z meteostanic do 20 km (údaje nejvýš 2 hodiny staré), i s vlhkostí
+  a tlakem, pokud je posílají; obnovuje se každých 5 minut, při otevřených tlačítkách mapy se posune pod ně,
+  vypíná se v nabídce mapy.
 - **Značky se nepřekrývají**: stanice na jednom místě nebo blízko sebe se rozestoupí, tenká šedá čára vede
   ze středu symbolu k tečce, kde stanice opravdu je. **Ocásky** (poslední půlhodina, i vaše vlastní z GPS),
   APRS **objekty** jako samostatná místa, nesmyslné skoky se ignorují. **Měření vzdálenosti** podržením

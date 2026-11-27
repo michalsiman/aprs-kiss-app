@@ -8,7 +8,7 @@ import time
 
 import flet as ft
 import flet_map as fm
-from aprs_kiss_core import mapfilter, repeater
+from aprs_kiss_core import localwx, mapfilter, repeater
 
 from ..legend import COLOR_ME, map_label, show_legend, station_color, visible
 from ..offline_map import LAND, MIN_ZOOM, BaseMap, Region, ScaleBar, gestures
@@ -106,18 +106,30 @@ class MapView(View):
         # The bar folds into one gear button (and stays folded next time) for those who want the whole map.
         self.fold_btn = ft.IconButton(on_click=self._toggle_tools)
         bar = ft.Row([self.fold_btn, *self.tools], tight=True, spacing=0, wrap=True, run_spacing=0)
-        self._show_tools(not conf.map_tools_hidden)
         # under the bar, small: how many stations the map shows now
         self.count_text = ft.Text(size=11, color=ft.Colors.ON_SURFACE_VARIANT)
         self._count_points: list[tuple[float, float]] = []
         self._view_at = (*center, self._zoom)
         self._map_size: tuple[float, float] | None = None
-        overlay = ft.Column([
+        # the weather around us: in the top right corner; under the bar while the bar is open (on a phone
+        # the open bar runs across the whole width)
+        self.wx_text = ft.Text(size=13, weight=ft.FontWeight.BOLD)
+        self.wx_box = ft.Container(
+            ft.Row([ft.Icon(ft.Icons.THERMOSTAT, size=16, color=ft.Colors.PRIMARY), self.wx_text],
+                   tight=True, spacing=4, vertical_alignment=ft.CrossAxisAlignment.CENTER),
+            bgcolor=ft.Colors.with_opacity(0.6, ft.Colors.SURFACE), border_radius=8,
+            padding=ft.Padding.symmetric(horizontal=8, vertical=3), visible=False)
+        self._wx_at = 0.0  # when the weather was last worked out (monotonic)
+        self._wx: dict | None = None
+        self._wx_news: tuple | None = None
+        self.wx_corner = ft.Container(right=8, top=8)
+        self.overlay = ft.Column([
             ft.Container(bar, bgcolor=ft.Colors.with_opacity(0.85, ft.Colors.SURFACE),
                          border_radius=8, padding=ft.Padding.symmetric(horizontal=2)),
             ft.Container(self.count_text, bgcolor=ft.Colors.with_opacity(0.75, ft.Colors.SURFACE),
                          border_radius=6, padding=ft.Padding.symmetric(horizontal=6, vertical=1)),
         ], spacing=3, tight=True, left=8, top=8)
+        self._show_tools(not conf.map_tools_hidden)
         self.controls = MapControls(self.map, self.t, lambda: self.app.page.run_task(self._ask_camera, 0.7))
         self.scale = ScaleBar()
         self.scale.show(center[0], self._zoom)
@@ -142,7 +154,7 @@ class MapView(View):
             shadow=ft.BoxShadow(blur_radius=6, color=ft.Colors.with_opacity(0.35, ft.Colors.BLACK)),
             left=8, bottom=40, visible=False, tooltip=self.t("follow_back_tip"), on_click=self._centre_me,  # above the scale
         )
-        return ft.Stack([self.menu, overlay, self.controls.control, self.scale.control, self.base.credit,
+        return ft.Stack([self.menu, self.overlay, self.wx_corner, self.controls.control, self.scale.control, self.base.credit,
                          self.measure_box, self.back_btn], expand=True, on_size_change=self._sized)
 
     def _sized(self, e) -> None:
@@ -171,6 +183,54 @@ class MapView(View):
             button.visible = shown
         self.fold_btn.icon = ft.Icons.CHEVRON_LEFT if shown else ft.Icons.SETTINGS
         self.fold_btn.tooltip = self.t("map_tools_hide" if shown else "map_tools_show")
+        # the weather: under the open bar, in the corner when the bar is folded
+        under = self.overlay.controls
+        if shown and self.wx_box not in under:
+            self.wx_corner.content = None
+            under.append(self.wx_box)
+        elif not shown and self.wx_corner.content is not self.wx_box:
+            if self.wx_box in under:
+                under.remove(self.wx_box)
+            self.wx_corner.content = self.wx_box
+
+    def _show_weather(self, force: bool = False) -> None:
+        """The average of the weather stations within 20 km, worked out every 5 minutes (sooner while there
+        is nothing to show yet); hidden when switched off or nothing is known."""
+        conf = self.engine.config
+        mono = time.monotonic()
+        heard = self.engine.station.heard
+        # nothing to show yet: again as soon as a station is heard or we learn where we are
+        news = (len(heard), next(reversed(heard), None), self.engine.my_position())
+        if not force and mono - self._wx_at < localwx.REFRESH_SECONDS and (self._wx or news == self._wx_news):
+            return
+        self._wx_at, self._wx_news = mono, news
+        self._wx = wx = localwx.around(heard, self.engine.my_position(), time.time()) \
+            if conf.map_weather else None
+        self.wx_box.visible = wx is not None
+        if wx is None:
+            return
+        comma = self.t.language not in ("en",)
+
+        def num(value: float, digits: int) -> str:
+            text = f"{value:.{digits}f}"
+            return text.replace(".", ",") if comma else text
+
+        parts = [f"{num(wx['temperature'], 1)} °C"]
+        if "humidity" in wx:
+            parts.append(f"{num(wx['humidity'], 0)} %")
+        if "pressure" in wx:
+            parts.append(f"{num(wx['pressure'], 0)} hPa")
+        self.wx_text.value = " · ".join(parts)
+        self.wx_box.tooltip = self.t("wx_near_tip", n=wx["stations"], km=localwx.RADIUS_KM,
+                                     minutes=max(1, round(wx["oldest"] / 60)))
+
+    def _toggle_weather(self, _e) -> None:
+        conf = self.engine.config
+        conf.map_weather = not conf.map_weather
+        self.wx_check.value = conf.map_weather
+        self.app.save_config_soon()
+        self._show_weather(force=True)
+        self.app.page.update()
 
     def _toggle_tools(self, _e) -> None:
         conf = self.engine.config
@@ -302,9 +362,11 @@ class MapView(View):
         self.muted, self.muted_box = check_item(self.t("map_muted"), ft.Icons.FILTER_B_AND_W,
                                                 self.engine.config.map_muted, self._toggle_muted)
         self.muted.disabled = self.app.offline_map()
+        weather, self.wx_check = check_item(self.t("wx_near"), ft.Icons.THERMOSTAT, self.engine.config.map_weather,
+                                            self._toggle_weather)
         legend = ft.PopupMenuItem(self.t("legend"), icon=ft.Icons.HELP_OUTLINE,
                                   on_click=lambda _e: show_legend(self.app))
-        self.source_btn = MapSourceButton(self.app, [self.muted, legend])
+        self.source_btn = MapSourceButton(self.app, [self.muted, weather, legend])
         return self.source_btn.control
 
     def _gesture_end(self, _e=None) -> None:
@@ -433,6 +495,7 @@ class MapView(View):
 
     def refresh(self) -> None:
         self._centre_on_first_fix()
+        self._show_weather()
         if (self.app.current_key == self.key and not self._camera_busy
                 and time.monotonic() - self._camera_asked > CAMERA_SECONDS):
             self._camera_asked = time.monotonic()

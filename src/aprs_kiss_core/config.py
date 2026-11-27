@@ -85,6 +85,7 @@ class Config:
     map_imported: bool = True  # offline: the imported map (when there is one) over the bundled one
     spot_last: str = ""  # Messages › Spot: the last spot (JSON: program, reference, frequency, mode, gateway)
     map_rf_km: int = 0  # the map shows stations heard on the radio this far (0 = no limit)
+    map_weather: bool = True  # the map's corner shows the temperature from the weather stations around us
     map_filters: str = ""  # the map shows only these kinds of stations ("weather,moving,road"); empty = all
     map_tools_hidden: bool = False  # the map's button bar folded into one gear button
     map_offline: bool = False  # the bundled offline map (borders, cities) instead of OpenStreetMap tiles

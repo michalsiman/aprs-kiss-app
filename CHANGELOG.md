@@ -6,6 +6,9 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 
 ## Unreleased
 
+- **Temperature around you on the map** – top right corner: the average of the weather stations within 20 km
+  (reports at most 2 hours old), humidity and pressure too when sent; every 5 minutes; under the map buttons
+  while they are open; *Temperature around me* in the map menu switches it off.
 - **Phone: IS and GPS lamps together exactly as wide as TNC below them.**
 
 ## 1.5.2 beta – 2026-11-27
