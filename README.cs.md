@@ -193,6 +193,8 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
   (seznam portů, na Linuxu se stálými názvy `/dev/serial/by-id`; na telefonu USB port přes OTG kabel),
   **Bluetooth** (spárované TNC nebo rádio, profil sériového portu) a **Bluetooth LE** (KISS přes BLE);
   TX delay pro TNC; po výpadku se připojí sama.
+- **Zvukový modem (Direwolf)** na počítači: TNC není potřeba – rádio na zvukové kartě (AIOC, DigiRig,
+  SignaLink…); aplikace Direwolf nastaví (zvuková karta, PTT přes VOX, CM108 nebo sériový port), spustí a vypne.
 - **Ladění rádia z aplikace**: rádia s vestavěným KISS TNC přes Bluetooth – **VGC VR-N76, BTECH UV-PRO,
   Radioddity GA-5WB** (firmware 0.7.11 a novější) – se naladí v *Nastavení › Připojení k TNC* (*Naladit*,
   a *Vlastní* je vrátí), příkazem KISS SetHardware. Výkon se takhle nastavit nedá.

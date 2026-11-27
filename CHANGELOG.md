@@ -4,6 +4,15 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## Unreleased
+
+- **Sound-card modem (Direwolf)** – a new TNC connection on computers: pick the sound card (an AIOC cable, a
+  DigiRig, a SignaLink…) and the PTT (VOX, the sound card's CM108 GPIO, RTS or DTR of a serial port); the app
+  writes Direwolf's configuration, starts it with the connection and stops it with the app; *Direwolf's log*
+  shows its output. Direwolf must be installed (Linux: `sudo apt install direwolf`); in the Flatpak it is
+  started by hand and reached over KISS TCP/IP.
+- **The phone's menu is very slightly see-through.**
+
 ## 1.7.1 beta – 2026-11-27
 
 - **Mic-E** (Settings › Station): the position goes shorter on air, with speed, course and altitude packed in and

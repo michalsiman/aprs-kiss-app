@@ -197,6 +197,8 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
   port** (the list shows the ports, with stable `/dev/serial/by-id` names on Linux; on a phone the USB port
   through an OTG cable), **Bluetooth** (a paired TNC or radio, serial port profile) and **Bluetooth LE** (KISS
   over BLE); TX delay for the TNC; reconnects by itself.
+- **Sound-card modem (Direwolf)** on a computer: no TNC needed – a radio on a sound card (AIOC, DigiRig,
+  SignaLink…); the app sets Direwolf up (sound card, PTT by VOX, CM108 or a serial port), starts and stops it.
 - **Tune the radio from the app**: radios with a built-in KISS TNC over Bluetooth – **VGC VR-N76, BTECH
   UV-PRO, Radioddity GA-5WB** (firmware 0.7.11+) – take a frequency from *Settings › TNC connection*
   (*Tune*, and *Its own* to go back), through the KISS SetHardware command. The power cannot be set this way.

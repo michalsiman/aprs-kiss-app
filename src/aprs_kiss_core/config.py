@@ -33,7 +33,11 @@ class Config:
     """Everything the user can set. Field names match the Home Assistant integration."""
 
     # TNC
-    connection: str = "tcp"  # a transport registered in connection.py
+    connection: str = "tcp"  # a transport registered in connection.py ("direwolf": the sound-card modem)
+    direwolf_adevice: str = ""  # Direwolf's ADEVICE ("plughw:1,0"); "" = the system's default sound card
+    direwolf_ptt: str = ""  # "" = VOX, "CM108" (the sound card's GPIO), "RTS:/dev/ttyUSB0", "DTR:COM3"
+    direwolf_port: int = 8101  # the KISS port of the Direwolf the app starts
+    direwolf_path: str = ""  # Direwolf's program; "" = found by itself
     host: str = "127.0.0.1"
     port: int = 8001
     device: str = ""
@@ -190,6 +194,9 @@ class Config:
         self.tracker_still_minutes = min(120, max(5, int(self.tracker_still_minutes or 60)))
         if self.road_alert_km not in roadalert.DISTANCES_KM:
             self.road_alert_km = 5
+        self.direwolf_port = int(self.direwolf_port or 8101)
+        if not 0 < self.direwolf_port < 65536:
+            raise ValueError("Port out of range")
         if self.connection == "tcp" and not (0 < int(self.port) < 65536):
             raise ValueError("Invalid TCP port")
         return self  # licence_confirmed stays when APRS-IS is switched off: the sentence is typed once

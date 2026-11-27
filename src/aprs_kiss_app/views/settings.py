@@ -11,7 +11,7 @@ from pathlib import Path
 
 import flet as ft
 
-from aprs_kiss_core import android_bt, android_usb, ble, profiles, roadalert, tilemaps, tracker, units
+from aprs_kiss_core import android_bt, android_usb, ble, direwolf, profiles, roadalert, tilemaps, tracker, units
 from aprs_kiss_core.aprs import MIC_E_STATUS
 from aprs_kiss_core.aprsis import licence_confirmed
 from aprs_kiss_core.bbs import BbsConfigError
@@ -123,7 +123,10 @@ class SettingsView(View):
                                          else [ft.DropdownOption(key="serial", text=t("conn_serial"))])
                                       # KISS over Bluetooth LE: wherever the build has the extension (any platform)
                                       + ([ft.DropdownOption(key="ble", text=t("conn_ble"))]
-                                         if self.app.ble_ok or c.connection == "ble" else []),
+                                         if self.app.ble_ok or c.connection == "ble" else [])
+                                      # a computer: Direwolf as the sound-card modem (there is none for phones)
+                                      + ([] if self.app.mobile else [ft.DropdownOption(key="direwolf",
+                                                                                       text=t("conn_direwolf"))]),
                                       on_select=lambda _e: self._connection_changed())
         self.host = ft.TextField(label=t("host"), value=c.host, width=240)
         self.port = ft.TextField(label=t("port"), value=str(c.port), width=110, input_filter=num)
@@ -133,6 +136,33 @@ class SettingsView(View):
                                     editable=True,
                                     options=[ft.DropdownOption(key=b, text=b) for b in BAUDRATES])
         self.tcp_row = ft.Row([self.host, self.port], wrap=True)
+        # Direwolf: the sound card and the PTT; the app writes direwolf.conf and starts it
+        cards = direwolf.sound_cards()
+        self.dw_card = ft.Dropdown(label=t("dw_card"), value=c.direwolf_adevice, editable=True, width=420,
+                                   options=[ft.DropdownOption(key="", text=t("dw_card_default")),
+                                            *[ft.DropdownOption(key=k, text=f"{name} ({k})") for k, name in cards],
+                                            *([ft.DropdownOption(key=c.direwolf_adevice, text=c.direwolf_adevice)]
+                                              if c.direwolf_adevice and all(k != c.direwolf_adevice for k, _ in cards)
+                                              else [])])
+        ptts = [("", t("dw_ptt_vox")), ("CM108", t("dw_ptt_cm108"))]
+        if not self.app.mobile:
+            for port, desc in serial_ports():
+                ptts += [(f"RTS:{port}", f"RTS – {desc}"), (f"DTR:{port}", f"DTR – {desc}")]
+        if c.direwolf_ptt and all(k != c.direwolf_ptt for k, _ in ptts):
+            ptts.append((c.direwolf_ptt, c.direwolf_ptt))
+        self.dw_ptt = ft.Dropdown(label=t("dw_ptt"), value=c.direwolf_ptt, width=420,
+                                  options=[ft.DropdownOption(key=k, text=v) for k, v in ptts])
+        found = direwolf.find_binary(c.direwolf_path)
+        state = (t("dw_flatpak") if direwolf.in_flatpak() else t("dw_found", path=found) if found
+                 else t("dw_missing"))
+        self.dw_box = ft.Column([
+            self.dw_card, self.dw_ptt,
+            ft.Text(state, size=12, color=ft.Colors.ON_SURFACE_VARIANT if found and not direwolf.in_flatpak()
+                    else ft.Colors.ERROR, selectable=True),
+            ft.Row([ft.OutlinedButton(t("dw_log"), icon=ft.Icons.TERMINAL, on_click=lambda _e: self._dw_log()),
+                    ft.TextButton(t("dw_get"), icon=ft.Icons.OPEN_IN_NEW, url="https://github.com/wb2osz/direwolf")],
+                   wrap=True),
+        ], spacing=10, visible=False)
         self.serial_row = ft.Row([self.device, ft.IconButton(ft.Icons.REFRESH, tooltip=t("refresh_ports"),
                                                              on_click=self._refresh_ports), self.baudrate])
         self.txdelay = ft.TextField(label=t("txdelay"), value=str(c.txdelay_ms or 0), width=320, input_filter=num)
@@ -352,7 +382,7 @@ class SettingsView(View):
         form = ft.Column(
             [
                 self.intro,
-                _section(t("tnc_section"), ft.Icons.CABLE, self.connection, self.tcp_row, self.serial_row, self.txdelay, self.radio_freq_row, expanded=first),
+                _section(t("tnc_section"), ft.Icons.CABLE, self.connection, self.tcp_row, self.serial_row, self.dw_box, self.txdelay, self.radio_freq_row, expanded=first),
                 station := _section(t("station"), ft.Icons.PERSON_PIN_CIRCLE, ft.Row([self.call]), self.profile_rows,
                          ft.Row([self.comment]), self.path,
                          ft.Row([self.lat, self.lon], wrap=True), self.gps_now,
@@ -439,6 +469,15 @@ class SettingsView(View):
 
         show_about(self.app)
 
+    def _dw_log(self) -> None:
+        """The end of Direwolf's output: the sound card it opened, audio levels, what it decoded, errors."""
+        lines = list(direwolf.MODEM.log)[-120:] or [self.t("dw_log_empty")]
+        self.app.show_dialog(ft.AlertDialog(
+            title=ft.Text("Direwolf"),
+            content=ft.Column([ft.Text("\n".join(lines), size=11, font_family="monospace", selectable=True)],
+                              scroll=ft.ScrollMode.AUTO, height=420, width=640),
+            actions=[ft.TextButton(self.t("close"), on_click=lambda _e: self.app.page.pop_dialog())]))
+
     def _port_options(self, current: str = "") -> list[ft.DropdownOption]:
         kind = self.connection.value if hasattr(self, "connection") else self.engine.config.connection
         if kind == "bt":  # the paired Bluetooth devices
@@ -479,7 +518,8 @@ class SettingsView(View):
     def _connection_changed(self, update: bool = True) -> None:
         kind = self.connection.value
         serial = kind in ("serial", "usb", "bt", "ble")
-        self.tcp_row.visible = not serial
+        self.dw_box.visible = kind == "direwolf"
+        self.tcp_row.visible = not serial and kind != "direwolf"
         self.serial_row.visible = serial
         self.baudrate.visible = kind not in ("bt", "ble")  # a Bluetooth link has no line speed
         self.radio_freq_row.visible = kind in ("bt", "ble")  # the radios with a KISS TNC talk Bluetooth
@@ -710,6 +750,7 @@ class SettingsView(View):
             **old.to_dict(),
             "connection": self.connection.value, "host": (self.host.value or "").strip(), "port": self.port.value,
             "device": (self.device.value or "").strip(), "baudrate": self.baudrate.value,
+            "direwolf_adevice": (self.dw_card.value or "").strip(), "direwolf_ptt": self.dw_ptt.value or "",
             "txdelay_ms": self.txdelay.value,
             "callsign": profiles.full_call(call, items[active]["ssid"]),
             "symbol": items[active]["symbol"], "profiles": "" if one else profiles.dump(items),

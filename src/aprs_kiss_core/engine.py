@@ -29,6 +29,7 @@ from pathlib import Path
 from typing import Any
 
 from . import aprs as aprs_build
+from . import direwolf
 from . import thursday
 from .aprsis import AprsIsClient, gate_to_is, passcode, third_party
 from .ax25 import PF, U_DM, Address, Frame, frequency_command
@@ -193,8 +194,13 @@ class Engine:
         self.accept_incoming = (conf.accept_incoming or conf.files_accept) and not bbs
         self.igate_rx = conf.igate_rx and not bbs
         self.igate_tx = conf.igate_tx and not bbs
+        if conf.connection == "direwolf":  # the sound-card modem: started by the connection, stopped with us
+            direwolf.MODEM.configure(direwolf.find_binary(conf.direwolf_path) or "",
+                                     direwolf.make_config(conf.callsign, conf.direwolf_adevice, conf.direwolf_ptt,
+                                                          conf.direwolf_port), self._folder)
         self.connection = KissConnection(
-            TncSettings(kind=conf.connection, host=conf.host, port=int(conf.port), device=conf.device,
+            TncSettings(kind=conf.connection, host=conf.host,
+                        port=int(conf.direwolf_port if conf.connection == "direwolf" else conf.port), device=conf.device,
                         baudrate=int(conf.baudrate), txdelay_ms=conf.txdelay_ms or None),
             self._on_frame,
             self._on_connection_state,
@@ -561,6 +567,7 @@ class Engine:
         if self.aprsis:
             await self.aprsis.stop()
         await self.connection.stop()
+        await direwolf.MODEM.stop()  # after the link: nothing restarts it then; nothing when it does not run
         await self.save()
 
     async def reconfigure(self, config: Config) -> None:

@@ -622,6 +622,8 @@ class App:
         self.drawer = ft.NavigationDrawer(
             controls=drawer_items + [ft.Divider(), self.about_item],
             on_change=self._menu_selected, on_dismiss=self._menu_dismissed,
+            # very slightly see-through: the map shows faintly under the menu
+            bgcolor=ft.Colors.with_opacity(0.94, ft.Colors.SURFACE_CONTAINER_LOW),
         )
         self.page.drawer = self.drawer if self.compact else None
         self.menu_btn = ft.IconButton(ft.Icons.MENU, tooltip=self.t("menu"), on_click=self._open_menu,
