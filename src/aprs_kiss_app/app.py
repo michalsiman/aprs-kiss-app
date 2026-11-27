@@ -14,6 +14,7 @@ import time
 import traceback
 import weakref
 from collections.abc import Awaitable
+from datetime import date
 from typing import Any
 
 import flet as ft
@@ -1128,11 +1129,12 @@ class App:
     _drive_pending = False
     _notify_asked = False
     _drive: drivedetect.DriveDetector | None = None
+    _drive_asked: float | None = None  # the last offer: at most once an hour
 
     def _drive_check(self) -> None:
         engine, conf = self.engine, self.engine.config
         if not (self.mobile and conf.offer_tracker and conf.gps_source == "phone") or conf.tracker_on \
-                or engine.exclusive_mode or not conf.configured:
+                or engine.exclusive_mode or not conf.configured or conf.offer_tracker_skip_day == date.today().isoformat():
             self._drive = None
             return
         if self._foreground and conf.run_background and not self._notify_asked:
@@ -1142,9 +1144,10 @@ class App:
         if not fix:
             return
         if self._drive is None:
-            self._drive = drivedetect.DriveDetector()
+            self._drive = drivedetect.DriveDetector(self._drive_asked)
         if not self._drive.update(time.time(), fix.latitude, fix.longitude, fix.speed_kmh):
             return
+        self._drive_asked = self._drive.asked_at
         if self._foreground:
             self._offer_tracker()
         else:  # in the background: a notification; a tap brings the app back and it asks
@@ -1160,11 +1163,20 @@ class App:
             if yes and not self.engine.config.tracker_on:
                 self.position_btn._toggle(None)  # noqa: SLF001 - the same as the menu's "start"
 
+        def not_today(_e) -> None:
+            self.page.pop_dialog()
+            self.engine.config.offer_tracker_skip_day = date.today().isoformat()
+            self.save_config_soon()
+
         self.sounds.play("meet")
         self.show_dialog(ft.AlertDialog(
             title=ft.Text(self.t("drive_title")),
-            content=ft.Text(self.t("drive_ask")),
-            actions=[ft.TextButton(self.t("drive_no"), on_click=lambda _e: answer(False)),
+            content=ft.Column([ft.Text(self.t("drive_ask")),
+                               ft.Text(self.t("drive_off_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT)],
+                              tight=True, spacing=10),
+            actions_alignment=ft.MainAxisAlignment.END, actions_overflow_button_spacing=4,
+            actions=[ft.TextButton(self.t("drive_today"), on_click=not_today),
+                     ft.TextButton(self.t("drive_no"), on_click=lambda _e: answer(False)),
                      ft.FilledButton(self.t("drive_yes"), icon=ft.Icons.PLAY_ARROW, on_click=lambda _e: answer(True))],
         ))
 

@@ -56,6 +56,7 @@ class Config:
     tracker_profile: str = "car"  # smart: walk, bike or car
     tracker_still_minutes: int = 60  # smart: standing still, once in this many minutes
     offer_tracker: bool = True  # phone: you seem to be driving with the tracker off - offer to switch it on
+    offer_tracker_skip_day: str = ""  # …but not on this day ("2026-11-27"): "Not today" was tapped
     road_alerts: bool = False  # while the tracker runs: warn about road incidents ahead…
     meet_alerts: bool = False  # …and about other moving stations ahead…
     road_alert_km: int = 5  # …this far

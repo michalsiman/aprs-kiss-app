@@ -10,6 +10,8 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
   scrolling down through the whole history.
 - **The bars at the bottom** (sent, TNC not connected, new message, hazard on the road) have the same thin grey
   frame and shadow as the menus and dialogs.
+- **"You seem to be driving"** comes at most once an hour (stops on the way do not bring it back sooner), and has a
+  new **Not today** button. It also says where to switch the offer off for good (Settings › Tracker).
 
 ## 1.5.0 – 2026-11-26
 
