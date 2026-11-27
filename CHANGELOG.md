@@ -4,7 +4,7 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
-## Unreleased
+## 1.8.1 beta – 2026-11-27
 
 - **Raspberry Pi as a station server with a display**: `aprs-kiss-server` runs one engine for as long as the
   computer runs (the TNC, APRS-IS, iGate, digipeater and beacon need no window; Transmit is remembered over a
@@ -15,7 +15,9 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
   switch transmitting. `packaging/raspberry/install.sh` sets it all up on Raspberry Pi OS: the app, a systemd
   service, a kiosk browser that shows **the whole app on the Pi's touch screen** (or `--dashboard`),
   `--touch-5inch` for the touch of the cheap 5" HDMI displays (XPT2046), a keyboard on the screen. Each
-  release now also carries a Python wheel.
+  release now also carries a Python wheel. A step-by-step guide: docs/RASPBERRY.md and
+  https://michalsiman.github.io/aprs-kiss-app/raspberry.html – one command:
+  `curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh | bash`.
 - **Low screens get the phone's layout** (the ☰ menu): below 640 px of height too, not only when narrow – a
   Raspberry Pi's 5" or 7" display (800×480, 1024×600).
 - **The menu hidden behind ☰ on a computer too** (Settings › App, when wanted): it slides in from the side as

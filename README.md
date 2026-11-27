@@ -454,22 +454,21 @@ the last frames, stations, messages or bulletins.
 <td width="50%"><img src="assets/display.png" alt="The dashboard on a 5-inch screen (800×480)"><br><sub>The dashboard on a 5" screen (800×480)</sub></td>
 </tr></table>
 
-On Raspberry Pi OS (Bookworm or newer), as the normal user:
+**One command to install** – a step-by-step guide (the card, the first start, the screen, the settings,
+troubleshooting) is in **[docs/RASPBERRY.md](docs/RASPBERRY.md)** and on the
+**[website](https://michalsiman.github.io/aprs-kiss-app/raspberry.html)**. In short, on Raspberry Pi OS:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/michalsiman/aprs-kiss-app/main/packaging/raspberry/install.sh | bash
-/opt/aprs-kiss/venv/bin/aprs-kiss-server --set-password && sudo systemctl restart aprs-kiss
+curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh | bash              # a screen or a monitor
+curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh | bash -s -- --touch-5inch   # 5" HDMI with touch
+curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh | bash -s -- --no-display    # no screen
 sudo reboot
 ```
 
-The script installs the app into `/opt/aprs-kiss`, a systemd service `aprs-kiss` (starts at boot, restarts
-by itself) and a kiosk browser that shows the app on the Pi's screen once the desktop starts (`--dashboard` only the dashboard, `--no-display` nothing – a Pi without a
-screen; `--touch-5inch` the touch of the cheap 5" HDMI displays like the Waveshare 5inch HDMI LCD with an
-XPT2046; `--port` picks another port). The **web
-password** is asked by every browser but the Pi's own screen – set one, the web can transmit. A TNC on USB
-(`/dev/ttyACM0`, `/dev/ttyUSB0`), over TCP/IP, Direwolf with a sound card (AIOC, DigiRig) all work as on a
-computer. Run the script again to update; `journalctl -u aprs-kiss -f` shows the log. On any other Linux
-computer: `pipx install "aprs-kiss[server]"` from the release's `.whl` and `aprs-kiss-server`.
+Then open `http://aprs.local:8080` on a phone and set up the TNC and the station. The script installs the app
+into `/opt/aprs-kiss`, a systemd service `aprs-kiss`, a kiosk browser for the screen, and asks for the web
+password (every browser but the Pi's own screen needs it). Run it again to update. On any other Linux:
+`pipx install "aprs-kiss[server]"` from the release's `.whl` and `aprs-kiss-server`.
 
 ## How it is built
 

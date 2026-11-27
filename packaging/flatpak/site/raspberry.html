@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APRS &amp; Packet – Raspberry Pi</title>
+<meta name="description" content="APRS &amp; Packet on a Raspberry Pi: a station with a touch screen, set up from a phone – installed with one command.">
+<link rel="icon" href="icon.png">
+<style>
+  :root {
+    --bg: #f6f7fb; --fg: #1b1d24; --muted: #5d6270; --card: #ffffff; --line: #e2e5ee; --code: #f0f2f8;
+    --accent: #3d46b2; --accent-fg: #ffffff; --soft: #eceefa; --shadow: 0 1px 2px rgba(20,24,60,.06), 0 6px 20px rgba(20,24,60,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #111318; --fg: #e6e7ee; --muted: #9ea3b3; --card: #1a1d25; --line: #2a2e3a; --code: #0d0f14;
+      --accent: #b9c0ff; --accent-fg: #14183f; --soft: #222743; --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  a { color: var(--accent); }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 16px; }
+  nav { display: flex; align-items: center; gap: 12px; padding: 14px 0; }
+  nav .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--fg); text-decoration: none; }
+  .spacer { flex: 1; }
+  .lang { border: 1px solid var(--line); background: var(--card); color: var(--fg); border-radius: 999px; padding: 4px 12px; cursor: pointer; font: inherit; font-size: 14px; }
+  h1 { font-size: 34px; line-height: 1.2; margin: 24px 0 8px; }
+  .lead { color: var(--muted); font-size: 18px; margin: 0 0 24px; }
+  .shots { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 8px 0 32px; }
+  .shots img { width: 100%; border-radius: 12px; border: 1px solid var(--line); box-shadow: var(--shadow); display: block; }
+  .shots figure { margin: 0; }
+  .shots figcaption { color: var(--muted); font-size: 14px; margin-top: 6px; }
+  .step { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 4px 22px 18px; margin: 0 0 18px; box-shadow: var(--shadow); }
+  .step h2 { display: flex; align-items: center; gap: 12px; font-size: 21px; margin: 18px 0 8px; }
+  .num { flex: none; width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: var(--accent-fg); display: grid; place-items: center; font-size: 16px; }
+  .step ul, .step ol { padding-left: 22px; margin: 8px 0; }
+  .cmd { display: flex; align-items: stretch; gap: 0; margin: 10px 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--code); }
+  .cmd code { flex: 1; padding: 10px 12px; font: 14px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace; overflow-x: auto; white-space: nowrap; }
+  .cmd button { flex: none; border: 0; border-left: 1px solid var(--line); background: var(--soft); color: var(--fg); padding: 0 14px; cursor: pointer; font: inherit; font-size: 14px; }
+  .label { font-weight: 600; margin-top: 14px; }
+  .note { color: var(--muted); font-size: 15px; }
+  code.inline { background: var(--code); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; font-size: 14px; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 16px; margin: 0 0 10px; }
+  summary { cursor: pointer; font-weight: 600; }
+  footer { border-top: 1px solid var(--line); padding: 24px 0 40px; margin-top: 32px; color: var(--muted); font-size: 14px; }
+  footer a { color: var(--muted); }
+  [data-lang] { display: none; }
+  html[lang="cs"] [data-lang="cs"], html[lang="en"] [data-lang="en"] { display: block; }
+  @media (max-width: 640px) { .shots { grid-template-columns: 1fr; } h1 { font-size: 28px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a class="brand" href="./"><img src="icon.png" width="32" height="32" alt="">APRS &amp; Packet</a>
+    <span class="spacer"></span>
+    <a href="https://github.com/michalsiman/aprs-kiss-app">GitHub</a>
+    <button class="lang" id="lang" type="button">Česky</button>
+  </nav>
+
+  <!-- ─────────────────────────── Čeština ─────────────────────────── -->
+  <div data-lang="cs">
+    <h1>APRS &amp; Packet na Raspberry Pi</h1>
+    <p class="lead">Raspberry Pi vedle rádia jako samostatná stanice – iGate, digipeater, maják, zprávy, packet. Naběhne samo po
+      zapnutí, na dotykovém displeji ukazuje celou aplikaci a nastavit ho můžeš i z telefonu. Instalace je jeden příkaz,
+      celé to zabere asi půl hodiny, většinou čekáním.</p>
+    <div class="shots">
+      <figure><img src="https://raw.githubusercontent.com/michalsiman/aprs-kiss-app/main/assets/cs/pi-app.png" alt="Celá aplikace na 5palcovém displeji"><figcaption>Celá aplikace na 5" displeji (800×480)</figcaption></figure>
+      <figure><img src="https://raw.githubusercontent.com/michalsiman/aprs-kiss-app/main/assets/cs/display.png" alt="Přehled stanice"><figcaption>Nebo jen přehled (volba <code class="inline">--dashboard</code>)</figcaption></figure>
+    </div>
+
+    <div class="step">
+      <h2><span class="num">0</span>Co potřebuješ</h2>
+      <ul>
+        <li><b>Raspberry Pi 3B, 3B+, 4 nebo 5</b> a jeho zdroj (Pi 4: USB-C 5 V / 3 A, Pi 3: micro-USB 5 V / 2,5 A)</li>
+        <li><b>microSD kartu</b> 16 GB nebo větší</li>
+        <li><b>TNC</b>: KISS TNC na USB (rádio s KISS přes USB, NinoTNC, Mobilinkd…), síťové KISS TNC, nebo zvukovou kartu / kabel AIOC či DigiRig s Direwolfem</li>
+        <li><b>displej</b> (nepovinně): 5" HDMI dotykový 800×480, oficiální 7" displej nebo jakýkoli monitor – bez displeje se ovládá jen přes web</li>
+      </ul>
+    </div>
+
+    <div class="step">
+      <h2><span class="num">1</span>Připrav kartu</h2>
+      <ol>
+        <li>Do počítače nainstaluj <a href="https://www.raspberrypi.com/software/">Raspberry Pi Imager</a>.</li>
+        <li>Vyber <b>zařízení</b> (své Pi), <b>systém</b> – s displejem <b>Raspberry Pi OS (64-bit)</b>, bez displeje <b>Raspberry Pi OS Lite (64-bit)</b> – a <b>kartu</b>.</li>
+        <li>Klikni na <i>Další</i> a pak <i>Upravit nastavení</i>:
+          <ul>
+            <li><b>Hostname</b>: <code class="inline">aprs</code> (Pi pak najdeš jako <code class="inline">aprs.local</code>)</li>
+            <li><b>uživatel a heslo</b>, třeba <code class="inline">pi</code> a vlastní heslo</li>
+            <li><b>Wi-Fi</b>: síť, heslo a země CZ (s kabelem do sítě netřeba)</li>
+            <li>na kartě <b>Služby</b> zapni <b>SSH</b></li>
+          </ul></li>
+        <li>Ulož, potvrď zápis a počkej, až Imager skončí.</li>
+      </ol>
+    </div>
+
+    <div class="step">
+      <h2><span class="num">2</span>Zapoj a zapni</h2>
+      <p>Kartu dej do Pi, připoj displej (5" HDMI displej se nasadí na piny GPIO a propojí spojkou HDMI z balení), TNC do USB
+        a nakonec zdroj. První start trvá pár minut.</p>
+    </div>
+
+    <div class="step">
+      <h2><span class="num">3</span>Připoj se k Pi</h2>
+      <p>Z počítače ve stejné síti otevři terminál (Windows: <i>PowerShell</i>, macOS a Linux: <i>Terminál</i>):</p>
+      <div class="cmd"><code>ssh pi@aprs.local</code><button type="button">Kopírovat</button></div>
+      <p class="note"><code class="inline">pi</code> nahraď svým uživatelem. Na otázku o klíči odpověz <code class="inline">yes</code> a zadej heslo.
+        S klávesnicí na Pi můžeš místo toho otevřít Terminál přímo na něm.</p>
+    </div>
+
+    <div class="step">
+      <h2><span class="num">4</span>Nainstaluj – jeden příkaz</h2>
+      <p>Vyber řádek podle displeje a vlož ho do terminálu:</p>
+      <div class="label">5" HDMI s dotykem na stylus (Waveshare a klony, 800×480)</div>
+      <div class="cmd"><code>curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh | bash -s -- --touch-5inch</code><button type="button">Kopírovat</button></div>
+      <div class="label">Oficiální 7", jiný dotykový displej nebo monitor</div>
+      <div class="cmd"><code>curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh | bash</code><button type="button">Kopírovat</button></div>
+      <div class="label">Bez displeje (Raspberry Pi OS Lite)</div>
+      <div class="cmd"><code>curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh | bash -s -- --no-display</code><button type="button">Kopírovat</button></div>
+      <p>Na konci se skript zeptá na <b>heslo k webu</b> – nastav ho, přes web se dá vysílat. Na Pi 4 to trvá kolem 5 minut, na Pi 3 až 15. Pak restartuj:</p>
+      <div class="cmd"><code>sudo reboot</code><button type="button">Kopírovat</button></div>
+    </div>
+
+    <div class="step">
+      <h2><span class="num">5</span>Nastav stanici</h2>
+      <p>Na telefonu nebo počítači otevři <a href="http://aprs.local:8080"><b>http://aprs.local:8080</b></a>, přihlas se heslem a v <b>Nastavení</b> vyplň:</p>
+      <ul>
+        <li><b>Připojení k TNC</b>: TNC na USB = <i>Sériový port (USB)</i> <code class="inline">/dev/ttyACM0</code> nebo <code class="inline">/dev/ttyUSB0</code>; síťové TNC = <i>KISS přes TCP (síť)</i>; zvuková karta = <i>Zvukový modem (Direwolf)</i></li>
+        <li><b>Stanice</b>: značka se SSID, poloha, komentář, maják</li>
+        <li>podle potřeby <b>APRS-IS</b> (iGate) a <b>Digipeater</b></li>
+      </ul>
+      <p>Ulož a zapni <b>TX</b> v horní liště. Totéž jde přímo na dotykovém displeji (menu ☰ vlevo nahoře). Hotovo – Pi teď naběhne samo po každém zapnutí.</p>
+    </div>
+
+    <h2>Aktualizace</h2>
+    <p>Spusť znovu příkaz z kroku 4. Nastavení, zprávy i heslo zůstanou.</p>
+
+    <h2>Když něco nejde</h2>
+    <details><summary>Displej je černý nebo ukazuje jen plochu</summary>
+      <p>Po startu počkej 1–2 minuty. Stav služby: <code class="inline">systemctl status aprs-kiss</code>, výpis: <code class="inline">journalctl -u aprs-kiss -f</code>.</p></details>
+    <details><summary>Dotyk nereaguje nebo jde jinam, než ťukám</summary>
+      <p>Instaloval jsi s <code class="inline">--touch-5inch</code>? V <code class="inline">/boot/firmware/config.txt</code> na řádku <code class="inline">dtoverlay=ads7846,…</code>
+        změň <code class="inline">swapxy=0</code> na <code class="inline">swapxy=1</code> (prohozené osy), nebo prohoď hodnoty <code class="inline">xmin</code> a <code class="inline">xmax</code> (převrácená osa), a restartuj.</p></details>
+    <details><summary>Adresa aprs.local nejde otevřít</summary>
+      <p>Použij IP adresu Pi – ukáže ji konec instalace, router, nebo příkaz <code class="inline">hostname -I</code>.</p></details>
+    <details><summary>TNC na USB není vidět</summary>
+      <p><code class="inline">ls /dev/ttyACM* /dev/ttyUSB*</code> ukáže, jestli ho Pi zná. Přístup k portu dává skupina <code class="inline">dialout</code> – skript tě do ní přidá, platí po restartu.</p></details>
+    <details><summary>Zapomenuté heslo k webu</summary>
+      <div class="cmd"><code>/opt/aprs-kiss/venv/bin/aprs-kiss-server --set-password &amp;&amp; sudo systemctl restart aprs-kiss</code><button type="button">Kopírovat</button></div></details>
+    <details><summary>Odinstalace</summary>
+      <div class="cmd"><code>sudo systemctl disable --now aprs-kiss; sudo rm -rf /opt/aprs-kiss /etc/systemd/system/aprs-kiss.service; rm -f ~/.config/autostart/aprs-kiss-display.desktop; sed -i '/aprs-kiss/d' ~/.config/labwc/autostart</code><button type="button">Kopírovat</button></div>
+      <p class="note">Nastavení a zprávy zůstanou v <code class="inline">~/.local/share/aprs-kiss</code>.</p></details>
+  </div>
+
+  <!-- ─────────────────────────── English ─────────────────────────── -->
+  <div data-lang="en">
+    <h1>APRS &amp; Packet on a Raspberry Pi</h1>
+    <p class="lead">A Raspberry Pi next to the radio as a station of its own – iGate, digipeater, beacon, messages, packet. It starts
+      when powered, shows the whole app on a touch screen and can be set up from a phone. One command installs it; it takes
+      about half an hour, mostly waiting.</p>
+    <div class="shots">
+      <figure><img src="https://raw.githubusercontent.com/michalsiman/aprs-kiss-app/main/assets/pi-app.png" alt="The whole app on a 5-inch screen"><figcaption>The whole app on a 5" screen (800×480)</figcaption></figure>
+      <figure><img src="https://raw.githubusercontent.com/michalsiman/aprs-kiss-app/main/assets/display.png" alt="The station dashboard"><figcaption>Or only a dashboard (<code class="inline">--dashboard</code>)</figcaption></figure>
+    </div>
+
+    <div class="step">
+      <h2><span class="num">0</span>What you need</h2>
+      <ul>
+        <li><b>A Raspberry Pi 3B, 3B+, 4 or 5</b> and its power supply (Pi 4: USB-C 5 V / 3 A, Pi 3: micro-USB 5 V / 2.5 A)</li>
+        <li><b>A microSD card</b>, 16 GB or more</li>
+        <li><b>A TNC</b>: a KISS TNC on USB (a radio with KISS over USB, NinoTNC, Mobilinkd…), a network KISS TNC, or a sound card / an AIOC or DigiRig cable with Direwolf</li>
+        <li><b>A screen</b> (optional): a 5" HDMI touch display (800×480), the official 7" display or any monitor – without one, only the web</li>
+      </ul>
+    </div>
+
+    <div class="step">
+      <h2><span class="num">1</span>Prepare the card</h2>
+      <ol>
+        <li>Install <a href="https://www.raspberrypi.com/software/">Raspberry Pi Imager</a> on your computer.</li>
+        <li>Choose the <b>device</b> (your Pi), the <b>system</b> – with a screen <b>Raspberry Pi OS (64-bit)</b>, without one <b>Raspberry Pi OS Lite (64-bit)</b> – and the <b>card</b>.</li>
+        <li>Click <i>Next</i>, then <i>Edit settings</i>:
+          <ul>
+            <li><b>Hostname</b>: <code class="inline">aprs</code> (the Pi is then <code class="inline">aprs.local</code>)</li>
+            <li><b>a username and password</b>, e.g. <code class="inline">pi</code> and a password of your own</li>
+            <li><b>Wi-Fi</b>: the network, its password and your country (not needed with a cable)</li>
+            <li>on the <b>Services</b> tab enable <b>SSH</b></li>
+          </ul></li>
+        <li>Save, confirm writing and wait for Imager to finish.</li>
+      </ol>
+    </div>
+
+    <div class="step">
+      <h2><span class="num">2</span>Connect and power on</h2>
+      <p>Put the card in the Pi, connect the screen (a 5" HDMI display sits on the GPIO pins and takes the HDMI connector from its
+        box), the TNC to USB and the power last. The first start takes a few minutes.</p>
+    </div>
+
+    <div class="step">
+      <h2><span class="num">3</span>Log in to the Pi</h2>
+      <p>From a computer in the same network open a terminal (Windows: <i>PowerShell</i>, macOS and Linux: <i>Terminal</i>):</p>
+      <div class="cmd"><code>ssh pi@aprs.local</code><button type="button">Copy</button></div>
+      <p class="note"><code class="inline">pi</code> is your username. Answer <code class="inline">yes</code> about the key and type the password.
+        With a keyboard on the Pi you can open its Terminal instead.</p>
+    </div>
+
+    <div class="step">
+      <h2><span class="num">4</span>Install – one command</h2>
+      <p>Pick the line for your screen and paste it in the terminal:</p>
+      <div class="label">5" HDMI with a stylus touch (Waveshare and clones, 800×480)</div>
+      <div class="cmd"><code>curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh | bash -s -- --touch-5inch</code><button type="button">Copy</button></div>
+      <div class="label">The official 7", another touch screen or a monitor</div>
+      <div class="cmd"><code>curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh | bash</code><button type="button">Copy</button></div>
+      <div class="label">No screen (Raspberry Pi OS Lite)</div>
+      <div class="cmd"><code>curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh | bash -s -- --no-display</code><button type="button">Copy</button></div>
+      <p>At the end the script asks for a <b>web password</b> – set one, the web can transmit. About 5 minutes on a Pi 4, up to 15 on a Pi 3. Then restart:</p>
+      <div class="cmd"><code>sudo reboot</code><button type="button">Copy</button></div>
+    </div>
+
+    <div class="step">
+      <h2><span class="num">5</span>Set up the station</h2>
+      <p>On a phone or a computer open <a href="http://aprs.local:8080"><b>http://aprs.local:8080</b></a>, log in and fill in <b>Settings</b>:</p>
+      <ul>
+        <li><b>TNC connection</b>: a TNC on USB = <i>Serial port (USB)</i> <code class="inline">/dev/ttyACM0</code> or <code class="inline">/dev/ttyUSB0</code>; a network TNC = <i>KISS over TCP (network)</i>; a sound card = <i>Sound-card modem (Direwolf)</i></li>
+        <li><b>Station</b>: the callsign with its SSID, position, comment, beacon</li>
+        <li><b>APRS-IS</b> (iGate) and <b>Digipeater</b> as you need</li>
+      </ul>
+      <p>Save and switch <b>TX</b> on in the top bar. The same works on the touch screen (the ☰ menu at the top left). Done – the Pi now starts by itself.</p>
+    </div>
+
+    <h2>Updating</h2>
+    <p>Run the command from step 4 again. Settings, messages and the password stay.</p>
+
+    <h2>When something does not work</h2>
+    <details><summary>The screen stays black or shows only the desktop</summary>
+      <p>Give it 1–2 minutes after starting. The service: <code class="inline">systemctl status aprs-kiss</code>, its log: <code class="inline">journalctl -u aprs-kiss -f</code>.</p></details>
+    <details><summary>Touch does nothing or lands elsewhere</summary>
+      <p>Installed with <code class="inline">--touch-5inch</code>? In <code class="inline">/boot/firmware/config.txt</code>, on the line <code class="inline">dtoverlay=ads7846,…</code>,
+        change <code class="inline">swapxy=0</code> to <code class="inline">swapxy=1</code> (axes swapped) or swap the <code class="inline">xmin</code> and <code class="inline">xmax</code> values (an axis reversed), and restart.</p></details>
+    <details><summary>aprs.local does not open</summary>
+      <p>Use the Pi's IP address – the install prints it, so does your router or <code class="inline">hostname -I</code>.</p></details>
+    <details><summary>The USB TNC is not there</summary>
+      <p><code class="inline">ls /dev/ttyACM* /dev/ttyUSB*</code> shows whether the Pi sees it. The port needs the <code class="inline">dialout</code> group – the script adds you, it applies after a restart.</p></details>
+    <details><summary>Forgotten web password</summary>
+      <div class="cmd"><code>/opt/aprs-kiss/venv/bin/aprs-kiss-server --set-password &amp;&amp; sudo systemctl restart aprs-kiss</code><button type="button">Copy</button></div></details>
+    <details><summary>Uninstalling</summary>
+      <div class="cmd"><code>sudo systemctl disable --now aprs-kiss; sudo rm -rf /opt/aprs-kiss /etc/systemd/system/aprs-kiss.service; rm -f ~/.config/autostart/aprs-kiss-display.desktop; sed -i '/aprs-kiss/d' ~/.config/labwc/autostart</code><button type="button">Copy</button></div>
+      <p class="note">Settings and messages stay in <code class="inline">~/.local/share/aprs-kiss</code>.</p></details>
+  </div>
+
+  <footer>
+    <a href="./">APRS &amp; Packet</a> ·
+    <a href="https://github.com/michalsiman/aprs-kiss-app/blob/main/docs/RASPBERRY.md">GitHub</a> ·
+    <a href="pi.sh">pi.sh</a> ·
+    <a href="https://github.com/michalsiman/aprs-kiss-app/releases">Releases</a>
+  </footer>
+</div>
+<script>
+let lang = (localStorage.getItem("lang") || (navigator.language || "en").slice(0, 2)) === "cs" ? "cs" : "en";
+function render() {
+  document.documentElement.lang = lang;
+  document.getElementById("lang").textContent = lang === "cs" ? "English" : "Česky";
+}
+document.getElementById("lang").addEventListener("click", () => {
+  lang = lang === "cs" ? "en" : "cs";
+  try { localStorage.setItem("lang", lang); } catch (e) {}
+  render();
+});
+for (const btn of document.querySelectorAll(".cmd button")) {
+  btn.addEventListener("click", async () => {
+    const text = btn.previousElementSibling.textContent;
+    try { await navigator.clipboard.writeText(text); } catch (e) {
+      const r = document.createRange(); r.selectNodeContents(btn.previousElementSibling);
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    }
+    const was = btn.textContent;
+    btn.textContent = lang === "cs" ? "Zkopírováno ✓" : "Copied ✓";
+    setTimeout(() => { btn.textContent = was; }, 1600);
+  });
+}
+render();
+</script>
+</body>
+</html>

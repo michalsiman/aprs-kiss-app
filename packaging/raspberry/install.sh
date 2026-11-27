@@ -11,7 +11,12 @@
 #                  800×480, a resistive XPT2046 touch on the GPIO pins, a stylus)
 #   --port N       the web port (default 8080)
 #   --version vX.Y.Z   a given release instead of the newest
+#   --beta         the newest beta too (otherwise the newest stable release)
 set -euo pipefail
+
+# all in a function: with `curl … | bash` the whole script is read before anything runs (apt or pip reading
+# the standard input cannot eat the rest of it)
+main() {
 
 REPO=michalsiman/aprs-kiss-app
 PREFIX=/opt/aprs-kiss
@@ -19,12 +24,14 @@ PORT=8080
 DISPLAY_ON=1
 PAGE=""
 TOUCH5=0
+BETA=0
 TAG=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --no-display) DISPLAY_ON=0 ;;
     --dashboard) PAGE="display" ;;
     --touch-5inch) TOUCH5=1 ;;
+    --beta) BETA=1 ;;
     --port) PORT="$2"; shift ;;
     --version) TAG="$2"; shift ;;
     *) echo "Unknown option: $1" >&2; exit 2 ;;
@@ -37,7 +44,7 @@ say() { printf '\n\033[1;34m==> %s\033[0m\n' "$*"; }
 
 say "System packages"
 sudo apt-get update -qq
-PKGS="python3-venv python3-pip curl"
+PKGS="python3-venv python3-pip python3 curl"
 if [ "$DISPLAY_ON" = 1 ]; then
   if apt-cache show chromium >/dev/null 2>&1; then PKGS="$PKGS chromium"; else PKGS="$PKGS chromium-browser"; fi
   # a keyboard on the screen when a text field is tapped (Wayland: labwc, wayfire)
@@ -52,17 +59,27 @@ sudo mkdir -p "$PREFIX"
 sudo chown "$USER_NAME": "$PREFIX"
 [ -x "$PREFIX/venv/bin/python" ] || python3 -m venv "$PREFIX/venv"
 "$PREFIX/venv/bin/pip" install -q --upgrade pip
-API="https://api.github.com/repos/$REPO/releases/${TAG:+tags/$TAG}"
-[ -n "$TAG" ] || API="$API/latest"
-WHEEL=$(curl -fsSL "$API" | grep -o '"browser_download_url": *"[^"]*\.whl"' | head -n1 | cut -d'"' -f4 || true)
-if [ -n "$WHEEL" ]; then
-  SRC="aprs-kiss[server] @ $WHEEL"
-else  # an older release without the wheel: the source of the tag (or of main)
-  REF=${TAG:-$(curl -fsSL "$API" | grep -o '"tag_name": *"[^"]*"' | cut -d'"' -f4)}
-  SRC="aprs-kiss[server] @ https://github.com/$REPO/archive/refs/tags/${REF}.tar.gz"
-fi
+# the newest stable release with a wheel (Python package); a beta when no stable one has it yet, or with --beta
+WHEEL=$(curl -fsSL "https://api.github.com/repos/$REPO/releases?per_page=30" | python3 -c '
+import json, sys
+tag, beta = sys.argv[1], sys.argv[2] == "1"
+releases = [r for r in json.load(sys.stdin) if not r.get("draft")]
+def wheel(r):
+    return next((a["browser_download_url"] for a in r.get("assets", []) if a["name"].endswith(".whl")), "")
+pick = [r for r in releases if r["tag_name"] == tag] if tag else (
+    [r for r in releases if wheel(r) and (beta or not r.get("prerelease"))] or [r for r in releases if wheel(r)])
+print(wheel(pick[0]) if pick else "")
+' "$TAG" "$BETA")
+[ -n "$WHEEL" ] || { echo "No release with the Raspberry Pi package (.whl) found${TAG:+ for $TAG}." >&2; exit 1; }
+SRC="aprs-kiss[server] @ $WHEEL"
 echo "Installing $SRC"
 "$PREFIX/venv/bin/pip" install -q --upgrade "$SRC"
+
+HAS_PW=$("$PREFIX/venv/bin/python" -c "from aprs_kiss_app.server import load_password; from aprs_kiss_core.config import data_dir; print(1 if load_password(data_dir()) else 0)")
+if [ "$HAS_PW" = 0 ] && [ -r /dev/tty ]; then
+  say "A password for the web (the web can transmit: set one; Enter = none)"
+  "$PREFIX/venv/bin/aprs-kiss-server" --set-password </dev/tty || true
+fi
 
 say "The service (runs at boot, restarts by itself)"
 sudo tee /etc/systemd/system/aprs-kiss.service >/dev/null <<UNIT
@@ -77,6 +94,7 @@ ExecStart=$PREFIX/venv/bin/aprs-kiss-server --port $PORT
 Restart=always
 RestartSec=5
 Environment=PYTHONUNBUFFERED=1
+Environment=APRS_KISS_WEB_URL=http://$(hostname).local:$PORT
 
 [Install]
 WantedBy=multi-user.target
@@ -141,14 +159,17 @@ fi
 ADDR=$(hostname -I 2>/dev/null | awk '{print $1}')
 say "Done"
 cat <<END
-The station server runs: http://${ADDR:-<the Pi's address>}:$PORT  (set everything there, from a phone or a computer)
+The station server runs: http://$(hostname).local:$PORT  or  http://${ADDR:-<the Pi's address>}:$PORT
+(open it on a phone or a computer in the same network and set everything there)
 Dashboard: http://${ADDR:-localhost}:$PORT/display
 $( [ "$DISPLAY_ON" = 1 ] && echo "The Pi's screen shows the $( [ -n "$PAGE" ] && echo dashboard || echo app ) after a restart: sudo reboot")
 
-Set a password for the web (strongly advised – the web can transmit):
-  $PREFIX/venv/bin/aprs-kiss-server --set-password && sudo systemctl restart aprs-kiss
+Change the web password: $PREFIX/venv/bin/aprs-kiss-server --set-password && sudo systemctl restart aprs-kiss
 
 The log:      journalctl -u aprs-kiss -f
 Update:       run this script again
 Stop / start: sudo systemctl stop aprs-kiss / sudo systemctl start aprs-kiss
 END
+}
+
+main "$@"

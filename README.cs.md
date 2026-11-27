@@ -448,22 +448,21 @@ zvolí přehled (`--dashboard`): kontrolky, počítadla a poslední rámce, stan
 <td width="50%"><img src="assets/cs/display.png" alt="Přehled na 5palcovém displeji (800×480)"><br><sub>Přehled na 5" displeji (800×480)</sub></td>
 </tr></table>
 
-Na Raspberry Pi OS (Bookworm nebo novějším), pod běžným uživatelem:
+**Instalace jedním příkazem** – podrobný návod krok za krokem (karta, první start, displej, nastavení,
+řešení problémů) je v **[docs/RASPBERRY.cs.md](docs/RASPBERRY.cs.md)** a na
+**[webu](https://michalsiman.github.io/aprs-kiss-app/raspberry.html)**. Ve zkratce, na Raspberry Pi OS:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/michalsiman/aprs-kiss-app/main/packaging/raspberry/install.sh | bash
-/opt/aprs-kiss/venv/bin/aprs-kiss-server --set-password && sudo systemctl restart aprs-kiss
+curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh | bash              # displej nebo monitor
+curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh | bash -s -- --touch-5inch   # 5" HDMI s dotykem
+curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh | bash -s -- --no-display    # bez displeje
 sudo reboot
 ```
 
-Skript nainstaluje aplikaci do `/opt/aprs-kiss`, službu systemd `aprs-kiss` (spustí se po zapnutí a při pádu
-se restartuje) a prohlížeč v režimu kiosku, který po startu plochy ukáže na displeji Pi
-aplikaci (`--dashboard` jen přehled, `--no-display` nic – Pi bez displeje; `--touch-5inch` zapne dotyk levných
-5" HDMI displejů typu Waveshare 5inch HDMI LCD s dotykem XPT2046; `--port` zvolí jiný port).
-**Heslo k webu** chce každý prohlížeč kromě displeje na samotném Pi – nastavte ho, přes web se dá vysílat.
-TNC na USB (`/dev/ttyACM0`, `/dev/ttyUSB0`), přes TCP/IP i Direwolf se zvukovou kartou (AIOC, DigiRig) fungují
-stejně jako na počítači. Aktualizace = spustit skript znovu; log ukáže `journalctl -u aprs-kiss -f`. Na jiném
-Linuxu: `pipx install "aprs-kiss[server]"` ze souboru `.whl` u vydání a `aprs-kiss-server`.
+Pak na telefonu otevřete `http://aprs.local:8080` a nastavte TNC a stanici. Skript nainstaluje aplikaci do
+`/opt/aprs-kiss`, službu systemd `aprs-kiss`, prohlížeč v režimu kiosku pro displej a zeptá se na heslo k webu
+(chce ho každý prohlížeč kromě displeje na samotném Pi). Aktualizace = spustit ho znovu. Na jiném Linuxu:
+`pipx install "aprs-kiss[server]"` ze souboru `.whl` u vydání a `aprs-kiss-server`.
 
 ## Jak je postavená
 

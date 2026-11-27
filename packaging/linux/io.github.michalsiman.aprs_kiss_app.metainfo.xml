@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="1.8.1" date="2026-11-27" type="development">
+      <description>
+        <p>Beta: a Raspberry Pi as a station server – the app on the Pi's touch screen and over the web with a password, one command to install; low screens get the phone's menu; the menu hidden behind ☰ on a computer when chosen.</p>
+      </description>
+    </release>
     <release version="1.8.0" date="2026-11-27">
       <description>
         <p>Bulletins: a new screen with the APRS bulletins and announcements from the stations around you (by radio, and from the internet within a chosen distance), and your own, repeated by themselves for as long as you choose. Position privacy: your position less exact (about 200 m to 110 km) and speed, course and altitude left out if you wish; EMERGENCY always exact. And from the betas: Mic-E with EMERGENCY, Winlink e-mail over APRS, OpenTopoMap, stations sorted, navigate to or share a place, warnings, smaller pictures and a camera for packet files, Direwolf as a sound-card modem, the phone's menu redrawn.</p>

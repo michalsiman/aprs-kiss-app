@@ -60,6 +60,8 @@ GPGKey=$B64
 EOF
 cp "$HERE/site/index.html" site/index.html  # the app's web page
 cp "$HERE/site/flatpak.html" site/flatpak.html  # installing the Flatpak
+cp "$HERE/site/raspberry.html" site/raspberry.html  # the Raspberry Pi guide
+cp "$HERE/../raspberry/install.sh" site/pi.sh  # … and its one-command installer
 # our own domain (aprs.ok1sim.cz), when set: GitHub Pages keeps it in this file
 [ -f "$HERE/site/CNAME" ] && cp "$HERE/site/CNAME" site/CNAME
 cp "$HERE/site/privacy.html" site/privacy.html  # the privacy policy Google Play links to

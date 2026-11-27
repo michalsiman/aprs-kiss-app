@@ -56,7 +56,7 @@
   .desk img { width: 100%; border-radius: 12px; border: 1px solid var(--line); box-shadow: var(--shadow); }
   .desk figure { margin: 0; }
   .desk figcaption { margin-top: 6px; font-size: 14px; color: var(--muted); }
-  .dl { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .dl { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
   .dl .card a.btn { margin-top: 12px; }
   footer { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--muted); font-size: 14px; }
   footer a { color: var(--muted); }
@@ -122,6 +122,7 @@
       <div class="card"><div class="ico">🪟</div><h3>Windows</h3><p data-t="dl_windows">Installer, or a ZIP to unpack anywhere.</p><a class="btn primary" id="dl-windows" href="RELEASES">Setup</a></div>
       <div class="card"><div class="ico">🍎</div><h3>macOS</h3><p data-t="dl_macos">A disk image – testers wanted.</p><a class="btn primary" id="dl-macos" href="RELEASES">DMG</a></div>
       <div class="card"><div class="ico">🐧</div><h3>Linux</h3><p data-t="dl_linux">Flatpak with updates, or a .deb package.</p><a class="btn primary" href="flatpak.html">Flatpak</a> <a class="btn" id="dl-deb" href="RELEASES">.deb</a></div>
+      <div class="card"><div class="ico">🍓</div><h3>Raspberry Pi</h3><p data-t="dl_pi">A station with a touch screen, set up from a phone – one command.</p><a class="btn primary" href="raspberry.html" data-t="dl_pi_btn">Guide</a></div>
     </div>
     <p class="version"><a href="RELEASES" data-t="all">All releases and betas</a> · <a href="https://github.com/michalsiman/aprs-kiss-app/blob/main/CHANGELOG.md" data-t="changes">What's new</a></p>
   </section>
@@ -153,6 +154,7 @@ const T = {
     download: "Download", download_sub: "Free and open source (MIT). New versions are offered by the app itself.",
     dl_android: "The APK – allow installing from your browser.", dl_windows: "Installer, or a ZIP to unpack anywhere.",
     dl_macos: "A disk image – testers wanted.", dl_linux: "Flatpak with updates, or a .deb package.",
+    dl_pi: "A station with a touch screen, set up from a phone – one command.", dl_pi_btn: "Guide",
     all: "All releases and betas", changes: "What's new", ha: "Home Assistant version", privacy: "Privacy",
     licence: "MIT licence · map data © OpenStreetMap contributors", version: "Latest version: {v}", lang: "Česky",
   },
@@ -166,6 +168,7 @@ const T = {
     download: "Stažení", download_sub: "Zdarma a s otevřeným kódem (MIT). Nové verze nabídne aplikace sama.",
     dl_android: "Soubor APK – povol instalaci z prohlížeče.", dl_windows: "Instalátor, nebo ZIP k rozbalení kamkoli.",
     dl_macos: "Obraz disku – hledáme testery.", dl_linux: "Flatpak s aktualizacemi, nebo balíček .deb.",
+    dl_pi: "Stanice s dotykovým displejem, nastavení z telefonu – jeden příkaz.", dl_pi_btn: "Návod",
     all: "Všechna vydání a bety", changes: "Co je nového", ha: "Verze pro Home Assistant", privacy: "Soukromí",
     licence: "Licence MIT · mapová data © přispěvatelé OpenStreetMap", version: "Poslední verze: {v}", lang: "English",
   },
