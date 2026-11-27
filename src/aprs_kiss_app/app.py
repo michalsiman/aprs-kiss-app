@@ -210,8 +210,8 @@ class App:
                 await self.engine.stop()
 
     async def apply_config(self, config: Config) -> None:
-        language_changed = (config.language, config.units_distance, config.units_temperature) != (
-            self.engine.config.language, self.engine.config.units_distance, self.engine.config.units_temperature)
+        shown = ("language", "units_distance", "units_temperature", "units_pressure")  # the screens are built again
+        language_changed = any(getattr(config, k) != getattr(self.engine.config, k) for k in shown)
         old = self.engine.config
         mode_changed = (config.bbs_enabled, config.tak_enabled) != (old.bbs_enabled, old.tak_enabled)
         t0 = time.monotonic()
@@ -524,7 +524,7 @@ class App:
         self.t = Translator(self.engine.config.language)
         conf = self.engine.config
         units.current = units.Units.choose(conf.units_distance, conf.units_temperature, i18n.system_country(),
-                                           comma=self.t.language != "en")
+                                           comma=self.t.language != "en", pressure=conf.units_pressure)
         self.compact = self._is_compact()
         # a new session after Android restarted the screen part: back on the screen the user had open
         key = self.current_key if self.views else (_LAST_SCREEN[0] if self.mobile and _LAST_SCREEN else "map")
@@ -1368,8 +1368,8 @@ class App:
                 wx.append(u.temperature_text(weather["temperature"]))
             if weather.get("humidity") is not None:
                 wx.append(f"{weather['humidity']} %")
-            if weather.get("pressure") is not None:
-                wx.append(f"{weather['pressure']} hPa")
+            if isinstance(weather.get("pressure"), (int, float)):
+                wx.append(u.pressure_text(weather["pressure"]))
             if isinstance(weather.get("wind_speed"), (int, float)):
                 wx.append(u.wind(weather["wind_speed"]))
             if wx:

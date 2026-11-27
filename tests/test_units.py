@@ -3,7 +3,7 @@ import unittest
 from unittest import mock
 
 from aprs_kiss_app import i18n
-from aprs_kiss_core.units import Units, system_distance, system_temperature
+from aprs_kiss_core.units import Units, system_distance, system_pressure, system_temperature
 
 
 class UnitsTest(unittest.TestCase):
@@ -28,13 +28,22 @@ class UnitsTest(unittest.TestCase):
         self.assertEqual(u.reach_choices(), ((16, "10"), (48, "30"), (97, "60")))
         self.assertAlmostEqual(u.to_km(u.from_km(50)), 50)
 
+    def test_pressure(self):
+        self.assertEqual(Units().pressure_text(1013.25), "1013 hPa")
+        self.assertEqual(Units(pressure="inHg").pressure_text(1013.25), "29.92 inHg")
+        self.assertEqual(Units(comma=True, pressure="inHg").pressure_text(1013.25), "29,92 inHg")
+        self.assertEqual([system_pressure(c) for c in ("US", "GB", "AU", "CZ", None)],
+                         ["inHg", "hPa", "hPa", "hPa", "hPa"])
+        self.assertEqual(Units.choose("", "", "US").pressure, "inHg")
+        self.assertEqual(Units.choose("", "", "US", pressure="hPa").pressure, "hPa")
+
     def test_system_default(self):
         self.assertEqual((system_distance("US"), system_temperature("US")), ("mi", "F"))
         self.assertEqual((system_distance("GB"), system_temperature("GB")), ("mi", "C"))
         self.assertEqual((system_distance("CZ"), system_temperature("CZ")), ("km", "C"))
         self.assertEqual((system_distance(None), system_temperature(None)), ("km", "C"))
-        self.assertEqual(Units.choose("", "", "US"), Units("mi", "F"))
-        self.assertEqual(Units.choose("km", "", "US"), Units("km", "F"))
+        self.assertEqual(Units.choose("", "", "US"), Units("mi", "F", pressure="inHg"))
+        self.assertEqual(Units.choose("km", "", "US"), Units("km", "F", pressure="inHg"))
 
     def test_country_from_the_environment(self):
         with mock.patch.object(i18n, "DEVICE_COUNTRY", None), \

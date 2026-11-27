@@ -319,7 +319,8 @@ class SettingsView(View):
 
         # units: as the phone / computer is set (what that is, in brackets), or chosen
         country = i18n.system_country()
-        sys_d, sys_t = units.system_distance(country), units.system_temperature(country)
+        sys_d, sys_t, sys_p = (units.system_distance(country), units.system_temperature(country),
+                               units.system_pressure(country))
         self.units_distance = ft.Dropdown(
             label=t("units_distance"), value=c.units_distance, width=240,
             options=[ft.DropdownOption(key="", text=f"{t('units_system')} ({sys_d})"),
@@ -328,6 +329,10 @@ class SettingsView(View):
             label=t("units_temperature"), value=c.units_temperature, width=240,
             options=[ft.DropdownOption(key="", text=f"{t('units_system')} (°{sys_t})"),
                      ft.DropdownOption(key="C", text="°C Celsius"), ft.DropdownOption(key="F", text="°F Fahrenheit")])
+        self.units_pressure = ft.Dropdown(
+            label=t("units_pressure"), value=c.units_pressure, width=240,
+            options=[ft.DropdownOption(key="", text=f"{t('units_system')} ({sys_p})"),
+                     ft.DropdownOption(key="hPa", text="hPa (mbar)"), ft.DropdownOption(key="inHg", text="inHg")])
 
         self.error = ft.Text(color=ft.Colors.ERROR)
         self.intro = ft.Text(t("first_run"), color=ft.Colors.PRIMARY, visible=not c.configured)
@@ -368,7 +373,7 @@ class SettingsView(View):
                          ft.Row([ft.OutlinedButton(t("sound_test"), icon=ft.Icons.PLAY_ARROW,
                                                    on_click=self._test_sounds)])),
                 _section(t("app_section"), ft.Icons.TUNE, ft.Row([self.language, self.theme], wrap=True),
-                         ft.Row([self.units_distance, self.units_temperature], wrap=True),
+                         ft.Row([self.units_distance, self.units_temperature, self.units_pressure], wrap=True),
                          self.check_updates, self.update_beta,
                          ft.Row([ft.OutlinedButton(t("about"), icon=ft.Icons.INFO_OUTLINE,
                                                    on_click=lambda _e: self._about())])),
@@ -712,6 +717,7 @@ class SettingsView(View):
             "igate_rx": self.igate_rx.value, "igate_tx": self.igate_tx.value,
             "language": self.language.value or "",
             "units_distance": self.units_distance.value or "", "units_temperature": self.units_temperature.value or "",
+            "units_pressure": self.units_pressure.value or "",
             "check_updates": self.check_updates.value, "update_beta": bool(self.update_beta.value),
             **{key: box.value for key, box in self.sound_boxes.items()},
             "tracker_mode": items[active]["tracker_mode"], "tracker_minutes": items[active]["tracker_minutes"],

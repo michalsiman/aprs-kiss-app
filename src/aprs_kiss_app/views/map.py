@@ -214,7 +214,7 @@ class MapView(View):
         if "humidity" in wx:
             parts.append(f"{wx['humidity']:.0f} %")
         if "pressure" in wx:
-            parts.append(f"{wx['pressure']:.0f} hPa")
+            parts.append(u.pressure_text(wx["pressure"]))
         self.wx_text.value = " · ".join(parts)
         self.wx_box.tooltip = self.t("wx_near_tip", n=wx["stations"], dist=u.whole(localwx.RADIUS_KM),
                                      minutes=max(1, round(wx["oldest"] / 60)))

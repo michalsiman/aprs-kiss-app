@@ -87,6 +87,7 @@ class Config:
     map_rf_km: int = 0  # the map shows stations heard on the radio this far (0 = no limit)
     units_distance: str = ""  # "km", "mi"; "" = as the phone / computer is set (miles in the US and the UK)
     units_temperature: str = ""  # "C", "F"; "" = as the phone / computer is set (Fahrenheit in the US)
+    units_pressure: str = ""  # "hPa", "inHg"; "" = as the phone / computer is set (inHg in the US)
     map_weather: bool = True  # the map's corner shows the temperature from the weather stations around us
     map_filters: str = ""  # the map shows only these kinds of stations ("weather,moving,road"); empty = all
     map_tools_hidden: bool = False  # the map's button bar folded into one gear button
@@ -168,6 +169,8 @@ class Config:
             self.units_distance = ""
         if self.units_temperature not in ("", "C", "F"):
             self.units_temperature = ""
+        if self.units_pressure not in ("", "hPa", "inHg"):
+            self.units_pressure = ""
         profiles.normalize(self)
         if self.tracker_profile not in ("walk", "bike", "car"):
             self.tracker_profile = "car"

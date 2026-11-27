@@ -1,4 +1,4 @@
-"""Units the user sees: kilometres or miles, °C or °F.
+"""Units the user sees: kilometres or miles, °C or °F, hPa or inHg (inches of mercury, the US).
 
 Everything inside the app stays metric (km, m, km/h, °C, m/s); only what is shown and typed in is
 converted. The default follows the country the phone or computer is set to (miles in the US, the UK,
@@ -14,6 +14,8 @@ FT_PER_M = 3.280839895
 
 MILES_COUNTRIES = {"US", "GB", "LR", "MM"}
 FAHRENHEIT_COUNTRIES = {"US", "LR", "BS", "BZ", "KY", "PW", "FM", "MH"}
+INHG_COUNTRIES = {"US"}  # the UK and Australia: hPa (millibars), as in Europe
+HPA_PER_INHG = 33.8638866667
 
 # the choices of "how far" in the map filter: the same steps in either unit, kept in whole kilometres
 REACH_KM = (20, 50, 100)
@@ -28,17 +30,24 @@ def system_temperature(country: str | None) -> str:
     return "F" if (country or "").upper() in FAHRENHEIT_COUNTRIES else "C"
 
 
+def system_pressure(country: str | None) -> str:
+    return "inHg" if (country or "").upper() in INHG_COUNTRIES else "hPa"
+
+
 @dataclass(frozen=True)
 class Units:
     distance: str = "km"  # "km" or "mi"
     temperature: str = "C"  # "C" or "F"
     comma: bool = False  # a decimal comma (most of the app's languages)
+    pressure: str = "hPa"  # "hPa" or "inHg"
 
     @classmethod
-    def choose(cls, distance: str, temperature: str, country: str | None, comma: bool = False) -> Units:
-        """distance / temperature as saved in the settings ("" = as the system says)."""
+    def choose(cls, distance: str, temperature: str, country: str | None, comma: bool = False,
+               pressure: str = "") -> Units:
+        """distance / temperature / pressure as saved in the settings ("" = as the system says)."""
         return cls(distance if distance in ("km", "mi") else system_distance(country),
-                   temperature if temperature in ("C", "F") else system_temperature(country), comma)
+                   temperature if temperature in ("C", "F") else system_temperature(country), comma,
+                   pressure if pressure in ("hPa", "inHg") else system_pressure(country))
 
     @property
     def miles(self) -> bool:
@@ -114,6 +123,14 @@ class Units:
 
     def temperature_text(self, celsius: float) -> str:
         return f"{self._num(self.temperature_value(celsius), 1)} {self.degree}"
+
+    # ─── pressure (hPa inside) ─────
+
+    def pressure_text(self, hpa: float) -> str:
+        """"1013 hPa" or "29.92 inHg"."""
+        if self.pressure == "inHg":
+            return f"{self._num(hpa / HPA_PER_INHG, 2)} inHg"
+        return f"{hpa:.0f} hPa"
 
     # ─── the "how far" choices ─────
 
