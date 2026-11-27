@@ -8,7 +8,6 @@ import unittest
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "src"))
 
 from aprs_kiss_app import server  # noqa: E402
-from aprs_kiss_app.display import path_text  # noqa: E402
 from aprs_kiss_core import packetinfo  # noqa: E402
 from aprs_kiss_core.parser import parse  # noqa: E402
 
@@ -70,6 +69,10 @@ class PacketInfoTest(unittest.TestCase):
         self.assertEqual(packetinfo.summary(third), "OK1XYZ: → OK1SIM-7: Hi")
 
     def test_path(self):
+        try:
+            from aprs_kiss_app.display import path_text
+        except ImportError:  # the CI tests run without Flet
+            self.skipTest("flet is not installed")
         self.assertEqual(path_text(["OK0DIG*", "WIDE2-1"]), "OK0DIG*,WIDE2-1")
         self.assertEqual(path_text(["TCPIP*"]), "")
         self.assertEqual(path_text([]), "")
