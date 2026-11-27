@@ -1,11 +1,22 @@
 # Statistics of michalsiman/aprs-kiss-app
 
-Updated 2026-11-26 by `.github/workflows/stats.yml`. Raw data: the CSV files on this branch.
+Updated 2026-11-27 by `.github/workflows/stats.yml`. Raw data: the CSV files on this branch.
 
-## Release downloads (523 in total)
+## Release downloads (626 in total)
 
 | Release | Downloads |
 |---|---:|
+| v1.6.0 | 11 |
+| v1.5.2-beta | 11 |
+| v1.5.1-beta | 3 |
+| v1.5.0 | 11 |
+| v1.4.0 | 2 |
+| v1.3.0 | 11 |
+| v1.2.3-beta | 4 |
+| v1.2.2-beta | 12 |
+| v1.2.1-beta | 10 |
+| v1.2.0 | 14 |
+| v1.1.3-beta | 13 |
 | v1.1.2-beta | 15 |
 | v1.1.1-beta | 11 |
 | hig-test | 4 |
@@ -29,7 +40,7 @@ Updated 2026-11-26 by `.github/workflows/stats.yml`. Raw data: the CSV files on 
 | v0.1.43 | 12 |
 | v0.1.42 | 12 |
 | v0.1.41 | 11 |
-| v0.1.40 | 3 |
+| v0.1.40 | 4 |
 | v0.1.39 | 11 |
 | v0.1.38 | 11 |
 | v0.1.37 | 11 |
