@@ -51,6 +51,7 @@ def config(lang: str, theme: str, **extra) -> dict:
         "language": lang, "language_asked": True, "disclaimer_accepted": True, "theme": theme,
         "gps_source": "manual", "map_trails": True, "map_tools_hidden": False, "check_updates": False,
         "aprsis_radius_km": 50, "tracked_callsigns": "OK1CAR-9", "bbs_sentence_ok": True, "tak_sentence_ok": True,
+        "position_ambiguity": 2,  # Settings › Position privacy shows it in use
         "seen_version": "9.9.9",  # no "what is new" after an update over the screens
         "tak_callsign": "OK1SIM", "tak_team": "Cyan", "vara_host": "", "beacon_minutes": 30,
         **extra, "_now": now,
@@ -80,6 +81,16 @@ def state(lang: str) -> dict:
         ("G4XYZ", "Good evening from Kent, IC-705 portable", "in", 2000),
         ("W1AW-10", "73 from Newington, CT – www.arrl.org", "in", 1500),
     ]
+    bulletins = [
+        ("OK1KPL-10", "BLN1", "bulletin", "Klubový kroužek dnes ve 20:00 na OK0BPL 439.350 MHz" if cs
+         else "Club net tonight at 20:00 on OK0BPL 439.350 MHz", 1500, 4),
+        ("OK1WX-13", "BLN2WX", "group", "Výstraha: silný vítr až 70 km/h, dnes 14–22 h" if cs
+         else "Alert: strong wind up to 70 km/h, today 14–22 h", 1800, 3),
+        ("OK1KPL-10", "BLNA", "announcement", "Setkání radioamatérů Rokycany, sobota 9:00, sokolovna" if cs
+         else "Hamfest in Rokycany, Saturday 9:00, Sokol hall", 7600, 6),
+        ("OK1DOP-1", "BLN3", "bulletin", "Převáděč OK0BL mimo provoz kvůli údržbě do neděle" if cs
+         else "Repeater OK0BL off the air for maintenance until Sunday", 10800, 9),
+    ]
     return {
         "msg_counter": 12,
         "messages": [{"direction": d, "from": f, "to": t, "text": x, "time": now - ago, "msg_no": str(i + 1),
@@ -87,6 +98,14 @@ def state(lang: str) -> dict:
                      for i, (d, f, t, x, ago) in enumerate(msgs)],
         "thursday": [{"time": now - ago, "from": f, "text": x, "kind": k, "via": "internet"} for f, x, k, ago in th],
         "thursday_joined": now - 2400, "thursday_cq": now - 2400,
+        "bulletins": {"heard": [
+            {"from": f, "addressee": a, "kind": k, "line": a[3], "group": a[4:], "text": x, "time": now - ago,
+             "last": now - ago + 60, "count": n, "via": "radio", "read": ago > 2000}
+            for f, a, k, x, ago, n in bulletins],
+            "mine": [{"addressee": "BLN4", "kind": "bulletin", "via": "both", "created": now - 2400,
+                      "until": now - 2400 + 4 * 3600, "sent": 5, "next": now + 480, "last_sent": now - 720,
+                      "text": "Packet BBS OK1SIM-1 na 144.875, přijímá zprávy" if cs
+                      else "Packet BBS OK1SIM-1 on 144.875, takes messages"}]},
     }
 
 
@@ -217,10 +236,10 @@ def out(name, lang, theme) -> Path:
 # ─── what to photograph (desktop 1300×820) ────────────────────────────────
 
 # the rail has a gap above each section (packet radio, settings)
-RAIL = {"map": 35, "messages": 100, "thursday": 165, "stations": 228, "terminal": 306, "chat": 370,
-        "files": 434, "monitor": 498, "bbs": 562, "tak": 626, "settings": 704}
-SECTION = {"tnc": 92, "station": 154, "gps": 219, "tracker": 283, "digi": 347, "aprsis": 411, "vara": 475,
-           "tak": 540, "bbs": 604, "maps": 668, "background": 732, "sounds": 796}
+RAIL = {"map": 35, "messages": 100, "bulletins": 165, "thursday": 228, "stations": 292, "terminal": 370,
+        "chat": 434, "files": 498, "monitor": 562, "bbs": 626, "tak": 690, "settings": 768}
+SECTION = {"tnc": 92, "station": 154, "privacy": 219, "gps": 283, "tracker": 347, "digi": 411, "aprsis": 475,
+           "vara": 540, "tak": 604, "bbs": 668, "maps": 732, "background": 796, "sounds": 860}
 
 
 async def desktop(lang, theme, only):
@@ -268,6 +287,16 @@ async def desktop(lang, theme, only):
             await b.click(240, 132, 2)  # Unread: only the conversations with unread messages, their counts
             await b.shot(out("messages-unread", lang, theme))
             await b.click(150, 132, 2)  # All again
+        if want("bulletins") or want("bulletin-new"):
+            await b.click(52, RAIL["bulletins"], 2)
+            if want("bulletins"):
+                await b.shot(out("bulletins", lang, theme))
+            if want("bulletin-new"):
+                await b.click(1180, 795, 2)  # New bulletin
+                await b.type("Dnes 19:00 test APRS & Packet na 144.800, hlaste se" if cs
+                             else "Tonight 19:00 APRS & Packet test on 144.800, check in", 1.5)
+                await b.shot(out("bulletin-new", lang, theme))
+                await b.key("Escape", 2)
         if want("thursday"):
             await b.click(52, RAIL["thursday"], 2)
             await b.shot(out("thursday", lang, theme))
@@ -297,12 +326,16 @@ async def desktop(lang, theme, only):
         if want("monitor"):
             await b.click(52, RAIL["monitor"], 2)
             await b.shot(out("monitor", lang, theme))
-        if want("settings") or want("settings-tracker") or want("settings-more"):
+        if want("settings") or want("settings-tracker") or want("settings-more") or want("settings-privacy"):
             await b.click(52, RAIL["settings"], 2)
             if want("settings"):
                 await b.click(700, SECTION["station"], 2)
                 await b.shot(out("settings", lang, theme))
                 await b.click(700, SECTION["station"], 2)
+            if want("settings-privacy"):
+                await b.click(700, SECTION["privacy"], 2)
+                await b.shot(out("settings-privacy", lang, theme))
+                await b.click(700, SECTION["privacy"], 2)
             if want("settings-tracker"):
                 await b.click(700, SECTION["tracker"], 2)
                 await b.shot(out("settings-tracker", lang, theme))
@@ -346,14 +379,14 @@ async def desktop(lang, theme, only):
 # ─── the phone (412×870 css px) ────────────────────────────────────────────
 
 # the menu has headings (APRS, Packet radio) and a line above the settings
-DRAWER = {"messages": 186, "thursday": 234, "stations": 282, "terminal": 370, "chat": 418, "files": 466,
-          "monitor": 514, "tak": 562, "settings": 627}
+DRAWER = {"messages": 186, "bulletins": 234, "thursday": 282, "stations": 330, "terminal": 418, "chat": 466,
+          "files": 514, "monitor": 562, "tak": 610, "settings": 675}
 
 
 async def phone(lang, theme, only):
     want = lambda name: not only or name in only  # noqa: E731
     if any(want(n) for n in ("phone-map", "phone-menu", "phone-filter", "phone-profiles", "phone-settings",
-                             "phone-messages")):
+                             "phone-messages", "phone-bulletins")):
         profiles = json.dumps([{"ssid": 7, "symbol": "/["}, {"ssid": 9, "symbol": "/>"}, {"ssid": 0, "symbol": "/-"}])
         async with Run(lang, theme, phone=True, profiles=profiles, symbol="/[") as b:
             await b.wait(4)
@@ -376,10 +409,14 @@ async def phone(lang, theme, only):
                 await b.click(24, 32, 2)
                 await b.click(100, DRAWER["messages"], 3)
                 await b.shot(out("phone-messages", lang, theme))
+            if want("phone-bulletins"):
+                await b.click(24, 32, 2)
+                await b.click(100, DRAWER["bulletins"], 3)
+                await b.shot(out("phone-bulletins", lang, theme))
             if want("phone-settings"):
                 await b.click(24, 32, 2)
                 await b.click(100, DRAWER["settings"], 3)
-                await b.click(200, 268, 3)  # the tracker section
+                await b.click(200, 333, 3)  # the tracker section
                 await b.shot(out("phone-settings", lang, theme))
     if want("phone-tnc"):
         # every way to a TNC on a phone: TCP/IP, USB (serial), Bluetooth and Bluetooth LE

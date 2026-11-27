@@ -49,6 +49,7 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
 <tr><td width="33%" valign="top"><h3>💻 Packet terminal</h3>AX.25 connected mode to BBSes and nodes, also over VARA FM.</td><td width="33%" valign="top"><h3>📁 Files</h3>Send and receive files over packet radio (YAPP), with progress and time left.</td><td width="33%" valign="top"><h3>🗄️ BBS SERVER</h3>Your own packet BBS – W0RLI / MBL / FBB style commands.</td></tr>
 <tr><td width="33%" valign="top"><h3>🎯 TAK</h3>ATAK-compatible positions and GeoChat over the radio.</td><td width="33%" valign="top"><h3>🏔️ Spot & services</h3>SOTA, POTA, WWFF … self-spots; FIND, REPEAT, WXNOW and more.</td><td width="33%" valign="top"><h3>📅 #APRSThursday</h3>The weekly HOTG net on its own screen.</td></tr>
 <tr><td width="33%" valign="top"><h3>🧭 Navigate & share</h3>Open any station or point in a navigation app, or share it.</td><td width="33%" valign="top"><h3>🌍 16 languages</h3>km or miles, °C or °F, hPa or inHg – as your phone or computer is set.</td><td width="33%" valign="top"><h3>🖥️ Everywhere</h3>Linux, Windows, macOS, Android, iOS – one app, light and dark.</td></tr>
+<tr><td width="33%" valign="top"><h3>📢 Bulletins</h3>Bulletins and announcements from the stations around you; yours repeat by themselves.</td><td width="33%" valign="top"><h3>🔒 Position privacy</h3>Your position less exact (200 m – 110 km), without speed or altitude; EMERGENCY always exact.</td><td width="33%" valign="top"><h3>🔊 Sound-card modem</h3>Direwolf instead of a TNC: a radio on a sound card (AIOC, DigiRig), set up and started by the app.</td></tr>
 </table>
 
 ## What it does
@@ -101,6 +102,10 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
   with transmitting off it all goes over the internet only.
 - **Mic-E**: the position shorter on air, with a status – and **EMERGENCY** (asked first, a red SOS in the top
   bar until ended); stations in emergency stand out in red on the map.
+- **Position privacy** (Settings › Position privacy): your position less exact – about 200 m, 2 km, 20 km or
+  110 km (APRS position ambiguity: the last digits are left out, others' maps show only the square you are
+  in), for the beacon, the tracker and Mic-E; and whether speed and course, and altitude, go with it.
+  EMERGENCY always goes exact.
 - **Tracker**: the position button in the top bar sends your position once, or starts the tracker (▶) –
   your GPS position then goes out by itself, at a fixed interval or **smart (SmartBeaconing)** like the APRS
   and LoRa APRS trackers: rarely when standing, more often the faster you go, at once on a turn; course and
@@ -138,6 +143,13 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
 - **Services on APRS** (Messages › Services): FIND (where a station was last heard), REPEAT (the nearest
   repeaters), WXNOW (the nearest weather), UTC, satellite passes and sunrise (9M2PJU-4), e-mail (MAILMY) –
   a tap puts the command in a message, the answer comes back as one.
+- **Bulletins**: APRS messages to everybody from the stations around you – BLN0–9 news for a few hours,
+  BLNA–Z announcements kept for days, group bulletins (BLN1WX) and NWS weather alerts. Those heard by radio
+  always, those from the internet when the sender is within 50, 150 or 500 km (or from anywhere); a repeat is
+  only counted, a new text with the same number replaces the old one; a red count in the menu and NEW on the
+  unseen ones. **Your own bulletin or announcement**: the number (and a group), the text and how long (1–48 h)
+  – the app shows what goes on air and how many times, then repeats it by itself (after 1, 5 and 10 min, then
+  every 20 min; an announcement every hour) until the time is up or you stop it.
 - **#APRSThursday**: its own section for the weekly HOTG net through ANSRVR – check in with one
   button, read the group's messages apart from your inbox (ANSRVR's relays never land in Messages), see when
   the next net starts, leave the group; by radio, internet or both, remembered.
@@ -188,7 +200,7 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
 
 ### The app
 
-- **The menu in sections**: APRS (map, messages, APRS Thursday, stations), packet radio (terminal, chat,
+- **The menu in sections**: APRS (map, messages, bulletins, APRS Thursday, stations), packet radio (terminal, chat,
   files, monitor, BBS, TAK) and the settings – headings in the phone's menu, gaps on a computer.
 - **Top bar as a dashboard**, on a computer and on a phone: **TNC**, **IS** and **GPS** lamps green when
   working, the position / tracker button, **TX** with a red frame while transmitting is on and all red while
@@ -247,7 +259,7 @@ full size. They follow your GitHub theme, and so does the app: it uses the syste
 <table>
 <tr><td width="33%" align="center"><a href="assets/phone-map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-map-light.png"><img src="assets/phone-map.png" width="200" alt="The map"></picture></a><br><b>The map</b></td><td width="33%" align="center"><a href="assets/phone-filter.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-filter-light.png"><img src="assets/phone-filter.png" width="200" alt="Filters and how far"></picture></a><br><b>Filters and how far</b></td><td width="33%" align="center"><a href="assets/phone-menu.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-menu-light.png"><img src="assets/phone-menu.png" width="200" alt="The menu in sections"></picture></a><br><b>The menu in sections</b></td></tr>
 <tr><td width="33%" align="center"><a href="assets/phone-messages.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-messages-light.png"><img src="assets/phone-messages.png" width="200" alt="Messages"></picture></a><br><b>Messages</b></td><td width="33%" align="center"><a href="assets/phone-profiles.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-profiles-light.png"><img src="assets/phone-profiles.png" width="200" alt="Profiles (SSIDs)"></picture></a><br><b>Profiles (SSIDs)</b></td><td width="33%" align="center"><a href="assets/phone-tnc.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-tnc-light.png"><img src="assets/phone-tnc.png" width="200" alt="TNC: TCP/IP, USB, Bluetooth, BLE"></picture></a><br><b>TNC: TCP/IP, USB, Bluetooth, BLE</b></td></tr>
-<tr><td width="33%" align="center"><a href="assets/phone-settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-settings-light.png"><img src="assets/phone-settings.png" width="200" alt="Settings"></picture></a><br><b>Settings</b></td><td width="33%" align="center"><a href="assets/phone-tak.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-tak-light.png"><img src="assets/phone-tak.png" width="200" alt="TAK map"></picture></a><br><b>TAK map</b></td><td width="33%" align="center"><a href="assets/phone-tak-chat.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-tak-chat-light.png"><img src="assets/phone-tak-chat.png" width="200" alt="TAK GeoChat"></picture></a><br><b>TAK GeoChat</b></td></tr>
+<tr><td width="33%" align="center"><a href="assets/phone-settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-settings-light.png"><img src="assets/phone-settings.png" width="200" alt="Settings"></picture></a><br><b>Settings</b></td><td width="33%" align="center"><a href="assets/phone-tak.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-tak-light.png"><img src="assets/phone-tak.png" width="200" alt="TAK map"></picture></a><br><b>TAK map</b></td><td width="33%" align="center"><a href="assets/phone-bulletins.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/phone-bulletins-light.png"><img src="assets/phone-bulletins.png" width="200" alt="Bulletins"></picture></a><br><b>Bulletins</b></td></tr>
 </table>
 
 ### On a computer
@@ -271,6 +283,10 @@ full size. They follow your GitHub theme, and so does the app: it uses the syste
 <tr>
 <td width="50%"><a href="assets/tracker-menu.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/tracker-menu-light.png"><img src="assets/tracker-menu.png" alt="The position and tracker menu"></picture></a><br><sub>The position and tracker menu</sub></td>
 <td width="50%"><a href="assets/station.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/station-light.png"><img src="assets/station.png" alt="A station's details: map, message, callbooks"></picture></a><br><sub>A station's details: map, message, callbooks</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="assets/bulletins.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/bulletins-light.png"><img src="assets/bulletins.png" alt="Bulletins: mine going out and those heard around"></picture></a><br><sub>Bulletins: mine going out and those heard around</sub></td>
+<td width="50%"><a href="assets/bulletin-new.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/bulletin-new-light.png"><img src="assets/bulletin-new.png" alt="A new bulletin: what goes on air and how many times"></picture></a><br><sub>A new bulletin: what goes on air and how many times</sub></td>
 </tr>
 <tr>
 <td width="50%"><a href="assets/thursday.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/thursday-light.png"><img src="assets/thursday.png" alt="#APRSThursday"></picture></a><br><sub>#APRSThursday</sub></td>
@@ -300,7 +316,8 @@ full size. They follow your GitHub theme, and so does the app: it uses the syste
 <td width="50%"><a href="assets/settings-tnc.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-tnc-light.png"><img src="assets/settings-tnc.png" alt="TNC over Bluetooth LE, and the radio's frequency (VR-N76, UV-PRO, GA-5WB)"></picture></a><br><sub>TNC over Bluetooth LE, and the radio's frequency (VR-N76, UV-PRO, GA-5WB)</sub></td>
 </tr>
 <tr>
-<td colspan="2"><a href="assets/settings-more.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-more-light.png"><img src="assets/settings-more.png" width="50%" alt="Settings: background and screen, sounds"></picture></a><br><sub>Settings: background and screen, sounds</sub></td>
+<td width="50%"><a href="assets/settings-privacy.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-privacy-light.png"><img src="assets/settings-privacy.png" alt="Position privacy: a less exact position, no speed or altitude"></picture></a><br><sub>Position privacy: a less exact position, no speed or altitude</sub></td>
+<td width="50%"><a href="assets/settings-more.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-more-light.png"><img src="assets/settings-more.png" alt="Settings: background and screen, sounds"></picture></a><br><sub>Settings: background and screen, sounds</sub></td>
 </tr>
 </table>
 
@@ -429,7 +446,7 @@ src/
   aprs_kiss_core/   the radio, no user interface: KISS, AX.25 (UI + connected mode), APRS,
                     APRS-IS/iGate, the station (acks, retries, limits), the BBS server (bbs/),
                     TAK (tak.py), USB GPS (gps.py), VARA FM (vara.py), APRS Thursday (thursday.py),
-                    spots (spotting.py), APRS services (services.py), the TNC transports
+                    bulletins (bulletins.py), spots (spotting.py), APRS services (services.py), the TNC transports
                     (android_usb.py, android_bt.py, ble.py) and the Engine that ties it together
                     and announces events to listeners
   aprs_kiss_app/    the Flet user interface: one view per screen; the offline map data (offline/)

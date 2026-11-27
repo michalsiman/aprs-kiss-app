@@ -38,6 +38,7 @@ from .symbols import symbol_info
 from .views.base import View, adapt, clock, distance_text
 from .views.bbs import BbsView
 from .views.tak import TakView
+from .views.bulletins import BulletinsView
 from .views.chat import ChatView
 from .views.files import FilesView, size_text
 from .views.map import MapView
@@ -50,13 +51,13 @@ from .views.thursday import ThursdayView
 
 _LOGGER = logging.getLogger(__name__)
 
-VIEWS = [MapView, MessagesView, ThursdayView, StationsView, TerminalView, ChatView, FilesView, MonitorView, BbsView,
+VIEWS = [MapView, MessagesView, BulletinsView, ThursdayView, StationsView, TerminalView, ChatView, FilesView, MonitorView, BbsView,
          TakView, SettingsView]
 # With BBS SERVER on the app is only the BBS; the monitor stays to see what the radio hears.
 BBS_VIEWS = [BbsView, MonitorView, SettingsView]
 TAK_VIEWS = [TakView, MonitorView, SettingsView]
 # The menu in sections: APRS, packet radio, then the settings (a heading each on a phone, a gap on a computer).
-SECTIONS = {"map": "aprs", "messages": "aprs", "thursday": "aprs", "stations": "aprs",
+SECTIONS = {"map": "aprs", "messages": "aprs", "bulletins": "aprs", "thursday": "aprs", "stations": "aprs",
             "terminal": "packet", "chat": "packet", "files": "packet", "monitor": "packet", "bbs": "packet",
             "tak": "packet", "settings": "app"}
 FLUSH_DELAY = 0.25
@@ -950,6 +951,13 @@ class App:
             dest.icon.badge = dest.selected_icon.badge = badge
             self.drawer_rows["messages"].set_badge(badge)  # a pill at the right of the row
             self.menu_btn.badge = badge  # the menu is closed on a phone: unread messages show on ☰
+        if self.has_view("bulletins"):
+            board = self.view("bulletins")
+            new = 0 if self.current_key == "bulletins" else self.engine.bulletins_unread()
+            badge = str(new) if new else None
+            dest = self.rail.destinations[self.menu_views.index(board)]
+            dest.icon.badge = dest.selected_icon.badge = badge
+            self.drawer_rows["bulletins"].set_badge(badge)
 
     # ─── new versions ─────────────────────────────────────────────────────
 

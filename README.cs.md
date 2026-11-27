@@ -48,6 +48,7 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
 <tr><td width="33%" valign="top"><h3>💻 Packet terminál</h3>Spojení AX.25 na BBS a nody, i přes VARA FM.</td><td width="33%" valign="top"><h3>📁 Soubory</h3>Posílání a příjem souborů přes packet rádio (YAPP), s průběhem a zbývajícím časem.</td><td width="33%" valign="top"><h3>🗄️ BBS SERVER</h3>Vlastní packet BBS – příkazy ve stylu W0RLI / MBL / FBB.</td></tr>
 <tr><td width="33%" valign="top"><h3>🎯 TAK</h3>Polohy a GeoChat kompatibilní s ATAK přes rádio.</td><td width="33%" valign="top"><h3>🏔️ Spot a služby</h3>Ohlášení SOTA, POTA, WWFF …; FIND, REPEAT, WXNOW a další.</td><td width="33%" valign="top"><h3>📅 #APRSThursday</h3>Týdenní síť HOTG na vlastní obrazovce.</td></tr>
 <tr><td width="33%" valign="top"><h3>🧭 Navigace a sdílení</h3>Otevři stanici nebo bod v navigaci, nebo ho pošli dál.</td><td width="33%" valign="top"><h3>🌍 16 jazyků</h3>km nebo míle, °C nebo °F, hPa nebo inHg – podle telefonu či počítače.</td><td width="33%" valign="top"><h3>🖥️ Všude</h3>Linux, Windows, macOS, Android, iOS – jedna aplikace, světlá i tmavá.</td></tr>
+<tr><td width="33%" valign="top"><h3>📢 Nástěnka</h3>Bulletiny a oznámení stanic z okolí; vlastní se opakují samy.</td><td width="33%" valign="top"><h3>🔒 Soukromí polohy</h3>Poloha méně přesně (200 m – 110 km), bez rychlosti či výšky; NOUZE vždy přesně.</td><td width="33%" valign="top"><h3>🔊 Zvukový modem</h3>Direwolf místo TNC: rádio na zvukové kartě (AIOC, DigiRig), aplikace ho nastaví a spustí.</td></tr>
 </table>
 
 ## Co umí
@@ -100,6 +101,9 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
   s vypnutým vysíláním jde vše jen přes internet.
 - **Mic-E**: poloha kratší ve vysílání, se stavem – i **NOUZE (EMERGENCY)** (s potvrzením, červené SOS v horní
   liště, dokud ji neukončíte); stanice v nouzi jsou na mapě červeně.
+- **Soukromí polohy** (Nastavení › Soukromí polohy): poloha méně přesně – asi 200 m, 2 km, 20 km nebo 110 km
+  (APRS position ambiguity: poslední číslice se vynechají, mapy ostatních ukážou jen čtverec, ve kterém jste),
+  pro maják, tracker i Mic-E; a zda posílat rychlost a směr a nadmořskou výšku. NOUZE jde vždy přesně.
 - **Tracker**: tlačítko polohy v horní liště pošle polohu jednou, nebo spustí tracker (▶) – poloha z GPS
   se pak posílá sama, v pevném intervalu nebo **chytře (SmartBeaconing)** jako APRS a LoRa APRS trackery:
   když stojíte zřídka, čím rychleji jedete tím častěji, hned v zatáčce; s kurzem a rychlostí. Rádiem jde,
@@ -135,6 +139,12 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
 - **Služby na APRS** (Zprávy › Služby): FIND (kde byla stanice naposledy slyšet), REPEAT (nejbližší
   převaděče), WXNOW (počasí z nejbližší meteostanice), UTC, přelety satelitů a východ slunce (9M2PJU-4),
   e-mail (MAILMY) – klepnutím se příkaz vloží do zprávy, odpověď přijde zprávou.
+- **Nástěnka (bulletiny)**: APRS zprávy pro všechny od stanic z okolí – BLN0–9 novinky na pár hodin, BLNA–Z
+  oznámení akcí na dny, skupinové bulletiny (BLN1WX) a meteovýstrahy NWS. Zachycené rádiem vždy, z internetu
+  od odesílatelů do 50, 150 nebo 500 km (nebo odkudkoli); opakování se jen počítá, nový text se stejným číslem
+  nahradí starý; červený počet v menu a NOVÉ u nepřečtených. **Vlastní bulletin či oznámení**: číslo (a
+  skupina), text a jak dlouho (1–48 h) – aplikace ukáže, co a kolikrát půjde do éteru, a pak ho opakuje sama
+  (po 1, 5 a 10 min, pak každých 20 min; oznámení jednou za hodinu), dokud čas nevyprší nebo ho nezastavíte.
 - **#APRSThursday**: vlastní sekce pro čtvrteční síť HOTG přes ANSRVR – zapojení jedním tlačítkem,
   zprávy skupiny zvlášť mimo běžné zprávy (přeposílání z ANSRVR se do Zpráv nikdy nedostane), kdy začíná
   další akce, odhlášení ze skupiny; rádiem, internetem nebo obojím, zapamatované.
@@ -184,7 +194,7 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
 
 ### Aplikace
 
-- **Menu v sekcích**: APRS (mapa, zprávy, APRS Thursday, stanice), packet radio (terminál, chat, soubory,
+- **Menu v sekcích**: APRS (mapa, zprávy, nástěnka, APRS Thursday, stanice), packet radio (terminál, chat, soubory,
   monitor, BBS, TAK) a nastavení – nadpisy v menu telefonu, mezery na počítači.
 - **Horní lišta jako přístrojová deska**, na počítači i na telefonu: kontrolky **TNC**, **IS** a **GPS**
   svítí zeleně, když fungují, tlačítko polohy / trackeru, **TX** s červeným rámečkem při zapnutém vysílání
@@ -244,7 +254,7 @@ zvětší. Řídí se motivem GitHubu, stejně jako aplikace: používá světl�
 <table>
 <tr><td width="33%" align="center"><a href="assets/cs/phone-map.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-map-light.png"><img src="assets/cs/phone-map.png" width="200" alt="Mapa"></picture></a><br><b>Mapa</b></td><td width="33%" align="center"><a href="assets/cs/phone-filter.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-filter-light.png"><img src="assets/cs/phone-filter.png" width="200" alt="Filtry a dosah"></picture></a><br><b>Filtry a dosah</b></td><td width="33%" align="center"><a href="assets/cs/phone-menu.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-menu-light.png"><img src="assets/cs/phone-menu.png" width="200" alt="Menu v sekcích"></picture></a><br><b>Menu v sekcích</b></td></tr>
 <tr><td width="33%" align="center"><a href="assets/cs/phone-messages.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-messages-light.png"><img src="assets/cs/phone-messages.png" width="200" alt="Zprávy"></picture></a><br><b>Zprávy</b></td><td width="33%" align="center"><a href="assets/cs/phone-profiles.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-profiles-light.png"><img src="assets/cs/phone-profiles.png" width="200" alt="Profily (SSID)"></picture></a><br><b>Profily (SSID)</b></td><td width="33%" align="center"><a href="assets/cs/phone-tnc.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-tnc-light.png"><img src="assets/cs/phone-tnc.png" width="200" alt="TNC: TCP/IP, USB, Bluetooth, BLE"></picture></a><br><b>TNC: TCP/IP, USB, Bluetooth, BLE</b></td></tr>
-<tr><td width="33%" align="center"><a href="assets/cs/phone-settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-settings-light.png"><img src="assets/cs/phone-settings.png" width="200" alt="Nastavení"></picture></a><br><b>Nastavení</b></td><td width="33%" align="center"><a href="assets/cs/phone-tak.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-tak-light.png"><img src="assets/cs/phone-tak.png" width="200" alt="Mapa TAK"></picture></a><br><b>Mapa TAK</b></td><td width="33%" align="center"><a href="assets/cs/phone-tak-chat.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-tak-chat-light.png"><img src="assets/cs/phone-tak-chat.png" width="200" alt="TAK GeoChat"></picture></a><br><b>TAK GeoChat</b></td></tr>
+<tr><td width="33%" align="center"><a href="assets/cs/phone-settings.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-settings-light.png"><img src="assets/cs/phone-settings.png" width="200" alt="Nastavení"></picture></a><br><b>Nastavení</b></td><td width="33%" align="center"><a href="assets/cs/phone-tak.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-tak-light.png"><img src="assets/cs/phone-tak.png" width="200" alt="Mapa TAK"></picture></a><br><b>Mapa TAK</b></td><td width="33%" align="center"><a href="assets/cs/phone-bulletins.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/phone-bulletins-light.png"><img src="assets/cs/phone-bulletins.png" width="200" alt="Nástěnka"></picture></a><br><b>Nástěnka</b></td></tr>
 </table>
 
 ### Na počítači
@@ -268,6 +278,10 @@ zvětší. Řídí se motivem GitHubu, stejně jako aplikace: používá světl�
 <tr>
 <td width="50%"><a href="assets/cs/tracker-menu.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/tracker-menu-light.png"><img src="assets/cs/tracker-menu.png" alt="Nabídka polohy a trackeru"></picture></a><br><sub>Nabídka polohy a trackeru</sub></td>
 <td width="50%"><a href="assets/cs/station.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/station-light.png"><img src="assets/cs/station.png" alt="Detail stanice: mapa, zpráva, katalogy značek"></picture></a><br><sub>Detail stanice: mapa, zpráva, katalogy značek</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="assets/cs/bulletins.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/bulletins-light.png"><img src="assets/cs/bulletins.png" alt="Nástěnka: moje bulletiny a zachycené z okolí"></picture></a><br><sub>Nástěnka: moje bulletiny a zachycené z okolí</sub></td>
+<td width="50%"><a href="assets/cs/bulletin-new.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/bulletin-new-light.png"><img src="assets/cs/bulletin-new.png" alt="Nový bulletin: co a kolikrát půjde do éteru"></picture></a><br><sub>Nový bulletin: co a kolikrát půjde do éteru</sub></td>
 </tr>
 <tr>
 <td width="50%"><a href="assets/cs/thursday.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/thursday-light.png"><img src="assets/cs/thursday.png" alt="#APRSThursday"></picture></a><br><sub>#APRSThursday</sub></td>
@@ -297,7 +311,8 @@ zvětší. Řídí se motivem GitHubu, stejně jako aplikace: používá světl�
 <td width="50%"><a href="assets/cs/settings-tnc.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/settings-tnc-light.png"><img src="assets/cs/settings-tnc.png" alt="TNC přes Bluetooth LE a frekvence rádia (VR-N76, UV-PRO, GA-5WB)"></picture></a><br><sub>TNC přes Bluetooth LE a frekvence rádia (VR-N76, UV-PRO, GA-5WB)</sub></td>
 </tr>
 <tr>
-<td colspan="2"><a href="assets/cs/settings-more.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/settings-more-light.png"><img src="assets/cs/settings-more.png" width="50%" alt="Nastavení: pozadí a obrazovka, zvuky"></picture></a><br><sub>Nastavení: pozadí a obrazovka, zvuky</sub></td>
+<td width="50%"><a href="assets/cs/settings-privacy.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/settings-privacy-light.png"><img src="assets/cs/settings-privacy.png" alt="Soukromí polohy: méně přesná poloha, bez rychlosti a výšky"></picture></a><br><sub>Soukromí polohy: méně přesná poloha, bez rychlosti a výšky</sub></td>
+<td width="50%"><a href="assets/cs/settings-more.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/settings-more-light.png"><img src="assets/cs/settings-more.png" alt="Nastavení: pozadí a obrazovka, zvuky"></picture></a><br><sub>Nastavení: pozadí a obrazovka, zvuky</sub></td>
 </tr>
 </table>
 
@@ -426,7 +441,7 @@ src/
   aprs_kiss_core/   rádio, bez uživatelského rozhraní: KISS, AX.25 (UI i spojení), APRS,
                     APRS-IS/iGate, stanice (potvrzení, opakování, limity), BBS server (bbs/),
                     TAK (tak.py), USB GPS (gps.py), VARA FM (vara.py), APRS Thursday (thursday.py),
-                    spoty (spotting.py), služby na APRS (services.py), způsoby připojení TNC
+                    bulletins (bulletins.py), spoty (spotting.py), služby na APRS (services.py), způsoby připojení TNC
                     (android_usb.py, android_bt.py, ble.py) a Engine, který to spojuje a hlásí
                     události posluchačům
   aprs_kiss_app/    uživatelské rozhraní ve Fletu: jedna obrazovka = jeden view; data offline mapy (offline/)

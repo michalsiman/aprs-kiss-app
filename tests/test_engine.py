@@ -124,6 +124,70 @@ class EngineTest(unittest.IsolatedAsyncioTestCase):
         self.assertAlmostEqual(p["latitude"], 49.7, places=3)
         self.assertAlmostEqual(p["longitude"], 13.4, places=3)
 
+    async def _capture(self):
+        self.engine.set_tx(True)
+        sent = []
+        real = self.engine.station._send_frame
+
+        async def keep(raw):
+            sent.append(raw)
+            await real(raw)
+        self.engine.station._send_frame = keep
+        return sent
+
+    async def test_private_beacon(self):
+        """Privacy: the position less exact (spaces for the hidden digits), plain and Mic-E; EMERGENCY exact."""
+        import aprslib
+        from aprs_kiss_core.ax25 import Frame
+
+        sent = await self._capture()
+        self.engine.config.latitude, self.engine.config.longitude = 49.7686, 13.4123
+        self.engine.config.position_ambiguity = 2
+        self.assertTrue(await self.engine.beacon())
+        frame = Frame.decode(sent[-1])
+        self.assertIn("4946.  N", frame.info.decode())
+        self.assertEqual(aprslib.parse(frame.tnc2())["posambiguity"], 2)
+        self.engine.config.mic_e = True
+        self.assertTrue(await self.engine.beacon())
+        p = aprslib.parse(Frame.decode(sent[-1]).tnc2())
+        self.assertEqual(p["posambiguity"], 2)
+        self.assertAlmostEqual(p["latitude"], 49.775, places=3)
+        self.engine.config.mic_e_status = "emergency"
+        self.assertTrue(await self.engine.beacon())
+        p = aprslib.parse(Frame.decode(sent[-1]).tnc2())
+        self.assertEqual(p.get("posambiguity", 0), 0)
+        self.assertAlmostEqual(p["latitude"], 49.7686, places=3)
+
+    async def test_bulletins(self):
+        """Ours goes out and repeats; one heard lands on the board, a repeat of it is not new."""
+        from aprs_kiss_core.ax25 import Frame
+
+        sent = await self._capture()
+        entry = await self.engine.send_bulletin("1", "", "Net tonight 20:00 on 145.500", via="radio", hours=4)
+        self.assertEqual(Frame.decode(sent[-1]).info.decode(), ":BLN1     :Net tonight 20:00 on 145.500")
+        self.assertEqual(entry["sent"], 1)
+        self.assertEqual(await self.engine.bulletin_tick(time.time() + 30), 0)
+        self.assertEqual(await self.engine.bulletin_tick(time.time() + 61), 1)
+        self.engine.stop_bulletin("BLN1")
+        self.assertEqual(self.engine.board.mine, [])
+        with self.assertRaises(ValueError):
+            await self.engine.send_bulletin("A", "WX", "group needs a digit")
+        packet = {"from": "OK1ABC-9", "format": "announcement", "aid": "B", "identifier": "",
+                  "message_text": "Hamfest on Saturday", "received_at": time.time()}
+        self.engine._bulletin_in(packet, "radio")
+        self.engine._bulletin_in(packet, "radio")
+        shown = self.engine.bulletins_shown()
+        self.assertEqual([(e["addressee"], e["count"]) for e in shown], [("BLNB", 2)])
+        self.assertEqual(self.engine.bulletins_unread(), 1)
+        self.engine.bulletins_read()
+        self.assertEqual(self.engine.bulletins_unread(), 0)
+        far = {**packet, "from": "W1AW", "message_text": "far away"}
+        self.engine._bulletin_in(far, "internet")  # position unknown, not by radio: off the board
+        self.assertEqual(len(self.engine.bulletins_shown()), 1)
+        await self.engine.save()
+        from aprs_kiss_core.config import load_state
+        self.assertEqual(len(load_state(self.folder)["bulletins"]["heard"]), 2)
+
     async def test_message_is_acked(self):
         self.engine.set_tx(True)
         result = await self.engine.send_aprs_message("OK1ABC-9", "hello", via="radio")

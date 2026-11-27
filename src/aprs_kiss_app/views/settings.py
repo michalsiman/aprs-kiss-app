@@ -12,7 +12,7 @@ from pathlib import Path
 import flet as ft
 
 from aprs_kiss_core import android_bt, android_usb, ble, direwolf, profiles, roadalert, tilemaps, tracker, units
-from aprs_kiss_core.aprs import MIC_E_STATUS
+from aprs_kiss_core.aprs import AMBIGUITY_KM, MIC_E_STATUS
 from aprs_kiss_core.aprsis import licence_confirmed
 from aprs_kiss_core.bbs import BbsConfigError
 from aprs_kiss_core.bbs.storage import (
@@ -371,6 +371,14 @@ class SettingsView(View):
                                         options=[ft.DropdownOption(key=k, text=t(f"mice_{k}")) for k in MIC_E_STATUS],
                                         on_select=self._mic_e_status_picked)
         self._mic_e_last = c.mic_e_status
+        # privacy: how exact our position goes out, and whether speed, course and altitude go with it
+        self.ambiguity = ft.Dropdown(
+            label=t("priv_ambiguity"), value=str(c.position_ambiguity), width=320,
+            options=[ft.DropdownOption(key="0", text=t("priv_exact"))] + [
+                ft.DropdownOption(key=str(level), text=t("priv_about", dist=units.current.distance_short(km)))
+                for level, km in AMBIGUITY_KM.items() if level])
+        self.send_motion = ft.Checkbox(label=t("priv_motion"), value=c.send_motion)
+        self.send_altitude = ft.Checkbox(label=t("priv_altitude"), value=c.send_altitude)
         self.wl_password = ft.TextField(label=self.t("wl_password"), value=c.winlink_password, width=420, password=True,
                                         can_reveal_password=True, helper=self.t("wl_password_help"))
 
@@ -390,6 +398,8 @@ class SettingsView(View):
                          self.beacon, self.mic_e, self.mic_e_status,
                          ft.Text(t("mice_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT),
                          self.tracked, self.incoming, self.wl_password, expanded=first),
+                _section(t("priv_section"), ft.Icons.PRIVACY_TIP_OUTLINED, self.ambiguity, self.send_motion,
+                         self.send_altitude, ft.Text(t("priv_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT)),
                 _section("GPS", ft.Icons.GPS_FIXED, self.gps_source, self.gps_phone_hint) if self.app.mobile else
                 _section("GPS", ft.Icons.GPS_FIXED, self.gps_source, self.gps_row, self.gps_hint),
                 _section(t("trk_section"), ft.Icons.ROUTE, self.trk_still, self.trk_hint,
@@ -772,6 +782,8 @@ class SettingsView(View):
             "units_distance": self.units_distance.value or "", "units_temperature": self.units_temperature.value or "",
             "units_pressure": self.units_pressure.value or "",
             "winlink_password": (self.wl_password.value or "").strip(),
+            "position_ambiguity": int(self.ambiguity.value or 0), "send_motion": bool(self.send_motion.value),
+            "send_altitude": bool(self.send_altitude.value),
             "mic_e": bool(self.mic_e.value), "mic_e_status": self.mic_e_status.value or "en_route",
             "check_updates": self.check_updates.value, "update_beta": bool(self.update_beta.value),
             **{key: box.value for key, box in self.sound_boxes.items()},

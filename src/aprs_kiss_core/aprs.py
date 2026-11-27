@@ -6,6 +6,7 @@ only builds what we send: messages, acks, positions and status reports.
 
 from __future__ import annotations
 
+import math
 import re
 
 # APRS messages: at most 67 characters of text; no | ~ { in the text.
@@ -69,18 +70,61 @@ def _lon(lon: float) -> str:
     return f"{deg:03d}{minutes:05.2f}{hemi}"
 
 
-def position(lat: float, lon: float, symbol: str = "/-", comment: str = "", messaging: bool = True) -> str:
+# Position ambiguity (APRS 1.01, chapter 6): the last digits of the minutes left out, the position only
+# says the square it is in. Level -> the hidden part in minutes (0.1', 1', 10', a whole degree) and about
+# how far the real position may be from what others see.
+AMBIGUITY_MINUTES = {0: 0.01, 1: 0.1, 2: 1.0, 3: 10.0, 4: 60.0}
+AMBIGUITY_KM = {0: 0.0, 1: 0.2, 2: 2.0, 3: 20.0, 4: 110.0}
+
+
+def _cut(value: float, level: int) -> float:
+    """|value| in degrees cut down to the square of `level` (its corner, never rounded up into the next)."""
+    step = AMBIGUITY_MINUTES[level] / 60
+    return math.floor(abs(value) / step + 1e-9) * step
+
+
+def blur(lat: float, lon: float, level: int) -> tuple[float, float]:
+    """The middle of the square an ambiguous position stands for (what a map shows; for TAK, which has
+    no ambiguity of its own). Level 0: as it is."""
+    if not level:
+        return lat, lon
+    half = AMBIGUITY_MINUTES[level] / 120
+    return (math.copysign(min(_cut(lat, level) + half, 90.0), lat),
+            math.copysign(min(_cut(lon, level) + half, 180.0), lon))
+
+
+def _hide(text: str, level: int) -> str:
+    """'4946.12N' with the last `level` digits as spaces: '4946.1 N', '4946.  N', '494 .  N', '49  .  N'."""
+    chars, hidden = list(text), 0
+    for i in range(len(chars) - 2, -1, -1):
+        if hidden == level:
+            break
+        if chars[i].isdigit():
+            chars[i], hidden = " ", hidden + 1
+    return "".join(chars)
+
+
+def position(lat: float, lon: float, symbol: str = "/-", comment: str = "", messaging: bool = True,
+             ambiguity: int = 0) -> str:
     """Uncompressed position without timestamp: '=DDMM.mmN/DDDMM.mmE-comment'.
 
     `symbol` is the table character and the symbol code, e.g. '/-' (house),
     '/>' (car), '/[' (person). '=' says the station can receive messages.
+    `ambiguity` 1–4: the position less exact (see AMBIGUITY_MINUTES), the hidden digits sent as spaces.
     """
     if not (-90 <= lat <= 90 and -180 <= lon <= 180):
         raise ValueError("Position out of range")
     if len(symbol) != 2:
         raise ValueError("Symbol must be two characters: table and code")
+    if ambiguity not in AMBIGUITY_MINUTES:
+        raise ValueError("Ambiguity is 0–4")
     kind = "=" if messaging else "!"
-    return f"{kind}{_lat(lat)}{symbol[0]}{_lon(lon)}{symbol[1]}{clean_text(comment, MAX_COMMENT)}"
+    if ambiguity:
+        lat_t = _hide(_lat(math.copysign(_cut(lat, ambiguity), lat)), ambiguity)
+        lon_t = _hide(_lon(math.copysign(_cut(lon, ambiguity), lon)), ambiguity)
+    else:
+        lat_t, lon_t = _lat(lat), _lon(lon)
+    return f"{kind}{lat_t}{symbol[0]}{lon_t}{symbol[1]}{clean_text(comment, MAX_COMMENT)}"
 
 
 def fix_mojibake(text: str) -> str:
@@ -148,7 +192,8 @@ def _b91(value: int, width: int) -> str:
 
 
 def mic_e(lat: float, lon: float, symbol: str = "/>", status: str = "en_route", course: float | None = None,
-          speed_kmh: float | None = None, altitude_m: float | None = None, comment: str = "") -> tuple[str, str]:
+          speed_kmh: float | None = None, altitude_m: float | None = None, comment: str = "",
+          ambiguity: int = 0) -> tuple[str, str]:
     """(destination, information field) of a Mic-E position (APRS 1.01, chapter 10): the latitude, the
     status ("emergency" among them) and N/S, W/E and the longitude offset go into the destination; the
     longitude, speed, course and symbol into 8 bytes of the information field; the altitude as base-91 'xxx}'."""
@@ -156,15 +201,20 @@ def mic_e(lat: float, lon: float, symbol: str = "/>", status: str = "en_route", 
         raise ValueError("Position out of range")
     if len(symbol) != 2:
         raise ValueError("Symbol must be two characters: table and code")
+    if ambiguity not in AMBIGUITY_MINUTES:
+        raise ValueError("Ambiguity is 0–4")
     bits = MIC_E_STATUS[status]
-    alat, alon = abs(lat), abs(lon)
+    alat, alon = (_cut(lat, ambiguity), _cut(lon, ambiguity)) if ambiguity else (abs(lat), abs(lon))
     hundredths = min(round(alat * 6000), 90 * 6000 - 1)  # in 1/100 minutes
     digits = f"{hundredths // 6000:02d}{hundredths % 6000 // 100:02d}{hundredths % 100:02d}"
     lon_h = min(round(alon * 6000), 180 * 6000 - 1)
     deg, mins, hund = lon_h // 6000, lon_h % 6000 // 100, lon_h % 100
     offset = deg < 10 or deg >= 100
-    dest = "".join(_mic_e_char(int(d), flag) for d, flag in zip(digits, (
-        bits[0] == "1", bits[1] == "1", bits[2] == "1", lat >= 0, offset, lon < 0)))
+    flags = (bits[0] == "1", bits[1] == "1", bits[2] == "1", lat >= 0, offset, lon < 0)
+    # a hidden digit: 'Z' (a space with the flag set) or 'L' (a space without it); the receiver hides the
+    # same digits of the longitude (cut down above, so nothing more exact goes out)
+    dest = "".join(("Z" if flag else "L") if i >= 6 - ambiguity else _mic_e_char(int(d), flag)
+                   for i, (d, flag) in enumerate(zip(digits, flags)))
     if deg < 10:
         d = deg + 90
     elif deg < 100:

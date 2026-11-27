@@ -4,6 +4,29 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## 1.8.0 – 2026-11-27
+
+- **Bulletins** – a new screen in the APRS part of the menu: APRS messages to everybody from the stations around
+  you – BLN0–9 news for a few hours (a net tonight, a repeater down), BLNA–Z announcements (a hamfest, a contest)
+  kept for days, group bulletins like BLN1WX and NWS weather alerts. Those heard by radio are always shown, those
+  from the internet when their sender is within 50, 150 or 500 km (or from anywhere); a repeat is counted, not
+  shown again, and a new text with the same number replaces the old one. A red count in the menu and NEW on the
+  ones not seen yet; a tap on the sender opens its details, ⋮ replies or deletes. **Your own bulletin or
+  announcement**: pick the number (and a group), write the text, choose for how long (1–48 h) – the app shows
+  what goes on air and how many times, sends it at once and then repeats it by itself (after 1, 5 and 10 min,
+  then every 20 min; an announcement every hour) until the time is up or you stop it. With APRS-IS the server is
+  asked for bulletins too.
+- **Position privacy** (a new section in Settings): your position less exact – about 200 m, 2 km, 20 km or
+  110 km (APRS position ambiguity: the last digits are left out, others' maps show the square you are in), for
+  the beacon, the tracker and Mic-E; and whether speed and course, and altitude, go with it. EMERGENCY always
+  goes exact, with speed and altitude.
+- Everything from the betas 1.7.1 and 1.7.2: **Mic-E with EMERGENCY**, **Winlink e-mail over APRS (WLNK-1)**,
+  **OpenTopoMap**, **stations sorted** by time, distance or callsign, **Navigate here / Share this place**,
+  *road incidents* are now **Warnings**, **pictures made smaller** before they go over packet radio (with the
+  time each size takes), **a photo from the phone's camera**, other files **zipped**, **Direwolf as a sound-card
+  modem** on computers, and **the phone's menu redrawn** – see below.
+- All screenshots redone (README, the website).
+
 ## 1.7.2 beta – 2026-11-27
 
 - **Files: pictures made smaller before they go** – a picked picture is offered in several sizes (1280, 800, 480,

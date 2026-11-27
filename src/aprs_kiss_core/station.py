@@ -349,9 +349,9 @@ class Station:
         self._on_update()
 
     async def send_position(self, lat: float, lon: float, comment: str | None = None,
-                            rf: bool = True, to_is: bool = True) -> None:
-        await self.send_info(aprs.position(lat, lon, self.config.symbol, self.config.comment if comment is None else comment),
-                             rf=rf, to_is=to_is)
+                            rf: bool = True, to_is: bool = True, ambiguity: int = 0) -> None:
+        await self.send_info(aprs.position(lat, lon, self.config.symbol, self.config.comment if comment is None else comment,
+                                           ambiguity=ambiguity), rf=rf, to_is=to_is)
 
     async def send_status(self, text: str) -> None:
         await self.send_info(aprs.status(text))

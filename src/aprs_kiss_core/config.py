@@ -20,10 +20,10 @@ from .ax25 import Address
 _LOGGER = logging.getLogger(__name__)
 
 APP_NAME = "aprs-kiss"
-VERSION = "1.7.2"
+VERSION = "1.8.0"
 # A beta (a pre-release on GitHub, tag vX.Y.Z-beta): betas take the next patch numbers (1.0.1, 1.0.2 …),
 # the next stable release a higher minor one (1.1.0), so updating always goes up.
-BETA = True
+BETA = False
 VERSION_LABEL = f"{VERSION} beta" if BETA else VERSION
 MIN_BEACON_MINUTES = 10
 
@@ -94,6 +94,10 @@ class Config:
     units_pressure: str = ""  # "hPa", "inHg"; "" = as the phone / computer is set (inHg in the US)
     mic_e: bool = False  # our position as Mic-E (shorter on air, with a status)
     mic_e_status: str = "en_route"  # the Mic-E status: off_duty … priority, "emergency" (always sent as Mic-E)
+    position_ambiguity: int = 0  # privacy: our position less exact (0 exact; 1 ≈ 200 m, 2 ≈ 2 km, 3 ≈ 20 km, 4 ≈ 110 km)
+    send_motion: bool = True  # privacy: speed and course go out with the position
+    send_altitude: bool = True  # privacy: the altitude goes out with the position
+    bulletin_km: int = 150  # the Bulletins screen: bulletins from stations this far (0 = all); heard by radio always
     winlink_password: str = ""  # Winlink (APRSLink, WLNK-1): only characters of it go on air, never the password
     stations_sort: str = "time"  # the Stations list: "time" (last heard first), "distance" (nearest first), "call"
     map_count: bool = True  # under the map's buttons: how many stations are on the map
@@ -126,7 +130,8 @@ class Config:
     keep_screen_on: str = "never"  # "never", "tak" (while TAK runs) or "always": the screen does not go dark
     sound_tx: bool = False  # a short beep whenever the radio transmits
     sound_messages: bool = True  # a sound for a new APRS message
-    thursday_via: str = ""  # the same for APRS Thursday; "" = internet
+    thursday_via: str = ""
+    bulletin_via: str = ""  # the same for our bulletins  # the same for APRS Thursday; "" = internet
     message_via: str = ""  # how messages go: "radio", "internet", "both"; "" = by the APRS-IS switch (beacon_is)
     sound_chat: bool = True  # … for a new packet chat line
     sound_tak: bool = True  # … for a new TAK GeoChat message
@@ -179,6 +184,8 @@ class Config:
             self.map_online = "osm"
         if self.mic_e_status not in aprs.MIC_E_STATUS:
             self.mic_e_status = "en_route"
+        self.position_ambiguity = min(4, max(0, int(self.position_ambiguity or 0)))
+        self.bulletin_km = max(0, int(self.bulletin_km or 0))
         if self.stations_sort not in ("time", "distance", "call"):
             self.stations_sort = "time"
         if self.units_distance not in ("", "km", "mi"):

@@ -136,11 +136,11 @@ class EngineGpsTest(unittest.TestCase):
                             aprsis_radius_km=50).validate(), pathlib.Path(tmp.name))
         self.assertEqual(eng.aprsis.filter, "")  # nothing known yet
         eng.gps.push(49.7477, 13.3776)
-        self.assertEqual(eng.aprsis.filter, "r/49.748/13.378/50")
+        self.assertEqual(eng.aprsis.filter, "r/49.748/13.378/50 g/BLN*")
         eng.gps.push(49.75, 13.38)  # a few hundred metres: the same area
-        self.assertEqual(eng.aprsis.filter, "r/49.748/13.378/50")
+        self.assertEqual(eng.aprsis.filter, "r/49.748/13.378/50 g/BLN*")
         eng.gps.push(50.08, 14.43)  # Prague
-        self.assertEqual(eng.aprsis.filter, "r/50.080/14.430/50")
+        self.assertEqual(eng.aprsis.filter, "r/50.080/14.430/50 g/BLN*")
 
 
 if __name__ == "__main__":
@@ -159,12 +159,12 @@ class ReconfigureTest(unittest.IsolatedAsyncioTestCase):
                     aprsis_radius_km=50)
         eng = Engine(Config(**conf).validate(), pathlib.Path(tmp.name))
         eng.gps.push(49.7477, 13.3776)
-        self.assertEqual(eng.aprsis.filter, "r/49.748/13.378/50")
+        self.assertEqual(eng.aprsis.filter, "r/49.748/13.378/50 g/BLN*")
         eng.station.heard["OK0BR-10"] = {"call": "OK0BR-10", "count": 1, "last_heard": time.time()}
         with mock.patch.object(Engine, "start", mock.AsyncMock()), mock.patch.object(Engine, "stop", mock.AsyncMock()):
             await eng.reconfigure(Config(**{**conf, "callsign": "OK1SIM-7", "symbol": "/["}).validate())
         self.assertEqual(str(eng.me), "OK1SIM-7")
-        self.assertEqual(eng.aprsis.filter, "r/49.748/13.378/50")  # the last fix carried over
+        self.assertEqual(eng.aprsis.filter, "r/49.748/13.378/50 g/BLN*")  # the last fix carried over
         self.assertIn("OK0BR-10", eng.station.heard)
 
     async def test_area_set_by_the_first_fix_after_a_rebuild(self):
@@ -180,7 +180,7 @@ class ReconfigureTest(unittest.IsolatedAsyncioTestCase):
             await eng.reconfigure(Config(**{**conf, "callsign": "OK1SIM-7"}).validate())
         self.assertEqual(eng.aprsis.filter, "")
         eng.gps.push(49.7478, 13.3777)  # the same place again: still the area must be set
-        self.assertEqual(eng.aprsis.filter, "r/49.748/13.378/50")
+        self.assertEqual(eng.aprsis.filter, "r/49.748/13.378/50 g/BLN*")
 
 
 class OwnTrailTest(unittest.TestCase):
