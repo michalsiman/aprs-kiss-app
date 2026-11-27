@@ -51,6 +51,7 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
   up again, a scale bar; two fingers turn the map only with a clear twist. **Menus stay open** while you tick their boxes or pick a map (an empty frame shows what is off); back or a tap outside closes them. Right-click (long press on a
   phone) the map: *Set as my position*. Only the stations around what is on screen are drawn, so the map
   stays quick also on a phone.
+- **Online maps**: OpenStreetMap, or the **topographic OpenTopoMap** (contour lines, hill shading).
 - **Offline map** bundled with the app: country borders, coastlines and about 1,000 bigger cities
   (Natural Earth); in Europe also motorways and main roads (Natural Earth), some 67,000 places of 1,000
   people and more and each country's 30 highest peaks (GeoNames) – more of them as you zoom in. Light in the dark mode too, like the online maps. One button switches to it; **with no internet the map
@@ -126,7 +127,7 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
   button, read the group's messages apart from your inbox (ANSRVR's relays never land in Messages), see when
   the next net starts, leave the group; by radio, internet or both, remembered.
 - **Stations** heard on the radio or seen on APRS-IS: distance, direction, comment, weather, the path;
-  a filter and a legend; the count says how many are shown of all, and an empty list says why. A station's
+  in order of last heard, distance or callsign; a filter and a legend; the count says how many are shown of all, and an empty list says why. A station's
   details offer the map, a message and the **callbooks** (QRZ.com, HamQTH, QRZCQ – the base callsign – and aprs.fi). Stations an iGate relays from the internet by radio (third-party packets)
   show up too.
 - **Position beacon** every N minutes and a *Send position now* button in the top bar; status and

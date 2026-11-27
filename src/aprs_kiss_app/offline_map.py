@@ -269,6 +269,9 @@ def _custom_layer(url: str, source: tilemaps.TileSource) -> fm.TileLayer:
 
 
 TILES = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+# OpenTopoMap: contour lines and hill shading on OpenStreetMap data, to zoom 17 (its servers have no more)
+TOPO_TILES = "https://tile.opentopomap.org/{z}/{x}/{y}.png"
+TOPO_CREDIT = "© OpenStreetMap, SRTM · © OpenTopoMap (CC-BY-SA)"
 # OpenStreetMap's tile usage policy asks for an identifying User-Agent.
 USER_AGENT = "io.github.michalsiman.aprs_kiss_app"
 OSM_CREDIT = "© OpenStreetMap"
@@ -302,7 +305,11 @@ class BaseMap:
                                    bgcolor=ft.Colors.with_opacity(0.55, ft.Colors.SURFACE),
                                    border_radius=ft.BorderRadius.only(top_left=4))
 
-    def layers(self, offline: bool, imported: bool = False) -> list:
+    def layers(self, offline: bool, imported: bool = False, online: str = "osm") -> list:
+        """online: "osm" OpenStreetMap, "otm" OpenTopoMap (when not offline)."""
+        topo = online == "otm"
+        self.tiles.url_template = TOPO_TILES if topo else TILES
+        self.tiles.max_zoom = 17 if topo else 19
         if offline and self.offline is None:
             self.offline = OfflineLayers(*self.center, self.zoom)
         self.tiles.visible = not offline
@@ -312,7 +319,8 @@ class BaseMap:
         for layer in extra:
             layer.visible = offline
         credits = list(dict.fromkeys(source.attribution or source.name for _, source in custom))  # once each
-        self.credit_text.value = (" · ".join([*credits, ATTRIBUTION]) + " (offline)") if offline else OSM_CREDIT
+        self.credit_text.value = ((" · ".join([*credits, ATTRIBUTION]) + " (offline)") if offline
+                                  else TOPO_CREDIT if topo else OSM_CREDIT)
         return [self.tiles, *extra, *([self.trails] if self.trails else []), self.markers, *self.overlays]
 
     def moved(self, lat: float, lon: float, zoom: float, offline: bool) -> bool:

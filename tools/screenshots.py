@@ -245,7 +245,7 @@ async def desktop(lang, theme, only):
             await b.key("Escape", 2)
         if want("map-source") or want("map-offline"):
             await b.click(376, 80)
-            await b.click(460, 206, 3)  # the basic offline map: chosen, the menu stays open over it
+            await b.click(460, 265, 3)  # the basic offline map: chosen, the menu stays open over it
             if want("map-source"):
                 await b.shot(out("map-source", lang, theme))
             await b.key("Escape", 2)

@@ -77,7 +77,7 @@ class MapView(View):
             initial_zoom=self._zoom,
             min_zoom=MIN_ZOOM,
             interaction_configuration=gestures(),
-            layers=self.base.layers(self.app.offline_map(), self.app.imported_shown()),
+            layers=self.base.layers(self.app.offline_map(), self.app.imported_shown(), self.engine.config.map_online),
             # Right click (long press on touch screens): "set as my position".
             on_secondary_tap=self._menu,
             on_long_press=self._menu,
@@ -460,7 +460,7 @@ class MapView(View):
     def base_map_changed(self) -> None:
         """Called by the app when the internet goes away or returns."""
         if hasattr(self, "map"):
-            self.map.layers = self.base.layers(self.app.offline_map(), self.app.imported_shown())
+            self.map.layers = self.base.layers(self.app.offline_map(), self.app.imported_shown(), self.engine.config.map_online)
             self.muted.disabled = self.app.offline_map()
             self.source_btn.refresh()
 

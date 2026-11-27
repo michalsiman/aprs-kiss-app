@@ -50,6 +50,7 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
   nahoru, měřítko; dvěma prsty se mapa otočí jen výrazným natočením. **Nabídky zůstávají otevřené**, když v nich zaškrtáváte nebo vybíráte mapu (prázdný rámeček ukazuje, co je vypnuté); zavře je tlačítko zpět nebo klepnutí mimo ně. Pravé tlačítko (na telefonu podržení
   prstu) na mapě: *Nastavit jako moji polohu*. Kreslí se jen stanice v okolí toho, co je na obrazovce,
   takže mapa zůstává svižná i na telefonu.
+- **Online mapy**: OpenStreetMap, nebo **topografická OpenTopoMap** (vrstevnice, stínování terénu).
 - **Offline mapa** přímo v aplikaci: hranice států, pobřeží a asi 1 000 větších měst (Natural Earth),
   v Evropě i dálnice a hlavní silnice (Natural Earth), asi 67 000 obcí nad 1 000 obyvatel a 30 nejvyšších
   hor každé země (GeoNames) – s přiblížením přibývají další. I v tmavém režimu je světlá, stejně jako mapy online. Přepíná se jedním tlačítkem; **když není internet, mapa se na ni
@@ -123,7 +124,7 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
   zprávy skupiny zvlášť mimo běžné zprávy (přeposílání z ANSRVR se do Zpráv nikdy nedostane), kdy začíná
   další akce, odhlášení ze skupiny; rádiem, internetem nebo obojím, zapamatované.
 - **Stanice** slyšené rádiem nebo viděné na APRS-IS: vzdálenost, směr, komentář, počasí, cesta;
-  filtr a legenda; počítadlo ukazuje zobrazené z celkového počtu a prázdný seznam řekne proč. Detail stanice
+  řazení podle času, vzdálenosti nebo značky; filtr a legenda; počítadlo ukazuje zobrazené z celkového počtu a prázdný seznam řekne proč. Detail stanice
   nabízí mapu, zprávu a **katalogy značek** (QRZ.com, HamQTH, QRZCQ – značka bez SSID – a aprs.fi). Objeví se i stanice, které iGate pošle z internetu do rádia (pakety třetí strany).
 - **Maják polohy** každých N minut a tlačítko *Poslat polohu teď* v horní liště; status a unproto.
   Ikona (APRS symbol), komentář, SSID a cesta v Nastavení.

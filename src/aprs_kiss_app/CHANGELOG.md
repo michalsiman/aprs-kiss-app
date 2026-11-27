@@ -6,6 +6,10 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 
 ## Unreleased
 
+- **Topographic map (OpenTopoMap)** as another online map in the map menu: contour lines and hill shading, to
+  zoom 17 (also on the TAK map).
+- **Stations in order**: last heard first, nearest first or by callsign – the sort button above the list,
+  remembered.
 - **"Road incidents" are now "Warnings"** (map filter, tracker alerts, sounds): besides crashes and road works
   they are fires, floods and fog too, and not only in Czechia – the same objects come from the US, Australia
   or Portugal.

@@ -88,10 +88,12 @@ class Config:
     units_distance: str = ""  # "km", "mi"; "" = as the phone / computer is set (miles in the US and the UK)
     units_temperature: str = ""  # "C", "F"; "" = as the phone / computer is set (Fahrenheit in the US)
     units_pressure: str = ""  # "hPa", "inHg"; "" = as the phone / computer is set (inHg in the US)
+    stations_sort: str = "time"  # the Stations list: "time" (last heard first), "distance" (nearest first), "call"
     map_count: bool = True  # under the map's buttons: how many stations are on the map
     map_weather: bool = True  # the map's corner shows the temperature from the weather stations around us
     map_filters: str = ""  # the map shows only these kinds of stations ("weather,moving,road"); empty = all
     map_tools_hidden: bool = False  # the map's button bar folded into one gear button
+    map_online: str = "osm"  # the online map: "osm" (OpenStreetMap) or "otm" (OpenTopoMap: contours, hill shading)
     map_offline: bool = False  # the bundled offline map (borders, cities) instead of OpenStreetMap tiles
     gps_source: str = "manual"  # "manual" (latitude/longitude above), "usb" (an NMEA GPS module), "phone"
     gps_device: str = ""  # its serial port
@@ -166,6 +168,10 @@ class Config:
             self.tracker_mode = "fixed"
         self.map_filters = mapfilter.join(mapfilter.parse(self.map_filters))
         self.map_rf_km = max(0, int(self.map_rf_km or 0))
+        if self.map_online not in ("osm", "otm"):
+            self.map_online = "osm"
+        if self.stations_sort not in ("time", "distance", "call"):
+            self.stations_sort = "time"
         if self.units_distance not in ("", "km", "mi"):
             self.units_distance = ""
         if self.units_temperature not in ("", "C", "F"):

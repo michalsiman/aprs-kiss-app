@@ -93,7 +93,7 @@ class TakView(View):
         self.map = fm.Map(
             expand=True, bgcolor=LAND,  # light in the dark mode too, like all the maps
             initial_center=fm.MapLatitudeLongitude(*(here or (49.8, 15.5))), initial_zoom=self._zoom, min_zoom=MIN_ZOOM,
-            layers=self.base.layers(self.app.offline_map(), self.app.imported_shown()), on_pointer_up=self._gesture_end,
+            layers=self.base.layers(self.app.offline_map(), self.app.imported_shown(), self.engine.config.map_online), on_pointer_up=self._gesture_end,
             interaction_configuration=gestures(),
         )
         self.source_btn = MapSourceButton(self.app)
@@ -153,7 +153,7 @@ class TakView(View):
     def base_map_changed(self) -> None:
         """Called by the app when the internet goes away or returns."""
         if hasattr(self, "map"):
-            self.map.layers = self.base.layers(self.app.offline_map(), self.app.imported_shown())
+            self.map.layers = self.base.layers(self.app.offline_map(), self.app.imported_shown(), self.engine.config.map_online)
             self.source_btn.refresh()
 
     def _gesture_end(self, _e=None) -> None:

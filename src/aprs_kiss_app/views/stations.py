@@ -46,10 +46,17 @@ class StationsView(View):
                                self.t("show_internet"),
                                lambda _e: self.app.set_show_internet(not self.engine.config.show_internet))
         self.count = ft.Text(color=ft.Colors.ON_SURFACE_VARIANT, tooltip=self.t("stations_count"))
+        # the order: last heard first, nearest first, by callsign (remembered)
+        self.sort_items = {key: ft.PopupMenuItem(self.t(f"sort_{key}"), icon=icon, data=key,
+                                                 on_click=lambda e: self._sort(e.control.data))
+                           for key, icon in (("time", ft.Icons.SCHEDULE), ("distance", ft.Icons.NEAR_ME),
+                                             ("call", ft.Icons.SORT_BY_ALPHA))}
+        self.sort_btn = ft.PopupMenuButton(icon=ft.Icons.SORT, tooltip=self.t("sort"), items=list(self.sort_items.values()))
+        self._show_sort()
         self.list = ft.ListView(expand=True, spacing=0)
         return ft.Column(
             [
-                ft.Row([self.filter, self.count, self.internet,
+                ft.Row([self.filter, self.count, self.sort_btn, self.internet,
                         ft.IconButton(ft.Icons.HELP_OUTLINE, tooltip=self.t("legend"),
                                       on_click=lambda _e: show_legend(self.app))],
                        vertical_alignment=ft.CrossAxisAlignment.CENTER, spacing=4),
@@ -57,6 +64,19 @@ class StationsView(View):
             ],
             expand=True,
         )
+
+    def _show_sort(self) -> None:
+        chosen = self.engine.config.stations_sort
+        for key, item in self.sort_items.items():
+            item.checked = key == chosen
+        self.sort_btn.tooltip = f"{self.t('sort')}: {self.t('sort_' + chosen)}"
+
+    def _sort(self, key: str) -> None:
+        self.engine.config.stations_sort = key
+        self.app.save_config_soon()
+        self._show_sort()
+        self.force()
+        self.app.page.update()
 
     def force(self) -> None:
         self._signature = None
@@ -67,14 +87,26 @@ class StationsView(View):
         heard = self.engine.station.heard
         now = time.time()
         # Ages are shown rounded, so a refresh every 30 s is enough when nothing new was heard.
+        order = self.engine.config.stations_sort
+        here = self.engine.my_position()
         signature = (len(heard), next(reversed(heard), None), heard[next(reversed(heard))]["count"] if heard else 0,
-                     int(now // 30))
+                     int(now // 30), order, here if order == "distance" else None)
         if signature == self._signature:
             return
         self._signature = signature
         needle = (self.filter.value or "").strip().upper()
         entries = [e for e in reversed(heard.values())
                    if (not needle or needle in e["call"].upper()) and visible(self.app, e)]
+        if order == "time":
+            entries.sort(key=lambda e: e.get("last_heard") or 0, reverse=True)
+        elif order == "call":
+            entries.sort(key=lambda e: e["call"].upper())
+        elif order == "distance":
+            def far(e: dict) -> float:  # those with no position (or ours unknown) at the end, newest first there
+                if here and e.get("latitude") is not None and e.get("longitude") is not None:
+                    return distance_km(*here, e["latitude"], e["longitude"])
+                return float("inf")
+            entries.sort(key=lambda e: (far(e), -(e.get("last_heard") or 0)))
         self.count.value = f"{len(entries)} / {len(heard)}"
         if not entries:
             # say why the list is empty: nothing heard, the filter, or only stations from the internet (hidden)

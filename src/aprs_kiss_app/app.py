@@ -1026,13 +1026,13 @@ class App:
         """What the user chose in the map menu."""
         conf = self.engine.config
         if not conf.map_offline:
-            return "online"
+            return "topo" if conf.map_online == "otm" else "online"
         return "imported" if conf.map_imported and self.has_imported_maps() else "basic"
 
     def map_mode(self) -> str:
         """What is shown: without internet an offline map even when online was chosen."""
         if not self.offline_map():
-            return "online"
+            return "topo" if self.engine.config.map_online == "otm" else "online"
         return "imported" if self.engine.config.map_imported and self.has_imported_maps() else "basic"
 
     def imported_shown(self) -> bool:
@@ -1040,12 +1040,14 @@ class App:
 
     def set_map_mode(self, mode: str) -> None:
         conf = self.engine.config
-        conf.map_offline = mode != "online"
-        if mode != "online":
+        conf.map_offline = mode not in ("online", "topo")
+        if mode in ("online", "topo"):
+            conf.map_online = "otm" if mode == "topo" else "osm"
+        else:
             conf.map_imported = mode == "imported"
         self.base_maps_changed()
         self.save_config_soon()
-        if mode == "online" and self.no_internet:
+        if mode in ("online", "topo") and self.no_internet:
             self.toast(self.t("net_offline"), seconds=6)
         self.page.update()
 

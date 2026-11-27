@@ -11,7 +11,8 @@ import flet as ft
 
 from .base import stay_item
 
-ICONS = {"online": ft.Icons.CLOUD_OUTLINED, "imported": ft.Icons.TERRAIN, "basic": ft.Icons.CLOUD_OFF}
+ICONS = {"online": ft.Icons.CLOUD_OUTLINED, "topo": ft.Icons.LANDSCAPE_OUTLINED, "imported": ft.Icons.TERRAIN,
+         "basic": ft.Icons.CLOUD_OFF}
 
 
 LABEL_WIDTH = 170  # the round mark, the icon and this fit a pop-up menu (Flutter: at most 280 wide)
@@ -41,7 +42,7 @@ class MapSourceButton:
         t = app.t
         # a choice leaves the menu open (the mark moves); back or a tap outside closes it
         self.items, self.boxes = {}, {}
-        for key in ("online", "imported", "basic"):
+        for key in ("online", "topo", "imported", "basic"):
             self.items[key], self.boxes[key] = stay_item(ft.Text(""), lambda _e, k=key: self._pick(k))
         manage = ft.PopupMenuItem(t("map_src_manage"), icon=ft.Icons.FOLDER_OPEN,
                                   on_click=lambda _e: app.select("settings"))
@@ -54,7 +55,7 @@ class MapSourceButton:
     def refresh(self) -> None:
         mode = self.app.map_mode()
         has_imported = self.app.has_imported_maps()
-        texts = {"online": "map_src_online", "imported": "map_src_imported" if has_imported else "map_src_none",
+        texts = {"online": "map_src_online", "topo": "map_src_topo", "imported": "map_src_imported" if has_imported else "map_src_none",
                  "basic": "map_src_basic"}
         for key, box in self.boxes.items():
             box.content = ft.Row([_choice_icon(ICONS[key], key == self.app.wanted_map_mode()),
