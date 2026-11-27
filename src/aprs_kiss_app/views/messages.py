@@ -226,7 +226,7 @@ class MessagesView(View):
             return
         self._signature = signature
         self.via_picker.sync()  # not chosen yet: follows the APRS-IS switch in Settings
-        self._show_filter()
+        self._show_filter(groups)
         shown = {c: m for c, m in groups.items() if c in self.unread} if self.only_unread else groups
         needle, hits = self._needle(), {}
         if needle:  # only conversations whose callsign or some message has the text; that message shown
@@ -274,7 +274,7 @@ class MessagesView(View):
         self.refresh()
         self.app.page.update()
 
-    # ─── the filter: all conversations, or only the unread ones; each with its count of messages ───
+    # ─── the filter: all conversations, or only the unread ones; each with its count of conversations ───
 
     only_unread = False
 
@@ -313,8 +313,10 @@ class MessagesView(View):
                             padding=ft.Padding.only(left=14, right=8, top=6, bottom=6), ink=True)
         return pill, count, circle
 
-    def _show_filter(self) -> None:
-        counts = {False: len(self.engine.messages), True: self.unread_total}
+    def _show_filter(self, groups: dict | None = None) -> None:
+        """The pills count the lines of the list: all conversations, and those with unread messages."""
+        groups = self._grouped() if groups is None else groups
+        counts = {False: len(groups), True: sum(1 for c in self.unread if c in groups)}
         for which, (pill, count, circle) in self.filter_pills.items():
             on = which == self.only_unread
             count.value = str(counts[which]) if counts[which] < 1000 else "999+"
