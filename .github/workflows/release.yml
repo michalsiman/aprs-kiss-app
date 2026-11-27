@@ -45,6 +45,10 @@ jobs:
           cp -a build/linux "staging/aprs-kiss-$V"
           tar -C staging -czf "dist/aprs-kiss-$V-linux-x86_64.tar.gz" "aprs-kiss-$V"
           packaging/deb/build-deb.sh build/linux "$V" dist
+      - name: Python wheel (the station server on a Raspberry Pi installs it)
+        run: |
+          pip install build
+          python -m build --wheel --outdir dist .
       - uses: actions/upload-artifact@v4
         with:
           name: linux
@@ -293,6 +297,7 @@ jobs:
           files: |
             out/linux/*.tar.gz
             out/linux/*.deb
+            out/linux/*.whl
             out/flatpak/*.flatpak
             out/windows/*.exe
             out/windows/*.zip

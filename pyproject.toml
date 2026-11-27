@@ -22,10 +22,13 @@ dependencies = [
 [project.optional-dependencies]
 # Running with plain Python (pip/pipx) needs the desktop client; `flet build` bundles its own.
 desktop = ["flet-desktop==1.1.2"]
+# The station server (Raspberry Pi): the app as a web page and a dashboard for a small screen.
+server = ["flet-web==1.1.2"]
 dev = ["flet[all]==1.1.2"]
 
 [project.scripts]
 aprs-kiss = "aprs_kiss_app.cli:run"
+aprs-kiss-server = "aprs_kiss_app.server:run"
 
 [project.urls]
 Homepage = "https://github.com/michalsiman/aprs-kiss-app"
@@ -39,7 +42,7 @@ build-backend = "setuptools.build_meta"
 where = ["src"]
 
 [tool.setuptools.package-data]
-aprs_kiss_app = ["icon.png", "offline/world.json", "CHANGELOG.md"]
+aprs_kiss_app = ["icon.png", "offline/world.json", "CHANGELOG.md", "web/*"]
 
 # ─── flet build (Linux now; Windows, macOS, Android, iOS from the same code) ───
 [tool.flet]

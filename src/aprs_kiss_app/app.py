@@ -38,6 +38,7 @@ from .symbols import symbol_info
 from .views.base import View, adapt, clock, distance_text
 from .views.bbs import BbsView
 from .views.tak import TakView
+from . import shared
 from .views.bulletins import BulletinsView
 from .views.chat import ChatView
 from .views.files import FilesView, size_text
@@ -130,14 +131,19 @@ class App:
                                        "connection": ("usb" if android_usb.available() else "tcp")
                                        if config.connection == "serial" else config.connection,
                                        "gps_source": "manual"}).validate()
-        self.engine = Engine(config, self.folder)
+        if shared.engine():  # the station server: one engine for every browser, running already
+            self.engine = shared.engine()
+            config = self.engine.config
+        else:
+            self.engine = Engine(config, self.folder)
         if config.map_paths:  # imported offline maps: opened before the map is drawn
             failed = await asyncio.to_thread(offline_map.set_custom_maps, config.map_paths)
             for path, err in failed:
                 _LOGGER.warning("Offline map %s cannot be used: %s", path, err)
         self.sounds = Sounds(self)
-        self.engine.add_listener(self._on_event)
-        await self.engine.start()
+        self._remove_listener = self.engine.add_listener(self._on_event)
+        if not shared.engine():
+            await self.engine.start()
         self.phone_gps = PhoneGps(self)
         await language.detect(page)  # phones say their language only this way
         await self.apply_theme()
@@ -210,8 +216,12 @@ class App:
     async def shutdown(self) -> None:
         if self._closing:
             return
-        _LOGGER.info("Session ends: stopping the engine")
         self._closing = True
+        if shared.engine():  # the station server: the engine goes on for the other browsers and the radio
+            _LOGGER.info("Web session ends")
+            self._remove_listener()
+            return
+        _LOGGER.info("Session ends: stopping the engine")
         if self.engine:
             with contextlib.suppress(Exception):
                 await self.engine.stop()
@@ -234,7 +244,16 @@ class App:
             self.select(("tak" if config.tak_enabled != old.tak_enabled else "bbs") if mode_changed else "settings")
         self.toast(self.t("saved"))
         self.refresh_now()
+        if shared.engine():  # the station server: other browsers show the new settings too
+            for other in [a for a in _LIVE_APPS if a is not self and not a._closing]:
+                with contextlib.suppress(Exception):
+                    other.page.run_task(other._settings_elsewhere)
         _LOGGER.info("Settings applied: radio %.2f s, screen %.2f s", t1 - t0, time.monotonic() - t1)
+
+    async def _settings_elsewhere(self) -> None:
+        """Settings were changed in another browser (station server): the screens built again."""
+        self.build()
+        self.refresh_now()
 
     async def send_position_text(self, lat: float, lon: float, where: str, locator: bool = False) -> None:
         """A position (picked on the map) to everybody in the chat, or into a message being written;

@@ -4,6 +4,17 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## Unreleased
+
+- **Raspberry Pi as a station server with a display**: `aprs-kiss-server` runs one engine for as long as the
+  computer runs (the TNC, APRS-IS, iGate, digipeater and beacon need no window; Transmit is remembered over a
+  restart) and serves the whole app as a web page – set everything from a phone or a computer in the same
+  network, behind a password (`--set-password`; the Pi's own screen needs none). `/display` is a dashboard
+  for a 5" or 7" screen (800×480 and up): TNC, APRS-IS, DIGI and TX lamps, counters (received, sent, to
+  APRS-IS, digipeated, stations) and the last frames, stations, messages or bulletins by a tap; hold TX to
+  switch transmitting. `packaging/raspberry/install.sh` sets it all up on Raspberry Pi OS: the app, a systemd
+  service, a kiosk browser on the screen. Each release now also carries a Python wheel.
+
 ## 1.8.0 – 2026-11-27
 
 - **Bulletins** – a new screen in the APRS part of the menu: APRS messages to everybody from the stations around

@@ -101,6 +101,8 @@ Listener = Callable[[str, dict[str, Any]], None]
 
 __all__ = ["Engine", "TransmitRefused"]
 
+RECENT_RF = 60  # packets heard by radio kept for the station server's display
+
 
 class Engine:
     """One TNC with one callsign."""
@@ -120,6 +122,7 @@ class Engine:
         self.thursday_joined = 0.0  # when we last sent a CQ to HOTG (0 = not in the group)
         self.thursday_cq = 0.0  # the last CQ, for the server's one-per-30-minutes rule
         self._thursday_recent: dict[str, float] = {}
+        self.recent_rf: deque[dict[str, Any]] = deque(maxlen=RECENT_RF)  # the last packets heard by radio
         self.board = bln.Board()  # bulletins heard and our own still going out
         self._bulletin_task: asyncio.Task | None = None
         self._chat_recent: dict[str, float] = {}
@@ -735,6 +738,7 @@ class Engine:
         self._emit("monitor", {"line": entry})
 
     def _on_packet(self, packet: dict[str, Any]) -> None:
+        self.recent_rf.append(packet)
         self._emit("packet", packet)
         self._bulletin_in(packet, "radio")
         if self.igate_rx and self.aprsis and self.aprsis.verified:
