@@ -18,7 +18,11 @@ CLOSE_Y = 48  # …and this one above the other cover each other's label
 RINGS = (54, 78, 104, 132, 160)  # pixels: the circles tried around a station's own place
 DIRECTIONS = 12
 MAX_SHIFT = RINGS[-1]
-SAME_PX = 10  # closer than this on screen: one place (a digi and an iGate on one mast)
+# Closer than this on screen (side by side, one above the other): as good as one place. One of them staying
+# would cover the other's dot with its symbol (the disc sits above the point) or the top of its tag, and the
+# dot would look like the first station's; so neither stays.
+SAME_X = 34
+SAME_Y = 32
 MIN_ZOOM = 9.0  # further out (a whole region) the markers stay where they are: spreading would be a web of lines
 
 
@@ -72,17 +76,17 @@ def spread(points: list[tuple[float, float]], zoom: float, fixed: int | None = N
         grid.setdefault((int(x // CLOSE_X), int(y // CLOSE_Y)), []).append((x, y))
 
     px = [to_px(*pt, zoom) for pt in points]
-    # Several stations at one place: none of them stays on it. The place itself is kept free for the dot
+    # Several stations at one place (or nearly, see SAME_X / SAME_Y): none of them stays on it. The place itself is kept free for the dot
     # the lines point to, otherwise the first station's marker covered it and nobody could tell where
     # the group really is.
     shared = set()
     cells: dict[tuple[int, int], list[int]] = {}
     for i, (x, y) in enumerate(px):
-        cx, cy = int(x // SAME_PX), int(y // SAME_PX)
+        cx, cy = int(x // SAME_X), int(y // SAME_Y)
         for dx in (-1, 0, 1):
             for dy in (-1, 0, 1):
                 for j in cells.get((cx + dx, cy + dy), ()):
-                    if abs(px[j][0] - x) < SAME_PX and abs(px[j][1] - y) < SAME_PX:
+                    if abs(px[j][0] - x) < SAME_X and abs(px[j][1] - y) < SAME_Y:
                         shared.update((i, j))
         cells.setdefault((cx, cy), []).append(i)
     if fixed in shared:

@@ -6,6 +6,9 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 
 ## Unreleased
 
+- **Map: the grey dot no longer sits inside another station's symbol.** Two stations a little apart (not at
+  one place, e.g. OK1KUN-1 and OK1KUN-2) – one stayed, and the other one's dot (where it really is) fell on the
+  first one's symbol. Now both move aside, as stations at one place do.
 - **A tap on the temperature around you** lists the weather stations it is the average of – nearest first, each
   with its temperature, humidity and pressure, how far and in which direction, how old; a tap on one opens it.
 

@@ -56,6 +56,25 @@ class DeclutterTest(unittest.TestCase):
                     self.assertFalse(overlap(shown[i], shown[j], 14), (n, i, j))
 
 
+    def test_a_moved_stations_dot_is_not_under_another_symbol(self):
+        """OK1KUN-1 and OK1KUN-2 a little apart (not one place): the one that stayed covered the other's dot."""
+        zoom = 13
+        x, y = to_px(49.6600, 13.2300, zoom)
+        for dx, dy in ((0, -20), (8, -25), (15, 10), (-25, 0)):
+            points = [(49.6600, 13.2300), from_px(x + dx, y + dy, zoom)]
+            shown = spread(points, zoom)
+            for i, real in enumerate(points):
+                if shown[i] == real:
+                    continue  # not moved: no dot
+                rx, ry = to_px(*real, zoom)
+                for j, at in enumerate(shown):
+                    if j == i:
+                        continue
+                    sx, sy = to_px(*at, zoom)
+                    disc = (sx, sy - 13)  # the symbol's disc is above the marker's point
+                    self.assertGreater(math.hypot(rx - disc[0], ry - disc[1]), 18, (dx, dy, i, j))
+
+
 if __name__ == "__main__":
     unittest.main()
 
