@@ -373,11 +373,11 @@ in the [issues](https://github.com/michalsiman/aprs-kiss-app/issues).
 ## Install (Linux)
 
 **With automatic updates (Flatpak):** open
-**[michalsiman.github.io/aprs-kiss-app](https://michalsiman.github.io/aprs-kiss-app/)** and click
+**[aprs.ok1sim.cz](https://aprs.ok1sim.cz/)** and click
 *Install*, or run
 
 ```bash
-flatpak install https://michalsiman.github.io/aprs-kiss-app/aprs-kiss.flatpakref
+flatpak install https://aprs.ok1sim.cz/aprs-kiss.flatpakref
 ```
 
 (Without `--user`: Linux Mint's Update Manager and Software Manager only see the system-wide
@@ -463,12 +463,12 @@ the last frames, stations, messages or bulletins.
 
 **One command to install** – a step-by-step guide (the card, the first start, the screen, the settings,
 troubleshooting) is in **[docs/RASPBERRY.md](docs/RASPBERRY.md)** and on the
-**[website](https://michalsiman.github.io/aprs-kiss-app/raspberry.html)**. In short, on Raspberry Pi OS:
+**[website](https://aprs.ok1sim.cz/raspberry.html)**. In short, on Raspberry Pi OS:
 
 ```bash
-curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh | bash              # a screen or a monitor
-curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh | bash -s -- --touch-5inch   # 5" HDMI with touch
-curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh | bash -s -- --no-display    # no screen
+curl -fsSL https://aprs.ok1sim.cz/pi.sh | bash              # a screen or a monitor
+curl -fsSL https://aprs.ok1sim.cz/pi.sh | bash -s -- --touch-5inch   # 5" HDMI with touch
+curl -fsSL https://aprs.ok1sim.cz/pi.sh | bash -s -- --no-display    # no screen
 sudo reboot
 ```
 
@@ -504,7 +504,7 @@ tests/              unit tests, engine tests against fake_tnc.py and fake_vara.p
 - The core modules are the same as in the Home Assistant integration (`hub.py` there,
   `engine.py` here). The plan is to publish the core as one package both use.
 
-Privacy: the app collects nothing; see the [privacy policy](https://michalsiman.github.io/aprs-kiss-app/privacy.html).
+Privacy: the app collects nothing; see the [privacy policy](https://aprs.ok1sim.cz/privacy.html).
 
 ## Platforms
 

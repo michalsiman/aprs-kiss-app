@@ -52,9 +52,9 @@ Pick the line for your screen and paste it in the terminal:
 
 | Screen | Command |
 |---|---|
-| 5" HDMI with a stylus touch (Waveshare and clones, 800×480) | `curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh \| bash -s -- --touch-5inch` |
-| official 7", another touch screen or a plain monitor | `curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh \| bash` |
-| no screen (Raspberry Pi OS Lite) | `curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh \| bash -s -- --no-display` |
+| 5" HDMI with a stylus touch (Waveshare and clones, 800×480) | `curl -fsSL https://aprs.ok1sim.cz/pi.sh \| bash -s -- --touch-5inch` |
+| official 7", another touch screen or a plain monitor | `curl -fsSL https://aprs.ok1sim.cz/pi.sh \| bash` |
+| no screen (Raspberry Pi OS Lite) | `curl -fsSL https://aprs.ok1sim.cz/pi.sh \| bash -s -- --no-display` |
 
 The script installs what is needed and at the end asks for a **web password** – set one, the web can
 transmit. About 5 minutes on a Pi 4, up to 15 on a Pi 3. Then restart the Pi:

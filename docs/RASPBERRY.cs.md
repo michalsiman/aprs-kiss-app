@@ -51,9 +51,9 @@ Vyber řádek podle svého displeje a vlož ho do terminálu:
 
 | Displej | Příkaz |
 |---|---|
-| 5" HDMI s dotykem na stylus (Waveshare a klony, 800×480) | `curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh \| bash -s -- --touch-5inch` |
-| oficiální 7", jiný dotykový nebo obyčejný monitor | `curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh \| bash` |
-| bez displeje (Raspberry Pi OS Lite) | `curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh \| bash -s -- --no-display` |
+| 5" HDMI s dotykem na stylus (Waveshare a klony, 800×480) | `curl -fsSL https://aprs.ok1sim.cz/pi.sh \| bash -s -- --touch-5inch` |
+| oficiální 7", jiný dotykový nebo obyčejný monitor | `curl -fsSL https://aprs.ok1sim.cz/pi.sh \| bash` |
+| bez displeje (Raspberry Pi OS Lite) | `curl -fsSL https://aprs.ok1sim.cz/pi.sh \| bash -s -- --no-display` |
 
 Skript sám nainstaluje, co je potřeba, a na konci se zeptá na **heslo k webu** – nastav ho, přes web se dá
 vysílat. Na Pi 4 to trvá kolem 5 minut, na Pi 3 až 15. Pak Pi restartuj:

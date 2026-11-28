@@ -369,11 +369,11 @@ napište prosím, jak to dopadlo, do [issues](https://github.com/michalsiman/apr
 ## Instalace (Linux)
 
 **S automatickými aktualizacemi (Flatpak):** otevřete
-**[michalsiman.github.io/aprs-kiss-app](https://michalsiman.github.io/aprs-kiss-app/)** a klikněte na
+**[aprs.ok1sim.cz](https://aprs.ok1sim.cz/)** a klikněte na
 *Instalovat*, nebo spusťte
 
 ```bash
-flatpak install https://michalsiman.github.io/aprs-kiss-app/aprs-kiss.flatpakref
+flatpak install https://aprs.ok1sim.cz/aprs-kiss.flatpakref
 ```
 
 (Bez `--user`: Správce aktualizací a Správce softwaru v Linux Mintu vidí jen celosystémovou
@@ -458,12 +458,12 @@ zvolí přehled (`--dashboard`): kontrolky, počítadla a poslední rámce, stan
 
 **Instalace jedním příkazem** – podrobný návod krok za krokem (karta, první start, displej, nastavení,
 řešení problémů) je v **[docs/RASPBERRY.cs.md](docs/RASPBERRY.cs.md)** a na
-**[webu](https://michalsiman.github.io/aprs-kiss-app/raspberry.html)**. Ve zkratce, na Raspberry Pi OS:
+**[webu](https://aprs.ok1sim.cz/raspberry.html)**. Ve zkratce, na Raspberry Pi OS:
 
 ```bash
-curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh | bash              # displej nebo monitor
-curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh | bash -s -- --touch-5inch   # 5" HDMI s dotykem
-curl -fsSL https://michalsiman.github.io/aprs-kiss-app/pi.sh | bash -s -- --no-display    # bez displeje
+curl -fsSL https://aprs.ok1sim.cz/pi.sh | bash              # displej nebo monitor
+curl -fsSL https://aprs.ok1sim.cz/pi.sh | bash -s -- --touch-5inch   # 5" HDMI s dotykem
+curl -fsSL https://aprs.ok1sim.cz/pi.sh | bash -s -- --no-display    # bez displeje
 sudo reboot
 ```
 
@@ -499,7 +499,7 @@ tests/              testy jednotek, testy enginu proti fake_tnc.py a fake_vara.p
 - Moduly jádra jsou stejné jako v integraci pro Home Assistant (tam `hub.py`, tady `engine.py`).
   V plánu je vydat jádro jako jeden balíček, který budou používat obě.
 
-Soukromí: aplikace nic nesbírá; viz [zásady ochrany osobních údajů](https://michalsiman.github.io/aprs-kiss-app/privacy.html).
+Soukromí: aplikace nic nesbírá; viz [zásady ochrany osobních údajů](https://aprs.ok1sim.cz/privacy.html).
 
 ## Platformy
 
