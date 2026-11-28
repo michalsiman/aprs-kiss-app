@@ -4,6 +4,14 @@ Stable versions are 1.0.0, 1.1.0, 1.2.0 …; between them come **betas** (1.0.1,
 `vX.Y.Z-beta`, pre-releases on GitHub) for testers. The app tells about a new beta only when
 *Also offer beta versions* is ticked in Settings; Flatpak and Linux Mint's update manager get stable ones only.
 
+## 1.10.0 – 2026-11-28
+
+- **Station telemetry for a digipeater or an iGate** (Settings › Station telemetry): every 10–60 minutes five
+  numbers – packets heard by radio, digipeated, gated RF→internet and internet→RF, and the farthest station
+  heard directly (without a digipeater) in km – plus digipeater/iGate/APRS-IS/Transmit bits, as APRS telemetry
+  (T#, with PARM/UNIT/EQNS/BITS every few reports) over the internet, by radio or both. aprs.fi draws graphs of
+  them (a button in the settings opens them).
+
 ## 1.9.1 – 2026-11-27
 
 - **Map tags no longer cover each other**: markers are spread by the real size of their tags – a repeater's

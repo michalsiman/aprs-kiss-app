@@ -71,6 +71,8 @@ instalace), přihlas se heslem a v **Nastavení** vyplň:
   *KISS přes TCP (síť)*; zvuková karta *Zvukový modem (Direwolf)*.
 - **Stanice**: značka se SSID, poloha, komentář, maják.
 - podle potřeby **APRS-IS** (iGate), **Digipeater**.
+- **Telemetrie stanice**: počty paketů (přijaté, přeposlané, přes iGate) a nejvzdálenější slyšená stanice
+  jako grafy na aprs.fi – stačí *Internetem*.
 
 Ulož a zapni **TX** v horní liště. Totéž můžeš udělat přímo na dotykovém displeji Pi (menu ☰ vlevo nahoře).
 Zapnuté vysílání si Pi pamatuje i po restartu.

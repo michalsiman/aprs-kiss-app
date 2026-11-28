@@ -44,7 +44,7 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
 <table>
 <tr><td width="33%" valign="top"><h3>🗺️ Živá mapa</h3>Stanice s APRS symboly, ocásky, převaděče s kmitočtem; OpenStreetMap, OpenTopoMap i offline.</td><td width="33%" valign="top"><h3>✉️ Zprávy</h3>Konverzace s počty nepřečtených a hledáním; polohy, odkazy a zmíněné stanice se otevřou na mapě.</td><td width="33%" valign="top"><h3>📧 Winlink e-mail</h3>Čtení a posílání e-mailů přes APRS a bránu WLNK-1 – přihlášení vyřeší aplikace sama.</td></tr>
 <tr><td width="33%" valign="top"><h3>🚗 Tracker</h3>Pevný interval nebo jako SmartBeaconing; mapa tě sleduje jako navigace.</td><td width="33%" valign="top"><h3>⚠️ Výstrahy před tebou</h3>Nehody, práce na silnici, požáry, povodně a protijedoucí stanice v laloku před tebou.</td><td width="33%" valign="top"><h3>🆘 Mic-E a NOUZE</h3>Kratší polohy se stavem; NOUZE s potvrzením a červeně na mapě.</td></tr>
-<tr><td width="33%" valign="top"><h3>🌡️ Počasí z okolí</h3>Průměr meteostanic do 20 km v rohu mapy.</td><td width="33%" valign="top"><h3>📻 Jakékoli KISS TNC</h3>TCP/IP, USB, Bluetooth i Bluetooth LE; ladí rádia VR-N76 / UV-PRO.</td><td width="33%" valign="top"><h3>🔁 Digipeater a iGate</h3>Fill-in nebo wide digipeater; RX i TX iGate do APRS-IS.</td></tr>
+<tr><td width="33%" valign="top"><h3>🌡️ Počasí z okolí</h3>Průměr meteostanic do 20 km v rohu mapy.</td><td width="33%" valign="top"><h3>📻 Jakékoli KISS TNC</h3>TCP/IP, USB, Bluetooth i Bluetooth LE; ladí rádia VR-N76 / UV-PRO.</td><td width="33%" valign="top"><h3>🔁 Digipeater a iGate</h3>Fill-in nebo wide digipeater; RX i TX iGate do APRS-IS; grafy telemetrie na aprs.fi.</td></tr>
 <tr><td width="33%" valign="top"><h3>💻 Packet terminál</h3>Spojení AX.25 na BBS a nody, i přes VARA FM.</td><td width="33%" valign="top"><h3>📁 Soubory</h3>Posílání a příjem souborů přes packet rádio (YAPP), s průběhem a zbývajícím časem.</td><td width="33%" valign="top"><h3>🗄️ BBS SERVER</h3>Vlastní packet BBS – příkazy ve stylu W0RLI / MBL / FBB.</td></tr>
 <tr><td width="33%" valign="top"><h3>🎯 TAK</h3>Polohy a GeoChat kompatibilní s ATAK přes rádio.</td><td width="33%" valign="top"><h3>🏔️ Spot a služby</h3>Ohlášení SOTA, POTA, WWFF …; FIND, REPEAT, WXNOW a další.</td><td width="33%" valign="top"><h3>📅 #APRSThursday</h3>Týdenní síť HOTG na vlastní obrazovce.</td></tr>
 <tr><td width="33%" valign="top"><h3>🧭 Navigace a sdílení</h3>Otevři stanici nebo bod v navigaci, nebo ho pošli dál.</td><td width="33%" valign="top"><h3>🌍 16 jazyků</h3>km nebo míle, °C nebo °F, hPa nebo inHg – podle telefonu či počítače.</td><td width="33%" valign="top"><h3>🖥️ Všude</h3>Linux, Windows, macOS, Android, iOS – jedna aplikace, světlá i tmavá.</td></tr>
@@ -157,6 +157,10 @@ vazbu** – jakékoli rádio, TNC i platforma: napište [issue](https://github.c
   rámce adresované vaší značce nebo aliasům (např. RELAY), stejný paket jen jednou za 30 sekund.
 - **APRS-IS** (internet) s volitelným **iGate** pro příjem i vysílání; zprávy, které vám iGate pošle
   rádiem, se přijmou a potvrdí.
+- **Telemetrie stanice** pro digipeater nebo iGate (Nastavení › Telemetrie stanice): každých 10–60 minut
+  počet paketů přijatých rádiem, přeposlaných digipeaterem, poslaných z rádia na internet a z internetu do
+  rádia a nejvzdálenější stanice slyšená přímo (km), jako APRS telemetrie internetem, rádiem nebo obojím –
+  aprs.fi z nich kreslí grafy.
 - **Poloha z GPS**: z GPS telefonu (na telefonu bez ručně zadané polohy výchozí; Nastavení ukazuje,
   kde podle ní jste), nebo z **USB GPS modulu** (NMEA, u-blox/VK-172 a podobné, rychlost se zjistí sama): s fixem používá jeho polohu
   mapa, maják (i s výškou) a TAK; stav GPS je v horní liště.
@@ -313,6 +317,10 @@ zvětší. Řídí se motivem GitHubu, stejně jako aplikace: používá světl�
 <tr>
 <td width="50%"><a href="assets/cs/settings-privacy.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/settings-privacy-light.png"><img src="assets/cs/settings-privacy.png" alt="Soukromí polohy: méně přesná poloha, bez rychlosti a výšky"></picture></a><br><sub>Soukromí polohy: méně přesná poloha, bez rychlosti a výšky</sub></td>
 <td width="50%"><a href="assets/cs/settings-more.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/settings-more-light.png"><img src="assets/cs/settings-more.png" alt="Nastavení: pozadí a obrazovka, zvuky"></picture></a><br><sub>Nastavení: pozadí a obrazovka, zvuky</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="assets/cs/settings-telemetry.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/cs/settings-telemetry-light.png"><img src="assets/cs/settings-telemetry.png" alt="Telemetrie stanice pro digipeater nebo iGate"></picture></a><br><sub>Telemetrie stanice pro digipeater nebo iGate</sub></td>
+<td width="50%"></td>
 </tr>
 </table>
 

@@ -72,6 +72,8 @@ printed), log in and fill in **Settings**:
   TCP (network)*; a sound card *Sound-card modem (Direwolf)*.
 - **Station**: the callsign with its SSID, position, comment, beacon.
 - **APRS-IS** (iGate), **Digipeater** as you need.
+- **Station telemetry**: packet counts (heard, digipeated, gated) and the farthest station heard as graphs on
+  aprs.fi – *Internet* is enough.
 
 Save and switch **TX** on in the top bar. The same works on the Pi's touch screen (the ☰ menu at the top
 left). The Pi remembers transmitting over a restart.

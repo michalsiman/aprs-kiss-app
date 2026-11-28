@@ -45,7 +45,7 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
 <table>
 <tr><td width="33%" valign="top"><h3>🗺️ Live map</h3>Stations with APRS symbols, trails, repeaters with their frequency; OpenStreetMap, OpenTopoMap or offline.</td><td width="33%" valign="top"><h3>✉️ Messages</h3>Conversations with unread counts and search; positions, links and mentioned stations open on the map.</td><td width="33%" valign="top"><h3>📧 Winlink e-mail</h3>Read and send e-mail over APRS through WLNK-1 – the login answered by itself.</td></tr>
 <tr><td width="33%" valign="top"><h3>🚗 Tracker</h3>Fixed rate or SmartBeaconing-like; the map follows you like a navigation.</td><td width="33%" valign="top"><h3>⚠️ Warnings ahead</h3>Crashes, road works, fires, floods and oncoming stations in a lobe ahead of you.</td><td width="33%" valign="top"><h3>🆘 Mic-E & EMERGENCY</h3>Shorter positions with a status; EMERGENCY asked first and shown in red.</td></tr>
-<tr><td width="33%" valign="top"><h3>🌡️ Weather around you</h3>The average of weather stations within 20 km in the map's corner.</td><td width="33%" valign="top"><h3>📻 Any KISS TNC</h3>TCP/IP, USB serial, Bluetooth and Bluetooth LE; tunes VR-N76 / UV-PRO radios.</td><td width="33%" valign="top"><h3>🔁 Digipeater & iGate</h3>Fill-in or wide digipeater; RX and TX iGate to APRS-IS.</td></tr>
+<tr><td width="33%" valign="top"><h3>🌡️ Weather around you</h3>The average of weather stations within 20 km in the map's corner.</td><td width="33%" valign="top"><h3>📻 Any KISS TNC</h3>TCP/IP, USB serial, Bluetooth and Bluetooth LE; tunes VR-N76 / UV-PRO radios.</td><td width="33%" valign="top"><h3>🔁 Digipeater & iGate</h3>Fill-in or wide digipeater; RX and TX iGate to APRS-IS; telemetry graphs on aprs.fi.</td></tr>
 <tr><td width="33%" valign="top"><h3>💻 Packet terminal</h3>AX.25 connected mode to BBSes and nodes, also over VARA FM.</td><td width="33%" valign="top"><h3>📁 Files</h3>Send and receive files over packet radio (YAPP), with progress and time left.</td><td width="33%" valign="top"><h3>🗄️ BBS SERVER</h3>Your own packet BBS – W0RLI / MBL / FBB style commands.</td></tr>
 <tr><td width="33%" valign="top"><h3>🎯 TAK</h3>ATAK-compatible positions and GeoChat over the radio.</td><td width="33%" valign="top"><h3>🏔️ Spot & services</h3>SOTA, POTA, WWFF … self-spots; FIND, REPEAT, WXNOW and more.</td><td width="33%" valign="top"><h3>📅 #APRSThursday</h3>The weekly HOTG net on its own screen.</td></tr>
 <tr><td width="33%" valign="top"><h3>🧭 Navigate & share</h3>Open any station or point in a navigation app, or share it.</td><td width="33%" valign="top"><h3>🌍 16 languages</h3>km or miles, °C or °F, hPa or inHg – as your phone or computer is set.</td><td width="33%" valign="top"><h3>🖥️ Everywhere</h3>Linux, Windows, macOS, Android, iOS – one app, light and dark.</td></tr>
@@ -163,6 +163,9 @@ Android **tracker** in a car with a Quansheng on a USB cable, and on its own ove
   addressed to your callsign or aliases (e.g. RELAY), the same packet only once in 30 seconds.
 - **APRS-IS** (internet) with an optional RX and TX **iGate**; messages an iGate relays to you by
   radio are received and acknowledged.
+- **Station telemetry** for a digipeater or an iGate (Settings › Station telemetry): every 10–60 minutes the
+  packets heard by radio, digipeated, gated RF→internet and internet→RF and the farthest station heard
+  directly (km), as APRS telemetry over the internet, by radio or both – aprs.fi draws graphs of them.
 - **Your position from a GPS**: the phone's own GPS (the default on a phone with no position typed in;
   Settings shows where it says you are), or a **USB GPS module** (NMEA, u-blox/VK-172 and the like, speed found automatically): with a fix the map,
   the beacon (with altitude) and TAK use its position; the GPS state is shown in the top bar.
@@ -318,6 +321,10 @@ full size. They follow your GitHub theme, and so does the app: it uses the syste
 <tr>
 <td width="50%"><a href="assets/settings-privacy.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-privacy-light.png"><img src="assets/settings-privacy.png" alt="Position privacy: a less exact position, no speed or altitude"></picture></a><br><sub>Position privacy: a less exact position, no speed or altitude</sub></td>
 <td width="50%"><a href="assets/settings-more.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-more-light.png"><img src="assets/settings-more.png" alt="Settings: background and screen, sounds"></picture></a><br><sub>Settings: background and screen, sounds</sub></td>
+</tr>
+<tr>
+<td width="50%"><a href="assets/settings-telemetry.png"><picture><source media="(prefers-color-scheme: light)" srcset="assets/settings-telemetry-light.png"><img src="assets/settings-telemetry.png" alt="Station telemetry for a digipeater or an iGate"></picture></a><br><sub>Station telemetry for a digipeater or an iGate</sub></td>
+<td width="50%"></td>
 </tr>
 </table>
 

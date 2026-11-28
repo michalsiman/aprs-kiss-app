@@ -115,6 +115,11 @@
   </requires>
 
   <releases>
+    <release version="1.10.0" date="2026-11-28">
+      <description>
+        <p>Station telemetry for a digipeater or an iGate: packets heard by radio, digipeated, gated both ways and the farthest station heard directly, every 10–60 minutes as APRS telemetry over the internet, by radio or both; aprs.fi draws graphs of them.</p>
+      </description>
+    </release>
     <release version="1.9.1" date="2026-11-27">
       <description>
         <p>Map tags no longer cover each other: markers are spread by the real size of their tags (a repeater's long frequency line too). Bulletins: the New bulletin button at the top, off the phone's gesture bar.</p>

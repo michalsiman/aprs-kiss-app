@@ -184,7 +184,7 @@ const CARDS = {
     ["🆘","Mic-E & EMERGENCY","Shorter positions with a status; EMERGENCY asked first and shown in red."],
     ["🌡️","Weather around you","The average of weather stations within 20 km in the map's corner."],
     ["📻","Any KISS TNC","TCP/IP, USB serial, Bluetooth, Bluetooth LE – or a sound card with Direwolf."],
-    ["🔁","Digipeater & iGate","Fill-in or wide digipeater; RX and TX iGate to APRS-IS."],
+    ["🔁","Digipeater & iGate","Fill-in or wide digipeater; RX and TX iGate to APRS-IS; telemetry graphs on aprs.fi."],
     ["💻","Packet terminal","AX.25 connected mode to BBSes and nodes, also over VARA FM."],
     ["📁","Files","Send and receive files over packet radio (YAPP), with progress and time left."],
     ["🗄️","BBS SERVER","Your own packet BBS – W0RLI / MBL / FBB style commands."],
@@ -207,7 +207,7 @@ const CARDS = {
     ["🆘","Mic-E a NOUZE","Kratší polohy se stavem; NOUZE s potvrzením a červeně na mapě."],
     ["🌡️","Počasí z okolí","Průměr meteostanic do 20 km v rohu mapy."],
     ["📻","Jakékoli KISS TNC","TCP/IP, USB, Bluetooth, Bluetooth LE – nebo zvuková karta s Direwolfem."],
-    ["🔁","Digipeater a iGate","Fill-in nebo wide digipeater; RX i TX iGate do APRS-IS."],
+    ["🔁","Digipeater a iGate","Fill-in nebo wide digipeater; RX i TX iGate do APRS-IS; grafy telemetrie na aprs.fi."],
     ["💻","Packet terminál","Spojení AX.25 na BBS a nody, i přes VARA FM."],
     ["📁","Soubory","Posílání a příjem souborů přes packet rádio (YAPP), s průběhem a zbývajícím časem."],
     ["🗄️","BBS SERVER","Vlastní packet BBS – příkazy ve stylu W0RLI / MBL / FBB."],
@@ -235,11 +235,13 @@ const DESKS = {
   en: [["map","Map: symbols, repeaters, warnings, trails"],["messages","Messages with filters and search"],
        ["station","A station's details: navigate, share, callbooks"],["terminal","Packet terminal to a BBS"],
        ["bulletins","Bulletins: mine going out and those heard around"],["settings-privacy","Position privacy"],
-       ["tak","TAK: stations by team and GeoChat"],["settings-tnc","TNC connection"]],
+       ["tak","TAK: stations by team and GeoChat"],["settings-tnc","TNC connection"],
+       ["settings-telemetry","Station telemetry for a digipeater or an iGate"],["monitor","Monitor: every frame on the air"]],
   cs: [["map","Mapa: symboly, převaděče, výstrahy, ocásky"],["messages","Zprávy s filtry a hledáním"],
        ["station","Detail stanice: navigace, sdílení, katalogy"],["terminal","Packet terminál na BBS"],
        ["bulletins","Nástěnka: moje bulletiny a zachycené z okolí"],["settings-privacy","Soukromí polohy"],
-       ["tak","TAK: stanice podle týmů a GeoChat"],["settings-tnc","Připojení k TNC"]],
+       ["tak","TAK: stanice podle týmů a GeoChat"],["settings-tnc","Připojení k TNC"],
+       ["settings-telemetry","Telemetrie stanice pro digipeater nebo iGate"],["monitor","Monitor: každý rámec z éteru"]],
 };
 
 function pic(name, lang, alt) {
