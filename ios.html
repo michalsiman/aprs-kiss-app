@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APRS &amp; Packet – iPhone</title>
+<meta name="description" content="How to try APRS &amp; Packet on an iPhone or iPad: install the .ipa with Sideloadly or AltStore and your own Apple ID.">
+<link rel="icon" href="icon.png">
+<style>
+  :root {
+    --bg: #f6f7fb; --fg: #1b1d24; --muted: #5d6270; --card: #ffffff; --line: #e2e5ee; --code: #f0f2f8;
+    --accent: #3d46b2; --accent-fg: #ffffff; --soft: #eceefa; --shadow: 0 1px 2px rgba(20,24,60,.06), 0 6px 20px rgba(20,24,60,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #111318; --fg: #e6e7ee; --muted: #9ea3b3; --card: #1a1d25; --line: #2a2e3a; --code: #0d0f14;
+      --accent: #b9c0ff; --accent-fg: #14183f; --soft: #222743; --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  a { color: var(--accent); }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 0 16px; }
+  nav { display: flex; align-items: center; gap: 12px; padding: 14px 0; }
+  nav .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--fg); text-decoration: none; }
+  .spacer { flex: 1; }
+  .lang { border: 1px solid var(--line); background: var(--card); color: var(--fg); border-radius: 999px; padding: 4px 12px; cursor: pointer; font: inherit; font-size: 14px; }
+  h1 { font-size: 34px; line-height: 1.2; margin: 24px 0 8px; }
+  .lead { color: var(--muted); font-size: 18px; margin: 0 0 24px; }
+  .shots { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 8px 0 32px; }
+  .shots img { width: 100%; border-radius: 12px; border: 1px solid var(--line); box-shadow: var(--shadow); display: block; }
+  .shots figure { margin: 0; }
+  .shots figcaption { color: var(--muted); font-size: 14px; margin-top: 6px; }
+  .step { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 4px 22px 18px; margin: 0 0 18px; box-shadow: var(--shadow); }
+  .step h2 { display: flex; align-items: center; gap: 12px; font-size: 21px; margin: 18px 0 8px; }
+  .num { flex: none; width: 32px; height: 32px; border-radius: 50%; background: var(--accent); color: var(--accent-fg); display: grid; place-items: center; font-size: 16px; }
+  .step ul, .step ol { padding-left: 22px; margin: 8px 0; }
+  .cmd { display: flex; align-items: stretch; gap: 0; margin: 10px 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--code); }
+  .cmd code { flex: 1; padding: 10px 12px; font: 14px/1.5 ui-monospace, "SF Mono", Menlo, Consolas, monospace; overflow-x: auto; white-space: nowrap; }
+  .cmd button { flex: none; border: 0; border-left: 1px solid var(--line); background: var(--soft); color: var(--fg); padding: 0 14px; cursor: pointer; font: inherit; font-size: 14px; }
+  .label { font-weight: 600; margin-top: 14px; }
+  .note { color: var(--muted); font-size: 15px; }
+  code.inline { background: var(--code); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; font-size: 14px; }
+  details { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 16px; margin: 0 0 10px; }
+  summary { cursor: pointer; font-weight: 600; }
+  footer { border-top: 1px solid var(--line); padding: 24px 0 40px; margin-top: 32px; color: var(--muted); font-size: 14px; }
+  footer a { color: var(--muted); }
+  [data-lang] { display: none; }
+  html[lang="cs"] [data-lang="cs"], html[lang="en"] [data-lang="en"] { display: block; }
+  @media (max-width: 640px) { .shots { grid-template-columns: 1fr; } h1 { font-size: 28px; } }
+  a.ipa { display: inline-block; background: var(--accent); color: var(--accent-fg); padding: 10px 20px; border-radius: 10px; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a class="brand" href="./"><img src="icon.png" width="32" height="32" alt="">APRS &amp; Packet</a>
+    <span class="spacer"></span>
+    <a href="https://github.com/michalsiman/aprs-kiss-app">GitHub</a>
+    <button class="lang" id="lang" type="button">Česky</button>
+  </nav>
+
+  <!-- ─────────────────────────── Čeština ─────────────────────────── -->
+  <div data-lang="cs">
+    <h1>APRS &amp; Packet na iPhonu a iPadu</h1>
+    <p class="lead">Aplikace zatím není v App Storu. Vyzkoušet ji ale můžeš hned: počítač ji podepíše tvým vlastním
+      Apple ID a nahraje do telefonu. S bezplatným Apple ID vydrží 7 dní, pak ji stačí obnovit jedním kliknutím.
+      Zabere to asi 15 minut.</p>
+    <p><b>Hledáme testery:</b> iOS verze se sestavuje, ale na skutečném iPhonu ji ještě nikdo nezkoušel. Napiš
+      prosím, jak to dopadlo, do <a href="https://github.com/michalsiman/aprs-kiss-app/issues">issues na GitHubu</a>
+      (i když to nepůjde, hlavně tehdy).</p>
+
+    <div class="step">
+      <h2><span class="num">0</span>Co potřebuješ</h2>
+      <ul>
+        <li><b>iPhone nebo iPad</b> s iOS 15 nebo novějším a USB kabel</li>
+        <li><b>počítač s Windows nebo macOS</b> (z Linuxu to oficiálně nejde)</li>
+        <li><b>Apple ID</b> – stačí běžné bezplatné. Doporučujeme si na to založit vedlejší Apple ID, heslo se zadává do aplikace třetí strany.</li>
+        <li><b>TNC po síti nebo přes Bluetooth LE</b> – iOS nedovolí aplikacím USB sériový port ani klasický Bluetooth. Funguje KISS přes TCP (Direwolf, síťové TNC, <a href="https://github.com/michalsiman/aprs-kiss-ha/tree/main/bridge">kiss_tcp_bridge</a>) a KISS přes BLE (např. VR-N76, UV-PRO, Mobilinkd TNC4). APRS-IS jde i bez TNC.</li>
+      </ul>
+    </div>
+
+    <div class="step">
+      <h2><span class="num">1</span>Stáhni aplikaci</h2>
+      <p>Do počítače stáhni soubor <code class="inline">aprs-kiss-…-ios-unsigned.ipa</code> z posledního vydání:</p>
+      <p><a class="ipa" href="https://github.com/michalsiman/aprs-kiss-app/releases/latest"><b>Stáhnout .ipa</b></a></p>
+    </div>
+
+    <div class="step">
+      <h2><span class="num">2</span>Nainstaluj Sideloadly</h2>
+      <ul>
+        <li>Stáhni <a href="https://sideloadly.io/">Sideloadly</a> pro Windows nebo macOS a nainstaluj ho.</li>
+        <li><b>Windows:</b> potřebuje ještě <b>iTunes</b> a <b>iCloud</b> – stáhni je <b>přímo z webu Apple</b> (verze z Microsoft Store nefungují); odkazy jsou na stránce Sideloadly.</li>
+        <li>Připoj iPhone kabelem, odemkni ho a potvrď <i>Důvěřovat tomuto počítači</i>.</li>
+      </ul>
+    </div>
+
+    <div class="step">
+      <h2><span class="num">3</span>Nahraj aplikaci do telefonu</h2>
+      <ol>
+        <li>Spusť Sideloadly, nahoře vyber svůj iPhone.</li>
+        <li>Přetáhni stažený <code class="inline">.ipa</code> do okna (nebo klikni na ikonu IPA).</li>
+        <li>Do <i>Apple ID</i> zadej svůj e-mail Apple ID a klikni na <b>Start</b>. Zeptá se na heslo a případně na ověřovací kód.</li>
+        <li>Počkej na <i>Done</i> – na ploše telefonu se objeví APRS &amp; Packet.</li>
+      </ol>
+    </div>
+
+    <div class="step">
+      <h2><span class="num">4</span>Povol aplikaci v telefonu</h2>
+      <ol>
+        <li><b>Nastavení › Obecné › Správa VPN a zařízení</b> – klepni na své Apple ID a dej <b>Důvěřovat</b>.</li>
+        <li><b>iOS 16 a novější:</b> <b>Nastavení › Soukromí a zabezpečení › Režim pro vývojáře</b> zapni a telefon restartuj.
+          (Položka se ukáže až po nahrání první aplikace.)</li>
+        <li>Spusť APRS &amp; Packet, povol Bluetooth a polohu a v <b>Nastavení › Připojení</b> zvol TNC.</li>
+      </ol>
+    </div>
+
+    <div class="step">
+      <h2><span class="num">5</span>Po 7 dnech</h2>
+      <p>S bezplatným Apple ID aplikace po 7 dnech přestane startovat (data v ní zůstanou). Připoj telefon a v Sideloadly
+        dej znovu <b>Start</b> se stejným souborem – nebo v Sideloadly zapni <i>automatické obnovování</i>, pak se o to postará
+        sám, když je počítač zapnutý a telefon na stejné Wi-Fi. Stejně nahraješ i novou verzi.</p>
+      <p class="note">S placeným vývojářským účtem Apple (99 USD/rok) vydrží aplikace rok.</p>
+    </div>
+
+    <h2>Když něco nejde</h2>
+    <details><summary>Sideloadly nevidí telefon</summary>
+      <p>Na Windows musí být iTunes z webu Apple, ne z Microsoft Store. Odemkni telefon, zkus jiný kabel a potvrď <i>Důvěřovat</i>.</p></details>
+    <details><summary>„Maximum number of apps“ nebo „App ID limit“</summary>
+      <p>Bezplatné Apple ID může mít najednou nejvýš 3 takto nahrané aplikace a 10 nových App ID za týden. Smaž v telefonu jinou nahranou aplikaci, nebo týden počkej.</p></details>
+    <details><summary>Aplikace se hned zavře nebo se neotevře</summary>
+      <p>Zkontroluj krok 4 (Důvěřovat a Režim pro vývojáře). Pokud to nepomůže, pošli nám prosím do issues verzi iOS a model telefonu.</p></details>
+    <details><summary>Jde to i bez Sideloadly?</summary>
+      <p>Ano, stejně funguje <a href="https://altstore.io/">AltStore</a> (AltServer na počítači s Windows nebo macOS, pak se <code class="inline">.ipa</code> otevře v aplikaci AltStore v telefonu, který ji obnovuje přes Wi-Fi).</p></details>
+  </div>
+
+  <!-- ─────────────────────────── English ─────────────────────────── -->
+  <div data-lang="en">
+    <h1>APRS &amp; Packet on an iPhone or iPad</h1>
+    <p class="lead">The app is not in the App Store yet. You can try it right now, though: a computer signs it with your own
+      Apple ID and puts it on your phone. With a free Apple ID it runs for 7 days, then you refresh it with one click.
+      It takes about 15 minutes.</p>
+    <p><b>Testers wanted:</b> the iOS version is built, but nobody has tried it on a real iPhone yet. Please tell us how it
+      went in the <a href="https://github.com/michalsiman/aprs-kiss-app/issues">GitHub issues</a> – especially if it does not work.</p>
+
+    <div class="step">
+      <h2><span class="num">0</span>What you need</h2>
+      <ul>
+        <li><b>An iPhone or iPad</b> with iOS 15 or later, and a USB cable</li>
+        <li><b>A Windows or macOS computer</b> (there is no official way from Linux)</li>
+        <li><b>An Apple ID</b> – a normal free one is enough. Consider a spare Apple ID for this, its password goes into a third-party app.</li>
+        <li><b>A TNC on the network or over Bluetooth LE</b> – iOS lets apps use no USB serial port and no classic Bluetooth. KISS over TCP works (Direwolf, a network TNC, <a href="https://github.com/michalsiman/aprs-kiss-ha/tree/main/bridge">kiss_tcp_bridge</a>) and KISS over BLE (VR-N76, UV-PRO, Mobilinkd TNC4…). APRS-IS works without a TNC.</li>
+      </ul>
+    </div>
+
+    <div class="step">
+      <h2><span class="num">1</span>Download the app</h2>
+      <p>On the computer download <code class="inline">aprs-kiss-…-ios-unsigned.ipa</code> from the latest release:</p>
+      <p><a class="ipa" href="https://github.com/michalsiman/aprs-kiss-app/releases/latest"><b>Download the .ipa</b></a></p>
+    </div>
+
+    <div class="step">
+      <h2><span class="num">2</span>Install Sideloadly</h2>
+      <ul>
+        <li>Download <a href="https://sideloadly.io/">Sideloadly</a> for Windows or macOS and install it.</li>
+        <li><b>Windows:</b> it also needs <b>iTunes</b> and <b>iCloud</b> – get them <b>straight from Apple's website</b> (the Microsoft Store versions do not work); Sideloadly's page links them.</li>
+        <li>Connect the iPhone with the cable, unlock it and confirm <i>Trust This Computer</i>.</li>
+      </ul>
+    </div>
+
+    <div class="step">
+      <h2><span class="num">3</span>Put the app on the phone</h2>
+      <ol>
+        <li>Start Sideloadly and pick your iPhone at the top.</li>
+        <li>Drag the downloaded <code class="inline">.ipa</code> into the window (or click the IPA icon).</li>
+        <li>Enter your Apple ID e-mail under <i>Apple ID</i> and click <b>Start</b>. It asks for the password and maybe a verification code.</li>
+        <li>Wait for <i>Done</i> – APRS &amp; Packet appears on the phone's home screen.</li>
+      </ol>
+    </div>
+
+    <div class="step">
+      <h2><span class="num">4</span>Allow the app on the phone</h2>
+      <ol>
+        <li><b>Settings › General › VPN &amp; Device Management</b> – tap your Apple ID and choose <b>Trust</b>.</li>
+        <li><b>iOS 16 and later:</b> switch on <b>Settings › Privacy &amp; Security › Developer Mode</b> and restart the phone.
+          (The item shows up only after the first app is installed.)</li>
+        <li>Start APRS &amp; Packet, allow Bluetooth and location and pick the TNC in <b>Settings › Connection</b>.</li>
+      </ol>
+    </div>
+
+    <div class="step">
+      <h2><span class="num">5</span>After 7 days</h2>
+      <p>With a free Apple ID the app stops starting after 7 days (its data stays). Connect the phone and click <b>Start</b>
+        in Sideloadly again with the same file – or switch on <i>automatic refresh</i> in Sideloadly and it does it by itself
+        while the computer is on and the phone is on the same Wi-Fi. A new version goes on the same way.</p>
+      <p class="note">With a paid Apple developer account (99 USD a year) the app lasts a year.</p>
+    </div>
+
+    <h2>When something does not work</h2>
+    <details><summary>Sideloadly does not see the phone</summary>
+      <p>On Windows iTunes has to come from Apple's website, not the Microsoft Store. Unlock the phone, try another cable and confirm <i>Trust</i>.</p></details>
+    <details><summary>"Maximum number of apps" or "App ID limit"</summary>
+      <p>A free Apple ID can have at most 3 sideloaded apps at a time and 10 new App IDs a week. Delete another sideloaded app or wait a week.</p></details>
+    <details><summary>The app closes at once or does not open</summary>
+      <p>Check step 4 (Trust and Developer Mode). If that does not help, please send us the iOS version and the phone model in the issues.</p></details>
+    <details><summary>Can I do it without Sideloadly?</summary>
+      <p>Yes, <a href="https://altstore.io/">AltStore</a> works the same way (AltServer on a Windows or macOS computer, then you open the <code class="inline">.ipa</code> in the AltStore app on the phone, which refreshes it over Wi-Fi).</p></details>
+  </div>
+
+  <footer>
+    <a href="./">APRS &amp; Packet</a> ·
+    <a href="https://github.com/michalsiman/aprs-kiss-app/blob/main/docs/IOS.md">GitHub</a> ·
+    <a href="https://github.com/michalsiman/aprs-kiss-app/releases">Releases</a>
+  </footer>
+</div>
+<script>
+let lang = (localStorage.getItem("lang") || (navigator.language || "en").slice(0, 2)) === "cs" ? "cs" : "en";
+function render() {
+  document.documentElement.lang = lang;
+  document.getElementById("lang").textContent = lang === "cs" ? "English" : "Česky";
+}
+document.getElementById("lang").addEventListener("click", () => {
+  lang = lang === "cs" ? "en" : "cs";
+  try { localStorage.setItem("lang", lang); } catch (e) {}
+  render();
+});
+// the download button points straight at the latest stable release's .ipa
+fetch("https://api.github.com/repos/michalsiman/aprs-kiss-app/releases/latest").then(r => r.ok ? r.json() : null).then(rel => {
+  const a = rel && rel.assets.find(x => /-ios-unsigned\.ipa$/.test(x.name));
+  if (a) for (const el of document.querySelectorAll("a.ipa")) el.href = a.browser_download_url;
+}).catch(() => {});
+render();
+</script>
+</body>
+</html>
