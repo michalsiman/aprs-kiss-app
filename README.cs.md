@@ -366,6 +366,9 @@ aplikacím nedovolí).
 **Na skutečném iPhonu ani iPadu zatím vyzkoušený není – hledáme testery:** pokud to můžete zkusit,
 napište prosím, jak to dopadlo, do [issues](https://github.com/michalsiman/aprs-kiss-app/issues).
 
+**Krok za krokem (Sideloadly, asi 15 minut): [docs/IOS.cs.md](docs/IOS.cs.md)** · také na
+**[webu](https://aprs.ok1sim.cz/ios.html)**.
+
 ## Instalace (Linux)
 
 **S automatickými aktualizacemi (Flatpak):** otevřete

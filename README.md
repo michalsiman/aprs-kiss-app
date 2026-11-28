@@ -370,6 +370,9 @@ BLE – iOS lets apps use no classic serial Bluetooth).
 **Not tried on a real iPhone or iPad yet – testers wanted:** if you can try it, please tell us how it went
 in the [issues](https://github.com/michalsiman/aprs-kiss-app/issues).
 
+**Step by step (Sideloadly, about 15 minutes): [docs/IOS.md](docs/IOS.md)** · also on the
+**[website](https://aprs.ok1sim.cz/ios.html)**.
+
 ## Install (Linux)
 
 **With automatic updates (Flatpak):** open
