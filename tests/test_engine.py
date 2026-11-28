@@ -195,7 +195,9 @@ class EngineTest(unittest.IsolatedAsyncioTestCase):
 
         from unittest import mock
 
-        self.enterContext(mock.patch("aprs_kiss_core.station.MIN_TX_GAP", 0))
+        patch = mock.patch("aprs_kiss_core.station.MIN_TX_GAP", 0)
+        patch.start()
+        self.addCleanup(patch.stop)
         sent = await self._capture()
         conf = self.engine.config
         conf.telemetry_via, conf.digi_mode = "radio", "fillin"
