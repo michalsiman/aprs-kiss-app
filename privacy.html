@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APRS &amp; Packet – Privacy</title>
+<link rel="icon" href="icon.png">
+<style>
+  :root { --bg: #fafafa; --fg: #1d1d1f; --muted: #5f6368; --card: #fff; --line: #ddd; --accent: #1565c0; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #121212; --fg: #e8eaed; --muted: #9aa0a6; --card: #1e1e1e; --line: #333; --accent: #64b5f6; }
+  }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 system-ui, sans-serif; }
+  main { max-width: 720px; margin: 0 auto; padding: 32px 16px; }
+  header { display: flex; gap: 16px; align-items: center; }
+  h1 { margin: 0; font-size: 28px; }
+  h2 { font-size: 18px; margin-top: 32px; }
+  p, li { color: var(--fg); }
+  .muted { color: var(--muted); }
+  .button { display: inline-block; background: var(--accent); color: var(--bg); padding: 10px 18px;
+            border-radius: 8px; text-decoration: none; font-weight: 600; margin: 8px 8px 0 0; }
+  pre { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 12px;
+        overflow-x: auto; font-size: 14px; }
+  a { color: var(--accent); }
+  hr { border: 0; border-top: 1px solid var(--line); margin: 32px 0; }
+</style>
+</head>
+<body>
+<main>
+
+  <h1>APRS &amp; Packet – privacy policy</h1>
+  <p class="muted">Applies to the APRS &amp; Packet app on Android, iOS, Linux, Windows and macOS. Last change: 23 November 2026.</p>
+
+  <h2>In short</h2>
+  <p>The author collects nothing. The app has no account, no analytics, no advertising and no tracking, and it sends
+  nothing to the author. What you set up stays on your device.</p>
+
+  <h2>What the app keeps on your device</h2>
+  <ul>
+    <li>Your settings (callsign, position typed in, TNC connection, APRS-IS passcode, choices on the screens).</li>
+    <li>Messages, heard stations and the BBS / TAK data, so they are there after a restart.</li>
+  </ul>
+  <p>They are stored only in the app's own folder on your device and are removed when you uninstall the app.</p>
+
+  <h2>Location</h2>
+  <p>When you choose <em>Settings › GPS › The phone's GPS</em>, the app reads the phone's location while it is
+  running (never in the background). It uses it for the map and – only if you turn transmitting or APRS-IS on –
+  in your position report (beacon).</p>
+
+  <h2>What goes out, and where</h2>
+  <ul>
+    <li><b>By radio:</b> what you transmit (your callsign, position, messages, packet traffic) is sent on air and
+    can be received by anyone. Transmitting is off until you switch it on and needs an amateur radio licence.</li>
+    <li><b>APRS-IS</b> (only when you enable it in Settings): your callsign, position reports and messages go to the
+    APRS-IS server you choose; APRS-IS is a public network and its data is shown on public sites such as aprs.fi.</li>
+    <li><b>Map tiles</b> come from OpenStreetMap (tile.openstreetmap.org); like any web request it sees your IP address
+    and which map area is loaded. The offline map needs no internet.</li>
+    <li><b>New-version check</b> (builds from GitHub; it can be switched off in Settings): once a day the app asks
+    api.github.com for the latest release; GitHub sees your IP address. The Google Play build has no such check.</li>
+    <li><b>Links</b> you tap (aprs.to, GitHub, the author's site) open in your browser.</li>
+  </ul>
+  <p>Those services have their own privacy policies; the app shares nothing with them beyond what is described here.</p>
+
+  <h2>Permissions (Android)</h2>
+  <ul>
+    <li><b>Internet</b> – APRS-IS, map tiles, a TNC on the network.</li>
+    <li><b>Location</b> – only for “The phone's GPS”, asked for when you choose it.</li>
+    <li><b>USB</b> – a TNC on the phone's USB port; Android asks before the app may use the device.</li>
+  </ul>
+
+  <h2>Children</h2>
+  <p>The app is meant for licensed radio amateurs, not for children.</p>
+
+  <h2>Contact</h2>
+  <p>Michal Šiman, OK1SIM – <a href="https://github.com/michalsiman/aprs-kiss-app/issues">GitHub issues</a>,
+  <a href="https://ok1sim.cz/">ok1sim.cz</a>.</p>
+
+  <hr>
+  <h1 lang="cs">Zásady ochrany osobních údajů (česky)</h1>
+  <div lang="cs">
+  <p><b>Stručně:</b> autor nic nesbírá. Aplikace nemá účet, analytiku, reklamy ani sledování a autorovi nic neposílá.
+  Nastavení, zprávy a slyšené stanice zůstávají jen v zařízení a s odinstalací zmizí.</p>
+  <p><b>Poloha:</b> při volbě <em>Nastavení › GPS › GPS telefonu</em> čte aplikace polohu telefonu, jen když běží
+  (nikdy na pozadí), pro mapu a – jen když zapneš vysílání nebo APRS-IS – pro hlášení polohy (maják).</p>
+  <p><b>Co odchází ven:</b> rádiem to, co vysíláš (značka, poloha, zprávy, packet) – přijmout to může kdokoli;
+  do APRS-IS (jen když ho zapneš) značka, poloha a zprávy – APRS-IS je veřejná síť zobrazovaná např. na aprs.fi;
+  dlaždice mapy z OpenStreetMap (vidí IP adresu a oblast mapy); kontrola nové verze na api.github.com jednou denně
+  (lze vypnout, verze z Google Play ji nemá).</p>
+  <p><b>Oprávnění:</b> internet (APRS-IS, mapa, TNC v síti), poloha (jen pro GPS telefonu), USB (TNC na USB, Android
+  se zeptá). Aplikace je určena radioamatérům s licencí, ne dětem.</p>
+  <p><b>Kontakt:</b> Michal Šiman, OK1SIM – <a href="https://github.com/michalsiman/aprs-kiss-app/issues">GitHub</a>,
+  <a href="https://ok1sim.cz/">ok1sim.cz</a>.</p>
+  </div>
+
+</main>
+</body>
+</html>

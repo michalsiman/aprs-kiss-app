@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APRS &amp; Packet</title>
+<meta name="description" content="APRS station and packet radio terminal for a KISS TNC – Linux, Windows, macOS, Android, iOS.">
+<link rel="icon" href="icon.png">
+<style>
+  :root {
+    --bg: #f6f7fb; --fg: #1b1d24; --muted: #5d6270; --card: #ffffff; --line: #e2e5ee;
+    --accent: #3d46b2; --accent-fg: #ffffff; --soft: #eceefa; --shadow: 0 1px 2px rgba(20,24,60,.06), 0 6px 20px rgba(20,24,60,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #111318; --fg: #e6e7ee; --muted: #9ea3b3; --card: #1a1d25; --line: #2a2e3a;
+      --accent: #b9c0ff; --accent-fg: #14183f; --soft: #222743; --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  a { color: var(--accent); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+  nav { display: flex; align-items: center; gap: 12px; padding: 14px 0; }
+  nav .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--fg); text-decoration: none; }
+  nav .spacer { flex: 1; }
+  nav a.link { color: var(--muted); text-decoration: none; font-size: 15px; }
+  nav a.link:hover { color: var(--fg); }
+  .lang { border: 1px solid var(--line); background: var(--card); color: var(--fg); border-radius: 999px; padding: 4px 12px; cursor: pointer; font: inherit; font-size: 14px; }
+  .hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; padding: 40px 0 56px; }
+  .hero h1 { font-size: clamp(34px, 5vw, 52px); line-height: 1.08; margin: 0 0 16px; letter-spacing: -.02em; }
+  .hero p.lead { font-size: 19px; color: var(--muted); margin: 0 0 24px; }
+  .btns { display: flex; flex-wrap: wrap; gap: 10px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 12px; text-decoration: none;
+         font-weight: 600; border: 1px solid var(--line); background: var(--card); color: var(--fg); box-shadow: var(--shadow); }
+  .btn.primary { background: var(--accent); color: var(--accent-fg); border-color: transparent; }
+  .btn small { font-weight: 400; opacity: .75; }
+  .version { margin-top: 14px; color: var(--muted); font-size: 14px; }
+  .shots-hero { display: flex; gap: 14px; justify-content: center; align-items: flex-end; }
+  .shots-hero picture { width: 46%; max-width: 240px; display: block; }
+  .shots-hero img { width: 100%; display: block; border-radius: 22px; box-shadow: var(--shadow); border: 1px solid var(--line); }
+  .shots-hero picture:nth-child(2) { transform: translateY(-28px); }
+  section { padding: 48px 0; }
+  h2 { font-size: 30px; margin: 0 0 8px; letter-spacing: -.01em; }
+  .sub { color: var(--muted); margin: 0 0 28px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; box-shadow: var(--shadow); }
+  .card .ico { width: 44px; height: 44px; border-radius: 12px; background: var(--soft); display: grid; place-items: center; font-size: 24px; margin-bottom: 12px; }
+  .card h3 { margin: 0 0 6px; font-size: 17px; }
+  .card p { margin: 0; color: var(--muted); font-size: 15px; }
+  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 18px; }
+  .gallery figure { margin: 0; text-align: center; }
+  .gallery img { width: 100%; border-radius: 18px; border: 1px solid var(--line); box-shadow: var(--shadow); }
+  .gallery figcaption { margin-top: 8px; font-size: 14px; color: var(--muted); }
+  .desk { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-top: 28px; }
+  .desk img { width: 100%; border-radius: 12px; border: 1px solid var(--line); box-shadow: var(--shadow); }
+  .desk figure { margin: 0; }
+  .desk figcaption { margin-top: 6px; font-size: 14px; color: var(--muted); }
+  .dl { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+  .dl .card a.btn { margin-top: 12px; }
+  footer { border-top: 1px solid var(--line); padding: 28px 0 40px; color: var(--muted); font-size: 14px; }
+  footer a { color: var(--muted); }
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; padding-top: 16px; }
+    .grid { grid-template-columns: repeat(2, 1fr); }
+    .dl { grid-template-columns: repeat(2, 1fr); }
+    .desk { grid-template-columns: 1fr; }
+    nav a.link { display: none; }
+  }
+  @media (max-width: 540px) {
+    .grid, .dl { grid-template-columns: 1fr; }
+    .gallery { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a class="brand" href="./"><img src="icon.png" width="32" height="32" alt="">APRS &amp; Packet</a>
+    <span class="spacer"></span>
+    <a class="link" href="#features" data-t="nav_features">Features</a>
+    <a class="link" href="#screens" data-t="nav_screens">Screenshots</a>
+    <a class="link" href="#download" data-t="nav_download">Download</a>
+    <a class="link" href="https://github.com/michalsiman/aprs-kiss-app">GitHub</a>
+    <button class="lang" id="lang" type="button">Česky</button>
+  </nav>
+
+  <header class="hero">
+    <div>
+      <h1 data-t="title">APRS and packet radio in one app</h1>
+      <p class="lead" data-t="lead">A full APRS station and a packet radio terminal for a radio with a KISS TNC – on your computer and your phone. Map, messages, tracker, Winlink e-mail, BBS, TAK, and it even tunes your radio.</p>
+      <div class="btns">
+        <a class="btn primary" href="#download" data-t="get">Download – it's free</a>
+        <a class="btn" href="https://github.com/michalsiman/aprs-kiss-app" data-t="source">Source code</a>
+      </div>
+      <div class="version" id="version"></div>
+    </div>
+    <div class="shots-hero">
+      <picture><source media="(prefers-color-scheme: light)" srcset="RAW/phone-map-light.png"><img src="RAW/phone-map.png" alt=""></picture>
+      <picture><source media="(prefers-color-scheme: light)" srcset="RAW/phone-messages-light.png"><img src="RAW/phone-messages.png" alt=""></picture>
+    </div>
+  </header>
+
+  <section id="features">
+    <h2 data-t="features">Features</h2>
+    <p class="sub" data-t="features_sub">Everything a radio amateur needs for APRS and packet radio – and a few things nobody else has.</p>
+    <div class="grid" id="cards"></div>
+  </section>
+
+  <section id="screens">
+    <h2 data-t="screens">Screenshots</h2>
+    <p class="sub" data-t="screens_sub">On a phone and on a computer, light or dark as your system is set.</p>
+    <div class="gallery" id="phones"></div>
+    <div class="desk" id="desks"></div>
+  </section>
+
+  <section id="download">
+    <h2 data-t="download">Download</h2>
+    <p class="sub" data-t="download_sub">Free and open source (MIT). New versions are offered by the app itself.</p>
+    <div class="dl">
+      <div class="card"><div class="ico">🤖</div><h3>Android</h3><p data-t="dl_android">The APK – allow installing from your browser.</p><a class="btn primary" id="dl-android" href="RELEASES">APK</a></div>
+      <div class="card"><div class="ico">🪟</div><h3>Windows</h3><p data-t="dl_windows">Installer, or a ZIP to unpack anywhere.</p><a class="btn primary" id="dl-windows" href="RELEASES">Setup</a></div>
+      <div class="card"><div class="ico">🍎</div><h3>macOS</h3><p data-t="dl_macos">A disk image – testers wanted.</p><a class="btn primary" id="dl-macos" href="RELEASES">DMG</a></div>
+      <div class="card"><div class="ico">🐧</div><h3>Linux</h3><p data-t="dl_linux">Flatpak with updates, or a .deb package.</p><a class="btn primary" href="flatpak.html">Flatpak</a> <a class="btn" id="dl-deb" href="RELEASES">.deb</a></div>
+      <div class="card"><div class="ico">🍓</div><h3>Raspberry Pi</h3><p data-t="dl_pi">A station with a touch screen, set up from a phone – one command.</p><a class="btn primary" href="raspberry.html" data-t="dl_pi_btn">Guide</a></div>
+    </div>
+    <p class="version"><a href="RELEASES" data-t="all">All releases and betas</a> · <a href="https://github.com/michalsiman/aprs-kiss-app/blob/main/CHANGELOG.md" data-t="changes">What's new</a></p>
+  </section>
+</div>
+
+<footer>
+  <div class="wrap">
+    APRS &amp; Packet · Michal Šiman, OK1SIM ·
+    <a href="https://github.com/michalsiman/aprs-kiss-app">GitHub</a> ·
+    <a href="https://github.com/michalsiman/aprs-kiss-ha" data-t="ha">Home Assistant version</a> ·
+    <a href="privacy.html" data-t="privacy">Privacy</a> ·
+    <span data-t="licence">MIT licence · map data © OpenStreetMap contributors</span>
+  </div>
+</footer>
+
+<script>
+const REPO = "michalsiman/aprs-kiss-app";
+const RAW = "https://raw.githubusercontent.com/" + REPO + "/main/assets/";
+const RELEASES = "https://github.com/" + REPO + "/releases/latest";
+
+const T = {
+  en: {
+    nav_features: "Features", nav_screens: "Screenshots", nav_download: "Download",
+    title: "APRS and packet radio in one app",
+    lead: "A full APRS station and a packet radio terminal for a radio with a KISS TNC – on your computer and your phone. Map, messages, tracker, Winlink e-mail, BBS, TAK, and it even tunes your radio.",
+    get: "Download – it's free", source: "Source code",
+    features: "Features", features_sub: "Everything a radio amateur needs for APRS and packet radio – and a few things nobody else has.",
+    screens: "Screenshots", screens_sub: "On a phone and on a computer, light or dark as your system is set.",
+    download: "Download", download_sub: "Free and open source (MIT). New versions are offered by the app itself.",
+    dl_android: "The APK – allow installing from your browser.", dl_windows: "Installer, or a ZIP to unpack anywhere.",
+    dl_macos: "A disk image – testers wanted.", dl_linux: "Flatpak with updates, or a .deb package.",
+    dl_pi: "A station with a touch screen, set up from a phone – one command.", dl_pi_btn: "Guide",
+    all: "All releases and betas", changes: "What's new", ha: "Home Assistant version", privacy: "Privacy",
+    licence: "MIT licence · map data © OpenStreetMap contributors", version: "Latest version: {v}", lang: "Česky",
+  },
+  cs: {
+    nav_features: "Funkce", nav_screens: "Snímky", nav_download: "Stažení",
+    title: "APRS a packet rádio v jedné aplikaci",
+    lead: "Plnohodnotná APRS stanice a packet terminál pro rádio s KISS TNC – na počítači i v telefonu. Mapa, zprávy, tracker, Winlink e-mail, BBS, TAK, a rádio dokonce i naladí.",
+    get: "Stáhnout – zdarma", source: "Zdrojový kód",
+    features: "Funkce", features_sub: "Všechno, co radioamatér pro APRS a packet potřebuje – a pár věcí, které nikdo jiný nemá.",
+    screens: "Snímky obrazovky", screens_sub: "Na telefonu i na počítači, světlé nebo tmavé podle systému.",
+    download: "Stažení", download_sub: "Zdarma a s otevřeným kódem (MIT). Nové verze nabídne aplikace sama.",
+    dl_android: "Soubor APK – povol instalaci z prohlížeče.", dl_windows: "Instalátor, nebo ZIP k rozbalení kamkoli.",
+    dl_macos: "Obraz disku – hledáme testery.", dl_linux: "Flatpak s aktualizacemi, nebo balíček .deb.",
+    dl_pi: "Stanice s dotykovým displejem, nastavení z telefonu – jeden příkaz.", dl_pi_btn: "Návod",
+    all: "Všechna vydání a bety", changes: "Co je nového", ha: "Verze pro Home Assistant", privacy: "Soukromí",
+    licence: "Licence MIT · mapová data © přispěvatelé OpenStreetMap", version: "Poslední verze: {v}", lang: "English",
+  },
+};
+
+const CARDS = {
+  en: [
+    ["🗺️","Live map","Stations with APRS symbols, trails, repeaters with their frequency; OpenStreetMap, OpenTopoMap or offline."],
+    ["✉️","Messages","Conversations with unread counts and search; positions, links and mentioned stations open on the map."],
+    ["📧","Winlink e-mail","Read and send e-mail over APRS through WLNK-1 – the login answered by itself."],
+    ["🚗","Tracker","Fixed rate or SmartBeaconing-like; the map follows you like a navigation."],
+    ["⚠️","Warnings ahead","Crashes, road works, fires, floods and oncoming stations in a lobe ahead of you."],
+    ["🆘","Mic-E & EMERGENCY","Shorter positions with a status; EMERGENCY asked first and shown in red."],
+    ["🌡️","Weather around you","The average of weather stations within 20 km in the map's corner."],
+    ["📻","Any KISS TNC","TCP/IP, USB serial, Bluetooth, Bluetooth LE – or a sound card with Direwolf."],
+    ["🔁","Digipeater & iGate","Fill-in or wide digipeater; RX and TX iGate to APRS-IS; telemetry graphs on aprs.fi."],
+    ["💻","Packet terminal","AX.25 connected mode to BBSes and nodes, also over VARA FM."],
+    ["📁","Files","Send and receive files over packet radio (YAPP), with progress and time left."],
+    ["🗄️","BBS SERVER","Your own packet BBS – W0RLI / MBL / FBB style commands."],
+    ["🎯","TAK","ATAK-compatible positions and GeoChat over the radio."],
+    ["🏔️","Spot & services","SOTA, POTA, WWFF … self-spots; FIND, REPEAT, WXNOW and more."],
+    ["📅","#APRSThursday","The weekly HOTG net on its own screen."],
+    ["📢","Bulletins","Bulletins and announcements from the stations around you; yours repeat by themselves."],
+    ["🔒","Position privacy","Your position less exact (200 m – 110 km), without speed or altitude; EMERGENCY always exact."],
+    ["📸","Photos over packet","Take a photo or pick one; made smaller, with the time each size takes on air."],
+    ["🧭","Navigate & share","Open any station or point in a navigation app, or share it."],
+    ["🌍","16 languages","km or miles, °C or °F, hPa or inHg – as your phone or computer is set."],
+    ["🖥️","Everywhere","Linux, Windows, macOS, Android, iOS – one app, light and dark."],
+  ],
+  cs: [
+    ["🗺️","Živá mapa","Stanice s APRS symboly, ocásky, převaděče s kmitočtem; OpenStreetMap, OpenTopoMap i offline."],
+    ["✉️","Zprávy","Konverzace s počty nepřečtených a hledáním; polohy, odkazy a zmíněné stanice se otevřou na mapě."],
+    ["📧","Winlink e-mail","Čtení a posílání e-mailů přes APRS a bránu WLNK-1 – přihlášení vyřeší aplikace sama."],
+    ["🚗","Tracker","Pevný interval nebo jako SmartBeaconing; mapa tě sleduje jako navigace."],
+    ["⚠️","Výstrahy před tebou","Nehody, práce na silnici, požáry, povodně a protijedoucí stanice v laloku před tebou."],
+    ["🆘","Mic-E a NOUZE","Kratší polohy se stavem; NOUZE s potvrzením a červeně na mapě."],
+    ["🌡️","Počasí z okolí","Průměr meteostanic do 20 km v rohu mapy."],
+    ["📻","Jakékoli KISS TNC","TCP/IP, USB, Bluetooth, Bluetooth LE – nebo zvuková karta s Direwolfem."],
+    ["🔁","Digipeater a iGate","Fill-in nebo wide digipeater; RX i TX iGate do APRS-IS; grafy telemetrie na aprs.fi."],
+    ["💻","Packet terminál","Spojení AX.25 na BBS a nody, i přes VARA FM."],
+    ["📁","Soubory","Posílání a příjem souborů přes packet rádio (YAPP), s průběhem a zbývajícím časem."],
+    ["🗄️","BBS SERVER","Vlastní packet BBS – příkazy ve stylu W0RLI / MBL / FBB."],
+    ["🎯","TAK","Polohy a GeoChat kompatibilní s ATAK přes rádio."],
+    ["🏔️","Spot a služby","Ohlášení SOTA, POTA, WWFF …; FIND, REPEAT, WXNOW a další."],
+    ["📅","#APRSThursday","Týdenní síť HOTG na vlastní obrazovce."],
+    ["📢","Nástěnka","Bulletiny a oznámení stanic z okolí; vlastní se opakují samy."],
+    ["🔒","Soukromí polohy","Poloha méně přesně (200 m – 110 km), bez rychlosti či výšky; NOUZE vždy přesně."],
+    ["📸","Fotky přes packet","Vyfoť nebo vyber fotku; aplikace ji zmenší a ukáže, jak dlouho která velikost poletí."],
+    ["🧭","Navigace a sdílení","Otevři stanici nebo bod v navigaci, nebo ho pošli dál."],
+    ["🌍","16 jazyků","km nebo míle, °C nebo °F, hPa nebo inHg – podle telefonu či počítače."],
+    ["🖥️","Všude","Linux, Windows, macOS, Android, iOS – jedna aplikace, světlá i tmavá."],
+  ],
+};
+
+const PHONES = {
+  en: [["phone-map","The map"],["phone-filter","Filters and how far"],["phone-menu","The menu in sections"],
+       ["phone-messages","Messages"],["phone-profiles","Profiles (SSIDs)"],["phone-tnc","TNC connection"],
+       ["phone-settings","Settings"],["phone-tak","TAK map"],["phone-bulletins","Bulletins"]],
+  cs: [["phone-map","Mapa"],["phone-filter","Filtry a dosah"],["phone-menu","Menu v sekcích"],
+       ["phone-messages","Zprávy"],["phone-profiles","Profily (SSID)"],["phone-tnc","Připojení k TNC"],
+       ["phone-settings","Nastavení"],["phone-tak","Mapa TAK"],["phone-bulletins","Nástěnka"]],
+};
+const DESKS = {
+  en: [["map","Map: symbols, repeaters, warnings, trails"],["messages","Messages with filters and search"],
+       ["station","A station's details: navigate, share, callbooks"],["terminal","Packet terminal to a BBS"],
+       ["bulletins","Bulletins: mine going out and those heard around"],["settings-privacy","Position privacy"],
+       ["tak","TAK: stations by team and GeoChat"],["settings-tnc","TNC connection"],
+       ["settings-telemetry","Station telemetry for a digipeater or an iGate"],["monitor","Monitor: every frame on the air"]],
+  cs: [["map","Mapa: symboly, převaděče, výstrahy, ocásky"],["messages","Zprávy s filtry a hledáním"],
+       ["station","Detail stanice: navigace, sdílení, katalogy"],["terminal","Packet terminál na BBS"],
+       ["bulletins","Nástěnka: moje bulletiny a zachycené z okolí"],["settings-privacy","Soukromí polohy"],
+       ["tak","TAK: stanice podle týmů a GeoChat"],["settings-tnc","Připojení k TNC"],
+       ["settings-telemetry","Telemetrie stanice pro digipeater nebo iGate"],["monitor","Monitor: každý rámec z éteru"]],
+};
+
+function pic(name, lang, alt) {
+  const base = RAW + (lang === "cs" ? "cs/" : "");
+  return `<picture><source media="(prefers-color-scheme: light)" srcset="${base}${name}-light.png">` +
+         `<img src="${base}${name}.png" alt="${alt}" loading="lazy"></picture>`;
+}
+
+let lang = (localStorage.getItem("lang") || (navigator.language || "en").slice(0, 2)) === "cs" ? "cs" : "en";
+let release = null;
+
+function render() {
+  document.documentElement.lang = lang;
+  for (const el of document.querySelectorAll("[data-t]")) {
+    const text = T[lang][el.dataset.t];
+    if (text) el.textContent = text;
+  }
+  document.getElementById("lang").textContent = T[lang].lang;
+  document.getElementById("cards").innerHTML = CARDS[lang].map(([i, t, d]) =>
+    `<div class="card"><div class="ico">${i}</div><h3>${t}</h3><p>${d}</p></div>`).join("");
+  document.getElementById("phones").innerHTML = PHONES[lang].map(([n, c]) =>
+    `<figure><a href="${RAW}${lang === "cs" ? "cs/" : ""}${n}.png">${pic(n, lang, c)}</a><figcaption>${c}</figcaption></figure>`).join("");
+  document.getElementById("desks").innerHTML = DESKS[lang].map(([n, c]) =>
+    `<figure><a href="${RAW}${lang === "cs" ? "cs/" : ""}${n}.png">${pic(n, lang, c)}</a><figcaption>${c}</figcaption></figure>`).join("");
+  for (const img of document.querySelectorAll(".shots-hero source, .shots-hero img")) {
+    for (const attr of ["src", "srcset"]) {
+      const v = img.getAttribute(attr);
+      if (v && v.startsWith("RAW/")) img.setAttribute(attr, RAW + (lang === "cs" ? "cs/" : "") + v.slice(4));
+      else if (v && v.startsWith(RAW)) img.setAttribute(attr, RAW + (lang === "cs" ? "cs/" : "") + v.replace(RAW, "").replace(/^cs\//, ""));
+    }
+  }
+  document.getElementById("version").textContent = release ? T[lang].version.replace("{v}", release.tag_name.replace(/^v/, "")) : "";
+}
+
+for (const a of document.querySelectorAll('a[href="RELEASES"]')) a.href = RELEASES;
+document.getElementById("lang").addEventListener("click", () => {
+  lang = lang === "cs" ? "en" : "cs";
+  try { localStorage.setItem("lang", lang); } catch (e) {}
+  render();
+});
+render();
+
+// the download buttons point straight at the latest stable release's files
+fetch("https://api.github.com/repos/" + REPO + "/releases/latest").then(r => r.ok ? r.json() : null).then(rel => {
+  if (!rel) return;
+  release = rel;
+  const find = re => (rel.assets.find(a => re.test(a.name)) || {}).browser_download_url;
+  const set = (id, re) => { const url = find(re); if (url) document.getElementById(id).href = url; };
+  set("dl-android", /-android\.apk$/);
+  set("dl-windows", /-windows-x64-setup\.exe$/);
+  set("dl-macos", /-macos\.dmg$/);
+  set("dl-deb", /_amd64\.deb$/);
+  render();
+}).catch(() => {});
+</script>
+</body>
+</html>
