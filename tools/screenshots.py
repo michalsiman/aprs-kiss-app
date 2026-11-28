@@ -51,7 +51,7 @@ def config(lang: str, theme: str, **extra) -> dict:
         "language": lang, "language_asked": True, "disclaimer_accepted": True, "theme": theme,
         "gps_source": "manual", "map_trails": True, "map_tools_hidden": False, "check_updates": False,
         "aprsis_radius_km": 50, "tracked_callsigns": "OK1CAR-9", "bbs_sentence_ok": True, "tak_sentence_ok": True,
-        "position_ambiguity": 2,  # Settings › Position privacy shows it in use
+        "position_ambiguity": 2, "telemetry_via": "internet",  # Settings › Position privacy shows it in use
         "seen_version": "9.9.9",  # no "what is new" after an update over the screens
         "tak_callsign": "OK1SIM", "tak_team": "Cyan", "vara_host": "", "beacon_minutes": 30,
         **extra, "_now": now,
@@ -239,7 +239,7 @@ def out(name, lang, theme) -> Path:
 RAIL = {"map": 35, "messages": 100, "bulletins": 165, "thursday": 228, "stations": 292, "terminal": 370,
         "chat": 434, "files": 498, "monitor": 562, "bbs": 626, "tak": 690, "settings": 768}
 SECTION = {"tnc": 92, "station": 154, "privacy": 219, "gps": 283, "tracker": 347, "digi": 411, "aprsis": 475,
-           "vara": 540, "tak": 604, "bbs": 668, "maps": 732, "background": 796, "sounds": 860}
+           "telemetry": 540, "vara": 604, "tak": 668, "bbs": 732, "maps": 796}
 
 
 async def desktop(lang, theme, only):
@@ -326,7 +326,8 @@ async def desktop(lang, theme, only):
         if want("monitor"):
             await b.click(52, RAIL["monitor"], 2)
             await b.shot(out("monitor", lang, theme))
-        if want("settings") or want("settings-tracker") or want("settings-more") or want("settings-privacy"):
+        if (want("settings") or want("settings-tracker") or want("settings-more") or want("settings-privacy")
+                or want("settings-telemetry")):
             await b.click(52, RAIL["settings"], 2)
             if want("settings"):
                 await b.click(700, SECTION["station"], 2)
@@ -336,12 +337,17 @@ async def desktop(lang, theme, only):
                 await b.click(700, SECTION["privacy"], 2)
                 await b.shot(out("settings-privacy", lang, theme))
                 await b.click(700, SECTION["privacy"], 2)
+            if want("settings-telemetry"):
+                await b.click(700, SECTION["telemetry"], 2)
+                await b.shot(out("settings-telemetry", lang, theme))
+                await b.click(700, SECTION["telemetry"], 2)
             if want("settings-tracker"):
                 await b.click(700, SECTION["tracker"], 2)
                 await b.shot(out("settings-tracker", lang, theme))
                 await b.click(700, SECTION["tracker"], 2)
             if want("settings-more"):
-                await b.click(700, SECTION["background"], 2)
+                await b.scroll(700, 500, 100, 2)  # the background section, below the screen's edge, comes up
+                await b.click(700, SECTION["maps"] + 64 - 100, 2)
                 await b.scroll(700, 500, 900, 2)
                 await b.click(700, 614, 2)  # sounds, now on screen
                 await b.shot(out("settings-more", lang, theme))

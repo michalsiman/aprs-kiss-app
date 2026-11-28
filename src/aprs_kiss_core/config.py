@@ -79,6 +79,9 @@ class Config:
     digi_mode: str = "off"  # APRS digipeater: "off", "fillin" (WIDE1-1) or "wide" (WIDEn-N up to digi_max_hops)
     digi_max_hops: int = 2  # the most hops a WIDEn-N path may ask for to be repeated
     digi_aliases: str = ""  # also repeat frames addressed to these (e.g. RELAY), besides our callsign
+    # station telemetry (digipeater and iGate numbers, aprs.fi graphs): "" off, "internet", "radio", "both"
+    telemetry_via: str = ""
+    telemetry_minutes: int = 20
     # App
     language: str = ""  # "", "cs" or "en"; empty = from the system
     show_internet: bool = True  # map and station list also show stations seen only on APRS-IS
@@ -187,6 +190,10 @@ class Config:
             self.mic_e_status = "en_route"
         self.position_ambiguity = min(4, max(0, int(self.position_ambiguity or 0)))
         self.bulletin_km = max(0, int(self.bulletin_km or 0))
+        if self.telemetry_via not in ("", "internet", "radio", "both"):
+            self.telemetry_via = ""
+        minutes = int(self.telemetry_minutes or 20)
+        self.telemetry_minutes = minutes if minutes in (10, 20, 30, 60) else 20
         if self.stations_sort not in ("time", "distance", "call"):
             self.stations_sort = "time"
         if self.units_distance not in ("", "km", "mi"):

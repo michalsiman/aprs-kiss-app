@@ -188,6 +188,37 @@ class EngineTest(unittest.IsolatedAsyncioTestCase):
         from aprs_kiss_core.config import load_state
         self.assertEqual(len(load_state(self.folder)["bulletins"]["heard"]), 2)
 
+    async def test_telemetry(self):
+        """The interval's numbers go out as T#, with PARM/UNIT/EQNS/BITS the first time; the farthest
+        station heard directly counts, one heard through a digipeater does not."""
+        from aprs_kiss_core.ax25 import Frame
+
+        from unittest import mock
+
+        self.enterContext(mock.patch("aprs_kiss_core.station.MIN_TX_GAP", 0))
+        sent = await self._capture()
+        conf = self.engine.config
+        conf.telemetry_via, conf.digi_mode = "radio", "fillin"
+        self.engine.telemetry.start(self.engine._telemetry_totals())
+        self.engine.digipeated += 3
+        self.engine._telemetry_heard({"from": "OK1ABC", "latitude": 50.08, "longitude": 14.42, "path": ["WIDE1-1"]})
+        self.engine._telemetry_heard({"from": "OK2XYZ", "latitude": 49.19, "longitude": 16.61, "path": ["OK0DIG*"]})
+        self.engine._telemetry_heard({"from": "OK1OBJ", "object_name": "FAR", "latitude": 40.0, "longitude": 0.0})
+        line = await self.engine.telemetry_tick()
+        self.assertRegex(line, r"^T#000,\d+,3,0,0,84,10010000$")
+        infos = [Frame.decode(r).info.decode() for r in sent[-5:]]
+        self.assertEqual(infos[0], ":OK1SIM-7 :PARM.RxPkts,Digi,RF>IS,IS>RF,MaxKm,Digi,IGate,Inet,TX")
+        self.assertTrue(infos[3].startswith(":OK1SIM-7 :BITS.11111111,"))
+        self.assertEqual(infos[4], line)
+        line = await self.engine.telemetry_tick()  # nothing new: no definitions, zeros, the next number
+        self.assertRegex(line, r"^T#001,\d+,0,0,0,0,10010000$")
+        self.assertEqual(Frame.decode(sent[-1]).info.decode(), line)
+        self.assertEqual(len(sent), 6)
+        conf.telemetry_via = ""
+        self.assertIsNone(await self.engine.telemetry_tick())
+        await self.engine.save()
+        self.assertEqual(load_state(self.folder)["telemetry_seq"], 2)
+
     async def test_message_is_acked(self):
         self.engine.set_tx(True)
         result = await self.engine.send_aprs_message("OK1ABC-9", "hello", via="radio")

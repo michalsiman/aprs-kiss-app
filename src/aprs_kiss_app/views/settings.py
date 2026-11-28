@@ -7,11 +7,12 @@ import glob
 import logging
 import os
 import sys
+import time
 from pathlib import Path
 
 import flet as ft
 
-from aprs_kiss_core import android_bt, android_usb, ble, direwolf, profiles, roadalert, tilemaps, tracker, units
+from aprs_kiss_core import android_bt, android_usb, ble, direwolf, profiles, roadalert, telemetry, tilemaps, tracker, units
 from aprs_kiss_core.aprs import AMBIGUITY_KM, MIC_E_STATUS
 from aprs_kiss_core.aprsis import licence_confirmed
 from aprs_kiss_core.bbs import BbsConfigError
@@ -326,6 +327,18 @@ class SettingsView(View):
                                          capitalization=ft.TextCapitalization.CHARACTERS)
         self.digi_hint = ft.Text(t("digi_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT)
         self._digi_changed(update=False)
+        # station telemetry: the digipeater's and iGate's numbers every few minutes (aprs.fi graphs)
+        self.tel_via = ft.Dropdown(label=t("tel_via"), value=c.telemetry_via or "off", width=340,
+                                   options=[ft.DropdownOption(key="off", text=t("tel_off"))] + [
+                                       ft.DropdownOption(key=k, text=t(f"via_{k}")) for k in ("internet", "radio", "both")])
+        self.tel_minutes = ft.Dropdown(label=t("tel_minutes"), value=str(c.telemetry_minutes), width=200,
+                                       options=mins(telemetry.MINUTES))
+        last = self.engine.telemetry.last
+        self.tel_last = ft.Text(t("tel_last", when=time.strftime("%H:%M", time.localtime(last["time"])), line=last["line"])
+                                if last else "", size=12, visible=bool(last), selectable=True)
+        self.tel_graphs = ft.TextButton(t("tel_graphs"), icon=ft.Icons.QUERY_STATS, visible=c.configured,
+                                        on_click=lambda _e: self.app.page.run_task(
+                                            ft.UrlLauncher().launch_url, f"https://aprs.fi/telemetry/a/{c.callsign}"))
         # running in the background (Android) and keeping the screen on
         self.run_bg = ft.Checkbox(label=t("run_background"), value=c.run_background)
         self.keep_screen = ft.Dropdown(label=t("keep_screen"), value=c.keep_screen_on if c.keep_screen_on in (
@@ -409,6 +422,8 @@ class SettingsView(View):
                          ft.Text(t("road_alerts_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT)),
                 _section(t("digi"), ft.Icons.REPEAT, self.digi_mode, self.digi_hops, self.digi_aliases, self.digi_hint),
                 _section(t("aprsis"), ft.Icons.PUBLIC, self.aprsis, self.licence_box, self.is_fields, self.is_state),
+                _section(t("tel_section"), ft.Icons.QUERY_STATS, ft.Row([self.tel_via, self.tel_minutes], wrap=True),
+                         ft.Text(t("tel_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT), self.tel_last, self.tel_graphs),
                 _section("VARA FM", walkie_talkie(ft.Colors.PRIMARY), ft.Row([self.vara_host, self.vara_port], wrap=True),
                          ft.Text(t("vara_hint"), size=12, color=ft.Colors.ON_SURFACE_VARIANT)),
                 _section(t("tak"), ft.Icons.RADAR, ft.Row([self.tak_callsign, self.tak_team, self.tak_role], wrap=True),
@@ -795,6 +810,8 @@ class SettingsView(View):
             "road_alert_km": self.road_km.value or "5",
             "digi_mode": self.digi_mode.value or "off", "digi_max_hops": self.digi_hops.value or "2",
             "digi_aliases": (self.digi_aliases.value or "").strip().upper(),
+            "telemetry_via": "" if (self.tel_via.value or "off") == "off" else self.tel_via.value,
+            "telemetry_minutes": self.tel_minutes.value or "20",
             "run_background": bool(self.run_bg.value), "keep_screen_on": self.keep_screen.value or "never",
             "theme": self.theme.value or "auto", "menu_hidden": bool(self.menu_hidden.value),
         }
